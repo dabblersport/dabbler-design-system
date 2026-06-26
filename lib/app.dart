@@ -75,7 +75,7 @@ class _HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Section → theme',
+                  'Section sets theme',
                   style: TextStyle(color: tokens.textSecondary),
                 ),
                 const SizedBox(height: 8),
@@ -93,7 +93,7 @@ class _HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Language → typography + direction',
+                  'Language sets typography + direction',
                   style: TextStyle(color: tokens.textSecondary),
                 ),
                 const SizedBox(height: 8),

@@ -174,15 +174,10 @@ The active locale lives in `themeControllerProvider` (`ThemeState.locale`).
 changing locale rebuilds the theme. `setLocale()` persists it; `MaterialApp`
 also flips direction to RTL for `ar`.
 
-### Adding the font binaries
+### The font binaries
 
 The family `ReadexPro` is declared in `pubspec.yaml` with four weights
-(400/500/600/700) under `assets/fonts/`. The repo ships **empty placeholder
-`.ttf` files** there so the asset bundle resolves and the app builds — a Flutter
-font asset that is *declared but missing* is a hard build error, so the paths
-must exist. Replace each placeholder with the real Readex Pro weight (same
-filename); no code or pubspec change is needed. Download from Google Fonts
-(Readex Pro) and drop in:
+(400/500/600/700) under `assets/fonts/`:
 
 ```
 assets/fonts/ReadexPro-Regular.ttf   (400)
@@ -191,8 +186,13 @@ assets/fonts/ReadexPro-SemiBold.ttf  (600)
 assets/fonts/ReadexPro-Bold.ttf      (700)
 ```
 
-Until then, text renders in the platform's default sans — sizes, weights, and
-leading are already correct.
+The repo ships **real Readex Pro** binaries (SIL OFL 1.1), each containing both
+Latin and Arabic glyphs. To swap in the official Google Fonts copies, replace
+these files keeping the same filenames — no code or pubspec change needed.
+
+> **Note:** the font files must contain glyphs. Empty/placeholder `.ttf` files
+> make CanvasKit (web) render **no text** (it does not fall back), and a
+> *declared-but-missing* asset is a hard build error — so don't blank these out.
 
 ## Persistence
 

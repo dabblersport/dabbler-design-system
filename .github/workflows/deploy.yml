@@ -34,8 +34,11 @@ jobs:
         run: flutter pub get
 
       # base-href MUST match the repo name for a project Pages site.
+      # --no-web-resources-cdn bundles CanvasKit and serves it from this origin
+      # instead of fetching it from gstatic.com at runtime — without it the app
+      # shows a blank screen on any network/CSP that blocks the gstatic CDN.
       - name: Build web
-        run: flutter build web --release --base-href "/dabbler-design-system/"
+        run: flutter build web --release --base-href "/dabbler-design-system/" --no-web-resources-cdn
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
