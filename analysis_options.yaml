@@ -1,0 +1,21 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-raw-types: true
+  errors:
+    # Hard-fail the build if any feature/UI code hardcodes a colour. The custom
+    # lint we care about most is enforced by review + the README guardrails;
+    # these keep the analyzer strict otherwise.
+    unused_import: error
+    unused_local_variable: error
+
+linter:
+  rules:
+    # RTL-safety: forbid hardcoded left/right; use start/end instead.
+    use_named_constants: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    sort_child_properties_last: true
+    avoid_redundant_argument_values: true
