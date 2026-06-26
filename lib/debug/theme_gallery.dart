@@ -19,6 +19,7 @@ import 'package:forui/forui.dart' as f;
 import '../theme/dabbler_colors.dart';
 import '../theme/dabbler_forui_theme.dart';
 import '../theme/dabbler_theme_data.dart';
+import '../theme/dabbler_type.dart';
 
 class ThemeGalleryScreen extends StatefulWidget {
   const ThemeGalleryScreen({super.key});
@@ -29,9 +30,13 @@ class ThemeGalleryScreen extends StatefulWidget {
   State<ThemeGalleryScreen> createState() => _ThemeGalleryScreenState();
 }
 
+enum _GalleryView { components, typography }
+
 class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
   DabblerTheme _theme = DabblerTheme.main;
   Brightness _brightness = Brightness.light;
+  _GalleryView _view = _GalleryView.components;
+  bool _rtl = false;
 
   static const _labels = {
     DabblerTheme.main: 'Main',
@@ -45,12 +50,24 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final previewTheme = dabblerThemeData(_theme, _brightness);
+    // RTL → drive the Arabic typography variant (taller leading) as well as
+    // direction, so the preview matches a real Arabic screen.
+    final previewTheme = dabblerThemeData(
+      _theme,
+      _brightness,
+      locale: Locale(_rtl ? 'ar' : 'en'),
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Theme Gallery'),
         actions: [
+          IconButton(
+            tooltip: _rtl ? 'Switch to LTR' : 'Switch to RTL',
+            icon: const Icon(Icons.format_textdirection_r_to_l),
+            isSelected: _rtl,
+            onPressed: () => setState(() => _rtl = !_rtl),
+          ),
           IconButton(
             tooltip: 'Toggle light / dark',
             icon: Icon(
@@ -73,16 +90,42 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
             labels: _labels,
             onSelected: (t) => setState(() => _theme = t),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SegmentedButton<_GalleryView>(
+              segments: const [
+                ButtonSegment(
+                  value: _GalleryView.components,
+                  label: Text('Components'),
+                ),
+                ButtonSegment(
+                  value: _GalleryView.typography,
+                  label: Text('Typography'),
+                ),
+              ],
+              selected: {_view},
+              onSelectionChanged: (s) => setState(() => _view = s.first),
+            ),
+          ),
+          const SizedBox(height: 8),
           const Divider(height: 1),
           // The preview is rendered under its own Theme + FTheme so it reflects
-          // exactly what an app screen would see for this (theme, brightness).
+          // exactly what an app screen would see for this (theme, brightness),
+          // and its own Directionality so RTL can be previewed in isolation.
           Expanded(
             child: Theme(
               data: previewTheme,
               child: f.FTheme(
                 data: dabblerForuiThemeData(previewTheme),
-                child: Builder(
-                  builder: (context) => _Preview(themeLabel: _labels[_theme]!),
+                child: Directionality(
+                  textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
+                  child: Builder(
+                    builder: (context) => switch (_view) {
+                      _GalleryView.components =>
+                        _Preview(themeLabel: _labels[_theme]!),
+                      _GalleryView.typography => const DabblerTypeSpecimen(),
+                    },
+                  ),
                 ),
               ),
             ),

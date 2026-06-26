@@ -55,8 +55,10 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
 abstract interface class ThemePreferences {
   DabblerTheme? readOverride();
   ThemeMode readThemeMode();
+  Locale readLocale();
   Future<void> writeOverride(DabblerTheme? theme);
   Future<void> writeThemeMode(ThemeMode mode);
+  Future<void> writeLocale(Locale locale);
 }
 
 /// [SharedPreferences]-backed implementation of [ThemePreferences].
@@ -67,6 +69,10 @@ class SharedPreferencesThemePreferences implements ThemePreferences {
 
   static const _overrideKey = 'dabbler.theme.override';
   static const _modeKey = 'dabbler.theme.mode';
+  static const _localeKey = 'dabbler.theme.locale';
+
+  /// Locales the design system ships typography for (EN + AR).
+  static const _supported = ['en', 'ar'];
 
   @override
   DabblerTheme? readOverride() {
@@ -88,6 +94,13 @@ class SharedPreferencesThemePreferences implements ThemePreferences {
   }
 
   @override
+  Locale readLocale() {
+    final code = _prefs.getString(_localeKey);
+    if (code != null && _supported.contains(code)) return Locale(code);
+    return const Locale('en');
+  }
+
+  @override
   Future<void> writeOverride(DabblerTheme? theme) async {
     if (theme == null) {
       await _prefs.remove(_overrideKey);
@@ -99,6 +112,10 @@ class SharedPreferencesThemePreferences implements ThemePreferences {
   @override
   Future<void> writeThemeMode(ThemeMode mode) =>
       _prefs.setString(_modeKey, mode.name);
+
+  @override
+  Future<void> writeLocale(Locale locale) =>
+      _prefs.setString(_localeKey, locale.languageCode);
 }
 
 final themePreferencesProvider = Provider<ThemePreferences>(
@@ -115,6 +132,7 @@ class ThemeState {
     required this.section,
     required this.userOverride,
     required this.themeMode,
+    required this.locale,
   });
 
   /// The active navigation section (home / sport / social / active).
@@ -125,25 +143,34 @@ class ThemeState {
 
   final ThemeMode themeMode;
 
+  /// The active app locale. Drives the typography variant (Arabic → taller
+  /// leading). Feed into MaterialApp.locale.
+  final Locale locale;
+
   /// The theme actually on screen: user override if any, else the section's map.
   DabblerTheme get resolvedTheme =>
       resolveTheme(section, userOverride: userOverride);
 
   /// Ready-to-use Material 3 [ThemeData] for the light + dark variants of the
-  /// resolved theme. Feed straight into MaterialApp.theme / .darkTheme.
-  ThemeData get lightTheme => dabblerThemeData(resolvedTheme, Brightness.light);
-  ThemeData get darkTheme => dabblerThemeData(resolvedTheme, Brightness.dark);
+  /// resolved theme — typography bound to [locale]. Feed straight into
+  /// MaterialApp.theme / .darkTheme.
+  ThemeData get lightTheme =>
+      dabblerThemeData(resolvedTheme, Brightness.light, locale: locale);
+  ThemeData get darkTheme =>
+      dabblerThemeData(resolvedTheme, Brightness.dark, locale: locale);
 
   ThemeState copyWith({
     DabblerSection? section,
     DabblerTheme? userOverride,
     bool clearOverride = false,
     ThemeMode? themeMode,
+    Locale? locale,
   }) {
     return ThemeState(
       section: section ?? this.section,
       userOverride: clearOverride ? null : (userOverride ?? this.userOverride),
       themeMode: themeMode ?? this.themeMode,
+      locale: locale ?? this.locale,
     );
   }
 }
@@ -160,6 +187,7 @@ class ThemeController extends Notifier<ThemeState> {
       section: DabblerSection.home,
       userOverride: prefs.readOverride(),
       themeMode: prefs.readThemeMode(),
+      locale: prefs.readLocale(),
     );
   }
 
@@ -181,6 +209,15 @@ class ThemeController extends Notifier<ThemeState> {
 
   /// Clears any user override (back to section-driven theming). Persisted.
   Future<void> clearUserOverride() => setUserOverride(null);
+
+  /// Sets the app locale (drives the typography variant). Persisted. Rebuilding
+  /// the theme on locale change is automatic — MaterialApp reads lightTheme /
+  /// darkTheme which fold the locale into the text theme.
+  Future<void> setLocale(Locale locale) async {
+    if (state.locale.languageCode == locale.languageCode) return;
+    state = state.copyWith(locale: locale);
+    await _prefs.writeLocale(locale);
+  }
 
   /// Sets system / light / dark. Persisted.
   Future<void> setThemeMode(ThemeMode mode) async {

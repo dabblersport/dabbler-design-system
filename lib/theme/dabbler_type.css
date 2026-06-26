@@ -1,0 +1,51 @@
+/* ============================================================================
+   Dabbler — Typography · CSS
+   Version 1.0 · Apple HIG ramp in Readex Pro. Mirrors dabbler_type.dart.
+   Apply a class (e.g. class="t-body"). Arabic auto-adjusts under [dir="rtl"].
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: 'Readex Pro', system-ui, -apple-system, sans-serif;
+
+  /* sizes */
+  --type-large-title: 34px; --type-title-1: 28px; --type-title-2: 22px;
+  --type-title-3: 20px; --type-headline: 17px; --type-body: 17px;
+  --type-callout: 16px; --type-subheadline: 15px; --type-footnote: 13px;
+  --type-caption-1: 12px; --type-caption-2: 11px;
+
+  /* leading (Latin) */
+  --leading-large-title: 41px; --leading-title-1: 34px; --leading-title-2: 28px;
+  --leading-title-3: 25px; --leading-headline: 22px; --leading-body: 22px;
+  --leading-callout: 21px; --leading-subheadline: 20px; --leading-footnote: 18px;
+  --leading-caption-1: 16px; --leading-caption-2: 13px;
+}
+
+.t-large-title  { font-family:var(--font-sans); font-size:34px; line-height:41px; font-weight:400; letter-spacing:0; }
+.t-title-1      { font-family:var(--font-sans); font-size:28px; line-height:34px; font-weight:400; letter-spacing:0; }
+.t-title-2      { font-family:var(--font-sans); font-size:22px; line-height:28px; font-weight:400; letter-spacing:0; }
+.t-title-3      { font-family:var(--font-sans); font-size:20px; line-height:25px; font-weight:400; letter-spacing:0; }
+.t-headline     { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:600; letter-spacing:0; }
+.t-body         { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:400; letter-spacing:0; }
+.t-callout      { font-family:var(--font-sans); font-size:16px; line-height:21px; font-weight:400; letter-spacing:0; }
+.t-subheadline  { font-family:var(--font-sans); font-size:15px; line-height:20px; font-weight:400; letter-spacing:0; }
+.t-footnote     { font-family:var(--font-sans); font-size:13px; line-height:18px; font-weight:400; letter-spacing:0; }
+.t-caption-1    { font-family:var(--font-sans); font-size:12px; line-height:16px; font-weight:400; letter-spacing:0; }
+.t-caption-2    { font-family:var(--font-sans); font-size:11px; line-height:13px; font-weight:400; letter-spacing:0; }
+
+/* Arabic / RTL — same sizes, taller leading (~1.18×), zero tracking */
+[dir="rtl"] .t-large-title  { line-height:48px; }
+[dir="rtl"] .t-title-1      { line-height:40px; }
+[dir="rtl"] .t-title-2      { line-height:33px; }
+[dir="rtl"] .t-title-3      { line-height:30px; }
+[dir="rtl"] .t-headline     { line-height:26px; }
+[dir="rtl"] .t-body         { line-height:26px; }
+[dir="rtl"] .t-callout      { line-height:25px; }
+[dir="rtl"] .t-subheadline  { line-height:24px; }
+[dir="rtl"] .t-footnote     { line-height:21px; }
+[dir="rtl"] .t-caption-1    { line-height:19px; }
+[dir="rtl"] .t-caption-2    { line-height:15px; }
+
+/* Button/label convenience = Headline weight at body size */
+.t-label { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:600; letter-spacing:0; }

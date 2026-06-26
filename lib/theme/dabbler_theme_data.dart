@@ -21,9 +21,17 @@ import 'package:flutter/material.dart';
 
 import 'dabbler_colors.dart';
 import 'dabbler_material_scheme.dart';
+import 'dabbler_type.dart';
 
 /// Builds the full [ThemeData] for a [theme] at the given [brightness].
-ThemeData dabblerThemeData(DabblerTheme theme, Brightness brightness) {
+///
+/// [locale] selects the typography variant — Arabic (`ar`) gets a slightly
+/// taller leading (see [dabblerTextTheme]); everything else uses the Latin ramp.
+ThemeData dabblerThemeData(
+  DabblerTheme theme,
+  Brightness brightness, {
+  Locale locale = const Locale('en'),
+}) {
   final tokens = DabblerColors.of(theme, brightness);
   final base = dabblerColorScheme(theme, brightness);
 
@@ -43,11 +51,18 @@ ThemeData dabblerThemeData(DabblerTheme theme, Brightness brightness) {
     outlineVariant: tokens.borderDefault,
   );
 
+  // Apple HIG ramp (Readex Pro) bound to the active scheme's on-surface colour.
+  final isArabic = locale.languageCode == 'ar';
+  final textTheme = dabblerTextTheme(arabic: isArabic)
+      .apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
+
   return ThemeData(
     useMaterial3: true,
     brightness: brightness,
     colorScheme: scheme,
     extensions: <ThemeExtension<dynamic>>[tokens],
+    fontFamily: kDabblerFontFamily,
+    textTheme: textTheme,
     scaffoldBackgroundColor: tokens.bgPrimary,
     canvasColor: tokens.bgPrimary,
     dividerColor: tokens.borderDefault,

@@ -1,0 +1,10 @@
+# Readex Pro font binaries live here (declared in pubspec.yaml, family ReadexPro).
+#
+# The four .ttf files in this folder are currently EMPTY PLACEHOLDERS so the
+# Flutter asset bundle resolves and the app builds. Replace each with the real
+# Readex Pro weight, keeping the same filename:
+#   ReadexPro-Regular.ttf  (400)
+#   ReadexPro-Medium.ttf   (500)
+#   ReadexPro-SemiBold.ttf (600)
+#   ReadexPro-Bold.ttf     (700)
+# Readex Pro contains BOTH Latin and Arabic glyphs — no separate Arabic face.

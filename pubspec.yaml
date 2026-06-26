@@ -30,3 +30,19 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Readex Pro carries BOTH Latin and Arabic glyphs in the same files, so there
+  # is no separate Arabic face. The .ttf binaries are added separately; until
+  # they exist Flutter falls back to the system font for this family, so the app
+  # still builds — nothing is gated on the files being present.
+  fonts:
+    - family: ReadexPro
+      fonts:
+        - asset: assets/fonts/ReadexPro-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/ReadexPro-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/ReadexPro-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/ReadexPro-Bold.ttf
+          weight: 700

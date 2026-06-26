@@ -23,16 +23,25 @@ class DabblerApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeControllerProvider);
 
+    final textDirection =
+        theme.locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr;
+
     return MaterialApp(
       title: 'Dabbler Design System',
       debugShowCheckedModeBanner: false,
       theme: theme.lightTheme,
       darkTheme: theme.darkTheme,
       themeMode: theme.themeMode,
-      // Keep Forui in lock-step with whichever Material theme is active.
-      builder: (context, child) => FTheme(
-        data: dabblerForuiThemeData(Theme.of(context)),
-        child: child!,
+      locale: theme.locale,
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      // Keep Forui in lock-step with the active Material theme, and apply the
+      // locale's text direction app-wide (RTL for Arabic).
+      builder: (context, child) => Directionality(
+        textDirection: textDirection,
+        child: FTheme(
+          data: dabblerForuiThemeData(Theme.of(context)),
+          child: child!,
+        ),
       ),
       routes: {
         if (kDebugMode) ThemeGalleryScreen.routeName: (_) => const ThemeGalleryScreen(),
@@ -81,6 +90,22 @@ class _HomeScreen extends ConsumerWidget {
                   ],
                   selected: {state.section},
                   onSelectionChanged: (s) => controller.setSection(s.first),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Language → typography + direction',
+                  style: TextStyle(color: tokens.textSecondary),
+                ),
+                const SizedBox(height: 8),
+                // Switching locale rebuilds the text theme (Arabic gets taller
+                // leading) and flips the app direction to RTL.
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'en', label: Text('English')),
+                    ButtonSegment(value: 'ar', label: Text('العربية')),
+                  ],
+                  selected: {state.locale.languageCode},
+                  onSelectionChanged: (s) => controller.setLocale(Locale(s.first)),
                 ),
                 const SizedBox(height: 24),
                 FilledButton(
