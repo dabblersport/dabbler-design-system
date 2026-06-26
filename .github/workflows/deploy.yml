@@ -1,0 +1,54 @@
+name: Deploy design system (Flutter web → GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # lets you trigger it manually from the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable        # if build fails on the SDK constraint,
+          # replace the line above with:  flutter-version: 3.44.0
+
+      # The repo has no web/ folder yet — generate it on the runner so you
+      # don't need Flutter installed locally. Only adds web support.
+      - name: Enable web support
+        run: flutter create . --platforms web
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # base-href MUST match the repo name for a project Pages site.
+      - name: Build web
+        run: flutter build web --release --base-href "/dabbler-design-system/"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
