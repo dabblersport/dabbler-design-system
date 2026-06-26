@@ -7,6 +7,7 @@ import 'package:dabbler_design_system/debug/theme_gallery.dart';
 import 'package:dabbler_design_system/theme/dabbler_colors.dart';
 import 'package:dabbler_design_system/theme/dabbler_material_scheme.dart';
 import 'package:dabbler_design_system/theme/dabbler_theme_data.dart';
+import 'package:dabbler_design_system/theme/dabbler_type.dart';
 import 'package:dabbler_design_system/theme/theme_controller.dart';
 
 const _white = Color(0xFFFFFFFF);
@@ -59,6 +60,54 @@ void main() {
         const Color(0xFF7328CE),
       );
     });
+
+    test('text theme is attached with the Dabbler font family', () {
+      final data = dabblerThemeData(DabblerTheme.main, Brightness.light);
+      expect(data.textTheme.bodyLarge, isNotNull);
+      expect(data.textTheme.bodyLarge!.fontSize, 17);
+      expect(data.textTheme.displayLarge!.fontSize, 34);
+    });
+  });
+
+  group('dabblerTextTheme (Apple HIG ramp)', () {
+    test('every M3 slot is populated', () {
+      final t = dabblerTextTheme();
+      final slots = <TextStyle?>[
+        t.displayLarge, t.displayMedium, t.displaySmall,
+        t.headlineLarge, t.headlineMedium, t.headlineSmall,
+        t.titleLarge, t.titleMedium, t.titleSmall,
+        t.bodyLarge, t.bodyMedium, t.bodySmall,
+        t.labelLarge, t.labelMedium, t.labelSmall,
+      ];
+      for (final s in slots) {
+        expect(s, isNotNull);
+        expect(s!.fontFamily, kDabblerFontFamily);
+      }
+    });
+
+    test('key sizes match the Apple ramp', () {
+      final t = dabblerTextTheme();
+      expect(t.bodyLarge!.fontSize, 17);
+      expect(t.displayLarge!.fontSize, 34);
+      expect(t.titleMedium!.fontSize, 17); // Headline (17/600)
+      expect(t.titleMedium!.fontWeight, FontWeight.w600);
+    });
+
+    test('Arabic variant keeps sizes but increases leading', () {
+      final latin = dabblerTextTheme();
+      final arabic = dabblerTextTheme(arabic: true);
+      expect(arabic.bodyLarge!.fontSize, latin.bodyLarge!.fontSize);
+      expect(arabic.bodyLarge!.height, greaterThan(latin.bodyLarge!.height!));
+      expect(arabic.bodyLarge!.height,
+          closeTo(latin.bodyLarge!.height! * kArabicLeadingScale, 0.0001));
+    });
+
+    test('dabblerTextThemeFor switches on locale', () {
+      expect(dabblerTextThemeFor(const Locale('en')).bodyLarge!.height,
+          dabblerTextTheme().bodyLarge!.height);
+      expect(dabblerTextThemeFor(const Locale('ar')).bodyLarge!.height,
+          dabblerTextTheme(arabic: true).bodyLarge!.height);
+    });
   });
 
   group('ThemeController', () {
@@ -104,6 +153,30 @@ void main() {
       await ctrl.setThemeMode(ThemeMode.dark);
       expect(c.read(themeControllerProvider).themeMode, ThemeMode.dark);
     });
+
+    test('locale drives the Arabic text theme and persists', () async {
+      final c = await container();
+      addTearDown(c.dispose);
+      final ctrl = c.read(themeControllerProvider.notifier);
+
+      expect(c.read(themeControllerProvider).locale, const Locale('en'));
+      await ctrl.setLocale(const Locale('ar'));
+
+      final state = c.read(themeControllerProvider);
+      expect(state.locale, const Locale('ar'));
+      // Arabic leading is folded into the resolved ThemeData's text theme.
+      expect(
+        state.lightTheme.textTheme.bodyLarge!.height,
+        dabblerTextTheme(arabic: true).bodyLarge!.height,
+      );
+
+      final prefs = c.read(sharedPreferencesProvider);
+      final c2 = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
+      addTearDown(c2.dispose);
+      expect(c2.read(themeControllerProvider).locale, const Locale('ar'));
+    });
   });
 
   testWidgets('Theme Gallery renders and switches theme/brightness',
@@ -122,6 +195,25 @@ void main() {
     // Toggle to dark.
     await tester.tap(find.byTooltip('Toggle light / dark'));
     await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Theme Gallery shows the type specimen in EN and RTL',
+      (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: ThemeGalleryScreen()));
+    await tester.pumpAndSettle();
+
+    // Switch to the Typography view.
+    await tester.tap(find.text('Typography'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sport belongs to everyone'), findsWidgets);
+    expect(find.text('LARGE TITLE'), findsOneWidget);
+
+    // Flip to RTL — specimen still renders without overflow/exceptions.
+    await tester.tap(find.byTooltip('Switch to RTL'));
+    await tester.pumpAndSettle();
+    expect(Directionality.of(tester.element(find.text('LARGE TITLE'))),
+        TextDirection.rtl);
     expect(tester.takeException(), isNull);
   });
 }

@@ -22,6 +22,7 @@ import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
 
 import 'dabbler_colors.dart';
+import 'dabbler_type.dart';
 
 /// Builds an [FThemeData] that mirrors the colours of [material].
 FThemeData dabblerForuiThemeData(ThemeData material) {
@@ -57,9 +58,21 @@ FThemeData dabblerForuiThemeData(ThemeData material) {
     TargetPlatform.iOS,
     TargetPlatform.fuchsia,
   };
+  final touch = touchPlatforms.contains(material.platform);
+
+  // Make Forui text use the same family as the Material text theme (Readex Pro)
+  // so Forui and Material widgets render with matching type. Forui keeps its own
+  // size scale; only the family is swapped onto it.
+  final typeface = FTypeface.inherit(
+    colors: colors,
+    touch: touch,
+    fontFamily: kDabblerFontFamily,
+  );
+  final typography = FTypography(display: typeface, body: typeface);
 
   return FThemeData(
     colors: colors,
-    touch: touchPlatforms.contains(material.platform),
+    touch: touch,
+    typography: typography,
   );
 }
