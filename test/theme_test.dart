@@ -179,41 +179,57 @@ void main() {
     });
   });
 
-  testWidgets('Theme Gallery renders and switches theme/brightness',
+  testWidgets('Theme Gallery: Roles view renders and switches theme/brightness',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(home: ThemeGalleryScreen()));
     await tester.pumpAndSettle();
 
     expect(find.text('Theme Gallery'), findsOneWidget);
-    expect(find.text('Primary CTA'), findsOneWidget);
+    // Default view is Roles — swatch labels are present.
+    expect(find.text('primary'), findsOneWidget);
+    expect(find.text('brandPrimary'), findsOneWidget);
 
-    // Switch to the Bright theme (dark on-brand text path).
     await tester.tap(find.text('Bright'));
     await tester.pumpAndSettle();
-    expect(find.text('Bright theme'), findsOneWidget);
-
-    // Toggle to dark.
     await tester.tap(find.byTooltip('Toggle light / dark'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Theme Gallery shows the type specimen in EN and RTL',
+  testWidgets('Theme Gallery: App Preview mockup renders in EN and AR/RTL',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(home: ThemeGalleryScreen()));
     await tester.pumpAndSettle();
 
-    // Switch to the Typography view.
-    await tester.tap(find.text('Typography'));
+    await tester.tap(find.text('App Preview'));
     await tester.pumpAndSettle();
-    expect(find.text('Sport belongs to everyone'), findsWidgets);
-    expect(find.text('LARGE TITLE'), findsOneWidget);
+    expect(find.text('Dabbler'), findsOneWidget);
+    expect(find.text('Tuesday 5-a-side'), findsOneWidget);
+    expect(find.text('Join game'), findsOneWidget);
 
-    // Flip to RTL — specimen still renders without overflow/exceptions.
+    // RTL → mockup switches to the Arabic strings.
     await tester.tap(find.byTooltip('Switch to RTL'));
     await tester.pumpAndSettle();
-    expect(Directionality.of(tester.element(find.text('LARGE TITLE'))),
-        TextDirection.rtl);
+    expect(find.text('خماسي يوم الثلاثاء'), findsOneWidget);
+    expect(find.text('انضم للعبة'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Theme Gallery: Typography view is dynamic (EN + AR)',
+      (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: ThemeGalleryScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Typography'));
+    await tester.pumpAndSettle();
+    // Spec label is derived from the DabblerType definitions (computed, not
+    // hardcoded): "<name> · <size>/<leading> · w<weight>".
+    expect(find.text('Large Title · 34/41 · w400'), findsOneWidget);
+    expect(find.text('Sport belongs to everyone'), findsWidgets);
+    expect(find.text('الرياضة لكل من يحضر'), findsWidgets);
+
+    await tester.tap(find.byTooltip('Switch to RTL'));
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 }
