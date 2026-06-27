@@ -2,8 +2,8 @@
 // Dabbler — application shell
 // -----------------------------------------------------------------------------
 // Wires the resolved theme into MaterialApp (theme / darkTheme / themeMode) and
-// maps the same colours into Forui via MaterialApp.builder. Also registers the
-// debug-only Theme Gallery route.
+// maps the same colours into Forui via MaterialApp.builder. The Theme Gallery is
+// a debug route on native; on the web build it is the public showcase (home).
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
@@ -44,9 +44,13 @@ class DabblerApp extends ConsumerWidget {
         ),
       ),
       routes: {
-        if (kDebugMode) ThemeGalleryScreen.routeName: (_) => const ThemeGalleryScreen(),
+        // The gallery is a debug tool on mobile; on the web build it doubles as
+        // the public design-system showcase (this is what deploys to Pages).
+        if (kDebugMode || kIsWeb)
+          ThemeGalleryScreen.routeName: (_) => const ThemeGalleryScreen(),
       },
-      home: const _HomeScreen(),
+      // Land the web preview straight on the gallery; native keeps the app home.
+      home: kIsWeb ? const ThemeGalleryScreen() : const _HomeScreen(),
     );
   }
 }

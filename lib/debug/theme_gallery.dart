@@ -1,16 +1,17 @@
 // =============================================================================
 // Dabbler — Theme Gallery (debug only)
 // -----------------------------------------------------------------------------
-// Visual acceptance check for the colour system. Switchers cover all 7 themes ×
-// light/dark; the preview shows an app bar, a primary CTA, a secondary button,
-// success/warning/error/info chips, and nested card surfaces.
+// Visual acceptance check for the colour + typography system. Switchers cover
+// all 7 themes × light/dark × LTR/RTL, driving three live views:
+//   • Roles        — Material ColorScheme + Dabbler token swatch grid
+//   • App Preview  — a realistic phone-style screen mockup
+//   • Typography   — the full Apple ramp specimen (EN + AR), driven dynamically
+//                    by the DabblerType definitions
 //
 // Register behind a debug route only (see app.dart, guarded by kDebugMode).
-//
-// Everything in the preview reads from Theme.of(context).colorScheme or
-// context.dabbler — there are no hardcoded colours. On-brand text always comes
-// from the token (onBrand / onAccent), so Bright's primary and Sport/Social's
-// accent correctly render dark-on-colour.
+// Everything reads from Theme.of(context).colorScheme or context.dabbler — no
+// hardcoded colours (the one exception is the spotlight badge, whose white text
+// is mandated by the spec) and no hardcoded font sizes (DabblerType only).
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -30,12 +31,12 @@ class ThemeGalleryScreen extends StatefulWidget {
   State<ThemeGalleryScreen> createState() => _ThemeGalleryScreenState();
 }
 
-enum _GalleryView { components, typography }
+enum _GalleryView { roles, appPreview, typography }
 
 class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
   DabblerTheme _theme = DabblerTheme.main;
   Brightness _brightness = Brightness.light;
-  _GalleryView _view = _GalleryView.components;
+  _GalleryView _view = _GalleryView.roles;
   bool _rtl = false;
 
   static const _labels = {
@@ -51,7 +52,7 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
   @override
   Widget build(BuildContext context) {
     // RTL → drive the Arabic typography variant (taller leading) as well as
-    // direction, so the preview matches a real Arabic screen.
+    // direction, so the previews match a real Arabic screen.
     final previewTheme = dabblerThemeData(
       _theme,
       _brightness,
@@ -94,9 +95,10 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: SegmentedButton<_GalleryView>(
               segments: const [
+                ButtonSegment(value: _GalleryView.roles, label: Text('Roles')),
                 ButtonSegment(
-                  value: _GalleryView.components,
-                  label: Text('Components'),
+                  value: _GalleryView.appPreview,
+                  label: Text('App Preview'),
                 ),
                 ButtonSegment(
                   value: _GalleryView.typography,
@@ -109,9 +111,8 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
           ),
           const SizedBox(height: 8),
           const Divider(height: 1),
-          // The preview is rendered under its own Theme + FTheme so it reflects
-          // exactly what an app screen would see for this (theme, brightness),
-          // and its own Directionality so RTL can be previewed in isolation.
+          // Rendered under its own Theme + FTheme + Directionality so every view
+          // reflects exactly what an app screen would see for this combination.
           Expanded(
             child: Theme(
               data: previewTheme,
@@ -121,9 +122,10 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                   textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
                   child: Builder(
                     builder: (context) => switch (_view) {
-                      _GalleryView.components =>
-                        _Preview(themeLabel: _labels[_theme]!),
-                      _GalleryView.typography => const DabblerTypeSpecimen(),
+                      _GalleryView.roles => const _RolesPanel(),
+                      _GalleryView.appPreview =>
+                        _AppPreviewPanel(themeLabel: _labels[_theme]!),
+                      _GalleryView.typography => const _TypePanel(),
                     },
                   ),
                 ),
@@ -169,253 +171,270 @@ class _ThemeSwitcher extends StatelessWidget {
   }
 }
 
-class _Preview extends StatelessWidget {
-  const _Preview({required this.themeLabel});
+// -----------------------------------------------------------------------------
+// View · Roles — Material ColorScheme + Dabbler token swatch grid
+// -----------------------------------------------------------------------------
 
-  final String themeLabel;
+class _RolesPanel extends StatelessWidget {
+  const _RolesPanel();
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final tokens = context.dabbler;
+    final cs = Theme.of(context).colorScheme;
+    final d = context.dabbler;
 
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _RoleGroup('Material roles', [
+          _Swatch('primary', cs.primary, cs.onPrimary),
+          _Swatch('secondary', cs.secondary, cs.onSecondary),
+          _Swatch('tertiary', cs.tertiary, cs.onTertiary),
+          _Swatch('error', cs.error, cs.onError),
+          _Swatch('surface', cs.surface, cs.onSurface),
+          _Swatch('surfaceVariant', cs.surfaceContainerHighest, cs.onSurfaceVariant),
+          _Swatch('inverseSurface', cs.inverseSurface, cs.onInverseSurface),
+          _Swatch('outline', cs.outline, cs.surface),
+        ]),
+        const SizedBox(height: 16),
+        _RoleGroup('Dabbler tokens', [
+          _Swatch('brandPrimary', d.brandPrimary, d.onBrand),
+          _Swatch('accent', d.accent, d.onAccent),
+          _Swatch('spotlight', d.spotlight, const Color(0xFFFFFFFF)),
+          _Swatch('bgPrimary', d.bgPrimary, d.textPrimary),
+          _Swatch('surfaceCard', d.surfaceCard, d.textPrimary),
+          _Swatch('bgTertiary', d.bgTertiary, d.textSecondary),
+          _Swatch('success', d.successSurface, d.onSuccess),
+          _Swatch('warning', d.warningSurface, d.onWarning),
+          _Swatch('error', d.errorSurface, d.onError),
+          _Swatch('info', d.infoSurface, d.onInfo),
+        ]),
+      ],
+    );
+  }
+}
+
+class _RoleGroup extends StatelessWidget {
+  const _RoleGroup(this.title, this.swatches);
+
+  final String title;
+  final List<Widget> swatches;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: DabblerType.caption2.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            letterSpacing: 0.6,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(spacing: 8, runSpacing: 8, children: swatches),
+      ],
+    );
+  }
+}
+
+class _Swatch extends StatelessWidget {
+  const _Swatch(this.name, this.bg, this.fg);
+
+  final String name;
+  final Color bg;
+  final Color fg;
+
+  String get _hex {
+    final v = bg.toARGB32() & 0xFFFFFF;
+    return '#${v.toRadixString(16).padLeft(6, '0').toUpperCase()}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      color: tokens.bgPrimary,
-      child: ListView(
-        padding: const EdgeInsets.all(16),
+      width: 150,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        border: Border.all(color: context.dabbler.borderDefault, width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Faux app bar -------------------------------------------------------
-          _Surface(
-            color: tokens.surfaceCard,
-            border: tokens.borderDefault,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: tokens.brandPrimary,
-                  child: Text(
-                    themeLabel.substring(0, 1),
-                    style: TextStyle(color: tokens.onBrand),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$themeLabel theme',
-                        style: TextStyle(
-                          color: tokens.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        'colorScheme + context.dabbler',
-                        style: TextStyle(color: tokens.textSecondary, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(Icons.more_vert, color: tokens.textTertiary),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // CTAs ---------------------------------------------------------------
-          const _SectionLabel('Actions'),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                // Primary CTA — on-brand text from the token, so Bright renders
-                // dark-on-orange instead of an illegible white-on-light.
-                child: FilledButton(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    backgroundColor: tokens.brandPrimary,
-                    foregroundColor: tokens.onBrand,
-                  ),
-                  child: const Text('Primary CTA'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                // Secondary / accent button — Sport & Social use dark onAccent.
-                child: FilledButton(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    backgroundColor: tokens.accent,
-                    foregroundColor: tokens.onAccent,
-                  ),
-                  child: const Text('Secondary'),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: colors.primary,
-                  side: BorderSide(color: tokens.borderStrong),
-                ),
-                child: const Text('Outlined'),
-              ),
-              const SizedBox(width: 12),
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(foregroundColor: colors.primary),
-                child: const Text('Text'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Status chips -------------------------------------------------------
-          const _SectionLabel('Status'),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _StatusChip('Success', tokens.successSurface, tokens.onSuccess, tokens.success),
-              _StatusChip('Warning', tokens.warningSurface, tokens.onWarning, tokens.warning),
-              _StatusChip('Error', tokens.errorSurface, tokens.onError, tokens.error),
-              _StatusChip('Info', tokens.infoSurface, tokens.onInfo, tokens.info),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Nested surfaces ----------------------------------------------------
-          const _SectionLabel('Surfaces'),
-          const SizedBox(height: 8),
-          _Surface(
-            color: tokens.bgSecondary,
-            border: tokens.borderDefault,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('bgSecondary',
-                    style: TextStyle(color: tokens.textSecondary, fontSize: 12)),
-                const SizedBox(height: 8),
-                _Surface(
-                  color: tokens.surfaceCard,
-                  border: tokens.borderDefault,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Card on surfaceCard',
-                        style: TextStyle(
-                          color: tokens.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Neutrals are a faint tint of the primary — never pure '
-                        'white or black.',
-                        style: TextStyle(color: tokens.textSecondary, fontSize: 13),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: tokens.bgTertiary,
-                          borderRadius: const BorderRadius.all(Radius.circular(8)),
-                          border: Border.all(color: tokens.borderStrong),
-                        ),
-                        child: Text(
-                          'bgTertiary + borderStrong',
-                          style: TextStyle(color: tokens.textTertiary, fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Material card (uses colorScheme roles) -----------------------------
-          Card(
-            child: ListTile(
-              leading: Icon(Icons.palette_outlined, color: colors.primary),
-              title: Text('Material Card', style: TextStyle(color: colors.onSurface)),
-              subtitle: Text(
-                'Driven by Theme.of(context).colorScheme',
-                style: TextStyle(color: colors.onSurfaceVariant),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Forui parity row ---------------------------------------------------
-          const _SectionLabel('Forui parity'),
-          const SizedBox(height: 8),
-          f.FCard(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  f.FButton(
-                    onPress: () {},
-                    child: const Text('FButton'),
-                  ),
-                  const SizedBox(width: 12),
-                  f.FBadge(child: const Text('FBadge')),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
+          Text(name, style: DabblerType.caption1.copyWith(color: fg)),
+          const SizedBox(height: 2),
+          Text(_hex, style: DabblerType.caption2.copyWith(color: fg)),
         ],
       ),
     );
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-  final String text;
+// -----------------------------------------------------------------------------
+// View · App Preview — a realistic phone-style screen mockup
+// -----------------------------------------------------------------------------
+
+class _AppPreviewPanel extends StatelessWidget {
+  const _AppPreviewPanel({required this.themeLabel});
+
+  final String themeLabel;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text.toUpperCase(),
-      style: TextStyle(
-        color: context.dabbler.textTertiary,
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.6,
+    final d = context.dabbler;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    final s = _MockStrings(isRtl);
+    final mode = Theme.of(context).brightness == Brightness.dark ? 'Dark' : 'Light';
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: SizedBox(
+          width: 320,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(18)),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: d.borderDefault, width: 0.5),
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 1 · App bar
+                  Container(
+                    color: d.brandPrimary,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    child: Row(
+                      children: [
+                        Text('Dabbler',
+                            style: DabblerType.headline.copyWith(color: d.onBrand)),
+                        const Spacer(),
+                        Text(
+                          '$themeLabel · $mode',
+                          style: DabblerType.footnote
+                              .copyWith(color: d.onBrand.withValues(alpha: 0.85)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // 2 · Body
+                  Container(
+                    color: d.bgPrimary,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // 3 · Game card
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: d.surfaceCard,
+                            borderRadius: const BorderRadius.all(Radius.circular(12)),
+                            border: Border.all(color: d.borderDefault, width: 0.5),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(s.title,
+                                  style: DabblerType.headline
+                                      .copyWith(color: d.textPrimary)),
+                              const SizedBox(height: 4),
+                              Text(s.meta,
+                                  style: DabblerType.footnote
+                                      .copyWith(color: d.textSecondary)),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _MockButton(
+                                      label: s.join,
+                                      bg: d.brandPrimary,
+                                      fg: d.onBrand,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  _MockButton(
+                                    label: s.invite,
+                                    bg: d.accent,
+                                    fg: d.onAccent,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // 4 · Status chips
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _StatusChip(s.chips[0], d.successSurface, d.onSuccess, d.success),
+                            _StatusChip(s.chips[1], d.warningSurface, d.onWarning, d.warning),
+                            _StatusChip(s.chips[2], d.errorSurface, d.onError, d.error),
+                            _StatusChip(s.chips[3], d.infoSurface, d.onInfo, d.info),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        // 5 · Footer
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(s.footer,
+                                  style: DabblerType.footnote
+                                      .copyWith(color: d.textSecondary)),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsetsDirectional.fromSTEB(10, 5, 10, 5),
+                              decoration: BoxDecoration(
+                                color: d.spotlight,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(999)),
+                              ),
+                              child: Text(
+                                s.badge,
+                                // White-on-spotlight is mandated by the spec.
+                                style: DabblerType.caption1
+                                    .copyWith(color: const Color(0xFFFFFFFF)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-class _Surface extends StatelessWidget {
-  const _Surface({required this.color, required this.border, required this.child});
+class _MockButton extends StatelessWidget {
+  const _MockButton({required this.label, required this.bg, required this.fg});
 
-  final Color color;
-  final Color border;
-  final Widget child;
+  final String label;
+  final Color bg;
+  final Color fg;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
-        border: Border.all(color: border),
+        color: bg,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child: child,
+      child: Text(label, style: DabblerType.headline.copyWith(color: fg)),
     );
   }
 }
@@ -431,7 +450,7 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsetsDirectional.fromSTEB(10, 6, 12, 6),
+      padding: const EdgeInsetsDirectional.fromSTEB(8, 5, 10, 5),
       decoration: BoxDecoration(
         color: surface,
         borderRadius: const BorderRadius.all(Radius.circular(999)),
@@ -444,17 +463,112 @@ class _StatusChip extends StatelessWidget {
             height: 8,
             decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
           ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: onColor,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          const SizedBox(width: 6),
+          Text(label, style: DabblerType.caption1.copyWith(color: onColor)),
         ],
       ),
+    );
+  }
+}
+
+class _MockStrings {
+  const _MockStrings(this.ar);
+  final bool ar;
+
+  String get title => ar ? 'خماسي يوم الثلاثاء' : 'Tuesday 5-a-side';
+  String get meta => ar
+      ? 'الخليج التجاري · ٧:٠٠ م · مكانان متاحان'
+      : 'Business Bay · 7:00 PM · 2 spots left';
+  String get join => ar ? 'انضم للعبة' : 'Join game';
+  String get invite => ar ? 'دعوة' : 'Invite';
+  String get footer => ar ? 'مباراتك ٤٧ هذا الموسم' : '47th game this season';
+  String get badge => ar ? 'إنجاز' : 'Milestone';
+  List<String> get chips => ar
+      ? ['مؤكد', 'أماكن قليلة', 'أُلغيت', 'تم التحديث']
+      : ['Confirmed', 'Spots low', 'Cancelled', 'Updated'];
+}
+
+// -----------------------------------------------------------------------------
+// View · Typography — dynamic specimen of the full Apple ramp (EN + AR)
+// -----------------------------------------------------------------------------
+
+enum _TypeCat { title, headline, body, caption }
+
+class _TypeTier {
+  const _TypeTier(this.name, this.style, this.cat);
+  final String name;
+  final TextStyle style;
+  final _TypeCat cat;
+}
+
+class _TypePanel extends StatelessWidget {
+  const _TypePanel();
+
+  // Driven by the DabblerType definitions: size/leading/weight are read off the
+  // styles, so this stays correct if the ramp changes.
+  static final List<_TypeTier> _tiers = [
+    _TypeTier('Large Title', DabblerType.largeTitle, _TypeCat.title),
+    _TypeTier('Title 1', DabblerType.title1, _TypeCat.title),
+    _TypeTier('Title 2', DabblerType.title2, _TypeCat.title),
+    _TypeTier('Title 3', DabblerType.title3, _TypeCat.title),
+    _TypeTier('Headline', DabblerType.headline, _TypeCat.headline),
+    _TypeTier('Body', DabblerType.body, _TypeCat.body),
+    _TypeTier('Callout', DabblerType.callout, _TypeCat.body),
+    _TypeTier('Subheadline', DabblerType.subheadline, _TypeCat.body),
+    _TypeTier('Footnote', DabblerType.footnote, _TypeCat.caption),
+    _TypeTier('Caption 1', DabblerType.caption1, _TypeCat.caption),
+    _TypeTier('Caption 2', DabblerType.caption2, _TypeCat.caption),
+  ];
+
+  static String _en(_TypeCat c) => switch (c) {
+        _TypeCat.title => 'Sport belongs to everyone',
+        _TypeCat.headline => 'Tuesday 5-a-side',
+        _TypeCat.body =>
+          'Two spots left — join before kickoff and meet the regulars.',
+        _TypeCat.caption => 'Updated 2 min ago',
+      };
+
+  static String _ar(_TypeCat c) => switch (c) {
+        _TypeCat.title => 'الرياضة لكل من يحضر',
+        _TypeCat.headline => 'خماسي يوم الثلاثاء',
+        _TypeCat.body => 'بقي مكانان فقط — انضم قبل البداية وقابل اللاعبين.',
+        _TypeCat.caption => 'آخر تحديث قبل دقيقتين',
+      };
+
+  static String _spec(_TypeTier t) {
+    final size = t.style.fontSize!.round();
+    final leading = (t.style.height! * t.style.fontSize!).round();
+    final weight = t.style.fontWeight!.value;
+    return '${t.name} · $size/$leading · w$weight';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final d = context.dabbler;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: _tiers.length,
+      separatorBuilder: (_, __) => const Divider(height: 28),
+      itemBuilder: (context, i) {
+        final t = _tiers[i];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_spec(t),
+                style: DabblerType.caption2.copyWith(color: muted)),
+            const SizedBox(height: 6),
+            Text(_en(t.cat), style: t.style.copyWith(color: d.textPrimary)),
+            const SizedBox(height: 2),
+            Text(
+              _ar(t.cat),
+              textDirection: TextDirection.rtl,
+              style: DabblerType.arabic(t.style).copyWith(color: d.textSecondary),
+            ),
+          ],
+        );
+      },
     );
   }
 }
