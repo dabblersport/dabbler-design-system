@@ -179,15 +179,16 @@ void main() {
     });
   });
 
-  testWidgets('Theme Gallery: Roles view renders and switches theme/brightness',
+  testWidgets('Theme Gallery: All view (default) shows every section',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(home: ThemeGalleryScreen()));
     await tester.pumpAndSettle();
 
     expect(find.text('Theme Gallery'), findsOneWidget);
-    // Default view is Roles — swatch labels are present.
-    expect(find.text('primary'), findsOneWidget);
-    expect(find.text('brandPrimary'), findsOneWidget);
+    // Default "All" view stacks Roles + App Preview + Typography together.
+    expect(find.text('primary'), findsOneWidget); // Roles swatch
+    expect(find.text('Dabbler'), findsOneWidget); // App Preview app bar
+    expect(find.text('Large Title · 34/41 · w400'), findsOneWidget); // Typography
 
     await tester.tap(find.text('Bright'));
     await tester.pumpAndSettle();
