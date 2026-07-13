@@ -12,6 +12,8 @@ dark, bilingual EN/AR.
 | `dabbler_tokens.css` | The same color tokens as CSS custom properties, for web surfaces. | **Canonical — do not edit color values.** |
 | `dabbler_type.dart` | `DabblerType` (Apple HIG ramp in Readex Pro), `dabblerTextTheme({arabic})`, `dabblerTextThemeFor(locale)`, `DabblerTypeSpecimen`, `kDabblerFontFamily`. | **Canonical — do not edit type values.** |
 | `dabbler_type.css` | CSS mirror of the type ramp. | **Canonical — do not edit type values.** |
+| `dabbler_spacing.dart` | `DabblerSpacing` / `DabblerRadius` / `DabblerSizing` / `DabblerElevation` — the base-3 geometry tokens. | **Canonical — do not edit values.** |
+| `dabbler_spacing.css` | CSS mirror of the geometry tokens. | **Canonical — do not edit values.** |
 | `dabbler_theme_data.dart` | `dabblerThemeData(theme, brightness, {locale})` → ready `ThemeData` (colorScheme + `DabblerColors` extension + `textTheme` + `fontFamily` + `useMaterial3`). | Yes |
 | `dabbler_forui_theme.dart` | `dabblerForuiThemeData(material)` → maps the active Material theme (colors + Readex Pro type) into Forui `FThemeData`. | Yes |
 | `theme_controller.dart` | Riverpod `themeControllerProvider` (section + override + ThemeMode + locale), persistence seam. | Yes |
@@ -193,6 +195,52 @@ these files keeping the same filenames — no code or pubspec change needed.
 > **Note:** the font files must contain glyphs. Empty/placeholder `.ttf` files
 > make CanvasKit (web) render **no text** (it does not fall back), and a
 > *declared-but-missing* asset is a hard build error — so don't blank these out.
+
+## Spacing, radius & elevation (`dabbler_spacing.dart`)
+
+Read geometry from `DabblerSpacing` / `DabblerRadius` / `DabblerSizing` /
+`DabblerElevation` — never inline raw numbers.
+
+```dart
+Padding(padding: const EdgeInsets.all(DabblerSpacing.cardPadding), …);
+ClipRRect(borderRadius: DabblerRadius.cardRadius, …);
+Container(decoration: BoxDecoration(boxShadow: DabblerElevation.level2), …);
+```
+
+### Base-3 grid
+
+The scale is **base 3**: `space1..space11` = 3, 6, 9, 12, 15, 18, 21, 24, 30, 36,
+48, with semantic aliases (`cardPadding` 18, `screenGutter` 24, `sectionGap` 30,
+`stackTight` 6, `stackDefault` 12, `iconGap` 6). Radii are base-3 too — `sm` 6,
+`md` 9, `lg` 12, `xl` 18, `pill` 999.
+
+> **Prefer 12 / 24 / 30 / 36 / 48 for structural values.** These are multiples of
+> **both 3 and 4**, so they line up with 24px icons (`iconMd`, the HugeIcons
+> native grid) and platform components. Use the other steps for fine tuning.
+
+`touchTargetMin` is **45** (base-3, and clears Apple's 44pt floor) — use it as the
+minimum tap size.
+
+### Flat elevation — only `level2` casts a shadow
+
+Elevation is **flat / Apple-style**: separation comes from hairline borders and
+tinted surfaces, not shadows.
+
+- **`level0`** — flat on the background. No shadow. (`const []`)
+- **`level1`** — a raised surface: `surfaceCard` tint + a 0.5px border. Still **no
+  shadow**. (`const []`)
+- **`level2`** — the **only** shadow in the system. Floating surfaces only:
+  modals, bottom sheets, popovers, FAB.
+
+`dabblerThemeData` enforces this: cards, app bars, navigation bars/rails, and
+elevated/filled buttons are all `elevation: 0` with `surfaceTintColor:
+transparent` (so M3's tonal-elevation tint never bleeds into the tinted
+neutrals). Only dialogs / bottom sheets / popup menus float. Custom floating
+surfaces should apply `DabblerElevation.level2` directly.
+
+In **dark mode** the shadow reads as almost nothing — that is intentional; dark
+floating surfaces separate via their border and a lighter surface tint. Keep the
+subtle shadow, don't increase it.
 
 ## Persistence
 

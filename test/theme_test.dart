@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dabbler_design_system/debug/theme_gallery.dart';
 import 'package:dabbler_design_system/theme/dabbler_colors.dart';
 import 'package:dabbler_design_system/theme/dabbler_material_scheme.dart';
+import 'package:dabbler_design_system/theme/dabbler_spacing.dart';
 import 'package:dabbler_design_system/theme/dabbler_theme_data.dart';
 import 'package:dabbler_design_system/theme/dabbler_type.dart';
 import 'package:dabbler_design_system/theme/theme_controller.dart';
@@ -14,6 +15,40 @@ const _white = Color(0xFFFFFFFF);
 const _black = Color(0xFF000000);
 
 void main() {
+  group('Geometry tokens', () {
+    test('every spacing value is a multiple of 3', () {
+      final values = <double>[
+        for (final (_, v) in DabblerSpacing.scale) v,
+        DabblerSpacing.cardPadding,
+        DabblerSpacing.screenGutter,
+        DabblerSpacing.sectionGap,
+        DabblerSpacing.stackTight,
+        DabblerSpacing.stackDefault,
+        DabblerSpacing.iconGap,
+      ];
+      for (final v in values) {
+        expect(v % 3, 0, reason: '$v is not a multiple of 3');
+      }
+    });
+
+    test('radius values are multiples of 3 (pill excepted)', () {
+      for (final (name, v) in DabblerRadius.scale) {
+        if (name == 'pill') continue;
+        expect(v % 3, 0, reason: '$name ($v) is not a multiple of 3');
+      }
+    });
+
+    test('touchTargetMin clears the 44pt floor', () {
+      expect(DabblerSizing.touchTargetMin, greaterThanOrEqualTo(44));
+    });
+
+    test('flat elevation: only level2 casts a shadow', () {
+      expect(DabblerElevation.level0, isEmpty);
+      expect(DabblerElevation.level1, isEmpty);
+      expect(DabblerElevation.level2, isNotEmpty);
+    });
+  });
+
   group('resolveTheme', () {
     test('section defaults', () {
       expect(resolveTheme(DabblerSection.home), DabblerTheme.main);

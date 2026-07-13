@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 
 import 'dabbler_colors.dart';
 import 'dabbler_material_scheme.dart';
+import 'dabbler_spacing.dart';
 import 'dabbler_type.dart';
 
 /// Builds the full [ThemeData] for a [theme] at the given [brightness].
@@ -56,6 +57,17 @@ ThemeData dabblerThemeData(
   final textTheme = dabblerTextTheme(arabic: isArabic)
       .apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
 
+  // Flat elevation everywhere except the floating surfaces (dialogs / sheets /
+  // menus), which are the ONLY things allowed to cast a shadow. surfaceTintColor
+  // is forced transparent so M3's tonal-elevation tint never fights the tinted
+  // neutrals. Custom floating surfaces use DabblerElevation.level2 directly.
+  const flat = 0.0;
+  const floating = 6.0;
+  const flatButton = ButtonStyle(
+    elevation: WidgetStatePropertyAll(flat),
+    shadowColor: WidgetStatePropertyAll(Colors.transparent),
+  );
+
   return ThemeData(
     useMaterial3: true,
     brightness: brightness,
@@ -66,22 +78,71 @@ ThemeData dabblerThemeData(
     scaffoldBackgroundColor: tokens.bgPrimary,
     canvasColor: tokens.bgPrimary,
     dividerColor: tokens.borderDefault,
+    shadowColor: DabblerElevation.shadowInk,
     appBarTheme: AppBarTheme(
       backgroundColor: tokens.bgPrimary,
       foregroundColor: tokens.textPrimary,
       surfaceTintColor: Colors.transparent,
-      elevation: 0,
-      scrolledUnderElevation: 1,
+      elevation: flat,
+      scrolledUnderElevation: flat,
     ),
     cardTheme: CardThemeData(
       color: tokens.surfaceCard,
       surfaceTintColor: Colors.transparent,
-      elevation: 0,
+      elevation: flat,
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: tokens.borderDefault),
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        side: BorderSide(color: tokens.borderDefault, width: DabblerSizing.borderHairline),
+        borderRadius: DabblerRadius.lgRadius,
       ),
     ),
-    dividerTheme: DividerThemeData(color: tokens.borderDefault, space: 1, thickness: 1),
+    // Floating surfaces — the only shadow in the system (≈ DabblerElevation.level2).
+    dialogTheme: DialogThemeData(
+      backgroundColor: tokens.surfaceCard,
+      surfaceTintColor: Colors.transparent,
+      elevation: floating,
+      shadowColor: DabblerElevation.shadowInk,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: tokens.borderDefault, width: DabblerSizing.borderHairline),
+        borderRadius: DabblerRadius.xlRadius,
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: tokens.surfaceCard,
+      surfaceTintColor: Colors.transparent,
+      elevation: floating,
+      modalElevation: floating,
+      shadowColor: DabblerElevation.shadowInk,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(DabblerRadius.xl)),
+      ),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: tokens.surfaceCard,
+      surfaceTintColor: Colors.transparent,
+      elevation: floating,
+      shadowColor: DabblerElevation.shadowInk,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: tokens.borderDefault, width: DabblerSizing.borderHairline),
+        borderRadius: DabblerRadius.mdRadius,
+      ),
+    ),
+    // Flat navigation surfaces — no shadow, no tint.
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: tokens.bgPrimary,
+      surfaceTintColor: Colors.transparent,
+      elevation: flat,
+      shadowColor: Colors.transparent,
+    ),
+    navigationRailTheme: NavigationRailThemeData(
+      backgroundColor: tokens.bgPrimary,
+      elevation: flat,
+    ),
+    elevatedButtonTheme: const ElevatedButtonThemeData(style: flatButton),
+    filledButtonTheme: const FilledButtonThemeData(style: flatButton),
+    dividerTheme: DividerThemeData(
+      color: tokens.borderDefault,
+      space: 1,
+      thickness: DabblerSizing.borderDefault,
+    ),
   );
 }
