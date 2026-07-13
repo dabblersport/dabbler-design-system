@@ -26,7 +26,9 @@ enum DabblerButtonVariant { filled, tonal, outlined, text, destructive, icon }
 /// Size steps — heights are base-3 (36 / 45 / 54); `medium` == touchTargetMin.
 enum DabblerButtonSize { small, medium, large }
 
-extension _SizeTokens on DabblerButtonSize {
+/// Public size metrics for each step — read by the docs' Specs table so it can
+/// never drift from the component.
+extension DabblerButtonMetrics on DabblerButtonSize {
   double get height => switch (this) {
         DabblerButtonSize.small => 36,
         DabblerButtonSize.medium => DabblerSizing.touchTargetMin, // 45
