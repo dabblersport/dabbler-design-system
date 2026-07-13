@@ -18,7 +18,9 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart' as f;
 
 import '../components/dabbler_button.dart';
+import '../components/dabbler_card.dart';
 import '../components/dabbler_inputs.dart';
+import '../components/dabbler_surface.dart';
 import '../components/dabbler_text_field.dart';
 import '../theme/dabbler_colors.dart';
 import '../theme/dabbler_forui_theme.dart';
@@ -35,7 +37,16 @@ class ThemeGalleryScreen extends StatefulWidget {
   State<ThemeGalleryScreen> createState() => _ThemeGalleryScreenState();
 }
 
-enum _GalleryView { all, roles, appPreview, typography, spacing, buttons, inputs }
+enum _GalleryView {
+  all,
+  roles,
+  appPreview,
+  typography,
+  spacing,
+  buttons,
+  inputs,
+  cards,
+}
 
 class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
   DabblerTheme _theme = DabblerTheme.main;
@@ -123,6 +134,10 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                   value: _GalleryView.inputs,
                   label: Text('Inputs'),
                 ),
+                ButtonSegment(
+                  value: _GalleryView.cards,
+                  label: Text('Cards & Lists'),
+                ),
               ],
               selected: {_view},
               onSelectionChanged: (s) => setState(() => _view = s.first),
@@ -149,6 +164,7 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                       _GalleryView.spacing => const _SpacingPanel(),
                       _GalleryView.buttons => const _ButtonsPanel(),
                       _GalleryView.inputs => const _InputsPanel(),
+                      _GalleryView.cards => const _CardsPanel(),
                     },
                   ),
                 ),
@@ -234,6 +250,10 @@ class _AllPanel extends StatelessWidget {
           const _SectionHeader('Inputs'),
           const SizedBox(height: 12),
           const _InputsShowcase(),
+          const SizedBox(height: 24),
+          const _SectionHeader('Cards & Lists'),
+          const SizedBox(height: 12),
+          const _CardsShowcase(),
         ],
       ),
     );
@@ -1355,4 +1375,258 @@ class _InputStrings {
     radio: 'زر اختيار',
     switchLabel: 'مفتاح',
   );
+}
+
+// -----------------------------------------------------------------------------
+// View · Cards & Lists — cards, sections, and list tiles in EN and AR/RTL
+// -----------------------------------------------------------------------------
+
+class _CardsPanel extends StatelessWidget {
+  const _CardsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: _CardsShowcase(),
+    );
+  }
+}
+
+/// The whole card/list set, rendered once LTR/English and once RTL/Arabic so the
+/// divider inset and chevron mirroring are visible at a glance.
+class _CardsShowcase extends StatelessWidget {
+  const _CardsShowcase();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SubHead('English · LTR'),
+        SizedBox(height: DabblerSpacing.stackDefault),
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: _CardsBlock(ar: false),
+        ),
+        SizedBox(height: DabblerSpacing.sectionGap),
+        Divider(height: 1),
+        SizedBox(height: DabblerSpacing.sectionGap),
+        _SubHead('العربية · RTL'),
+        SizedBox(height: DabblerSpacing.stackDefault),
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: _CardsBlock(ar: true),
+        ),
+      ],
+    );
+  }
+}
+
+class _CardsBlock extends StatefulWidget {
+  const _CardsBlock({required this.ar});
+  final bool ar;
+
+  @override
+  State<_CardsBlock> createState() => _CardsBlockState();
+}
+
+class _CardsBlockState extends State<_CardsBlock> {
+  bool _switch = true;
+
+  String _t(String en, String ar) => widget.ar ? ar : en;
+
+  @override
+  Widget build(BuildContext context) {
+    final d = context.dabbler;
+
+    Widget gap() => const SizedBox(height: DabblerSpacing.stackDefault);
+
+    String variantName(DabblerCardVariant v) => switch (v) {
+          DabblerCardVariant.standard => _t('Standard', 'قياسي'),
+          DabblerCardVariant.interactive => _t('Interactive (tap)', 'تفاعلي (اضغط)'),
+          DabblerCardVariant.outlined => _t('Outlined', 'محدّد'),
+          DabblerCardVariant.filled => _t('Filled', 'ممتلئ'),
+          DabblerCardVariant.selected => _t('Selected', 'محدَّد'),
+        };
+
+    Widget variantCard(DabblerCardVariant v) => DabblerCard(
+          variant: v,
+          onTap: v == DabblerCardVariant.interactive ? () {} : null,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(variantName(v),
+                  style: DabblerType.headline.copyWith(color: d.textPrimary)),
+              const SizedBox(height: DabblerSpacing.stackTight),
+              Text(
+                _t('Separation via tint + border, no shadow.',
+                    'الفصل عبر التدرّج والحدود، بلا ظل.'),
+                style: DabblerType.footnote.copyWith(color: d.textSecondary),
+              ),
+            ],
+          ),
+        );
+
+    Widget badge(String text) => Container(
+          padding: const EdgeInsetsDirectional.symmetric(
+            horizontal: DabblerSpacing.space2, // 6
+            vertical: DabblerSpacing.space1, // 3
+          ),
+          decoration: BoxDecoration(
+            color: d.brandPrimary,
+            borderRadius: DabblerRadius.pillRadius,
+          ),
+          // Mark colour is onBrand (dark in Bright/Sport), never hardcoded white.
+          child: Text(text,
+              style: DabblerType.caption2.copyWith(color: d.onBrand)),
+        );
+
+    Widget avatar(String initials) => CircleAvatar(
+          radius: DabblerSpacing.space9 / 2, // 15 → fits the 30 leading lane
+          backgroundColor: d.bgTertiary,
+          child: Text(initials,
+              style: DabblerType.caption1.copyWith(color: d.textSecondary)),
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Variants — driven by the enum.
+        _MiniHead(_t('Card variants', 'أنواع البطاقات')),
+        gap(),
+        for (final v in DabblerCardVariant.values) ...[
+          variantCard(v),
+          gap(),
+        ],
+        const SizedBox(height: DabblerSpacing.stackDefault),
+
+        // Nested tonal ladder — filled card inside a standard card, no shadow.
+        _MiniHead(_t('Nested surfaces (flat ladder)', 'أسطح متداخلة (تدرّج مسطّح)')),
+        gap(),
+        DabblerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_t('Standard card', 'بطاقة قياسية'),
+                  style: DabblerType.headline.copyWith(color: d.textPrimary)),
+              gap(),
+              DabblerCard(
+                variant: DabblerCardVariant.filled,
+                child: Text(
+                  _t('Filled card nested inside — reads as a distinct layer.',
+                      'بطاقة ممتلئة بالداخل — تظهر كطبقة مستقلة.'),
+                  style: DabblerType.footnote.copyWith(color: d.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: DabblerSpacing.sectionGap),
+
+        // Section with a title + "See all" action.
+        DabblerSurfaceSection(
+          title: _t('Upcoming games', 'المباريات القادمة'),
+          subtitle: _t('This week', 'هذا الأسبوع'),
+          action: DabblerButton(
+            label: _t('See all', 'عرض الكل'),
+            variant: DabblerButtonVariant.text,
+            size: DabblerButtonSize.small,
+            onPressed: () {},
+          ),
+          children: [
+            DabblerCard(
+              variant: DabblerCardVariant.interactive,
+              onTap: () {},
+              padding: EdgeInsets.zero,
+              child: DabblerListTile(
+                leading: Icon(Icons.sports_soccer,
+                    size: DabblerSizing.iconMd, color: d.textSecondary),
+                title: _t('Tuesday 5-a-side', 'خماسي الثلاثاء'),
+                subtitle: _t('Business Bay · 7:00 PM', 'الخليج التجاري · ٧:٠٠ م'),
+                trailing: const DabblerChevron(),
+                onTap: () {},
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: DabblerSpacing.sectionGap),
+
+        // List tiles — leading / trailing variety + dense.
+        _MiniHead(_t('List tiles', 'عناصر القائمة')),
+        gap(),
+        DabblerCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              DabblerListTile(
+                leading: Icon(Icons.event,
+                    size: DabblerSizing.iconMd, color: d.textSecondary),
+                title: _t('With icon + chevron', 'أيقونة + سهم'),
+                subtitle: _t('Leading icon, trailing chevron', 'أيقونة بادئة وسهم لاحق'),
+                trailing: const DabblerChevron(),
+                onTap: () {},
+                showDivider: true,
+              ),
+              DabblerListTile(
+                leading: avatar(widget.ar ? 'أ' : 'AL'),
+                title: _t('With avatar + badge', 'صورة + شارة'),
+                subtitle: _t('Leading avatar', 'صورة بادئة'),
+                trailing: badge('3'),
+                onTap: () {},
+                showDivider: true,
+              ),
+              DabblerListTile(
+                leading: Icon(Icons.notifications_outlined,
+                    size: DabblerSizing.iconMd, color: d.textSecondary),
+                title: _t('With switch', 'مع مفتاح'),
+                trailing: DabblerSwitch(
+                  value: _switch,
+                  onChanged: (v) => setState(() => _switch = v),
+                ),
+              ),
+            ],
+          ),
+        ),
+        gap(),
+        _MiniHead(_t('Dense · selected · disabled', 'كثيف · محدَّد · معطّل')),
+        gap(),
+        DabblerCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              DabblerListTile(
+                dense: true,
+                leading: Icon(Icons.tag,
+                    size: DabblerSizing.iconMd, color: d.textSecondary),
+                title: _t('Dense tile', 'عنصر كثيف'),
+                trailing: const DabblerChevron(),
+                onTap: () {},
+                showDivider: true,
+              ),
+              DabblerListTile(
+                selected: true,
+                leading: Icon(Icons.check_circle_outline,
+                    size: DabblerSizing.iconMd, color: d.brandPrimary),
+                title: _t('Selected tile', 'عنصر محدَّد'),
+                trailing: const DabblerChevron(),
+                onTap: () {},
+                showDivider: true,
+              ),
+              DabblerListTile(
+                enabled: false,
+                leading: Icon(Icons.block,
+                    size: DabblerSizing.iconMd, color: d.textSecondary),
+                title: _t('Disabled tile', 'عنصر معطّل'),
+                trailing: const DabblerChevron(),
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }

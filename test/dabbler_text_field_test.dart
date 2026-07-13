@@ -106,7 +106,6 @@ void main() {
       tester,
       const DabblerTextField(prefixIcon: Icons.person_outline),
       direction: TextDirection.rtl,
-      width: 320,
     );
 
     final iconCenter = tester.getCenter(find.byIcon(Icons.person_outline));

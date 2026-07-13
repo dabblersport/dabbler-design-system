@@ -90,9 +90,23 @@ ThemeData dabblerThemeData(
       color: tokens.surfaceCard,
       surfaceTintColor: Colors.transparent,
       elevation: flat,
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         side: BorderSide(color: tokens.borderDefault, width: DabblerSizing.borderHairline),
         borderRadius: DabblerRadius.lgRadius,
+      ),
+    ),
+    // Material ListTiles inherit flat, base-3 metrics so any that slip in match
+    // DabblerListTile (which is what screens should use).
+    listTileTheme: ListTileThemeData(
+      tileColor: Colors.transparent,
+      selectedColor: tokens.brandPrimary,
+      iconColor: tokens.textSecondary,
+      textColor: tokens.textPrimary,
+      minVerticalPadding: DabblerSpacing.space3, // 9
+      horizontalTitleGap: DabblerSpacing.space3, // 9
+      contentPadding: const EdgeInsetsDirectional.symmetric(
+        horizontal: DabblerSpacing.space4, // 12
       ),
     ),
     // Floating surfaces — the only shadow in the system (≈ DabblerElevation.level2).
