@@ -11,16 +11,17 @@ final elevationPage = DocPage(
   group: DocGroup.foundations,
   title: 'Elevation',
   definition:
-      'A flat, Apple-style system — separation is tint + border, only one shadow.',
+      'RETIRED flat rule — elevation now belongs to the Glass foundation.',
   keywords: ['foundation', 'elevation', 'shadow', 'flat', 'depth', 'layer'],
   builder: (context) => [
     DocSection(
       'Overview',
       const DocProse(
-        'Elevation is flat. Surfaces separate through the tinted-neutral ladder '
-        '(bgPrimary → surfaceCard → bgTertiary) and hairline borders — not '
-        'shadows. Only genuinely floating things (modals, sheets, popovers) cast '
-        'the single shadow, level2. Cards and tiles never do.',
+        'The flat-elevation rule is RETIRED. Surfaces are now liquid glass — '
+        'see Foundations · Glass for the surface, hairline, and shadow sets '
+        '(cards and chips DO cast the glass shadows). What remains here is the '
+        'legacy DabblerElevation.level2 shadow, still used by Material dialogs, '
+        'sheets, and menus via dabblerThemeData.',
       ),
     ),
     DocSection('Live example', DocExampleFrame(child: _Levels())),
@@ -39,12 +40,12 @@ final elevationPage = DocPage(
       'Usage',
       const DocDoDont(
         dos: [
-          'Separate cards with surfaceCard/bgTertiary tint + a hairline border.',
-          'Reserve level2 for modals, sheets, and popovers only.',
+          'Use the DabblerGlass shadow sets for cards, chips, and fields.',
+          'Reserve level2 for Material modals, sheets, and popovers.',
         ],
         donts: [
-          'Add a BoxShadow to a card, tile, button, or app bar.',
-          'Raise the dark-mode shadow — it is faint on purpose.',
+          'Follow the old flat guidance — it is retired.',
+          'Invent one-off BoxShadows; every shadow is a glass token.',
         ],
       ),
     ),

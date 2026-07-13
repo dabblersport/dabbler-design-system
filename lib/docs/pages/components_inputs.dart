@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../components/dabbler_chip.dart';
 import '../../components/dabbler_inputs.dart';
 import '../../components/dabbler_text_field.dart';
 import '../../theme/dabbler_spacing.dart';
@@ -13,7 +14,7 @@ final inputsPage = DocPage(
   group: DocGroup.components,
   title: 'Text Fields & Inputs',
   definition:
-      'Flat text fields (standard, multiline, search, password) plus checkbox, radio, and switch.',
+      'Glass text fields (standard, multiline, search, password) plus checkbox, radio, and switch.',
   keywords: [
     'component',
     'text field',
@@ -24,14 +25,17 @@ final inputsPage = DocPage(
     'checkbox',
     'radio',
     'switch',
+    'chip',
+    'icon tile',
   ],
   builder: (context) => [
     DocSection(
       'Overview',
       const DocProse(
         'Text fields capture input; the selection controls capture choices. All '
-        'are flat: every InputDecoration border is set explicitly so no Material '
-        'underline or filled default leaks through, and nothing casts a shadow. '
+        'are glass surfaces: every InputDecoration border is explicit so no Material '
+        'underline or filled default leaks through; the glass surface owns fill, '
+        'gradient hairline, and the inset glass shadow. '
         'Focus draws a 2px focusRing and turns the label brandPrimary.',
       ),
     ),
@@ -49,7 +53,7 @@ final inputsPage = DocPage(
       'Anatomy',
       const DocAnatomy([
         AnatomyPart('Label', 'Above the field — subheadline; brandPrimary on focus.'),
-        AnatomyPart('Container', 'Fill bgSecondary, hairline border, radius sm.'),
+        AnatomyPart('Container', 'Glass fill + gradient hairline + inset shadow, radius xxl (24).'),
         AnatomyPart('Hint', 'Placeholder — body, textTertiary.'),
         AnatomyPart('Helper / error', 'Below — footnote; error text replaces helper.'),
         AnatomyPart('Prefix / suffix', 'Start/end icon slots; mirror in RTL.'),
@@ -88,15 +92,34 @@ final inputsPage = DocPage(
       const DocExampleFrame(child: _SelectionDemo()),
     ),
     DocSection(
+      'Chips & icon tiles',
+      DocExampleFrame(
+        child: Wrap(
+          spacing: DabblerSpacing.stackDefault,
+          runSpacing: DabblerSpacing.stackDefault,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            DabblerChip(
+                label: 'Near me',
+                selected: true,
+                leadingIcon: Icons.near_me,
+                onTap: () {}),
+            DabblerChip(label: 'Today', onTap: () {}),
+            DabblerChip(label: 'Free to join', onTap: () {}),
+            const DabblerIconTile(icon: Icons.sports_soccer),
+          ],
+        ),
+      ),
+    ),
+    DocSection(
       'Specs',
       DocSpecsTable([
         SpecRow('Min height', '${DabblerSizing.touchTargetMin.toInt()} px',
             'DabblerSizing.touchTargetMin'),
-        SpecRow('Radius · standard', '${DabblerRadius.sm.toInt()} px',
-            'DabblerRadius.sm'),
-        SpecRow('Radius · multiline', '${DabblerRadius.md.toInt()} px',
-            'DabblerRadius.md'),
-        const SpecRow('Radius · search', 'full', 'DabblerRadius.pill'),
+        SpecRow('Radius · single-line', '${DabblerRadius.xxl.toInt()} px',
+            'DabblerRadius.xxl'),
+        SpecRow('Radius · multiline', '${DabblerRadius.xl.toInt()} px',
+            'DabblerRadius.xl'),
         const SpecRow('Focus border', '2 px focusRing', 'DabblerSizing.borderDefault + 1'),
         SpecRow('H-padding', '${DabblerSpacing.space4.toInt()} px',
             'DabblerSpacing.space4'),

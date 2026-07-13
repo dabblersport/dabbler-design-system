@@ -24,6 +24,7 @@ import '../components/dabbler_surface.dart';
 import '../components/dabbler_text_field.dart';
 import '../theme/dabbler_colors.dart';
 import '../theme/dabbler_forui_theme.dart';
+import '../theme/dabbler_glass.dart';
 import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_theme_data.dart';
 import '../theme/dabbler_type.dart';
@@ -154,18 +155,22 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                 data: dabblerForuiThemeData(previewTheme),
                 child: Directionality(
                   textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
+                  // Panels render on the glass background so the liquid-glass
+                  // surfaces read the way they do in the product.
                   child: Builder(
-                    builder: (context) => switch (_view) {
-                      _GalleryView.all => _AllPanel(themeLabel: label),
-                      _GalleryView.roles => const _RolesPanel(),
-                      _GalleryView.appPreview =>
-                        _AppPreviewPanel(themeLabel: label),
-                      _GalleryView.typography => const _TypePanel(),
-                      _GalleryView.spacing => const _SpacingPanel(),
-                      _GalleryView.buttons => const _ButtonsPanel(),
-                      _GalleryView.inputs => const _InputsPanel(),
-                      _GalleryView.cards => const _CardsPanel(),
-                    },
+                    builder: (context) => DabblerGlassBackground(
+                      child: switch (_view) {
+                        _GalleryView.all => _AllPanel(themeLabel: label),
+                        _GalleryView.roles => const _RolesPanel(),
+                        _GalleryView.appPreview =>
+                          _AppPreviewPanel(themeLabel: label),
+                        _GalleryView.typography => const _TypePanel(),
+                        _GalleryView.spacing => const _SpacingPanel(),
+                        _GalleryView.buttons => const _ButtonsPanel(),
+                        _GalleryView.inputs => const _InputsPanel(),
+                        _GalleryView.cards => const _CardsPanel(),
+                      },
+                    ),
                   ),
                 ),
               ),

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/dabbler_colors.dart';
+import '../theme/dabbler_glass.dart';
 import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_type.dart';
 import 'doc_model.dart';
@@ -57,8 +58,9 @@ class DocProse extends StatelessWidget {
 
 // --- live example frame ------------------------------------------------------
 
-/// A bordered surface that holds a live example, visually separating it from the
-/// prose. Flat (no shadow), tokens only.
+/// A bordered stage that holds a live example. Glass era: examples sit on the
+/// [DabblerGlassBackground] (theme-tinted base + brand orbs) so the liquid
+/// glass surfaces read the way they do in the product.
 class DocExampleFrame extends StatelessWidget {
   const DocExampleFrame({super.key, required this.child, this.align});
   final Widget child;
@@ -69,18 +71,22 @@ class DocExampleFrame extends StatelessWidget {
     final d = context.dabbler;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(DabblerSpacing.space8), // 24
       decoration: BoxDecoration(
-        color: d.bgSecondary,
         borderRadius: DabblerRadius.lgRadius,
         border: Border.all(
           color: d.borderDefault,
           width: DabblerSizing.borderHairline,
         ),
       ),
-      child: Align(
-        alignment: align ?? AlignmentDirectional.centerStart,
-        child: child,
+      clipBehavior: Clip.antiAlias,
+      child: DabblerGlassBackground(
+        child: Padding(
+          padding: const EdgeInsets.all(DabblerSpacing.space8), // 24
+          child: Align(
+            alignment: align ?? AlignmentDirectional.centerStart,
+            child: child,
+          ),
+        ),
       ),
     );
   }

@@ -1,9 +1,11 @@
 // =============================================================================
 // Dabbler — Geometry tokens (spacing · radius · sizing · elevation)
-// Version 1.0
+// Version 2.0 · glass era
 // -----------------------------------------------------------------------------
-// Grid is BASE 3. Elevation is FLAT / Apple-style: separation comes from
-// hairline borders and tinted surfaces — only ONE level (level2) casts a shadow.
+// Grid is BASE 3. Elevation: the old FLAT rule is RETIRED — surfaces are liquid
+// glass (see dabbler_glass.dart for the surface/border/shadow sets).
+// DabblerElevation.level2 remains only as the legacy floating shadow for
+// Material dialogs / sheets / menus.
 //
 // Structural values 12 / 24 / 30 / 36 / 48 are multiples of BOTH 3 and 4, so
 // they line up with 24px icons and platform components — prefer them for layout.
@@ -59,21 +61,24 @@ abstract final class DabblerRadius {
 
   static const double sm = 6; // chips, small inputs
   static const double md = 9; // buttons
-  static const double lg = 12; // cards
-  static const double xl = 18; // sheets, modals
-  static const double pill = 999; // pills, avatars
+  static const double lg = 12; // icon tiles, nested surfaces
+  static const double xl = 18; // cards, sheets, modals
+  static const double xxl = 24; // search fields, hero glass surfaces
+  static const double pill = 999; // pills, avatars, glass chips
 
   static const BorderRadius smRadius = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius mdRadius = BorderRadius.all(Radius.circular(md));
   static const BorderRadius lgRadius = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius xlRadius = BorderRadius.all(Radius.circular(xl));
+  static const BorderRadius xxlRadius = BorderRadius.all(Radius.circular(xxl));
   static const BorderRadius pillRadius = BorderRadius.all(Radius.circular(pill));
 
-  // Semantic getters.
-  static BorderRadius get chipRadius => smRadius;
+  // Semantic getters (glass era: cards sit at xl, glass chips are pills).
+  static BorderRadius get chipRadius => pillRadius;
   static BorderRadius get buttonRadius => mdRadius;
-  static BorderRadius get cardRadius => lgRadius;
+  static BorderRadius get cardRadius => xlRadius;
   static BorderRadius get sheetRadius => xlRadius;
+  static BorderRadius get fieldRadius => xxlRadius;
 
   /// Ordered scale (name · usage → value), for token-driven UIs.
   static const List<(String, double)> scale = [
@@ -81,6 +86,7 @@ abstract final class DabblerRadius {
     ('md', md),
     ('lg', lg),
     ('xl', xl),
+    ('xxl', xxl),
     ('pill', pill),
   ];
 }

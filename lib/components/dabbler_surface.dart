@@ -13,6 +13,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/dabbler_colors.dart';
+import '../theme/dabbler_glass.dart';
 import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_type.dart';
 
@@ -223,6 +224,8 @@ class _DabblerListTileState extends State<DabblerListTile> {
     if (!widget.showDivider) return tile;
 
     // Divider inset to the title's start edge; start-inset mirrors under RTL.
+    // Glass era: dividers inside glass containers are brandPrimary @ 10%
+    // hairlines (the Trending List treatment).
     final inset = DabblerSpacing.space4 +
         (widget.leading != null
             ? DabblerListTile._leadingLane + DabblerListTile._gap
@@ -234,8 +237,8 @@ class _DabblerListTileState extends State<DabblerListTile> {
         Padding(
           padding: EdgeInsetsDirectional.only(start: inset.toDouble()),
           child: Container(
-            height: DabblerSizing.borderHairline, // 0.5px
-            color: d.borderDefault,
+            height: DabblerSizing.borderDefault, // 1px (pen divider)
+            color: DabblerGlass.divider(d),
           ),
         ),
       ],

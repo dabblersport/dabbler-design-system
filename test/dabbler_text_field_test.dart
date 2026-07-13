@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dabbler_design_system/components/dabbler_text_field.dart';
 import 'package:dabbler_design_system/theme/dabbler_colors.dart';
+import 'package:dabbler_design_system/theme/dabbler_glass.dart';
 import 'package:dabbler_design_system/theme/dabbler_theme_data.dart';
 
 /// Pump a widget inside a real Dabbler theme so `context.dabbler` resolves.
@@ -27,9 +28,16 @@ Future<void> _pump(
   );
 }
 
-OutlineInputBorder _errorBorder(WidgetTester tester) {
-  final field = tester.widget<TextField>(find.byType(TextField));
-  return field.decoration!.errorBorder! as OutlineInputBorder;
+/// The glass surface owns the border now — read its painter's solid override.
+GlassBorderPainter _borderPainter(WidgetTester tester) {
+  final paints = tester.widgetList<CustomPaint>(find.descendant(
+    of: find.byType(DabblerTextField),
+    matching: find.byType(CustomPaint),
+  ));
+  return paints
+      .map((p) => p.foregroundPainter)
+      .whereType<GlassBorderPainter>()
+      .first;
 }
 
 void main() {
@@ -57,7 +65,7 @@ void main() {
     expect(find.text('Required'), findsOneWidget);
 
     final expected = tester.element(find.byType(DabblerTextField)).dabbler.error;
-    expect(_errorBorder(tester).borderSide.color, expected);
+    expect(_borderPainter(tester).solidColor, expected);
   });
 
   testWidgets('enabled: false prevents editing', (tester) async {

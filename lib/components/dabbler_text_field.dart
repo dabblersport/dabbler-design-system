@@ -1,13 +1,12 @@
 // =============================================================================
-// Dabbler — Text Field / Input component
+// Dabbler — Text Field / Input component (Liquid Glass)
 // -----------------------------------------------------------------------------
-// A flat, token-driven text field. Every colour, size, radius, and weight is
-// read from the design tokens (context.dabbler / DabblerType / DabblerSizing /
-// DabblerRadius / DabblerSpacing) — nothing is hardcoded.
-//
-// Flat by design: no shadow, and every InputDecoration border slot is set
-// explicitly to an OutlineInputBorder so Material's default underline / filled
-// decoration never leaks through.
+// The design's Search Field treatment: a glass surface (blurred translucent
+// fill), radius xxl (24), the gradient hairline, the inset glass shadow, and a
+// brandPrimary leading icon. Focus swaps the hairline for a 2px focusRing;
+// error swaps it for the error colour. Every InputDecoration border slot is an
+// explicit InputBorder.none, so Material's underline / filled default can never
+// leak through — the glass surface owns fill, border, and shadow.
 //
 // Bilingual / RTL: prefix/suffix affordances use InputDecoration's start/end
 // slots (so they mirror under RTL), Arabic gets DabblerType.arabic() leading,
@@ -18,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/dabbler_colors.dart';
+import '../theme/dabbler_glass.dart';
 import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_type.dart';
 
@@ -167,14 +167,20 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
   }
 
   void _onTextChange() {
-    if (widget.variant == DabblerTextFieldVariant.search) setState(() {});
+    // Search: the clear (×) appears with text. maxLength: the manual counter.
+    if (widget.variant == DabblerTextFieldVariant.search ||
+        widget.maxLength != null) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final d = context.dabbler;
+    final b = Theme.of(context).brightness;
     final rtl = Directionality.of(context) == TextDirection.rtl;
     final enabled = widget.enabled;
+    final hasError = widget.errorText != null;
 
     // Arabic takes DabblerType's taller leading.
     TextStyle a(TextStyle s) => rtl ? DabblerType.arabic(s) : s;
@@ -189,24 +195,16 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
 
     final radius = _radius(widget.variant);
 
-    // Every border slot is explicit → no Material underline, ever. Flat.
-    OutlineInputBorder border(Color color, double width) => OutlineInputBorder(
-          borderRadius: radius,
-          borderSide: BorderSide(color: color, width: width),
-        );
-
+    // The glass surface carries fill + border + shadow; the InputDecoration is
+    // stripped to content only (explicit InputBorder.none everywhere → no
+    // Material underline or filled default can leak through).
     final decoration = InputDecoration(
       isDense: true,
-      filled: true,
-      fillColor: enabled ? d.bgSecondary : d.bgTertiary,
+      filled: false,
       hintText: widget.hint,
       hintStyle: hintStyle,
-      helperText: widget.helperText,
-      helperStyle: helperStyle,
-      errorText: widget.errorText,
-      errorStyle: errorStyle,
-      counterStyle: counterStyle,
-      // Single-line fields clear the 45 tap-target floor; multiline grows above.
+      errorStyle: errorStyle, // used only by Form validators
+      counterText: '', // counter is rendered manually below the glass
       constraints:
           const BoxConstraints(minHeight: DabblerSizing.touchTargetMin),
       contentPadding: const EdgeInsetsDirectional.symmetric(
@@ -216,14 +214,12 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
       prefixIcon: _buildPrefix(d),
       suffixIcon: _buildSuffix(d),
       // start/end slots mirror automatically under RTL.
-      // Border per state — focus = 2px focusRing, error = 1px error, else 1px
-      // borderDefault. No shadow anywhere.
-      border: border(d.borderDefault, DabblerSizing.borderDefault),
-      enabledBorder: border(d.borderDefault, DabblerSizing.borderDefault),
-      focusedBorder: border(d.focusRing, DabblerSizing.borderDefault + 1),
-      errorBorder: border(d.error, DabblerSizing.borderDefault),
-      focusedErrorBorder: border(d.error, DabblerSizing.borderDefault),
-      disabledBorder: border(d.borderDefault, DabblerSizing.borderDefault),
+      border: InputBorder.none,
+      enabledBorder: InputBorder.none,
+      focusedBorder: InputBorder.none,
+      errorBorder: InputBorder.none,
+      focusedErrorBorder: InputBorder.none,
+      disabledBorder: InputBorder.none,
     );
 
     final field = TextFormField(
@@ -249,21 +245,75 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
       decoration: decoration,
     );
 
-    if (widget.label == null) return field;
+    // State-driven border: error > focus > glass gradient hairline.
+    // Disabled fields get a solid quiet border on a denser fill.
+    Color? borderOverride;
+    double borderWidth = DabblerSizing.borderDefault;
+    if (!enabled) {
+      borderOverride = d.borderDefault;
+    } else if (hasError) {
+      borderOverride = d.error;
+    } else if (_focused && !widget.readOnly) {
+      borderOverride = d.focusRing;
+      borderWidth = DabblerSizing.borderDefault + 1; // 2px
+    }
+
+    final glassField = DabblerGlassSurface(
+      borderRadius: radius,
+      blur: DabblerGlass.blurField, // 22 — the search-field scale
+      fill: enabled ? null : DabblerGlass.solidFill(d, b),
+      borderColor: borderOverride,
+      borderWidth: borderWidth,
+      shadows: DabblerGlass.insetShadows(d, b),
+      child: field,
+    );
+
+    // Below the glass: error replaces helper; counter trails.
+    final below = <Widget>[];
+    if (hasError) {
+      below.add(Text(widget.errorText!, style: errorStyle));
+    } else if (widget.helperText != null) {
+      below.add(Text(widget.helperText!, style: helperStyle));
+    }
+    Widget? belowRow;
+    final counter = widget.maxLength == null
+        ? null
+        : Text('${_controller.text.length}/${widget.maxLength}',
+            style: counterStyle);
+    if (below.isNotEmpty || counter != null) {
+      belowRow = Row(
+        children: [
+          Expanded(child: below.isEmpty ? const SizedBox.shrink() : below.first),
+          if (counter != null) counter,
+        ],
+      );
+    }
+
+    if (widget.label == null && belowRow == null) return glassField;
 
     // Label sits ABOVE the field; it turns brandPrimary while focused.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.label!,
-          style: a(DabblerType.subheadline).copyWith(
-            color: _focused ? d.brandPrimary : d.textSecondary,
+        if (widget.label != null) ...[
+          Text(
+            widget.label!,
+            style: a(DabblerType.subheadline).copyWith(
+              color: _focused ? d.brandPrimary : d.textSecondary,
+            ),
           ),
-        ),
-        const SizedBox(height: DabblerSpacing.stackTight), // 6
-        field,
+          const SizedBox(height: DabblerSpacing.stackTight), // 6
+        ],
+        glassField,
+        if (belowRow != null) ...[
+          const SizedBox(height: DabblerSpacing.stackTight),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(
+                start: DabblerSpacing.space4),
+            child: belowRow,
+          ),
+        ],
       ],
     );
   }
@@ -281,20 +331,23 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
     return null;
   }
 
+  // The search-field treatment (pen radius 24 → DabblerRadius.xxl) applies to
+  // every single-line field; multiline steps down to xl.
   BorderRadius _radius(DabblerTextFieldVariant v) => switch (v) {
-        DabblerTextFieldVariant.standard => DabblerRadius.smRadius, // 6
-        DabblerTextFieldVariant.password => DabblerRadius.smRadius,
-        DabblerTextFieldVariant.multiline => DabblerRadius.mdRadius, // 9
-        DabblerTextFieldVariant.search => DabblerRadius.pillRadius, // 999
+        DabblerTextFieldVariant.standard => DabblerRadius.xxlRadius, // 24
+        DabblerTextFieldVariant.password => DabblerRadius.xxlRadius,
+        DabblerTextFieldVariant.multiline => DabblerRadius.xlRadius, // 18
+        DabblerTextFieldVariant.search => DabblerRadius.xxlRadius,
       };
 
-  /// Leading slot (start side; mirrors under RTL).
+  /// Leading slot (start side; mirrors under RTL). The design renders the
+  /// leading icon in brandPrimary on the glass field.
   Widget? _buildPrefix(DabblerColors d) {
     final icon = widget.variant == DabblerTextFieldVariant.search
         ? Icons.search
         : widget.prefixIcon;
     if (icon == null) return null;
-    return Icon(icon, size: DabblerSizing.iconMd, color: d.textSecondary);
+    return Icon(icon, size: DabblerSizing.iconMd, color: d.brandPrimary);
   }
 
   /// Trailing slot (end side; mirrors under RTL). Password → visibility toggle,

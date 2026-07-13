@@ -9,9 +9,10 @@ import '../doc_model.dart';
 String _radiusUse(String name) => switch (name) {
       'sm' => 'chips, inputs',
       'md' => 'buttons',
-      'lg' => 'cards',
-      'xl' => 'sheets, modals',
-      'pill' => 'pills, avatars, switches',
+      'lg' => 'icon tiles, nested surfaces',
+      'xl' => 'cards, sheets',
+      'xxl' => 'search fields, hero glass',
+      'pill' => 'pills, avatars, glass chips',
       _ => '',
     };
 

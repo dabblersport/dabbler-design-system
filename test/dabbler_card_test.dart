@@ -49,27 +49,58 @@ void main() {
     expect(find.byType(InkWell), findsNothing);
   });
 
-  testWidgets('card is flat: elevation 0 and no BoxShadow in the tree',
+  testWidgets('glass card: casts the two-part glass shadow and blurs once',
       (tester) async {
-    await _pump(tester, const DabblerCard(child: Text('Flat')));
+    await _pump(tester, const DabblerCard(child: Text('Glass')));
 
-    final material = tester.widget<Material>(
-      find
-          .descendant(
-            of: find.byType(DabblerCard),
-            matching: find.byType(Material),
-          )
-          .first,
+    // The two-part glass shadow (brand cast + white lip) is present.
+    final shadowed = tester
+        .widgetList<Container>(find.descendant(
+          of: find.byType(DabblerCard),
+          matching: find.byType(Container),
+        ))
+        .where((c) =>
+            c.decoration is BoxDecoration &&
+            ((c.decoration! as BoxDecoration).boxShadow?.isNotEmpty ?? false));
+    expect(shadowed, isNotEmpty);
+    expect(
+      (shadowed.first.decoration! as BoxDecoration).boxShadow!.length,
+      2, // coloured cast + white lip
     );
-    expect(material.elevation, 0);
 
-    // No decoration anywhere carries a shadow.
-    for (final w in tester.widgetList<DecoratedBox>(find.byType(DecoratedBox))) {
-      final dec = w.decoration;
-      if (dec is BoxDecoration) {
-        expect(dec.boxShadow ?? const <BoxShadow>[], isEmpty);
-      }
-    }
+    // Exactly one BackdropFilter per top-level surface.
+    expect(find.byType(BackdropFilter), findsOneWidget);
+  });
+
+  testWidgets('nested glass never nests BackdropFilters', (tester) async {
+    await _pump(
+      tester,
+      const DabblerCard(
+        child: DabblerCard(
+          variant: DabblerCardVariant.filled,
+          child: Text('Nested'),
+        ),
+      ),
+    );
+    // Outer card blurs; the nested card must skip its own filter.
+    expect(find.byType(BackdropFilter), findsOneWidget);
+  });
+
+  testWidgets('reduce-transparency: high contrast disables every blur',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: dabblerThemeData(DabblerTheme.main, Brightness.light),
+        home: const MediaQuery(
+          data: MediaQueryData(highContrast: true),
+          child: Scaffold(
+            body: Center(child: DabblerCard(child: Text('Solid'))),
+          ),
+        ),
+      ),
+    );
+    expect(find.byType(BackdropFilter), findsNothing);
+    expect(find.text('Solid'), findsOneWidget);
   });
 
   testWidgets('list tile min height is >= 45 (>= 36 when dense)',

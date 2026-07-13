@@ -1,26 +1,32 @@
 // =============================================================================
-// Dabbler — Button component
+// Dabbler — Button component (Liquid Glass)
 // -----------------------------------------------------------------------------
-// A flat, token-driven button. Every colour, size, radius, and weight is read
-// from the design tokens (context.dabbler / DabblerType / DabblerSizing /
-// DabblerRadius / DabblerSpacing) — nothing is hardcoded.
+// A token-driven glass button. Every colour, size, radius, and weight is read
+// from the design tokens (context.dabbler / DabblerGlass / DabblerType /
+// DabblerSizing / DabblerRadius / DabblerSpacing) — nothing is hardcoded.
+//
+//   filled / destructive → the "selected chip" treatment: brand (or error) fill
+//     @85% + a top-lit sheen + a white stroke + the selected glass shadow.
+//   tonal / outlined     → glass surface + the gradient hairline.
+//   text                 → unchanged (no surface, no shadow).
+//   icon                 → a circular glass button (the design's arrow buttons).
 //
 // Correctness note: label/icon colour on a brand or error surface is ALWAYS the
 // matching on-token (onBrand / onError), never a literal white. Bright and Sport
 // have LIGHT primaries whose onBrand is DARK, so hardcoding white would be
 // illegible — reading the token is the only correct way.
 //
-// Flat by design: elevation is 0 everywhere. Press feedback is a tonal darken +
-// a slight scale, never a shadow lift.
+// Press feedback = deepen the glass shadow + a slight scale.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../theme/dabbler_colors.dart';
+import '../theme/dabbler_glass.dart';
 import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_type.dart';
 
-/// Visual variants. `icon` is a square, tonal, icon-only button.
+/// Visual variants. `icon` is a circular, glass, icon-only button.
 enum DabblerButtonVariant { filled, tonal, outlined, text, destructive, icon }
 
 /// Size steps — heights are base-3 (36 / 45 / 54); `medium` == touchTargetMin.
@@ -52,16 +58,30 @@ extension DabblerButtonMetrics on DabblerButtonSize {
 /// Resolved paint for one (variant × state) combination.
 class _Paint {
   const _Paint({
-    required this.background,
     required this.foreground,
-    required this.border,
+    this.fill,
+    this.overlay,
+    this.borderColor,
+    this.shadows,
+    this.blur = DabblerGlass.blurSmall,
+    this.glass = true,
+    this.plainBackground,
   });
 
-  final Color background;
+  /// Label / icon colour.
   final Color foreground;
 
-  /// Border colour, or null for no border.
-  final Color? border;
+  /// Glass path (when [glass] is true).
+  final Color? fill; // null → DabblerGlass.fill for the brightness
+  final Gradient? overlay; // top-lit sheen (selected treatment)
+  final Color? borderColor; // null → the gradient hairline
+  final List<BoxShadow>? shadows;
+  final double blur;
+
+  /// When false, render a plain (non-glass) container: the `text` variant and
+  /// the disabled state.
+  final bool glass;
+  final Color? plainBackground;
 }
 
 /// A flat, token-driven button.
@@ -135,34 +155,55 @@ class _DabblerButtonState extends State<DabblerButton> {
 
     if (widget.isLoading) content = _wrapLoading(content, paint.foreground);
 
-    // Painted surface — fixed height, flat (no shadow), token radius.
+    // The icon variant is circular (the design's arrow buttons); labelled
+    // buttons keep the token button radius.
+    final radius =
+        widget._isIcon ? DabblerRadius.pillRadius : DabblerRadius.mdRadius;
+    final contentPadding = widget._isIcon
+        ? EdgeInsets.zero
+        : EdgeInsetsDirectional.symmetric(
+            horizontal: widget.size.horizontalPadding);
+
+    // Painted surface — fixed height; press deepens the shadow (never lifts).
+    final Widget painted;
+    if (paint.glass) {
+      final shadows = paint.shadows;
+      painted = DabblerGlassSurface(
+        key: DabblerButton.surfaceKey,
+        height: widget.size.height,
+        width: widget._isIcon ? widget.size.height : null,
+        borderRadius: radius,
+        blur: paint.blur,
+        fill: paint.fill,
+        overlay: paint.overlay,
+        borderColor: paint.borderColor,
+        shadows: _pressed && shadows != null
+            ? DabblerGlass.deepen(shadows)
+            : shadows,
+        alignment: Alignment.center,
+        padding: contentPadding,
+        child: content,
+      );
+    } else {
+      painted = Container(
+        key: DabblerButton.surfaceKey,
+        height: widget.size.height,
+        width: widget._isIcon ? widget.size.height : null,
+        alignment: Alignment.center,
+        padding: contentPadding,
+        decoration: BoxDecoration(
+          color: paint.plainBackground,
+          borderRadius: radius,
+        ),
+        child: content,
+      );
+    }
+
     final surface = AnimatedScale(
       scale: _pressed ? 0.98 : 1.0,
       duration: const Duration(milliseconds: 80),
       curve: Curves.easeOut,
-      child: Container(
-        key: DabblerButton.surfaceKey,
-        height: widget.size.height,
-        width: widget._isIcon ? widget.size.height : null, // square icon button
-        alignment: Alignment.center,
-        padding: widget._isIcon
-            ? EdgeInsets.zero
-            : EdgeInsetsDirectional.symmetric(
-                horizontal: widget.size.horizontalPadding),
-        decoration: BoxDecoration(
-          color: paint.background,
-          borderRadius: DabblerRadius.mdRadius,
-          border: paint.border == null
-              ? null
-              : Border.all(
-                  color: paint.border!,
-                  // ignore: avoid_redundant_argument_values  (token-driven, not a literal)
-                  width: DabblerSizing.borderDefault,
-                ),
-          // Flat: no boxShadow, ever.
-        ),
-        child: content,
-      ),
+      child: painted,
     );
 
     // Guarantee a >= touchTargetMin hit area even for the small step, without
@@ -272,93 +313,84 @@ class _DabblerButtonState extends State<DabblerButton> {
     );
   }
 
-  /// Maps variant + state → background / foreground / border, all from tokens.
-  _Paint _resolvePaint(DabblerColors d, Brightness brightness) {
-    // Disabled overrides everything: fill → borderDefault, label → textSecondary.
+  /// Maps variant + state → glass treatment, all from tokens.
+  _Paint _resolvePaint(DabblerColors d, Brightness b) {
+    // Disabled overrides everything: solid fill → borderDefault, label →
+    // textSecondary, no glass, no shadow (plus the 50% opacity wrapper).
     if (widget._isDisabled) {
-      final filledLike = widget.variant != DabblerButtonVariant.outlined &&
-          widget.variant != DabblerButtonVariant.text;
+      final filledLike = widget.variant != DabblerButtonVariant.text;
       return _Paint(
-        background: filledLike ? d.borderDefault : Colors.transparent,
+        glass: false,
+        plainBackground:
+            filledLike ? d.borderDefault : Colors.transparent,
         foreground: d.textSecondary,
-        border: filledLike ? null : d.borderDefault,
       );
     }
 
     switch (widget.variant) {
+      // The "selected chip" treatment from the design: near-opaque brand fill,
+      // a top-lit sheen, a white stroke, and the selected glass shadow.
       case DabblerButtonVariant.filled:
         return _Paint(
-          background: _maybePress(d.brandPrimary),
+          fill: DabblerGlass.selectedFill(d),
+          overlay: DabblerGlass.selectedOverlay(d),
+          borderColor: DabblerGlass.selectedStroke(),
+          shadows: DabblerGlass.selectedShadows(d, b),
+          blur: DabblerGlass.blurSelected,
           foreground: d.onBrand, // dark on Bright/Sport — never hardcode white
-          border: null,
         );
 
+      // Same treatment over the error colour.
       case DabblerButtonVariant.destructive:
         return _Paint(
-          background: _maybePress(d.error),
+          fill: DabblerGlass.selectedFill(d, base: d.error),
+          overlay: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: const [0.0, 0.5],
+            colors: [
+              Color.lerp(d.error, Colors.white, 0.5)!.withValues(alpha: 0.5),
+              Color.lerp(d.error, Colors.white, 0.5)!.withValues(alpha: 0.0),
+            ],
+          ),
+          borderColor: DabblerGlass.selectedStroke(),
+          shadows: DabblerGlass.selectedShadows(d, b, base: d.error),
+          blur: DabblerGlass.blurSelected,
           foreground: d.onError,
-          border: null,
         );
 
+      // Standard glass + the gradient hairline.
       case DabblerButtonVariant.tonal:
-      case DabblerButtonVariant.icon:
-        final tint = _tonalTint(d, brightness);
         return _Paint(
-          background: _maybePress(tint),
-          foreground: _readableBrandTone(d, tint),
-          border: null,
+          shadows: DabblerGlass.raisedShadows(d, b),
+          foreground: d.brandPrimary,
         );
 
+      // Lighter glass density for the quieter option.
       case DabblerButtonVariant.outlined:
         return _Paint(
-          background: _pressed
-              ? d.brandPrimary.withValues(alpha: 0.08)
-              : Colors.transparent,
+          fill: Colors.white
+              .withValues(alpha: b == Brightness.dark ? 0.05 : 0.08),
+          shadows: DabblerGlass.raisedShadows(d, b),
           foreground: d.brandPrimary,
-          border: d.borderDefault,
         );
 
+      // Circular glass arrow/icon button (blur = _Paint's blurSmall default).
+      case DabblerButtonVariant.icon:
+        return _Paint(
+          shadows: DabblerGlass.raisedShadows(d, b),
+          foreground: d.brandPrimary,
+        );
+
+      // Unchanged: no surface, no shadow.
       case DabblerButtonVariant.text:
         return _Paint(
-          background: _pressed
+          glass: false,
+          plainBackground: _pressed
               ? d.brandPrimary.withValues(alpha: 0.08)
               : Colors.transparent,
           foreground: d.brandPrimary,
-          border: null,
         );
     }
-  }
-
-  /// Darken a fill by ~12% (brightness × 0.88) while pressed — the flat, tonal
-  /// press feedback. No-op when not pressed.
-  Color _maybePress(Color c) {
-    if (!_pressed) return c;
-    final hsv = HSVColor.fromColor(c);
-    return hsv.withValue((hsv.value * 0.88).clamp(0.0, 1.0)).toColor();
-  }
-
-  /// Tonal background: a tint of brandPrimary toward the page surface.
-  Color _tonalTint(DabblerColors d, Brightness brightness) {
-    final t = brightness == Brightness.dark ? 0.72 : 0.86;
-    return Color.lerp(d.brandPrimary, d.bgPrimary, t)!;
-  }
-
-  /// A readable, brand-derived label tone for the tonal surface: whichever of
-  /// the brand tones (or the brand-tinted textPrimary) contrasts best against
-  /// [bg]. This keeps tonal labels brand-coloured where legible (e.g. dark mode)
-  /// and falls back to textPrimary where a light primary would be washed out
-  /// (e.g. Bright).
-  Color _readableBrandTone(DabblerColors d, Color bg) {
-    final candidates = <Color>[d.brandPrimary, d.brandPrimaryHover, d.textPrimary];
-    candidates.sort((a, b) => _contrast(b, bg).compareTo(_contrast(a, bg)));
-    return candidates.first;
-  }
-
-  static double _contrast(Color a, Color b) {
-    final la = a.computeLuminance();
-    final lb = b.computeLuminance();
-    final hi = la > lb ? la : lb;
-    final lo = la > lb ? lb : la;
-    return (hi + 0.05) / (lo + 0.05);
   }
 }

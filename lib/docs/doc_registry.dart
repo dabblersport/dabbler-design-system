@@ -12,12 +12,14 @@ import 'pages/components_cards.dart';
 import 'pages/components_inputs.dart';
 import 'pages/foundations_color.dart';
 import 'pages/foundations_elevation.dart';
+import 'pages/foundations_glass.dart';
 import 'pages/foundations_iconography.dart';
 import 'pages/foundations_motion.dart';
 import 'pages/foundations_radius.dart';
 import 'pages/foundations_spacing.dart';
 import 'pages/foundations_typography.dart';
 import 'pages/getting_started.dart';
+import 'pages/patterns_search_screen.dart';
 import 'pages/patterns_stubs.dart';
 
 /// Every documentation page, in sidebar order.
@@ -25,6 +27,7 @@ final List<DocPage> docPages = <DocPage>[
   gettingStartedPage,
   // Foundations
   colorPage,
+  glassPage,
   typographyPage,
   spacingPage,
   radiusPage,
@@ -36,6 +39,7 @@ final List<DocPage> docPages = <DocPage>[
   inputsPage,
   cardsPage,
   // Patterns
+  searchScreenPage,
   gameCardPage,
   organiserCardPage,
   venueCardPage,

@@ -25,14 +25,14 @@ final gettingStartedPage = DocPage(
     DocSection(
       'Principles',
       const DocAnatomy([
-        AnatomyPart('Flat, not floating',
-            'Separation comes from tinted surfaces and hairline borders, not shadows. Only genuinely floating things (modals, sheets) cast one.'),
+        AnatomyPart('Liquid glass',
+            'Surfaces are translucent glass: a blurred fill, a gradient hairline, and a brand-coloured cast + white lip. The old flat rule is retired — see Foundations · Glass.'),
         AnatomyPart('Tokens are the source of truth',
             'Colours, sizes, radii, and type live in the foundations. UI reads them; it never inlines a literal.'),
         AnatomyPart('Bilingual by default',
             'Every component is RTL-safe and picks up Arabic leading. Design in both directions from the start.'),
         AnatomyPart('Seven themes, one system',
-            'Main, Sport, Social, Active, Bright, Simple, and Shade all share one structure. On-brand marks read from tokens so light-primaried themes stay legible.'),
+            'Main, Sport, Social, Active, Bright, Simple, and Shade all share one structure. Even the glass re-tints per theme; on-brand marks read from tokens so light-primaried themes stay legible.'),
       ]),
     ),
     DocSection(
@@ -72,7 +72,7 @@ Padding(padding: EdgeInsets.all(DabblerSpacing.cardPadding));'''),
         ],
         donts: [
           'Hardcode a hex, a raw pixel value, or Colors.white.',
-          'Add a shadow to a card or tile — the system is flat.',
+          'Invent a shadow — use the DabblerGlass shadow sets.',
           'Assume left/right; use start/end so layouts mirror.',
         ],
       ),

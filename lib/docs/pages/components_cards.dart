@@ -26,7 +26,7 @@ Widget _variantCard(BuildContext context, DabblerCardVariant v) {
           Text(_titleCase(v.name),
               style: DabblerType.headline.copyWith(color: d.textPrimary)),
           const SizedBox(height: DabblerSpacing.stackTight),
-          Text('Tint + border, no shadow.',
+          Text('Glass: blur, hairline, cast.',
               style: DabblerType.footnote.copyWith(color: d.textSecondary)),
         ],
       ),
@@ -39,7 +39,7 @@ final cardsPage = DocPage(
   group: DocGroup.components,
   title: 'Cards & Lists',
   definition:
-      'Flat surfaces, a titled section grouping, and the workhorse list tile.',
+      'Glass surfaces, a titled section grouping, and the workhorse list tile.',
   keywords: [
     'component',
     'card',
@@ -54,10 +54,11 @@ final cardsPage = DocPage(
     DocSection(
       'Overview',
       const DocProse(
-        'Cards group related content on a flat surface. Separation comes from the '
-        'tinted-neutral ladder (bgPrimary → surfaceCard → bgTertiary) and a '
-        'hairline border — never a shadow. The list tile is the workhorse row; '
-        'the section groups tiles and cards under a title.',
+        'Cards group related content on a liquid-glass surface: a blurred '
+        'translucent fill, the gradient hairline, and the two-part glass shadow '
+        '(brand cast + white lip). Variants are glass densities — filled is '
+        'denser, outlined is lighter. The list tile is the workhorse row; the '
+        'section groups tiles and cards under a title.',
       ),
     ),
     DocSection(
@@ -83,10 +84,10 @@ final cardsPage = DocPage(
     DocSection(
       'Anatomy',
       const DocAnatomy([
-        AnatomyPart('Container', 'surfaceCard fill, radius lg (12), elevation 0.'),
-        AnatomyPart('Border', 'Hairline (0.5px) borderDefault — the separation cue.'),
+        AnatomyPart('Container', 'Glass fill over a backdrop blur, radius xl (18).'),
+        AnatomyPart('Border', 'The 1px gradient hairline — white → brand → white.'),
         AnatomyPart('Padding', 'cardPadding (18) by default; override per case.'),
-        AnatomyPart('States', 'interactive press shifts tonally toward bgTertiary.'),
+        AnatomyPart('States', 'interactive press densifies the glass + deepens the cast.'),
       ]),
     ),
     DocSection(
@@ -97,7 +98,7 @@ final cardsPage = DocPage(
       ]),
     ),
     DocSection(
-      'Nested surfaces (flat-ladder proof)',
+      'Nested surfaces (one blur, denser fill)',
       DocExampleFrame(
         child: SizedBox(
           width: 320,
@@ -113,7 +114,7 @@ final cardsPage = DocPage(
                 DabblerCard(
                   variant: DabblerCardVariant.filled,
                   child: Text(
-                    'Filled card nested inside — a distinct layer with no shadow.',
+                    'Filled card nested inside — denser glass, no second blur.',
                     style: DabblerType.footnote
                         .copyWith(color: context.dabbler.textSecondary),
                   ),
@@ -133,7 +134,7 @@ final cardsPage = DocPage(
     DocSection(
       'Specs',
       DocSpecsTable([
-        SpecRow('Card radius', '${DabblerRadius.lg.toInt()} px', 'DabblerRadius.lg'),
+        SpecRow('Card radius', '${DabblerRadius.xl.toInt()} px', 'DabblerRadius.xl'),
         SpecRow('Card padding', '${DabblerSpacing.cardPadding.toInt()} px',
             'DabblerSpacing.cardPadding'),
         const SpecRow('Border', '${DabblerSizing.borderHairline} px',
@@ -157,7 +158,7 @@ final cardsPage = DocPage(
           'Group related rows under a DabblerSurfaceSection with a title.',
         ],
         donts: [
-          'Add a BoxShadow to lift a card — the system is flat.',
+          'Nest BackdropFilters — inner surfaces must skip their blur.',
           'Use raw Material Card default elevation/tint.',
           'Inset a divider with left/right — it must mirror in RTL.',
         ],

@@ -226,26 +226,36 @@ The scale is **base 3**: `space1..space11` = 3, 6, 9, 12, 15, 18, 21, 24, 30, 36
 `touchTargetMin` is **45** (base-3, and clears Apple's 44pt floor) — use it as the
 minimum tap size.
 
-### Flat elevation — only `level2` casts a shadow
+### Elevation — the FLAT rule is RETIRED; Liquid Glass is the rule
 
-Elevation is **flat / Apple-style**: separation comes from hairline borders and
-tinted surfaces, not shadows.
+> **Superseded (glass era).** The system previously mandated *flat* elevation —
+> no shadows, separation via borders + tint only. That rule is **retired** and
+> replaced by the **Glass elevation rule** below (source of truth:
+> `dabbler.pen` · "Search Screen"). Do not follow the old flat guidance.
 
-- **`level0`** — flat on the background. No shadow. (`const []`)
-- **`level1`** — a raised surface: `surfaceCard` tint + a 0.5px border. Still **no
-  shadow**. (`const []`)
-- **`level2`** — the **only** shadow in the system. Floating surfaces only:
-  modals, bottom sheets, popovers, FAB.
+Surfaces are now **liquid glass** (`dabbler_glass.dart`):
 
-`dabblerThemeData` enforces this: cards, app bars, navigation bars/rails, and
-elevated/filled buttons are all `elevation: 0` with `surfaceTintColor:
-transparent` (so M3's tonal-elevation tint never bleeds into the tinted
-neutrals). Only dialogs / bottom sheets / popup menus float. Custom floating
-surfaces should apply `DabblerElevation.level2` directly.
+- **Surface** — a translucent fill (white 45% light / ~12% dark) over a
+  `BackdropFilter` blur (`DabblerGlass.blurCard/blurField/blurSmall/blurSelected`).
+- **Border** — a 1px **gradient hairline** (white → brand-light → brand →
+  white, top to bottom) that re-tints from the active theme's `brandPrimary`.
+- **Shadow** — a two-part set per scale (`cardShadows` / `raisedShadows` /
+  `insetShadows` / `selectedShadows`): a **coloured cast** derived from
+  `brandPrimary` plus a 1px **white lip** highlight. Cards and chips DO cast
+  these glass shadows now.
+- **Background** — glass only reads against `DabblerGlassBackground` (a theme-
+  tinted base + four brand/accent radial orbs).
+- **Selected / active** — brand fill @ 85% + a top-lit sheen + a white 70%
+  stroke; the label reads `onBrand` (dark in Bright/Sport — never white).
 
-In **dark mode** the shadow reads as almost nothing — that is intentional; dark
-floating surfaces separate via their border and a lighter surface tint. Keep the
-subtle shadow, don't increase it.
+Build glass surfaces with `DabblerGlassSurface` — it enforces the performance
+rules (one `BackdropFilter` per surface, never nested; `RepaintBoundary`;
+`DabblerGlass.enabled` + platform high-contrast / disable-animations degrade it
+to a solid tinted surface + border).
+
+`DabblerElevation.level2` remains only as the legacy floating shadow used by
+Material dialogs / sheets / menus via `dabblerThemeData`; new surfaces should
+use the `DabblerGlass` shadow sets instead.
 
 ## Persistence
 

@@ -12,7 +12,7 @@ final buttonsPage = DocPage(
   id: 'buttons',
   group: DocGroup.components,
   title: 'Buttons',
-  definition: 'A flat, token-driven button in six variants and three sizes.',
+  definition: 'A token-driven glass button in six variants and three sizes.',
   keywords: [
     'component',
     'button',
@@ -28,10 +28,12 @@ final buttonsPage = DocPage(
     DocSection(
       'Overview',
       const DocProse(
-        'Buttons trigger actions. They are flat — press feedback is a tonal '
-        'darken plus a slight scale, never a shadow lift. Every colour, size, '
-        'and label weight is a token, and the label colour is always onBrand / '
-        'onError so it stays legible on light-primaried themes.',
+        'Buttons trigger actions. Filled and destructive carry the brand-filled '
+        'glass treatment (near-opaque fill, top-lit sheen, white stroke, '
+        'selected shadow); tonal and outlined are glass surfaces with the '
+        'gradient hairline; text stays bare. Press deepens the glass shadow '
+        'with a slight scale. The label colour is always onBrand / onError so '
+        'it stays legible on light-primaried themes.',
       ),
     ),
     DocSection(
@@ -45,10 +47,12 @@ final buttonsPage = DocPage(
     DocSection(
       'Anatomy',
       const DocAnatomy([
-        AnatomyPart('Container', 'Fill + radius (md, 9) from tokens; elevation 0.'),
+        AnatomyPart('Container',
+            'Glass or brand-filled surface, radius md (9); icon variant is a circular glass button.'),
         AnatomyPart('Label', 'DabblerType.headline (Medium 500), colour onBrand.'),
         AnatomyPart('Icon', 'Optional leading/trailing at iconMd (24); mirrors in RTL.'),
-        AnatomyPart('States', 'default · pressed (tonal) · disabled · loading.'),
+        AnatomyPart('States',
+            'default · pressed (deeper shadow + slight scale) · disabled · loading.'),
       ]),
     ),
     DocSection(
@@ -108,7 +112,7 @@ final buttonsPage = DocPage(
         ],
         donts: [
           'Hardcode white label text — Bright and Sport need dark onBrand.',
-          'Add a shadow or lift on press; feedback is tonal only.',
+          'Invent a custom shadow; press feedback is the deepened glass cast.',
           'Stack multiple Filled buttons competing for attention.',
         ],
       ),
