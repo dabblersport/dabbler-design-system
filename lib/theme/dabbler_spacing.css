@@ -1,0 +1,58 @@
+/* ============================================================================
+   Dabbler — Geometry tokens (spacing · radius · sizing · elevation) · CSS
+   Version 1.0 · Base-3 grid, flat/Apple elevation. Mirrors dabbler_spacing.dart.
+   Only --elevation-2 casts a shadow. 12/24/30/36/48 are multiples of 3 AND 4 —
+   prefer them for structural values (align with 24px icons + platform components).
+   ========================================================================== */
+
+:root {
+  /* Spacing scale (base 3) */
+  --space-1: 3px;
+  --space-2: 6px;
+  --space-3: 9px;
+  --space-4: 12px;
+  --space-5: 15px;
+  --space-6: 18px;
+  --space-7: 21px;
+  --space-8: 24px;
+  --space-9: 30px;
+  --space-10: 36px;
+  --space-11: 48px;
+
+  /* Semantic spacing aliases */
+  --card-padding: var(--space-6);   /* 18 */
+  --screen-gutter: var(--space-8);  /* 24 */
+  --section-gap: var(--space-9);    /* 30 */
+  --stack-tight: var(--space-2);    /* 6 */
+  --stack-default: var(--space-4);  /* 12 */
+  --icon-gap: var(--space-2);       /* 6 */
+
+  /* Radius (base 3) */
+  --radius-sm: 6px;   /* chips, small inputs */
+  --radius-md: 9px;   /* buttons */
+  --radius-lg: 12px;  /* cards */
+  --radius-xl: 18px;  /* sheets, modals */
+  --radius-pill: 999px; /* pills, avatars */
+
+  /* Sizing */
+  --touch-target-min: 45px; /* base-3, clears Apple's 44pt floor */
+  --border-hairline: 0.5px;
+  --border-default: 1px;
+  --icon-sm: 18px;
+  --icon-md: 24px; /* HugeIcons native grid */
+  --icon-lg: 30px;
+
+  /* Elevation (flat — only level 2 casts a shadow) */
+  --elevation-0: none;
+  --elevation-1: none;
+  --elevation-2: 0 9px 24px rgba(23, 17, 35, 0.14),
+                 0 3px 6px rgba(23, 17, 35, 0.08);
+}
+
+/* In dark mode the shadow reads as almost nothing — that is intentional; dark
+   floating surfaces separate via their border + a lighter surface tint. Keep it
+   subtle, do not increase it. */
+[data-mode="dark"] {
+  --elevation-2: 0 9px 24px rgba(0, 0, 0, 0.28),
+                 0 3px 6px rgba(0, 0, 0, 0.20);
+}

@@ -19,6 +19,7 @@ import 'package:forui/forui.dart' as f;
 
 import '../theme/dabbler_colors.dart';
 import '../theme/dabbler_forui_theme.dart';
+import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_theme_data.dart';
 import '../theme/dabbler_type.dart';
 
@@ -31,7 +32,7 @@ class ThemeGalleryScreen extends StatefulWidget {
   State<ThemeGalleryScreen> createState() => _ThemeGalleryScreenState();
 }
 
-enum _GalleryView { all, roles, appPreview, typography }
+enum _GalleryView { all, roles, appPreview, typography, spacing }
 
 class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
   DabblerTheme _theme = DabblerTheme.main;
@@ -107,6 +108,10 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                   value: _GalleryView.typography,
                   label: Text('Typography'),
                 ),
+                ButtonSegment(
+                  value: _GalleryView.spacing,
+                  label: Text('Spacing & Layout'),
+                ),
               ],
               selected: {_view},
               onSelectionChanged: (s) => setState(() => _view = s.first),
@@ -130,6 +135,7 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                       _GalleryView.appPreview =>
                         _AppPreviewPanel(themeLabel: label),
                       _GalleryView.typography => const _TypePanel(),
+                      _GalleryView.spacing => const _SpacingPanel(),
                     },
                   ),
                 ),
@@ -202,6 +208,10 @@ class _AllPanel extends StatelessWidget {
           const _SectionHeader('Typography'),
           const SizedBox(height: 12),
           ...typeTiles(context),
+          const SizedBox(height: 24),
+          const _SectionHeader('Spacing & Layout'),
+          const SizedBox(height: 12),
+          ...spacingSections(context),
         ],
       ),
     );
@@ -655,6 +665,237 @@ class _TypePanel extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: typeTiles(context),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// View · Spacing & Layout — spacing / radius / elevation / sizing tokens
+// -----------------------------------------------------------------------------
+
+class _SpacingPanel extends StatelessWidget {
+  const _SpacingPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: spacingSections(context),
+    );
+  }
+}
+
+/// Shared between the Spacing view and the All view. Driven by the token
+/// definitions (DabblerSpacing.scale / DabblerRadius.scale), not hardcoded.
+List<Widget> spacingSections(BuildContext context) {
+  final cs = Theme.of(context).colorScheme;
+  final d = context.dabbler;
+
+  return [
+    // Spacing scale — labelled bars.
+    const _SubHead('Spacing · base 3'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    for (final (name, value) in DabblerSpacing.scale)
+      Padding(
+        padding: const EdgeInsets.only(bottom: DabblerSpacing.stackTight),
+        child: Row(
+          children: [
+            SizedBox(
+              width: DabblerSpacing.space11 * 2,
+              child: Text('$name · ${value.toInt()}',
+                  style: DabblerType.caption1.copyWith(color: d.textSecondary)),
+            ),
+            Container(
+              width: value,
+              height: DabblerSpacing.space3,
+              decoration: BoxDecoration(
+                color: d.brandPrimary,
+                borderRadius: DabblerRadius.smRadius,
+              ),
+            ),
+          ],
+        ),
+      ),
+    const SizedBox(height: DabblerSpacing.sectionGap),
+
+    // Radius scale — labelled swatches.
+    const _SubHead('Radius · base 3'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    Wrap(
+      spacing: DabblerSpacing.stackDefault,
+      runSpacing: DabblerSpacing.stackDefault,
+      children: [
+        for (final (name, value) in DabblerRadius.scale)
+          _RadiusSwatch(name: name, value: value),
+      ],
+    ),
+    const SizedBox(height: DabblerSpacing.sectionGap),
+
+    // Elevation — three cards, only level 2 floats.
+    const _SubHead('Elevation · flat (only level 2 casts a shadow)'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    const Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _ElevationCard(label: 'level0', shadows: DabblerElevation.level0, bordered: false),
+        SizedBox(width: DabblerSpacing.stackDefault),
+        _ElevationCard(label: 'level1', shadows: DabblerElevation.level1, bordered: true),
+        SizedBox(width: DabblerSpacing.stackDefault),
+        _ElevationCard(label: 'level2', shadows: DabblerElevation.level2, bordered: true),
+      ],
+    ),
+    const SizedBox(height: DabblerSpacing.sectionGap),
+
+    // Sizing readout.
+    const _SubHead('Sizing'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    Row(
+      children: [
+        Container(
+          width: DabblerSizing.touchTargetMin,
+          height: DabblerSizing.touchTargetMin,
+          decoration: BoxDecoration(
+            color: d.bgTertiary,
+            borderRadius: DabblerRadius.mdRadius,
+            border: Border.all(color: d.borderStrong),
+          ),
+          alignment: Alignment.center,
+          child: Icon(Icons.touch_app_outlined,
+              size: DabblerSizing.iconMd, color: cs.primary),
+        ),
+        const SizedBox(width: DabblerSpacing.stackDefault),
+        Expanded(
+          child: Text('touchTargetMin · ${DabblerSizing.touchTargetMin.toInt()}',
+              style: DabblerType.footnote.copyWith(color: d.textSecondary)),
+        ),
+      ],
+    ),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    _BorderRow('borderHairline', DabblerSizing.borderHairline, d.borderStrong, d.textSecondary),
+    const SizedBox(height: DabblerSpacing.stackTight),
+    _BorderRow('borderDefault', DabblerSizing.borderDefault, d.borderStrong, d.textSecondary),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    Row(
+      children: [
+        for (final (name, size) in const [
+          ('iconSm · 18', DabblerSizing.iconSm),
+          ('iconMd · 24', DabblerSizing.iconMd),
+          ('iconLg · 30', DabblerSizing.iconLg),
+        ])
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: DabblerSpacing.sectionGap),
+            child: Column(
+              children: [
+                Icon(Icons.star_rounded, size: size, color: cs.primary),
+                const SizedBox(height: DabblerSpacing.stackTight),
+                Text(name,
+                    style: DabblerType.caption2.copyWith(color: d.textTertiary)),
+              ],
+            ),
+          ),
+      ],
+    ),
+  ];
+}
+
+class _SubHead extends StatelessWidget {
+  const _SubHead(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text.toUpperCase(),
+      style: DabblerType.caption2.copyWith(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        letterSpacing: 0.6,
+      ),
+    );
+  }
+}
+
+class _RadiusSwatch extends StatelessWidget {
+  const _RadiusSwatch({required this.name, required this.value});
+  final String name;
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final d = context.dabbler;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: DabblerSpacing.space11 + DabblerSpacing.space5,
+          height: DabblerSpacing.space11,
+          decoration: BoxDecoration(
+            color: d.surfaceCard,
+            borderRadius: BorderRadius.all(Radius.circular(value)),
+            border: Border.all(color: d.borderStrong, width: DabblerSizing.borderHairline),
+          ),
+        ),
+        const SizedBox(height: DabblerSpacing.stackTight),
+        Text('$name · ${value.toInt()}',
+            style: DabblerType.caption2.copyWith(color: d.textTertiary)),
+      ],
+    );
+  }
+}
+
+class _ElevationCard extends StatelessWidget {
+  const _ElevationCard({
+    required this.label,
+    required this.shadows,
+    required this.bordered,
+  });
+
+  final String label;
+  final List<BoxShadow> shadows;
+  final bool bordered;
+
+  @override
+  Widget build(BuildContext context) {
+    final d = context.dabbler;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: DabblerSpacing.space11 * 2,
+          height: DabblerSpacing.space8 * 3,
+          decoration: BoxDecoration(
+            color: d.surfaceCard,
+            borderRadius: DabblerRadius.lgRadius,
+            border: bordered
+                ? Border.all(color: d.borderDefault, width: DabblerSizing.borderHairline)
+                : null,
+            boxShadow: shadows,
+          ),
+        ),
+        const SizedBox(height: DabblerSpacing.stackTight),
+        Text(label, style: DabblerType.caption2.copyWith(color: d.textTertiary)),
+      ],
+    );
+  }
+}
+
+class _BorderRow extends StatelessWidget {
+  const _BorderRow(this.name, this.width, this.lineColor, this.textColor);
+  final String name;
+  final double width;
+  final Color lineColor;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: DabblerSpacing.space11 * 2,
+          child: Text('$name · $width',
+              style: DabblerType.caption1.copyWith(color: textColor)),
+        ),
+        Expanded(child: Container(height: width, color: lineColor)),
+      ],
     );
   }
 }
