@@ -130,13 +130,17 @@ Text('Join game', style: DabblerType.headline);
 
 ### The Apple ramp
 
+The ramp runs **lighter** than Apple's SF Pro defaults — titles are **Light
+(300)** and Headline is **Medium (500)** — tuned for Readex Pro. Sizes and
+leading are unchanged from the Apple ramp.
+
 | Style | Size / Leading | Weight |
 | --- | --- | --- |
-| Large Title | 34 / 41 | 400 |
-| Title 1 | 28 / 34 | 400 |
-| Title 2 | 22 / 28 | 400 |
-| Title 3 | 20 / 25 | 400 |
-| Headline | 17 / 22 | 600 |
+| Large Title | 34 / 41 | 300 |
+| Title 1 | 28 / 34 | 300 |
+| Title 2 | 22 / 28 | 300 |
+| Title 3 | 20 / 25 | 300 |
+| Headline | 17 / 22 | 500 |
 | Body | 17 / 22 | 400 |
 | Callout | 16 / 21 | 400 |
 | Subheadline | 15 / 20 | 400 |
@@ -145,7 +149,7 @@ Text('Join game', style: DabblerType.headline);
 | Caption 2 | 11 / 13 | 400 |
 
 `leading / size` becomes Flutter's `height` multiplier. `DabblerType.emphasized()`
-and `.bold()` bump the weight to 600 / 700.
+and `.bold()` bump the weight to 500 / 700.
 
 ### Apple → Material 3 slot mapping
 
@@ -155,7 +159,7 @@ widgets inherit the ramp:
 | M3 slot | Apple style | | M3 slot | Apple style |
 | --- | --- | --- | --- | --- |
 | `displayLarge` | Large Title | | `titleLarge` | Title 3 |
-| `displayMedium` | Title 1 | | `titleMedium` | **Headline** (17/600) |
+| `displayMedium` | Title 1 | | `titleMedium` | **Headline** (17/500) |
 | `displaySmall` | Title 2 | | `titleSmall` | Subheadline |
 | `headlineLarge` | Title 1 | | `bodyLarge` | Body |
 | `headlineMedium` | Title 2 | | `bodyMedium` | Callout |
@@ -178,10 +182,11 @@ also flips direction to RTL for `ar`.
 
 ### The font binaries
 
-The family `ReadexPro` is declared in `pubspec.yaml` with four weights
-(400/500/600/700) under `assets/fonts/`:
+The family `ReadexPro` is declared in `pubspec.yaml` with five weights
+(300/400/500/600/700) under `assets/fonts/`:
 
 ```
+assets/fonts/ReadexPro-Light.ttf     (300)
 assets/fonts/ReadexPro-Regular.ttf   (400)
 assets/fonts/ReadexPro-Medium.ttf    (500)
 assets/fonts/ReadexPro-SemiBold.ttf  (600)

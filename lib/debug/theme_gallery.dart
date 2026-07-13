@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart' as f;
 
+import '../components/dabbler_button.dart';
 import '../theme/dabbler_colors.dart';
 import '../theme/dabbler_forui_theme.dart';
 import '../theme/dabbler_spacing.dart';
@@ -32,7 +33,7 @@ class ThemeGalleryScreen extends StatefulWidget {
   State<ThemeGalleryScreen> createState() => _ThemeGalleryScreenState();
 }
 
-enum _GalleryView { all, roles, appPreview, typography, spacing }
+enum _GalleryView { all, roles, appPreview, typography, spacing, buttons }
 
 class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
   DabblerTheme _theme = DabblerTheme.main;
@@ -112,6 +113,10 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                   value: _GalleryView.spacing,
                   label: Text('Spacing & Layout'),
                 ),
+                ButtonSegment(
+                  value: _GalleryView.buttons,
+                  label: Text('Buttons'),
+                ),
               ],
               selected: {_view},
               onSelectionChanged: (s) => setState(() => _view = s.first),
@@ -136,6 +141,7 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                         _AppPreviewPanel(themeLabel: label),
                       _GalleryView.typography => const _TypePanel(),
                       _GalleryView.spacing => const _SpacingPanel(),
+                      _GalleryView.buttons => const _ButtonsPanel(),
                     },
                   ),
                 ),
@@ -212,6 +218,11 @@ class _AllPanel extends StatelessWidget {
           const _SectionHeader('Spacing & Layout'),
           const SizedBox(height: 12),
           ...spacingSections(context),
+          const SizedBox(height: 24),
+          const _SectionHeader('Buttons'),
+          const SizedBox(height: 12),
+          // Omit the live spinner here so the aggregated view can settle.
+          ...buttonSections(context, animated: false),
         ],
       ),
     );
@@ -899,3 +910,141 @@ class _BorderRow extends StatelessWidget {
     );
   }
 }
+
+// -----------------------------------------------------------------------------
+// View · Buttons — every DabblerButton variant / size / state, enum-driven
+// -----------------------------------------------------------------------------
+
+class _ButtonsPanel extends StatelessWidget {
+  const _ButtonsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: buttonSections(context),
+    );
+  }
+}
+
+/// A button with a small caption below it (state / variant / size name).
+class _ButtonCell extends StatelessWidget {
+  const _ButtonCell({required this.caption, required this.child});
+  final String caption;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        child,
+        const SizedBox(height: DabblerSpacing.stackTight),
+        Text(
+          caption,
+          style: DabblerType.caption2
+              .copyWith(color: context.dabbler.textTertiary),
+        ),
+      ],
+    );
+  }
+}
+
+/// Shared between the Buttons view and the All view. Everything is driven by the
+/// [DabblerButtonVariant] / [DabblerButtonSize] enums, so new variants or sizes
+/// appear here automatically.
+///
+/// [animated] gates the live loading spinner: the dedicated Buttons tab shows it
+/// (true), while the aggregated "All" view omits it (false) so the screen can
+/// settle for `pumpAndSettle` in tests.
+List<Widget> buttonSections(BuildContext context, {bool animated = true}) {
+  void noop() {}
+
+  Wrap row(List<Widget> children) => Wrap(
+        spacing: DabblerSpacing.stackDefault,
+        runSpacing: DabblerSpacing.stackDefault,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: children,
+      );
+
+  return [
+    // All variants at the default (medium) size.
+    const _SubHead('Variants · default size'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    row([
+      for (final v in DabblerButtonVariant.values)
+        _ButtonCell(
+          caption: v.name,
+          child: v == DabblerButtonVariant.icon
+              ? DabblerButton.icon(icon: Icons.favorite_border, onPressed: noop)
+              : DabblerButton(label: _titleCase(v.name), variant: v, onPressed: noop),
+        ),
+    ]),
+    const SizedBox(height: DabblerSpacing.sectionGap),
+
+    // All sizes (filled).
+    const _SubHead('Sizes · filled'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    row([
+      for (final s in DabblerButtonSize.values)
+        _ButtonCell(
+          caption: s.name,
+          child: DabblerButton(label: _titleCase(s.name), size: s, onPressed: noop),
+        ),
+    ]),
+    const SizedBox(height: DabblerSpacing.sectionGap),
+
+    // The four states. "Pressed" is transient — hold the button to see it.
+    const _SubHead('States'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    row([
+      _ButtonCell(
+        caption: 'default',
+        child: DabblerButton(label: 'Default', onPressed: noop),
+      ),
+      _ButtonCell(
+        caption: 'pressed (hold)',
+        child: DabblerButton(label: 'Pressed', onPressed: noop),
+      ),
+      // onPressed defaults to null → disabled.
+      const _ButtonCell(
+        caption: 'disabled',
+        child: DabblerButton(label: 'Disabled'),
+      ),
+      if (animated)
+        _ButtonCell(
+          caption: 'loading',
+          child:
+              DabblerButton(label: 'Loading', isLoading: true, onPressed: noop),
+        ),
+    ]),
+    const SizedBox(height: DabblerSpacing.sectionGap),
+
+    // Leading / trailing icons — placement mirrors under RTL (start/end).
+    const _SubHead('With icons'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    row([
+      DabblerButton(label: 'Add', leadingIcon: Icons.add, onPressed: noop),
+      DabblerButton(
+        label: 'Next',
+        trailingIcon: Icons.arrow_forward,
+        variant: DabblerButtonVariant.tonal,
+        onPressed: noop,
+      ),
+    ]),
+    const SizedBox(height: DabblerSpacing.sectionGap),
+
+    // Full-width CTA.
+    const _SubHead('Full width'),
+    const SizedBox(height: DabblerSpacing.stackDefault),
+    DabblerButton(
+      label: 'Join game',
+      leadingIcon: Icons.sports_soccer,
+      fullWidth: true,
+      onPressed: noop,
+    ),
+  ];
+}
+
+String _titleCase(String s) =>
+    s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';

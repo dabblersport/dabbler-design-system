@@ -27,9 +27,9 @@ abstract final class DabblerType {
   DabblerType._();
 
   static const _f = kDabblerFontFamily;
+  static const _light = FontWeight.w300;
   static const _reg = FontWeight.w400;
   static const _med = FontWeight.w500;
-  static const _semi = FontWeight.w600;
   static const _bold = FontWeight.w700;
 
   // leading (pt) / size (pt) = Flutter height multiplier.
@@ -43,11 +43,13 @@ abstract final class DabblerType {
       );
 
   // Apple text styles at the default Dynamic Type size.
-  static final TextStyle largeTitle  = _s(34, 41, _reg);
-  static final TextStyle title1      = _s(28, 34, _reg);
-  static final TextStyle title2      = _s(22, 28, _reg);
-  static final TextStyle title3      = _s(20, 25, _reg);
-  static final TextStyle headline    = _s(17, 22, _semi);
+  // Titles run Light (300) and Headline runs Medium (500) — a lighter ramp than
+  // Apple's SF Pro defaults, tuned for Readex Pro. Sizes/leading are unchanged.
+  static final TextStyle largeTitle  = _s(34, 41, _light);
+  static final TextStyle title1      = _s(28, 34, _light);
+  static final TextStyle title2      = _s(22, 28, _light);
+  static final TextStyle title3      = _s(20, 25, _light);
+  static final TextStyle headline    = _s(17, 22, _med);
   static final TextStyle body        = _s(17, 22, _reg);
   static final TextStyle callout     = _s(16, 21, _reg);
   static final TextStyle subheadline = _s(15, 20, _reg);
@@ -55,8 +57,8 @@ abstract final class DabblerType {
   static final TextStyle caption1    = _s(12, 16, _reg);
   static final TextStyle caption2    = _s(11, 13, _reg);
 
-  /// Apple's "emphasized" trait — same style, heavier weight.
-  static TextStyle emphasized(TextStyle s) => s.copyWith(fontWeight: _semi);
+  /// Apple's "emphasized" trait — same style, one step heavier (Medium 500).
+  static TextStyle emphasized(TextStyle s) => s.copyWith(fontWeight: _med);
   static TextStyle bold(TextStyle s) => s.copyWith(fontWeight: _bold);
 
   /// Apply Arabic leading to any style.
@@ -85,7 +87,7 @@ TextTheme dabblerTextTheme({bool arabic = false}) {
     bodyLarge:  a(DabblerType.body),
     bodyMedium: a(DabblerType.callout),
     bodySmall:  a(DabblerType.footnote),
-    // Label ← Headline (buttons, 17/600) / Footnote / Caption 2
+    // Label ← Headline (buttons, 17/500) / Footnote / Caption 2 — all Medium 500.
     labelLarge:  a(DabblerType.headline),
     labelMedium: a(DabblerType.footnote.copyWith(fontWeight: DabblerType._med)),
     labelSmall:  a(DabblerType.caption2.copyWith(fontWeight: DabblerType._med)),

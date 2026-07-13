@@ -22,7 +22,6 @@ dependencies:
   # Forui component library. We map the same Material ColorScheme + Dabbler
   # tokens into FThemeData so Forui and Material widgets stay visually identical.
   forui: ^0.23.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -38,6 +37,8 @@ flutter:
   fonts:
     - family: ReadexPro
       fonts:
+        - asset: assets/fonts/ReadexPro-Light.ttf
+          weight: 300
         - asset: assets/fonts/ReadexPro-Regular.ttf
           weight: 400
         - asset: assets/fonts/ReadexPro-Medium.ttf

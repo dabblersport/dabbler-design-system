@@ -4,7 +4,7 @@
    Apply a class (e.g. class="t-body"). Arabic auto-adjusts under [dir="rtl"].
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap');
 
 :root {
   --font-sans: 'Readex Pro', system-ui, -apple-system, sans-serif;
@@ -22,11 +22,11 @@
   --leading-caption-1: 16px; --leading-caption-2: 13px;
 }
 
-.t-large-title  { font-family:var(--font-sans); font-size:34px; line-height:41px; font-weight:400; letter-spacing:0; }
-.t-title-1      { font-family:var(--font-sans); font-size:28px; line-height:34px; font-weight:400; letter-spacing:0; }
-.t-title-2      { font-family:var(--font-sans); font-size:22px; line-height:28px; font-weight:400; letter-spacing:0; }
-.t-title-3      { font-family:var(--font-sans); font-size:20px; line-height:25px; font-weight:400; letter-spacing:0; }
-.t-headline     { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:600; letter-spacing:0; }
+.t-large-title  { font-family:var(--font-sans); font-size:34px; line-height:41px; font-weight:300; letter-spacing:0; }
+.t-title-1      { font-family:var(--font-sans); font-size:28px; line-height:34px; font-weight:300; letter-spacing:0; }
+.t-title-2      { font-family:var(--font-sans); font-size:22px; line-height:28px; font-weight:300; letter-spacing:0; }
+.t-title-3      { font-family:var(--font-sans); font-size:20px; line-height:25px; font-weight:300; letter-spacing:0; }
+.t-headline     { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:500; letter-spacing:0; }
 .t-body         { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:400; letter-spacing:0; }
 .t-callout      { font-family:var(--font-sans); font-size:16px; line-height:21px; font-weight:400; letter-spacing:0; }
 .t-subheadline  { font-family:var(--font-sans); font-size:15px; line-height:20px; font-weight:400; letter-spacing:0; }
@@ -47,5 +47,5 @@
 [dir="rtl"] .t-caption-1    { line-height:19px; }
 [dir="rtl"] .t-caption-2    { line-height:15px; }
 
-/* Button/label convenience = Headline weight at body size */
-.t-label { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:600; letter-spacing:0; }
+/* Button/label convenience = Headline weight at body size (Medium 500) */
+.t-label { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:500; letter-spacing:0; }

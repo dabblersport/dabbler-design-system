@@ -124,8 +124,10 @@ void main() {
       final t = dabblerTextTheme();
       expect(t.bodyLarge!.fontSize, 17);
       expect(t.displayLarge!.fontSize, 34);
-      expect(t.titleMedium!.fontSize, 17); // Headline (17/600)
-      expect(t.titleMedium!.fontWeight, FontWeight.w600);
+      expect(t.titleMedium!.fontSize, 17); // Headline (17/500)
+      expect(t.titleMedium!.fontWeight, FontWeight.w500);
+      // Titles are Light (300) after the ramp was lightened.
+      expect(t.displayLarge!.fontWeight, FontWeight.w300); // Large Title
     });
 
     test('Arabic variant keeps sizes but increases leading', () {
@@ -223,7 +225,7 @@ void main() {
     // Default "All" view stacks Roles + App Preview + Typography together.
     expect(find.text('primary'), findsOneWidget); // Roles swatch
     expect(find.text('Dabbler'), findsOneWidget); // App Preview app bar
-    expect(find.text('Large Title · 34/41 · w400'), findsOneWidget); // Typography
+    expect(find.text('Large Title · 34/41 · w300'), findsOneWidget); // Typography
 
     await tester.tap(find.text('Bright'));
     await tester.pumpAndSettle();
@@ -260,7 +262,7 @@ void main() {
     await tester.pumpAndSettle();
     // Spec label is derived from the DabblerType definitions (computed, not
     // hardcoded): "<name> · <size>/<leading> · w<weight>".
-    expect(find.text('Large Title · 34/41 · w400'), findsOneWidget);
+    expect(find.text('Large Title · 34/41 · w300'), findsOneWidget);
     expect(find.text('Sport belongs to everyone'), findsWidgets);
     expect(find.text('الرياضة لكل من يحضر'), findsWidgets);
 
