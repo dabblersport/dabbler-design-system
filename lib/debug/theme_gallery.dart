@@ -24,6 +24,8 @@ import '../components/dabbler_surface.dart';
 import '../components/dabbler_text_field.dart';
 import '../theme/dabbler_colors.dart';
 import '../theme/dabbler_forui_theme.dart';
+import '../theme/dabbler_glass.dart';
+import '../theme/dabbler_glass_background.dart';
 import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_theme_data.dart';
 import '../theme/dabbler_type.dart';
@@ -46,6 +48,7 @@ enum _GalleryView {
   buttons,
   inputs,
   cards,
+  glassTest,
 }
 
 class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
@@ -138,6 +141,10 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                   value: _GalleryView.cards,
                   label: Text('Cards & Lists'),
                 ),
+                ButtonSegment(
+                  value: _GalleryView.glassTest,
+                  label: Text('Glass (test)'),
+                ),
               ],
               selected: {_view},
               onSelectionChanged: (s) => setState(() => _view = s.first),
@@ -165,6 +172,7 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                       _GalleryView.buttons => const _ButtonsPanel(),
                       _GalleryView.inputs => const _InputsPanel(),
                       _GalleryView.cards => const _CardsPanel(),
+                      _GalleryView.glassTest => const _GlassTestPanel(),
                     },
                   ),
                 ),
@@ -1003,13 +1011,17 @@ List<Widget> buttonSections(BuildContext context, {bool animated = true}) {
     const _SubHead('Variants · default size'),
     const SizedBox(height: DabblerSpacing.stackDefault),
     row([
+      // Glass variants live in the "Glass (test)" tab — over a flat background
+      // glass looks broken (skill: it needs DabblerGlassBackground).
       for (final v in DabblerButtonVariant.values)
-        _ButtonCell(
-          caption: v.name,
-          child: v == DabblerButtonVariant.icon
-              ? DabblerButton.icon(icon: Icons.favorite_border, onPressed: noop)
-              : DabblerButton(label: _titleCase(v.name), variant: v, onPressed: noop),
-        ),
+        if (v != DabblerButtonVariant.glass &&
+            v != DabblerButtonVariant.glassActive)
+          _ButtonCell(
+            caption: v.name,
+            child: v == DabblerButtonVariant.icon
+                ? DabblerButton.icon(icon: Icons.favorite_border, onPressed: noop)
+                : DabblerButton(label: _titleCase(v.name), variant: v, onPressed: noop),
+          ),
     ]),
     const SizedBox(height: DabblerSpacing.sectionGap),
 
@@ -1626,6 +1638,157 @@ class _CardsBlockState extends State<_CardsBlock> {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// View · Glass (test) — the Liquid Glass BUTTONS-ONLY scoped test
+// -----------------------------------------------------------------------------
+// Everything renders ON DabblerGlassBackground (glass over a flat background
+// looks broken). Shows the two glass variants beside the opaque set so the
+// layering-law contrast — "floating = glass, content = opaque" — is visible,
+// plus a DabblerGlassConfig.enabled toggle to demo the opaque fallback.
+
+class _GlassTestPanel extends StatefulWidget {
+  const _GlassTestPanel();
+
+  @override
+  State<_GlassTestPanel> createState() => _GlassTestPanelState();
+}
+
+class _GlassTestPanelState extends State<_GlassTestPanel> {
+  void _noop() {}
+
+  @override
+  Widget build(BuildContext context) {
+    final d = context.dabbler;
+
+    Wrap row(List<Widget> children) => Wrap(
+          spacing: DabblerSpacing.stackDefault,
+          runSpacing: DabblerSpacing.stackDefault,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: children,
+        );
+
+    Widget cell(String caption, Widget child) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            child,
+            const SizedBox(height: DabblerSpacing.stackTight),
+            Text(caption,
+                style: DabblerType.caption2.copyWith(color: d.textTertiary)),
+          ],
+        );
+
+    return DabblerGlassBackground(
+      child: ListView(
+        padding: const EdgeInsets.all(DabblerSpacing.screenGutter),
+        children: [
+          // Reduce-transparency demo toggle.
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Glass enabled (DabblerGlassConfig.enabled)',
+                  style:
+                      DabblerType.footnote.copyWith(color: d.textSecondary),
+                ),
+              ),
+              Switch(
+                value: DabblerGlassConfig.enabled,
+                onChanged: (v) =>
+                    setState(() => DabblerGlassConfig.enabled = v),
+              ),
+            ],
+          ),
+          const SizedBox(height: DabblerSpacing.sectionGap),
+
+          const _SubHead('Floating = glass'),
+          const SizedBox(height: DabblerSpacing.stackDefault),
+          row([
+            cell(
+              'glass',
+              DabblerButton(
+                label: 'Filter',
+                variant: DabblerButtonVariant.glass,
+                onPressed: _noop,
+              ),
+            ),
+            cell(
+              'glass · pressed (hold)',
+              DabblerButton(
+                label: 'Filter',
+                variant: DabblerButtonVariant.glass,
+                onPressed: _noop,
+              ),
+            ),
+            const _GlassDisabledCell(variant: DabblerButtonVariant.glass),
+          ]),
+          const SizedBox(height: DabblerSpacing.stackDefault),
+          row([
+            cell(
+              'glassActive',
+              DabblerButton(
+                label: 'Near me',
+                variant: DabblerButtonVariant.glassActive,
+                onPressed: _noop,
+              ),
+            ),
+            cell(
+              'glassActive · pressed (hold)',
+              DabblerButton(
+                label: 'Near me',
+                variant: DabblerButtonVariant.glassActive,
+                onPressed: _noop,
+              ),
+            ),
+            const _GlassDisabledCell(
+                variant: DabblerButtonVariant.glassActive),
+          ]),
+          const SizedBox(height: DabblerSpacing.sectionGap),
+
+          const _SubHead('Content = opaque (unchanged, for contrast)'),
+          const SizedBox(height: DabblerSpacing.stackDefault),
+          row([
+            for (final v in const [
+              DabblerButtonVariant.filled,
+              DabblerButtonVariant.tonal,
+              DabblerButtonVariant.outlined,
+              DabblerButtonVariant.text,
+            ])
+              cell(
+                v.name,
+                DabblerButton(
+                    label: _titleCase(v.name), variant: v, onPressed: _noop),
+              ),
+          ]),
+          const SizedBox(height: DabblerSpacing.sectionGap),
+          Text(
+            'Layering law: if it scrolls, it\'s opaque. If it floats, it\'s glass.',
+            style: DabblerType.footnote.copyWith(color: d.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GlassDisabledCell extends StatelessWidget {
+  const _GlassDisabledCell({required this.variant});
+  final DabblerButtonVariant variant;
+
+  @override
+  Widget build(BuildContext context) {
+    final d = context.dabbler;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        DabblerButton(label: 'Disabled', variant: variant),
+        const SizedBox(height: DabblerSpacing.stackTight),
+        Text('disabled',
+            style: DabblerType.caption2.copyWith(color: d.textTertiary)),
       ],
     );
   }

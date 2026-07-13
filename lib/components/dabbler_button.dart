@@ -17,11 +17,34 @@
 import 'package:flutter/material.dart';
 
 import '../theme/dabbler_colors.dart';
+import '../theme/dabbler_glass.dart';
 import '../theme/dabbler_spacing.dart';
 import '../theme/dabbler_type.dart';
 
 /// Visual variants. `icon` is a square, tonal, icon-only button.
-enum DabblerButtonVariant { filled, tonal, outlined, text, destructive, icon }
+///
+/// LAYERING LAW (see .claude/skills/dabbler-liquid-glass/SKILL.md): buttons that
+/// live INSIDE content stay opaque — that is every variant below except the two
+/// glass ones. [glass] / [glassActive] are ONLY for floating/chrome controls
+/// (FABs, toolbar buttons, floating filter actions) rendered above content, on a
+/// rich backdrop such as [DabblerGlassBackground]. If the button scrolls with
+/// content, use an opaque variant.
+enum DabblerButtonVariant {
+  filled,
+  tonal,
+  outlined,
+  text,
+  destructive,
+  icon,
+
+  /// Floating glass control: blur 18 + saturation boost, gradient hairline,
+  /// `raised` shadow, label = textPrimary. Chrome layer only.
+  glass,
+
+  /// Selected/engaged floating control: brandPrimary @ 85% + top-lit overlay,
+  /// white @ 70% stroke, `active` shadow, label = onBrand (dark in Bright).
+  glassActive,
+}
 
 /// Size steps — heights are base-3 (36 / 45 / 54); `medium` == touchTargetMin.
 enum DabblerButtonSize { small, medium, large }
@@ -64,11 +87,20 @@ class _Paint {
   final Color? border;
 }
 
-/// A flat, token-driven button.
+/// A token-driven button.
 ///
 /// `onPressed == null` renders the disabled treatment and ignores taps.
 /// `isLoading` swaps the content for an inline spinner (sized to the label),
 /// keeps the button at its current layout width, and ignores taps.
+///
+/// ## Layering law (Liquid Glass)
+/// Buttons inside scrolling content are **opaque** — use `filled`, `tonal`,
+/// `outlined`, `text`, `destructive`, or `icon`. The `glass` / `glassActive`
+/// variants are reserved for **floating chrome controls** (FABs, toolbar
+/// actions, floating filters) rendered above content on a rich backdrop
+/// ([DabblerGlassBackground]); they honour Reduce Transparency and
+/// [DabblerGlassConfig.enabled] by falling back to an opaque bordered surface.
+/// Rule of thumb: if it scrolls, it's opaque; if it floats, it's glass.
 class DabblerButton extends StatefulWidget {
   const DabblerButton({
     super.key,
@@ -122,47 +154,63 @@ class DabblerButton extends StatefulWidget {
 class _DabblerButtonState extends State<DabblerButton> {
   bool _pressed = false;
 
+  bool get _isGlassVariant =>
+      widget.variant == DabblerButtonVariant.glass ||
+      widget.variant == DabblerButtonVariant.glassActive;
+
   @override
   Widget build(BuildContext context) {
     final d = context.dabbler;
     final brightness = Theme.of(context).brightness;
-    final paint = _resolvePaint(d, brightness);
+    // Glass path only when enabled — a disabled glass button uses the shared
+    // opaque disabled treatment below, like every other variant.
+    final useGlass = _isGlassVariant && !widget._isDisabled;
+    final paint = useGlass ? null : _resolvePaint(d, brightness);
+
+    final foreground = useGlass
+        ? (widget.variant == DabblerButtonVariant.glassActive
+            ? d.onBrand // dark on Bright — NEVER hardcode white
+            : d.textPrimary)
+        : paint!.foreground;
 
     // Content — icon-only, or leading/label/trailing row.
     Widget content = widget._isIcon
-        ? Icon(widget.icon, size: DabblerSizing.iconMd, color: paint.foreground)
-        : _buildRow(paint.foreground);
+        ? Icon(widget.icon, size: DabblerSizing.iconMd, color: foreground)
+        : _buildRow(foreground);
 
-    if (widget.isLoading) content = _wrapLoading(content, paint.foreground);
+    if (widget.isLoading) content = _wrapLoading(content, foreground);
 
-    // Painted surface — fixed height, flat (no shadow), token radius.
+    // Painted surface — fixed height, token radius (md, 9 — base-3).
+    final Widget painted =
+        useGlass ? _buildGlassSurface(d, content) : Container(
+      key: DabblerButton.surfaceKey,
+      height: widget.size.height,
+      width: widget._isIcon ? widget.size.height : null, // square icon button
+      alignment: Alignment.center,
+      padding: widget._isIcon
+          ? EdgeInsets.zero
+          : EdgeInsetsDirectional.symmetric(
+              horizontal: widget.size.horizontalPadding),
+      decoration: BoxDecoration(
+        color: paint?.background,
+        borderRadius: DabblerRadius.mdRadius,
+        border: paint?.border == null
+            ? null
+            : Border.all(
+                color: paint!.border!,
+                // ignore: avoid_redundant_argument_values  (token-driven, not a literal)
+                width: DabblerSizing.borderDefault,
+              ),
+        // Opaque variants stay flat: no boxShadow.
+      ),
+      child: content,
+    );
+
     final surface = AnimatedScale(
       scale: _pressed ? 0.98 : 1.0,
       duration: const Duration(milliseconds: 80),
       curve: Curves.easeOut,
-      child: Container(
-        key: DabblerButton.surfaceKey,
-        height: widget.size.height,
-        width: widget._isIcon ? widget.size.height : null, // square icon button
-        alignment: Alignment.center,
-        padding: widget._isIcon
-            ? EdgeInsets.zero
-            : EdgeInsetsDirectional.symmetric(
-                horizontal: widget.size.horizontalPadding),
-        decoration: BoxDecoration(
-          color: paint.background,
-          borderRadius: DabblerRadius.mdRadius,
-          border: paint.border == null
-              ? null
-              : Border.all(
-                  color: paint.border!,
-                  // ignore: avoid_redundant_argument_values  (token-driven, not a literal)
-                  width: DabblerSizing.borderDefault,
-                ),
-          // Flat: no boxShadow, ever.
-        ),
-        child: content,
-      ),
+      child: painted,
     );
 
     // Guarantee a >= touchTargetMin hit area even for the small step, without
@@ -215,6 +263,49 @@ class _DabblerButtonState extends State<DabblerButton> {
 
   void _setPressed(bool value) {
     if (_pressed != value) setState(() => _pressed = value);
+  }
+
+  /// The floating-control glass treatments (skill recipe: blur + saturation
+  /// boost + tinted overlay/highlight stroke). Pressed deepens the shadow cast;
+  /// the slight scale is applied by the shared AnimatedScale.
+  Widget _buildGlassSurface(DabblerColors d, Widget content) {
+    final active = widget.variant == DabblerButtonVariant.glassActive;
+    final shadows = active
+        ? DabblerGlassShadows.active(d)
+        : DabblerGlassShadows.raised(d);
+
+    return SizedBox(
+      key: DabblerButton.surfaceKey,
+      height: widget.size.height,
+      width: widget._isIcon ? widget.size.height : null,
+      child: DabblerGlass(
+        // Skill blur radii: floating control 18, selected/active control 16.
+        blur: active ? 16 : 18,
+        borderRadius: DabblerRadius.mdRadius, // 9 — base-3 button radius
+        tint: active ? d.brandPrimary.withValues(alpha: 0.85) : null,
+        overlay: active
+            ? LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  dabblerBrandLight(d).withValues(alpha: 0.5),
+                  dabblerBrandLight(d).withValues(alpha: 0.0),
+                ],
+              )
+            : null,
+        strokeColor: active ? Colors.white.withValues(alpha: 0.7) : null,
+        shadows:
+            _pressed ? DabblerGlassShadows.deepen(shadows) : shadows,
+        child: Container(
+          alignment: Alignment.center,
+          padding: widget._isIcon
+              ? EdgeInsets.zero
+              : EdgeInsetsDirectional.symmetric(
+                  horizontal: widget.size.horizontalPadding),
+          child: content,
+        ),
+      ),
+    );
   }
 
   /// Leading icon · label · trailing icon. Row honours the ambient
@@ -286,6 +377,21 @@ class _DabblerButtonState extends State<DabblerButton> {
     }
 
     switch (widget.variant) {
+      // Enabled glass variants take the _buildGlassSurface path and never reach
+      // this switch; these cases exist for exhaustiveness only.
+      case DabblerButtonVariant.glass:
+        return _Paint(
+          background: Colors.transparent,
+          foreground: d.textPrimary,
+          border: null,
+        );
+      case DabblerButtonVariant.glassActive:
+        return _Paint(
+          background: Colors.transparent,
+          foreground: d.onBrand,
+          border: null,
+        );
+
       case DabblerButtonVariant.filled:
         return _Paint(
           background: _maybePress(d.brandPrimary),

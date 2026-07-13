@@ -54,8 +54,12 @@ final buttonsPage = DocPage(
     DocSection(
       'Variants',
       DocCaptionedGrid([
+        // Glass variants are chrome-only and need DabblerGlassBackground —
+        // see the debug gallery's "Glass (test)" tab, not this flat frame.
         for (final v in DabblerButtonVariant.values)
-          Captioned(
+          if (v != DabblerButtonVariant.glass &&
+              v != DabblerButtonVariant.glassActive)
+            Captioned(
             v.name,
             v == DabblerButtonVariant.icon
                 ? DabblerButton.icon(icon: Icons.favorite_border, onPressed: () {})
