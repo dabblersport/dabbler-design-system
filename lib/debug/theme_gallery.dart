@@ -18,6 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart' as f;
 
 import '../components/dabbler_button.dart';
+import '../components/dabbler_inputs.dart';
+import '../components/dabbler_text_field.dart';
 import '../theme/dabbler_colors.dart';
 import '../theme/dabbler_forui_theme.dart';
 import '../theme/dabbler_spacing.dart';
@@ -33,7 +35,7 @@ class ThemeGalleryScreen extends StatefulWidget {
   State<ThemeGalleryScreen> createState() => _ThemeGalleryScreenState();
 }
 
-enum _GalleryView { all, roles, appPreview, typography, spacing, buttons }
+enum _GalleryView { all, roles, appPreview, typography, spacing, buttons, inputs }
 
 class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
   DabblerTheme _theme = DabblerTheme.main;
@@ -117,6 +119,10 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                   value: _GalleryView.buttons,
                   label: Text('Buttons'),
                 ),
+                ButtonSegment(
+                  value: _GalleryView.inputs,
+                  label: Text('Inputs'),
+                ),
               ],
               selected: {_view},
               onSelectionChanged: (s) => setState(() => _view = s.first),
@@ -142,6 +148,7 @@ class _ThemeGalleryScreenState extends State<ThemeGalleryScreen> {
                       _GalleryView.typography => const _TypePanel(),
                       _GalleryView.spacing => const _SpacingPanel(),
                       _GalleryView.buttons => const _ButtonsPanel(),
+                      _GalleryView.inputs => const _InputsPanel(),
                     },
                   ),
                 ),
@@ -223,6 +230,10 @@ class _AllPanel extends StatelessWidget {
           const SizedBox(height: 12),
           // Omit the live spinner here so the aggregated view can settle.
           ...buttonSections(context, animated: false),
+          const SizedBox(height: 24),
+          const _SectionHeader('Inputs'),
+          const SizedBox(height: 12),
+          const _InputsShowcase(),
         ],
       ),
     );
@@ -1048,3 +1059,300 @@ List<Widget> buttonSections(BuildContext context, {bool animated = true}) {
 
 String _titleCase(String s) =>
     s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+
+// -----------------------------------------------------------------------------
+// View · Inputs — text fields + selection controls, shown in EN and AR/RTL
+// -----------------------------------------------------------------------------
+
+class _InputsPanel extends StatelessWidget {
+  const _InputsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: _InputsShowcase(),
+    );
+  }
+}
+
+/// Renders the whole input set twice — once LTR/English, once RTL/Arabic — so
+/// mirroring (prefix/suffix side, clear/toggle side, cursor) is visible at a
+/// glance regardless of the gallery's global direction toggle.
+class _InputsShowcase extends StatelessWidget {
+  const _InputsShowcase();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SubHead('English · LTR'),
+        SizedBox(height: DabblerSpacing.stackDefault),
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: _InputsBlock(strings: _InputStrings.en),
+        ),
+        SizedBox(height: DabblerSpacing.sectionGap),
+        Divider(height: 1),
+        SizedBox(height: DabblerSpacing.sectionGap),
+        _SubHead('العربية · RTL'),
+        SizedBox(height: DabblerSpacing.stackDefault),
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: _InputsBlock(strings: _InputStrings.ar),
+        ),
+      ],
+    );
+  }
+}
+
+/// One localized copy of the inputs. Holds its own interactive state so the two
+/// language copies don't share checkbox/switch/search values.
+class _InputsBlock extends StatefulWidget {
+  const _InputsBlock({required this.strings});
+  final _InputStrings strings;
+
+  @override
+  State<_InputsBlock> createState() => _InputsBlockState();
+}
+
+class _InputsBlockState extends State<_InputsBlock> {
+  late final TextEditingController _filled =
+      TextEditingController(text: widget.strings.sampleValue);
+  late final TextEditingController _search =
+      TextEditingController(text: widget.strings.sampleValue);
+
+  bool _checkbox = false;
+  int _radio = 0;
+  bool _switch = true;
+
+  @override
+  void dispose() {
+    _filled.dispose();
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = widget.strings;
+
+    Widget gap() => const SizedBox(height: DabblerSpacing.stackDefault);
+
+    // A field per variant — driven by the enum so new variants appear here.
+    Widget variantField(DabblerTextFieldVariant v) => switch (v) {
+          DabblerTextFieldVariant.standard =>
+            DabblerTextField(label: s.name, hint: s.nameHint, helperText: s.helper),
+          DabblerTextFieldVariant.multiline => DabblerTextField(
+              variant: DabblerTextFieldVariant.multiline,
+              label: s.notes,
+              hint: s.notesHint,
+              minLines: 3,
+              maxLines: 5,
+            ),
+          DabblerTextFieldVariant.search =>
+            DabblerTextField.search(hint: s.searchHint, controller: _search),
+          DabblerTextFieldVariant.password =>
+            DabblerTextField.password(label: s.password, hint: s.passwordHint),
+        };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Variants.
+        _MiniHead(s.variants),
+        gap(),
+        for (final v in DabblerTextFieldVariant.values) ...[
+          variantField(v),
+          gap(),
+        ],
+        const SizedBox(height: DabblerSpacing.stackDefault),
+
+        // States.
+        _MiniHead(s.states),
+        gap(),
+        DabblerTextField(label: s.stateDefault, hint: s.nameHint),
+        gap(),
+        DabblerTextField(label: s.stateFilled, controller: _filled),
+        gap(),
+        DabblerTextField(label: s.stateError, hint: s.nameHint, errorText: s.error),
+        gap(),
+        DabblerTextField(label: s.stateDisabled, hint: s.nameHint, enabled: false),
+        const SizedBox(height: DabblerSpacing.stackDefault),
+
+        // Prefix + suffix.
+        _MiniHead(s.prefixSuffix),
+        gap(),
+        DabblerTextField(
+          label: s.name,
+          hint: s.nameHint,
+          prefixIcon: Icons.person_outline,
+          suffixIcon: Icons.info_outline,
+          onSuffixTap: () {},
+        ),
+        const SizedBox(height: DabblerSpacing.stackDefault),
+
+        // Selection controls.
+        _MiniHead(s.selection),
+        gap(),
+        Wrap(
+          spacing: DabblerSpacing.sectionGap,
+          runSpacing: DabblerSpacing.stackDefault,
+          children: [
+            _labeled(s.checkbox, [
+              DabblerCheckbox(
+                value: _checkbox,
+                onChanged: (v) => setState(() => _checkbox = v),
+              ),
+              DabblerCheckbox(value: true, onChanged: (_) {}),
+              const DabblerCheckbox(value: true), // disabled
+            ]),
+            _labeled(s.radio, [
+              for (var i = 0; i < 3; i++)
+                DabblerRadio<int>(
+                  value: i,
+                  groupValue: _radio,
+                  onChanged: i == 2 ? null : (v) => setState(() => _radio = v),
+                ),
+            ]),
+            _labeled(s.switchLabel, [
+              DabblerSwitch(
+                value: _switch,
+                onChanged: (v) => setState(() => _switch = v),
+              ),
+              DabblerSwitch(value: false, onChanged: (_) {}),
+              const DabblerSwitch(value: true), // disabled
+            ]),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _labeled(String caption, List<Widget> controls) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          caption,
+          style: DabblerType.caption2.copyWith(color: context.dabbler.textTertiary),
+        ),
+        const SizedBox(height: DabblerSpacing.stackTight),
+        Row(mainAxisSize: MainAxisSize.min, children: controls),
+      ],
+    );
+  }
+}
+
+class _MiniHead extends StatelessWidget {
+  const _MiniHead(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: DabblerType.subheadline
+          .copyWith(color: context.dabbler.textSecondary),
+    );
+  }
+}
+
+/// Localized specimen strings for the inputs block.
+class _InputStrings {
+  const _InputStrings({
+    required this.variants,
+    required this.states,
+    required this.prefixSuffix,
+    required this.selection,
+    required this.name,
+    required this.nameHint,
+    required this.helper,
+    required this.error,
+    required this.notes,
+    required this.notesHint,
+    required this.searchHint,
+    required this.password,
+    required this.passwordHint,
+    required this.sampleValue,
+    required this.stateDefault,
+    required this.stateFilled,
+    required this.stateError,
+    required this.stateDisabled,
+    required this.checkbox,
+    required this.radio,
+    required this.switchLabel,
+  });
+
+  final String variants,
+      states,
+      prefixSuffix,
+      selection,
+      name,
+      nameHint,
+      helper,
+      error,
+      notes,
+      notesHint,
+      searchHint,
+      password,
+      passwordHint,
+      sampleValue,
+      stateDefault,
+      stateFilled,
+      stateError,
+      stateDisabled,
+      checkbox,
+      radio,
+      switchLabel;
+
+  static const en = _InputStrings(
+    variants: 'Variants',
+    states: 'States',
+    prefixSuffix: 'Prefix + suffix',
+    selection: 'Selection controls',
+    name: 'Full name',
+    nameHint: 'Enter your name',
+    helper: 'As printed on your ID',
+    error: 'This field is required',
+    notes: 'Notes',
+    notesHint: 'Add any details…',
+    searchHint: 'Search games',
+    password: 'Password',
+    passwordHint: 'Your password',
+    sampleValue: 'Ada Lovelace',
+    stateDefault: 'Default',
+    stateFilled: 'Filled',
+    stateError: 'Error',
+    stateDisabled: 'Disabled',
+    checkbox: 'Checkbox',
+    radio: 'Radio',
+    switchLabel: 'Switch',
+  );
+
+  static const ar = _InputStrings(
+    variants: 'الأنواع',
+    states: 'الحالات',
+    prefixSuffix: 'أيقونة بادئة ولاحقة',
+    selection: 'عناصر الاختيار',
+    name: 'الاسم الكامل',
+    nameHint: 'أدخل اسمك',
+    helper: 'كما هو مكتوب في الهوية',
+    error: 'هذا الحقل مطلوب',
+    notes: 'ملاحظات',
+    notesHint: 'أضف أي تفاصيل…',
+    searchHint: 'ابحث عن مباريات',
+    password: 'كلمة المرور',
+    passwordHint: 'كلمة المرور',
+    sampleValue: 'آدا لوفلايس',
+    stateDefault: 'افتراضي',
+    stateFilled: 'ممتلئ',
+    stateError: 'خطأ',
+    stateDisabled: 'معطّل',
+    checkbox: 'مربع اختيار',
+    radio: 'زر اختيار',
+    switchLabel: 'مفتاح',
+  );
+}
