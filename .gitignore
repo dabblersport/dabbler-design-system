@@ -42,9 +42,11 @@ app.*.map.json
 /android/app/release
 
 # Web related
-lib/generated_plugin_registrant.dart
 
 # Environment / secrets
 .env
 .env.*
 !.env.example
+
+# Tooling
+.claude-flow/
