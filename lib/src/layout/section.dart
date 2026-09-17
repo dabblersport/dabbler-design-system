@@ -48,14 +48,28 @@ import '../tokens/dabbler_type.dart';
 /// [DabblerColors.textPrimary]; [subtitle] in [DabblerType.footnote] (13/18) at
 /// [DabblerColors.textSecondary].
 ///
-/// **Deviation, recorded.** `Section.jsx:20-21` sets the title inline as
-/// `font-sans` at `fontWeight: 300`, while the same file's own docstring, its
-/// `.d.ts` and `Section.prompt.md` all say **title3**. `title3` is a *display*
-/// role style at weight 400 — Gloock and Wingx each ship one weight, so a 300
-/// title is not a face the system has. The three prose sources agree against
-/// one inline style, and only one of the four describes a renderable face, so
-/// the prose wins and this uses [DabblerType.title3]. Flagged to `cxo` rather
-/// than settled here.
+/// **Deviation, settled by `DECISIONS.md` D-013.** `Section.jsx:18-19` sets
+/// the title inline as `font-sans` at `fontWeight: 300`, while the same file's
+/// own header comment, its `.d.ts` and `Section.prompt.md` all say **title3**.
+/// `cxo` ruled [DabblerType.title3] (20/25 at weight 400) correct; the inline
+/// style in `Section.jsx` is the defect, and is corrected in the design source
+/// separately.
+///
+/// **The reason is not that 300 is unrenderable — D-013 explicitly withdraws
+/// that argument, and it must not be carried forward.** `--weight-light: 300`
+/// *is* declared (`tokens/typography.css:55`) and `meral-sans-light.ttf` does
+/// ship, so a 300-weight **sans** title is perfectly renderable. (What cannot
+/// run Light is the *display* ramp — Gloock and Wingx each ship one weight.)
+///
+/// It is rejected because it is **unmotivated, unique and inconsistent**: the
+/// inline style carries no rationale, and `Dialog.jsx`, `Sheet.jsx` and
+/// `EmptyState.jsx` all reach `title3` through the `.t-title-3` class while
+/// `Section.jsx` alone hand-rolls it — dropping the family (`--font-display`)
+/// and the weight in the transcription, the two properties a hand-copy loses.
+/// A declared step with exactly one user is a ramp entry waiting for a reason,
+/// and it does not get one here. D-013 does **not** pre-refuse a light sans
+/// heading: if one is ever wanted it is an ordinary new ramp step with a
+/// stated role.
 ///
 /// ## RTL
 ///

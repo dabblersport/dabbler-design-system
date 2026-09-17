@@ -6,6 +6,7 @@ import '../controls/fab.dart';
 import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -687,14 +688,22 @@ class _DabblerNavigationBottomBarState
           textAlign: TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          // `fontSize: 12.5, fontWeight: 500` — `.t-caption-1` (12) at
-          // `--weight-medium`. `--text-body` is **undefined** in the design
-          // source's token files, so it inherits; the system's body/secondary
-          // ink is [DabblerColors.textSecondary]. Reported as an ambiguity.
-          style: DabblerType.caption1
+          // `NavigationBottomBar.jsx:121` sets this label to `--text-body`,
+          // which is referenced exactly once in the whole design source and
+          // declared nowhere in `tokens/`. On the web it silently inherits;
+          // Flutter cannot inherit a name that does not exist.
+          //
+          // **Resolved by `DECISIONS.md` D-007(1):** `--text-body` is a
+          // **defect, not a missing token** — it is not added to `colors.css`.
+          // The create-tile label instead takes the same role its sibling
+          // label in this same widget already takes: the destination-item
+          // label at `:503-510`, which is [DabblerType.subheadline] at
+          // `--brand-primary`, weight medium. The ruling names the mechanism
+          // (mirror the sibling), not a hex, so nothing is invented here.
+          style: DabblerType.subheadline
               .resolveForDirection(Directionality.of(context))
               .copyWith(
-                color: colors.textSecondary,
+                color: colors.brandPrimary,
                 fontWeight: DabblerType.medium,
               ),
         ),

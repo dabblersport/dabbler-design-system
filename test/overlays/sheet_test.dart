@@ -1,4 +1,4 @@
-import 'package:dabbler_design_system/src/interaction/press_scale.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_motion.dart';
 import 'package:dabbler_design_system/src/interaction/scrim.dart';
 import 'package:dabbler_design_system/src/overlays/sheet.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';

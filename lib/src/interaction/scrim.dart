@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../tokens/dabbler_colors.dart';
-import 'press_scale.dart';
+import '../tokens/dabbler_motion.dart';
 
 /// Scrim — the one wash behind every overlay.
 ///

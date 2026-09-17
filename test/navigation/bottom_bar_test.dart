@@ -4,6 +4,7 @@ import 'package:dabbler_design_system/src/interaction/focus_ring.dart';
 import 'package:dabbler_design_system/src/navigation/bottom_bar.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -306,6 +307,27 @@ void main() {
       expect(find.text('Create meetup'), findsOneWidget);
       // The pill is gone — it is replaced, not covered.
       expect(find.text('Home'), findsNothing);
+    });
+
+    testWidgets(
+        'the create-tile label mirrors the destination label — D-007(1)',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(const DabblerNavigationBottomBar(defaultMenuOpen: true)),
+      );
+      await tester.pumpAndSettle();
+
+      final TextStyle style =
+          tester.widget<Text>(find.text('Create game')).style!;
+      final DabblerColors colors = _colors();
+
+      // D-007(1): `--text-body` is a defect, not a token. The label takes the
+      // destination-item label's role — subheadline (15) at `--brand-primary`,
+      // weight medium — and not the muted secondary ink it used to guess.
+      expect(style.fontSize, DabblerType.subheadline.fontSize);
+      expect(style.color, colors.brandPrimary);
+      expect(style.fontWeight, DabblerType.medium);
+      expect(style.color, isNot(colors.textSecondary));
     });
 
     testWidgets('the action rotates 45 degrees while open',

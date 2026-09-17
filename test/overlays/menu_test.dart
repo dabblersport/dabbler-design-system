@@ -4,6 +4,7 @@ import 'package:dabbler_design_system/src/overlays/sheet.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:flutter/material.dart';
+import 'dart:async' show unawaited;
 import 'dart:ui' show Tristate;
 
 import 'package:flutter/gestures.dart';
@@ -811,6 +812,88 @@ void main() {
   });
 
   // ----- Reuse by Select (DS-601) and TimePicker (DS-806) -----
+  group('controller (KAN-278)', () {
+    /// Enough rows to overflow [height] and leave something to scroll to.
+    List<DabblerMenuEntry> manyRows() => List<DabblerMenuEntry>.generate(
+          40,
+          (int i) => DabblerMenuEntry(id: '$i', label: 'row $i'),
+        );
+
+    Widget column(ScrollController? controller, {double height = 200}) =>
+        _host(Center(
+          child: SizedBox(
+            height: height,
+            width: 240,
+            child: DabblerMenuList(
+              label: 'rows',
+              items: manyRows(),
+              controller: controller,
+              decorated: false,
+              autofocus: false,
+            ),
+          ),
+        ));
+
+    testWidgets('a supplied controller actually moves the scroll offset',
+        (WidgetTester tester) async {
+      final ScrollController controller = ScrollController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(column(controller));
+      await tester.pumpAndSettle();
+
+      expect(controller.hasClients, isTrue,
+          reason: 'the controller must be attached to the list\'s own view');
+      expect(controller.offset, 0);
+
+      controller.jumpTo(150);
+      await tester.pump();
+      expect(controller.offset, 150);
+
+      // And the rows really moved with it, not just the controller's number.
+      final Offset afterJump = tester.getTopLeft(find.text('row 0'));
+
+      unawaited(controller.animateTo(
+        300,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.linear,
+      ));
+      await tester.pumpAndSettle();
+      expect(controller.offset, 300);
+      expect(tester.getTopLeft(find.text('row 0')).dy,
+          lessThan(afterJump.dy));
+    });
+
+    testWidgets('null controller is unchanged — ambient Primary still works',
+        (WidgetTester tester) async {
+      final ScrollController ambient = ScrollController();
+      addTearDown(ambient.dispose);
+
+      await tester.pumpWidget(_host(Center(
+        child: SizedBox(
+          height: 200,
+          width: 240,
+          child: PrimaryScrollController(
+            controller: ambient,
+            automaticallyInheritForPlatforms: TargetPlatform.values.toSet(),
+            child: DabblerMenuList(
+              label: 'rows',
+              items: manyRows(),
+              decorated: false,
+              autofocus: false,
+            ),
+          ),
+        ),
+      )));
+      await tester.pumpAndSettle();
+
+      expect(ambient.hasClients, isTrue);
+      ambient.jumpTo(120);
+      await tester.pump();
+      expect(ambient.offset, 120);
+    });
+  });
+
   group('composition', () {
     testWidgets('the list stands alone, with no Menu around it',
         (WidgetTester tester) async {

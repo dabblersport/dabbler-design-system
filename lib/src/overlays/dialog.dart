@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../interaction/press_scale.dart';
+import '../tokens/dabbler_motion.dart';
 import '../interaction/scrim.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';

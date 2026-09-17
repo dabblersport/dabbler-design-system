@@ -378,11 +378,30 @@ class DabblerButton extends StatefulWidget {
   /// [DabblerType.label] is *"the button/label convenience"* by its own
   /// dartdoc, and this widget takes its **role** (sans) and therefore its font
   /// family and fallback from it — not its metrics. The button's own ramp is
-  /// 16/14/12 at weight 600, which the type ramp does not carry at all: there
-  /// is no 14 step, and semibold appears only at `headline`'s 17. Overriding
-  /// one step's size and weight keeps a single, stated provenance for the face;
-  /// inventing three new ramp constants would put three type values outside
-  /// `tokens/typography.css`.
+  /// 16/14/12 at weight 600, which `tokens/typography.css` does not carry at
+  /// all: there is no 14 step, and semibold appears only at `headline`'s 17.
+  ///
+  /// **Why there is no home for 14 — `DECISIONS.md` D-024.** This note used to
+  /// weigh "override one step" against "invent three new ramp constants", as
+  /// though the ramp simply had a gap. **It does not have a gap.** `cxo`
+  /// measured the design source and found **three** ways of specifying type
+  /// across its 79 components: 30 on `.t-*` from `tokens/typography.css`, 13 on
+  /// `--font-size-*` from `tokens/figma/fig-tokens.css`, and 25 on raw inline
+  /// literals. They are two different ramps, not two spellings of one —
+  /// `typography.css` is HIG-shaped with `--type-body: 16` and **contains no 14
+  /// at all**, while the Figma file's body size **is 14**. `Button.jsx:22` is a
+  /// transcription from the second ramp. So this component is not working
+  /// around an oversight in one ramp; **it sits across a split between two**,
+  /// and 14 was never going to be found inside `typography.css`.
+  ///
+  /// **D-024 ruled this override correct and left it untouched**: it keeps a
+  /// single stated provenance for the face and invents nothing, which is the
+  /// right behaviour while the question is open. D-024(c) makes
+  /// `typography.css` the sole type source of truth and `fig-tokens.css` an
+  /// export artefact; which ramp the product's type actually *is* is escalated
+  /// to the CEO as the design source (KAN-281). Until that lands, see
+  /// [DabblerType]'s class dartdoc for the freeze this sits under — and do not
+  /// "fix" the values below by promoting them into the ramp.
   static const DabblerTypeStyle labelStyle = DabblerType.label;
 
   /// The label [TextStyle] for [size] and [tone], resolved for [direction] so

@@ -704,26 +704,28 @@ class _ValueColumnState extends State<_ValueColumn> {
           borderRadius: DabblerRadius.lgAll,
           child: SizedBox(
             height: _ValueColumn.rowExtent * widget.visibleRows,
-            // `SingleChildScrollView` inside [DabblerMenuList] inherits this
-            // controller on every platform, which is what lets [_revealSelected]
-            // move it. The list has no controller parameter of its own; widening
-            // DS-700's file to add one would be another ticket's surface.
-            child: PrimaryScrollController(
+            // [DabblerMenuList.controller] hands this controller straight to
+            // the list's internal `SingleChildScrollView`, which is what lets
+            // [_revealSelected] move it. This used to go through a
+            // [PrimaryScrollController] wrapper with
+            // `automaticallyInheritForPlatforms: TargetPlatform.values` — the
+            // list had no controller parameter of its own, so the only route
+            // in was ambient inheritance. KAN-278 added the parameter and the
+            // wrapper came out with it: the composer now drives the list
+            // directly, which is the composition this widget was designed for.
+            child: DabblerMenuList(
+              items: entries,
               controller: _controller,
-              automaticallyInheritForPlatforms: TargetPlatform.values.toSet(),
-              child: DabblerMenuList(
-                items: entries,
-                label: widget.label,
-                role: DabblerMenuRole.listbox,
-                // The column draws no card of its own: it sits inside the
-                // picker's card, exactly as a list inside a Sheet does
-                // (`DabblerMenuList.decorated`). This also keeps every row at
-                // exactly `rowExtent`, which [_revealSelected] depends on.
-                decorated: false,
-                autofocus: false,
-                onSelected: (DabblerMenuEntry entry) =>
-                    widget.onSelected(int.parse(entry.id!)),
-              ),
+              label: widget.label,
+              role: DabblerMenuRole.listbox,
+              // The column draws no card of its own: it sits inside the
+              // picker's card, exactly as a list inside a Sheet does
+              // (`DabblerMenuList.decorated`). This also keeps every row at
+              // exactly `rowExtent`, which [_revealSelected] depends on.
+              decorated: false,
+              autofocus: false,
+              onSelected: (DabblerMenuEntry entry) =>
+                  widget.onSelected(int.parse(entry.id!)),
             ),
           ),
         ),

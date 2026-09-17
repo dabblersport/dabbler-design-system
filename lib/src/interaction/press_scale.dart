@@ -2,13 +2,6 @@ import 'package:flutter/widgets.dart';
 
 import '../tokens/dabbler_motion.dart';
 
-/// `DabblerMotion` moved to `lib/src/tokens/dabbler_motion.dart`, where the
-/// rest of the tokens live. It was declared in this file only because no motion
-/// token file existed when DS-200 landed. It is re-exported here so the import
-/// path every call site already pins keeps resolving; new code should import
-/// the token file directly.
-export '../tokens/dabbler_motion.dart' show DabblerMotion;
-
 /// Press scale — the one press affordance in the system.
 ///
 /// Transcribed from the design source's `.dbl-press` rule
@@ -67,8 +60,8 @@ class DabblerPressScale extends StatefulWidget {
     this.enabled = true,
     this.scale = DabblerMotion.pressScale,
     this.alignment = Alignment.center,
-  })  : _selfDriven = false,
-        assert(scale > 0 && scale <= 1, 'press scale shrinks; it never grows');
+  }) : _selfDriven = false,
+       assert(scale > 0 && scale <= 1, 'press scale shrinks; it never grows');
 
   /// Scales [child] while a pointer is down on it, tracking the pointer
   /// itself.
@@ -80,9 +73,9 @@ class DabblerPressScale extends StatefulWidget {
     this.enabled = true,
     this.scale = DabblerMotion.pressScale,
     this.alignment = Alignment.center,
-  })  : _selfDriven = true,
-        pressed = false,
-        assert(scale > 0 && scale <= 1, 'press scale shrinks; it never grows');
+  }) : _selfDriven = true,
+       pressed = false,
+       assert(scale > 0 && scale <= 1, 'press scale shrinks; it never grows');
 
   /// The widget being pressed. Any widget.
   final Widget child;

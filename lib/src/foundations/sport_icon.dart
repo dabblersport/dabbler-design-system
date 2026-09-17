@@ -143,6 +143,44 @@ class DabblerSportIconResolution {
 /// which warns once so the gap stays visible rather than becoming invisible
 /// house style.
 ///
+/// ### The standing constraint every screen-builder must obey — D-009
+///
+/// `DECISIONS.md` **D-009** attaches a rule to this gap, and it binds screens,
+/// not this class:
+///
+/// > **No screen may carry "which sport" in the icon alone.** Sport is also
+/// > carried by a label or by the sport background artwork wherever it is the
+/// > primary information. A screen that breaks this is an experience defect,
+/// > not a missing-asset inconvenience.
+///
+/// The reason is arithmetic, not taste: four sports collapse onto `game` and
+/// five onto `activity`, so the fallback glyph destroys the one thing a sport
+/// icon exists to do — distinguish sports. If you are building a screen where
+/// sport is the primary information, put a **text label** on it. See also
+/// `DabblerSportBackgroundRegistry` (`sport_background.dart`), which carries
+/// the same constraint from the artwork side (D-010).
+///
+/// ### This does NOT end when the licensed set ships — D-022
+///
+/// The obvious wrong inference is *"we'll turn the sport overlay back on when
+/// the icons land"*. **D-022 rules that out in advance**, and it is a
+/// durability point, not an interim one. The measured ratios for the sport
+/// overlay on `CardEvent`'s covers:
+///
+/// | Size | Thumb | Well 32 as % width | As % **area** |
+/// |---|---|---|---|
+/// | Medium | 64 | 50% | 25% |
+/// | Small | 48 | 67% | **44%** |
+///
+/// **A real, licensed glyph at 32-on-48 is still 44% of the cover's area** —
+/// *"a replacement of it, not a mark on it"*. The geometry does not improve
+/// because the drawing does. So `DabblerCardEventMedium` and
+/// `DabblerCardEventSmall` carry no sport overlay **at all**, independent of
+/// glyph-set status; the sport overlay belongs to Large's full-bleed 16:9
+/// cover only, where 32pt genuinely is a mark in a corner. It reopens only if
+/// a **smaller mark** is drawn in the design source — and that is a new node
+/// with its own geometry, never an inference from this one.
+///
 /// ## The premise was verified, not assumed
 ///
 /// The ticket's premise is that *"no sport-specific Iconsax glyph exists"*.

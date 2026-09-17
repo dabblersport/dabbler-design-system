@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -721,6 +722,7 @@ class DabblerMenuList extends StatefulWidget {
     this.onSelected,
     this.decorated = true,
     this.autofocus = true,
+    this.controller,
   });
 
   /// `700ms` — the type-ahead buffer's reset window (`Menu.jsx:99`).
@@ -749,6 +751,21 @@ class DabblerMenuList extends StatefulWidget {
   /// Whether the list takes focus when it appears, so the arrow keys work
   /// without a click first (`Menu.jsx:163`).
   final bool autofocus;
+
+  /// The scroll controller for the rows, so the composer can drive the scroll
+  /// position directly.
+  ///
+  /// Added by KAN-278. Without it the only way to scroll this list
+  /// programmatically was to wrap it in a [PrimaryScrollController] and let
+  /// the internal [SingleChildScrollView] pick the controller up ambiently —
+  /// which is what `DabblerTimePicker`'s value columns used to do. A list that
+  /// its own composer cannot scroll is an incomplete API, and composition is
+  /// exactly what this widget is for.
+  ///
+  /// **Null is unchanged behaviour.** The [SingleChildScrollView] is then
+  /// given no controller and still attaches to an ambient
+  /// [PrimaryScrollController] if one is present, exactly as before.
+  final ScrollController? controller;
 
   @override
   State<DabblerMenuList> createState() => _DabblerMenuListState();
@@ -956,6 +973,10 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
     Widget scroller = SingleChildScrollView(
       // `overflow-y: auto` (`Menu.jsx:121`); the column is short, so it only
       // scrolls once the 45dvh cap bites.
+      //
+      // Null when the caller supplies none, which leaves the view free to
+      // attach to an ambient `PrimaryScrollController` as it always has.
+      controller: widget.controller,
       child: list,
     );
 

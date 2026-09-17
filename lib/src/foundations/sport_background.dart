@@ -129,6 +129,23 @@ class DabblerSportArtwork {
 /// treatment, if needed, belongs to the consuming screen"*. [DabblerSportBackground]
 /// therefore applies no scrim, no gradient and no filter, which is also what
 /// the flat-system house rule requires.
+///
+/// ## Never the sole carrier of meaning — D-010, and D-009 from the other side
+///
+/// `DECISIONS.md` **D-010(2)**: this artwork is **decorative and never the
+/// sole carrier of meaning**. It is the same constraint **D-009** places on
+/// `DabblerSportIconRegistry`, arriving from the opposite direction:
+///
+/// > **No screen may carry "which sport" in the icon alone.** Sport is also
+/// > carried by a label or by the sport background artwork wherever it is the
+/// > primary information.
+///
+/// Read together: a screen where sport is primary needs a **text label**. The
+/// background may reinforce it and the icon may reinforce it, but neither one
+/// — nor both together — discharges the requirement. A background can also be
+/// missing, slow or undeclared (D-010(1) is why the token-derived solid paint
+/// sits beneath it), which is a second reason it cannot be what tells a user
+/// which sport they are looking at.
 abstract final class DabblerSportBackgroundRegistry {
   const DabblerSportBackgroundRegistry._();
 

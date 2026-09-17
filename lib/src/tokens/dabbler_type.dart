@@ -25,6 +25,36 @@ import 'package:flutter/widgets.dart';
 /// Gloock and Wingx each ship a single weight (400), so **every title style is
 /// weight 400 in both scripts** — titles never run Light and never run Bold.
 ///
+/// ## FREEZE — in effect now, bounded, `DECISIONS.md` D-024(3)
+///
+/// `cxo` measured the design source on 2026-09-17 and found it specifies type
+/// **three** different ways across 79 components: 30 on `.t-*` from
+/// `tokens/typography.css`, 13 on `--font-size-*` from the Figma export
+/// `tokens/figma/fig-tokens.css`, and 25 on raw inline literals. Those are two
+/// genuinely different ramps — `typography.css` is HIG-shaped and carries no
+/// 14 at all; the Figma file's body size *is* 14. Which one the product's type
+/// actually is is escalated to the CEO as the design source (KAN-281).
+///
+/// Until that is resolved, and to stop the split widening while it is decided:
+///
+/// * **No new ramp constants** are added to this class.
+/// * **No component's private scale is promoted into `typography.css`** — a
+///   ramp step earns its place by being a role the system names and several
+///   unrelated things reach for, not by one component parking a value.
+/// * **No further transcription of `--font-size-*` from `fig-tokens.css`**,
+///   which D-024(c) rules an export artefact — a diagnostic, never a source of
+///   truth.
+///
+/// **New work uses the `.t-*` ramp.** Where it genuinely cannot, it
+/// **transcribes the source's value literally, with a comment naming D-024** —
+/// exactly as `DabblerCalendarTextAction` already did for its own gap, and as
+/// `DabblerButtonMetrics.labelStyle` does for 16/14/12-at-600. A literal value
+/// with a stated provenance is the wanted behaviour here; inventing a ramp
+/// step is not.
+///
+/// **A freeze is not a decision** — it holds the line while the decision is
+/// made. It lifts when KAN-281 is answered, and not by anyone else.
+///
 /// ## Structure only
 ///
 /// DS-103a delivers the ramp's structure. The font binaries, and therefore any
