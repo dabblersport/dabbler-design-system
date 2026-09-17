@@ -535,7 +535,7 @@ void main() {
       expect(taps, 0);
     });
 
-    testWidgets('a select with no value shows the placeholder in tertiary', (
+    testWidgets('a select with no value shows the placeholder in textSecondary', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -546,9 +546,11 @@ void main() {
           ),
         ),
       );
+      // D-003(a): a placeholder is text under WCAG, so it takes the
+      // ink-soft-backed secondary role — never a surface neutral.
       expect(
         tester.widget<Text>(find.text('pick a sport')).style!.color,
-        _colors().textTertiary,
+        _colors().textSecondary,
       );
     });
   });

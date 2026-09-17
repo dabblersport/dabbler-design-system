@@ -343,7 +343,9 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
                 focusedErrorBorder: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 hintText: widget.placeholder,
-                hintStyle: textStyle.copyWith(color: colors.textTertiary),
+                // D-003(a): a placeholder is text under WCAG, so it takes the
+                // ink-soft-backed secondary role, never a surface neutral.
+                hintStyle: textStyle.copyWith(color: colors.textSecondary),
                 hintMaxLines: 1,
               ),
             ),
@@ -394,9 +396,13 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
             style: DabblerType.body
                 .resolveForDirection(direction)
                 .copyWith(
+                  // D-003(a): the unfilled placeholder is text and takes
+                  // [DabblerColors.textSecondary]. The disabled value keeps
+                  // the tertiary role — WCAG 1.4.3 exempts an inactive
+                  // user-interface component.
                   color: disabled
                       ? colors.textTertiary
-                      : (filled ? colors.textPrimary : colors.textTertiary),
+                      : (filled ? colors.textPrimary : colors.textSecondary),
                 ),
           ),
         ),

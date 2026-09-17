@@ -1,6 +1,7 @@
 import 'package:dabbler_design_system/src/calendar/calendar.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -656,7 +657,13 @@ void main() {
       final DabblerColors c = colorsFor();
       // The finding this deviation is reported for: `Calendar.jsx:50` sets the
       // column labels in `--muted`, which cannot carry AA body text on a card.
-      expect(contrastRatio(c.textSecondary, c.surfaceCard), lessThan(4.5));
+      // Measured against the token itself: since D-003(a) (KAN-260)
+      // `textSecondary` no longer resolves to `--muted`, so reading the source
+      // token through that field would have stopped measuring the source.
+      expect(
+        contrastRatio(DabblerPalette.muted, c.surfaceCard),
+        lessThan(4.5),
+      );
       // What is drawn instead.
       expect(
         contrastRatio(c.textPrimary, c.surfaceCard),
@@ -696,9 +703,10 @@ void main() {
     });
 
     test('--subtle is never a text colour here (D-003)', () {
-      // `Calendar.jsx:58` uses `var(--subtle)` for an outside day.
-      // [DabblerColors.textTertiary] is that token; nothing in this widget
-      // draws text with it.
+      // `Calendar.jsx:58` uses `var(--subtle)` for an outside day. Since
+      // D-003(a) no light text role resolves to `--subtle` at all; what this
+      // still guards is that the outside day is not painted in the tertiary
+      // de-emphasis role either.
       final DabblerColors c = colorsFor();
       expect(c.textSecondary, isNot(c.textTertiary));
     });

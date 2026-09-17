@@ -296,7 +296,7 @@ abstract final class DabblerCalendarMonth {
 /// | Day in month | `--ink` | [DabblerColors.textPrimary] | 18.1:1 |
 /// | Selected day | `--color-on-brand` on `--color-brand-primary` | same | 8.6:1 (main) |
 /// | Weekday label | `--muted` | [DabblerColors.textPrimary] | **deviation**; see below |
-/// | Outside day | `--subtle` | [DabblerColors.textSecondary] | **deviation**; see below |
+/// | Outside day | `--subtle` | [DabblerColors.textSecondary] | **deviation**; 10.37:1 |
 ///
 /// **Weekday label.** `Calendar.jsx:50` sets the column labels in `--muted`
 /// (`#8C8C8C`), which measures **3.36:1** on `#FFFFFF` — below the 4.5:1 that
@@ -309,10 +309,10 @@ abstract final class DabblerCalendarMonth {
 ///
 /// **Outside day.** `Calendar.jsx:58` sets these in `--subtle`, which
 /// `DECISIONS.md` D-003 forbids as a text colour outright. They are set in
-/// [DabblerColors.textSecondary] (`--muted`). That is 3.36:1, and it stands:
-/// an outside day is **not selectable** in the source and is not here either,
-/// so it is an inactive user-interface component, which WCAG 1.4.3 exempts by
-/// name. No *interactive* text in this widget is below 4.5:1.
+/// [DabblerColors.textSecondary], which since D-003(a) (KAN-260) resolves to
+/// `--ink-soft` rather than `--muted` — **10.37:1** on the card. The WCAG
+/// 1.4.3 inactive-component exemption this paragraph used to lean on is no
+/// longer needed: no text in this widget, interactive or not, is below 4.5:1.
 ///
 /// **Touch targets.** Every date cell is a target. Each is at least
 /// [DabblerSizing.touchTargetMin] (45) **tall** — `Calendar.jsx:55` says `39`,

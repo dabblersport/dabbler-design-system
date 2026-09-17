@@ -271,7 +271,9 @@ class _DabblerPickerFieldShellState extends State<DabblerPickerFieldShell> {
                 focusedErrorBorder: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 hintText: widget.placeholder,
-                hintStyle: textStyle.copyWith(color: colors.textTertiary),
+                // D-003(a): a placeholder is text and takes the ink-soft-backed
+                // secondary role, not a surface neutral.
+                hintStyle: textStyle.copyWith(color: colors.textSecondary),
                 hintTextDirection: TextDirection.ltr,
                 hintMaxLines: 1,
               ),

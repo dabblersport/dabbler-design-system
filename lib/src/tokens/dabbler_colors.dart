@@ -209,9 +209,26 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
   final Color surfaceGrey;
   /// `--color-text-primary`.
   final Color textPrimary;
-  /// `--color-text-secondary` — muted / secondary text.
+  /// `--color-text-secondary` — **the only secondary body-text role.**
+  ///
+  /// Light resolves to [DabblerPalette.inkSoft] (`--ink-soft`, `#404040`), not
+  /// to `--muted`. `DECISIONS.md` D-003(a): `--muted` and `--subtle` are
+  /// signed-off Figma *surface-ramp* neutrals that the semantic layer wrongly
+  /// exposed as text roles. Secondary body text, and **every placeholder**
+  /// (a placeholder is text under WCAG), belongs here — 9.13:1 on
+  /// [bgPrimary], 10.37:1 on [surfaceCard].
   final Color textSecondary;
-  /// `--color-text-tertiary` — subtle text, placeholder.
+  /// `--color-text-tertiary` — de-emphasis for **large text, icons and
+  /// inactive controls only. Never body text and never a placeholder.**
+  ///
+  /// Light resolves to [DabblerPalette.muted] (`--muted`, `#8C8C8C`), demoted
+  /// here from the secondary-text role by `DECISIONS.md` D-003(a). At 3.36:1
+  /// on a card it clears AA-large (≥24px, or ≥18.66px bold) and nothing else,
+  /// so its legitimate uses are large text, icons, non-informational rules,
+  /// and the disabled state of a control — which WCAG 1.4.3 exempts by name as
+  /// an inactive user-interface component. `--subtle` (2.15:1) no longer backs
+  /// any text role at light brightness at all; see
+  /// `test/tokens/no_subtle_as_text_test.dart`, which enforces that.
   final Color textTertiary;
   /// `--color-border-default` — the card border outline.
   final Color borderDefault;
@@ -325,10 +342,13 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
       surfaceGrey: dark ? DabblerProvisionalDark.surfaceGrey
           : DabblerPalette.surfaceGrey,
       textPrimary: dark ? DabblerProvisionalDark.textPrimary : DabblerPalette.ink,
+      // D-003(a). Light secondary text is `--ink-soft`, not `--muted`; light
+      // tertiary is `--muted`, not `--subtle`. The dark values are untouched —
+      // the dark ramp's structure is D-003(c) and is not actionable yet.
       textSecondary: dark ? DabblerProvisionalDark.textSecondary
-          : DabblerPalette.muted,
+          : DabblerPalette.inkSoft,
       textTertiary: dark ? DabblerProvisionalDark.textTertiary
-          : DabblerPalette.subtle,
+          : DabblerPalette.muted,
       borderDefault: dark ? DabblerProvisionalDark.borderDefault
           : DabblerPalette.outlineCard,
       borderStrong: dark ? DabblerProvisionalDark.borderStrong

@@ -329,8 +329,17 @@ void main() {
     // respectively. Both are inherited verbatim from "Dabbler Design UI.fig"
     // (`tokens/colors.css:34-45`). AA body text cannot be set in either role at
     // light brightness until the design source changes.
-    test('light textSecondary/textTertiary are pinned below AA, as measured',
-        () {
+    //
+    // KAN-260 / D-003(a) moved the SUBJECT of this pin, not one of its numbers.
+    // The six measured ratios are unchanged to the hundredth, and every one is
+    // still asserted below 4.5. What changed is that they are now measured
+    // against [DabblerPalette.muted] and [DabblerPalette.subtle] directly
+    // rather than through `textSecondary`/`textTertiary`: after the remap the
+    // semantic fields no longer resolve to those tokens, so reading the pin
+    // through them would have quietly stopped measuring the source. The pin
+    // records `colors.css`, and `colors.css` has not moved.
+    test('--muted and --subtle on the paper ramp are pinned below AA, '
+        'as measured', () {
       final DabblerColors c = DabblerColors.resolve(
         theme: DabblerTheme.main,
         brightness: Brightness.light,
@@ -343,17 +352,38 @@ void main() {
         'tertiary/surfaceCard': 2.15,
         'tertiary/bgTertiary': 1.64,
       };
+      const Color muted = DabblerPalette.muted;
+      const Color subtle = DabblerPalette.subtle;
       final Map<String, double> actual = <String, double>{
-        'secondary/bgPrimary': contrast(c.textSecondary, c.bgPrimary),
-        'secondary/surfaceCard': contrast(c.textSecondary, c.surfaceCard),
-        'secondary/bgTertiary': contrast(c.textSecondary, c.bgTertiary),
-        'tertiary/bgPrimary': contrast(c.textTertiary, c.bgPrimary),
-        'tertiary/surfaceCard': contrast(c.textTertiary, c.surfaceCard),
-        'tertiary/bgTertiary': contrast(c.textTertiary, c.bgTertiary),
+        'secondary/bgPrimary': contrast(muted, c.bgPrimary),
+        'secondary/surfaceCard': contrast(muted, c.surfaceCard),
+        'secondary/bgTertiary': contrast(muted, c.bgTertiary),
+        'tertiary/bgPrimary': contrast(subtle, c.bgPrimary),
+        'tertiary/surfaceCard': contrast(subtle, c.surfaceCard),
+        'tertiary/bgTertiary': contrast(subtle, c.bgTertiary),
       };
       for (final MapEntry<String, double> e in measured.entries) {
         expect(actual[e.key], closeTo(e.value, 0.01), reason: e.key);
         expect(e.value, lessThan(4.5), reason: '${e.key} is a known AA gap');
+      }
+    });
+
+    // The other half of D-003(a): the ROLES that used to sit on those two
+    // tokens now clear AA outright, which is the whole point of the remap.
+    test('light textSecondary clears AA on every paper surface (D-003(a))', () {
+      final DabblerColors c = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      for (final Color s in <Color>[
+        c.bgPrimary,
+        c.bgSecondary,
+        c.bgTertiary,
+        c.surfaceCard,
+        c.surfaceSunken,
+        c.surfaceGrey,
+      ]) {
+        expect(contrast(c.textSecondary, s), greaterThanOrEqualTo(4.5));
       }
     });
 

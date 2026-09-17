@@ -180,13 +180,15 @@ void main() {
       );
     });
 
-    testWidgets('the label is caption1 at textTertiary', (
+    testWidgets('the label is caption1 at textSecondary (D-003(a))', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(_host(const DabblerDivider(label: 'or')));
       final TextStyle style = tester.widget<Text>(find.text('or')).style!;
       expect(style.fontSize, DabblerType.caption1.fontSize);
-      expect(style.color, _colors().textTertiary);
+      // caption1 is 11px — body-sized, not large text — so D-003(a) puts it
+      // on the ink-soft-backed secondary role, not on `--muted`.
+      expect(style.color, _colors().textSecondary);
     });
   });
 

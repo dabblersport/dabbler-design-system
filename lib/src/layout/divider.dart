@@ -102,7 +102,7 @@ class DabblerDivider extends StatelessWidget {
 
   /// Centres a caption between two rules. Horizontal only.
   ///
-  /// Set in [DabblerType.caption1] at [DabblerColors.textTertiary], and kept in
+  /// Set in [DabblerType.caption1] at [DabblerColors.textSecondary], and kept in
   /// the accessibility tree.
   final String? label;
 
@@ -162,7 +162,10 @@ class DabblerDivider extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: DabblerType.caption1
                       .resolveForDirection(Directionality.of(context))
-                      .copyWith(color: colors.textTertiary),
+                      // D-003(a): caption1 is 11px — body-sized, not large
+                      // text — so the label takes the ink-soft-backed
+                      // secondary role, not `--muted`.
+                      .copyWith(color: colors.textSecondary),
                 ),
                 const SizedBox(width: DabblerSpacing.space4),
                 Expanded(child: _rule(color)),
