@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../tokens/dabbler_motion.dart';
@@ -53,7 +54,20 @@ enum DabblerToastTone {
 
   /// The DS-102 status tone this maps onto, or `null` for [neutral].
   final DabblerStatusTone? status;
+
+  /// The tone's default Iconsax glyph, from `statusTones`
+  /// (`components/foundations/overlay.jsx:161-166`).
+  String get glyph => switch (this) {
+        DabblerToastTone.success => 'tick-circle',
+        DabblerToastTone.warning => 'warning-2',
+        DabblerToastTone.error => 'danger',
+        DabblerToastTone.info || DabblerToastTone.neutral => 'info-circle',
+      };
 }
+
+/// Passed as a toast's `icon` to draw no leading glyph at all — the source's
+/// explicit `icon={null}`, which is distinct from omitting the prop.
+const Widget dabblerToastNoIcon = SizedBox.shrink();
 
 /// The label and callback of a [DabblerToast]'s trailing action.
 ///
@@ -120,18 +134,13 @@ class DabblerToastSpec {
   /// The leading glyph, in an 18×18 ([DabblerSizing.iconSm]) slot — the
   /// source's *"Iconsax bold at 18px"*.
   ///
-  /// The source defaults this to the tone's glyph (`tick-circle`, `warning-2`,
-  /// `danger`, `info-circle`). `cto` has approved `iconsax_flutter`
-  /// (`DECISIONS.md` T-083), but the dependency and the `DabblerIcon` widget
-  /// are **DS-300's** to land, so nothing here imports `iconsax_flutter` and
-  /// the default is **no glyph**.
+  /// Defaults to the tone's own glyph — [DabblerToastTone.glyph], drawn
+  /// `bold` at 18 — exactly as `Toast.jsx:104-105` does.
   ///
-  /// It is deliberately not a Material stand-in: T-083 names shipping a wrong
-  /// glyph as a defect, and a correctly sized empty slot is preferable. The
-  /// slot is already [DabblerSizing.iconSm] with its [DabblerSpacing.space3]
-  /// gap, so dropping `DabblerIcon` in later moves no layout. The widget is
-  /// given the tone's ink through [IconTheme], so any [Icon] inherits the
-  /// right colour.
+  /// This was `null` until this pass, on a comment saying DS-300 had yet to
+  /// land `DabblerIcon`. DS-300 shipped, so every toast in the cut rendered
+  /// without the glyph the design always draws. Pass [dabblerToastNoIcon] to
+  /// suppress it.
   final Widget? icon;
 }
 
@@ -714,7 +723,24 @@ class _DabblerToastState extends State<DabblerToast>
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     final TextDirection direction = Directionality.of(context);
 
+    // `icon !== undefined ? icon : <Icon name={t.icon} type="bold" size={18} />`
+    // (`Toast.jsx:104-105`).
+    final Widget? glyph = identical(widget.icon, dabblerToastNoIcon)
+        ? null
+        : widget.icon ??
+            DabblerIcon(
+              widget.tone.glyph,
+              weight: DabblerIconWeight.bold,
+              size: DabblerSizing.iconSm,
+              color: ink,
+            );
+
     final Widget body = Container(
+      // `width: '100%', maxWidth: 420` (`Toast.jsx:115`). The previous cut left
+      // the width unconstrained and the row at `MainAxisSize.min`, so a toast
+      // shrank to its message instead of filling its column the way the
+      // specimen draws it.
+      width: double.infinity,
       constraints: const BoxConstraints(
         minHeight: DabblerSizing.touchTargetMin,
         maxWidth: _DabblerToastMetrics.maxWidth,
@@ -734,15 +760,14 @@ class _DabblerToastState extends State<DabblerToast>
         // No boxShadow and no gradient: the system is flat.
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          if (widget.icon != null) ...<Widget>[
+          if (glyph != null) ...<Widget>[
             SizedBox(
               width: DabblerSizing.iconSm,
               height: DabblerSizing.iconSm,
               child: IconTheme.merge(
                 data: IconThemeData(color: ink, size: DabblerSizing.iconSm),
-                child: widget.icon!,
+                child: glyph,
               ),
             ),
             // `gap: var(--space-3)` on the row, Toast.jsx:114.

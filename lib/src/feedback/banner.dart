@@ -40,6 +40,15 @@ enum DabblerBannerTone {
   /// The DS-102 status tone this maps onto, or `null` for [neutral].
   final DabblerStatusTone? status;
 
+  /// The tone's default Iconsax glyph, from `statusTones`
+  /// (`components/foundations/overlay.jsx:161-166`).
+  String get glyph => switch (this) {
+        DabblerBannerTone.success => 'tick-circle',
+        DabblerBannerTone.warning => 'warning-2',
+        DabblerBannerTone.error => 'danger',
+        DabblerBannerTone.info || DabblerBannerTone.neutral => 'info-circle',
+      };
+
   /// Whether this tone interrupts.
   ///
   /// The source sets `role="alert"` for `error` and `warning` and
@@ -127,14 +136,19 @@ class DabblerBanner extends StatelessWidget {
 
   /// The leading glyph, in a 24×24 ([DabblerSizing.iconMd]) slot.
   ///
-  /// The source defaults this to the tone's Iconsax glyph (`tick-circle`,
-  /// `warning-2`, `danger`, `info-circle`). **This package has no icon
-  /// dependency yet** — adding one is a `cto` hand-off — so the default here is
-  /// no glyph rather than a substituted one, and a caller that has an icon set
-  /// passes it in. The slot and its spacing are already correct, so supplying
-  /// the glyph later changes nothing else. The widget is given the tone's ink
-  /// through [IconTheme], so a plain [Icon] inherits the right colour.
+  /// Defaults to the tone's own Iconsax glyph — [DabblerBannerTone.glyph],
+  /// drawn `bold` at 24 — exactly as `Banner.jsx:25-26` does.
+  ///
+  /// This was `null` until this pass, on a comment claiming the package had no
+  /// icon dependency. It has had one since T-083 adopted `iconsax_flutter` and
+  /// DS-300 shipped the registry (the dismiss glyph below already used it), so
+  /// every banner in the cut rendered without the status glyph the design
+  /// always draws. Pass [DabblerBanner.noIcon] to suppress it.
   final Widget? icon;
+
+  /// Passed as [icon] to draw no leading glyph at all — the source's explicit
+  /// `icon={null}`, which is distinct from omitting the prop.
+  static const Widget noIcon = SizedBox.shrink();
 
   /// An outlined action below the message, inline-start aligned.
   final DabblerBannerAction? action;
@@ -159,6 +173,16 @@ class DabblerBanner extends StatelessWidget {
   /// Identifies the action button's touch target.
   static const Key actionTargetKey = Key('DabblerBanner.actionTarget');
 
+  /// Inline space the content row leaves for the dismiss button, which is
+  /// positioned from the container's edge rather than laid out in the row.
+  ///
+  /// The button is 45 wide and starts `--space-5 - --space-3` (6) from the
+  /// container's inline end, so it reaches 51 in; the row's own padding
+  /// already covers 15 of that.
+  static const double dismissReserve = DabblerSizing.touchTargetMin +
+      (DabblerSpacing.space5 - DabblerSpacing.space3) -
+      DabblerSpacing.space5;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -174,6 +198,19 @@ class DabblerBanner extends StatelessWidget {
         : resolved.strong.withValues(alpha: 0.20);
 
     final TextDirection direction = Directionality.of(context);
+
+    // `icon !== undefined ? icon : <Icon name={t.icon} type="bold" size={24} />`
+    // (`Banner.jsx:25-26`).
+    final Widget? glyph = identical(icon, noIcon)
+        ? null
+        : icon ??
+            DabblerIcon(
+              tone.glyph,
+              weight: DabblerIconWeight.bold,
+              size: DabblerSizing.iconMd,
+              color: ink,
+            );
+
     final List<Widget> column = <Widget>[];
 
     if (title != null) {
@@ -213,7 +250,7 @@ class DabblerBanner extends StatelessWidget {
       );
     }
 
-    final Widget body = Container(
+    final Widget content = Container(
       width: double.infinity,
       padding: const EdgeInsets.all(DabblerSpacing.space5),
       decoration: BoxDecoration(
@@ -228,13 +265,13 @@ class DabblerBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          if (icon != null) ...<Widget>[
+          if (glyph != null) ...<Widget>[
             SizedBox(
               width: DabblerSizing.iconMd,
               height: DabblerSizing.iconMd,
               child: IconTheme.merge(
                 data: IconThemeData(color: ink, size: DabblerSizing.iconMd),
-                child: icon!,
+                child: glyph,
               ),
             ),
             // `gap: var(--space-4)` on the row, Banner.jsx:31.
@@ -247,10 +284,39 @@ class DabblerBanner extends StatelessWidget {
               children: column,
             ),
           ),
-          if (onDismiss != null) _buildDismiss(context, ink: ink),
+          // The dismiss button is NOT in this row — see [_dismissInset].
+          if (onDismiss != null)
+            const SizedBox(width: dismissReserve),
         ],
       ),
     );
+
+    // `marginBlock: calc(var(--space-5) * -1 + var(--space-1))` and
+    // `marginInlineEnd: calc(var(--space-3) * -1)` (`Banner.jsx:60-62`) — the
+    // 45 square is pulled back out through the banner's own 15px padding so
+    // the ✕ sits in the corner. The previous cut dropped both margins, which
+    // made every dismissible banner 30px taller than drawn with the glyph
+    // indented off the edge.
+    //
+    // Flutter has no negative margin. An `OverflowBox` would place it
+    // correctly but **would not hit-test**: a box outside its parent's bounds
+    // is unreachable, and `banner_test.dart` proved it by only dispatching one
+    // of the four corners. So the button is lifted out of the row into a
+    // [Stack] instead, positioned from the container's own edges, and the row
+    // reserves [dismissReserve] of inline space for it. Layout is unchanged,
+    // the target stays a live 45×45.
+    final Widget body = onDismiss == null
+        ? content
+        : Stack(
+            children: <Widget>[
+              content,
+              PositionedDirectional(
+                top: DabblerSpacing.space1,
+                end: DabblerSpacing.space5 - DabblerSpacing.space3,
+                child: _buildDismiss(context, ink: ink),
+              ),
+            ],
+          );
 
     return Semantics(
       container: true,

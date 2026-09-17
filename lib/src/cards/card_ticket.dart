@@ -136,19 +136,18 @@ class DabblerTicketAction {
 /// `borderRadius: 24` is `--radius-xxl` exactly, and DS-800's own doc names
 /// `CardTicket` as the variant expected to pass it.
 ///
-/// ## The one structural simplification, stated
+/// ## The strip's bottom edge is NOT straight — see [_BodyCap]
 ///
 /// The source nests two boxes: an outer box filled with the header colour, and
 /// an inner white box that carries **its own** `borderRadius: 24`, so the white
-/// body's top corners curve over the coloured strip. Composed on [DabblerCard]
-/// the card is one white surface with the strip in [DabblerCard.media], so the
-/// strip's bottom edge is straight.
+/// body's top corners curve over the coloured strip.
 ///
-/// This is deliberate. Reproducing the overlap needs either a second nested
-/// card — re-deriving chrome DS-800 exists to settle — or a clip the slot
-/// contract does not offer. The delta is two 24px corners on an internal seam;
-/// the cost of removing it is the thing KAN-233/234/242 were split out to
-/// avoid. Recorded rather than hidden.
+/// This file used to declare that overlap an accepted simplification, on the
+/// grounds that reproducing it needed a second nested card or a clip the slot
+/// contract does not offer. **Neither is true**, and the delta was the most
+/// visible difference between this card and the design. [_BodyCap] draws it
+/// inside the existing `media` slot, with no second card, no change to
+/// [DabblerCard] and no layout height consumed.
 ///
 /// ## `indigo` is a KNOWN DEFECT pending `DECISIONS.md` D-004
 ///
@@ -256,13 +255,21 @@ class DabblerCardTicket extends StatelessWidget {
   /// ([DabblerSpacing.space1]).
   static const double titleGap = DabblerSpacing.space1;
 
-  /// An action pill's height.
+  /// An action pill's height — `height: 40`, transcribed literally.
   ///
-  /// [DabblerSizing.touchTargetMin] (45), **not** the source's `height: 40`.
-  /// `--touch-target-min` is 45 and the source's own annotation says it clears
-  /// Apple's 44pt floor; 40 clears neither. The token wins, on the same
-  /// token-over-literal reasoning DS-800 applied to radius and padding.
-  static const double actionHeight = DabblerSizing.touchTargetMin;
+  /// **This was [DabblerSizing.touchTargetMin] (45) and the design draws 40.**
+  /// Measured on the rendered specimen
+  /// (`components/cards/cards.card.html`): every action pill on every ticket
+  /// is a 40px box. The earlier reading took `--touch-target-min` on the
+  /// argument that 40 clears neither the token nor Apple's 44pt floor — which
+  /// is true, and is a **token/accessibility conflict reported with this
+  /// change**, not a licence to redraw the card 5px taller than the design.
+  ///
+  /// The whole card is tappable via [onTap], so the 44pt affordance exists at
+  /// the card level even where the pill itself is under it. If the conflict is
+  /// resolved in favour of the floor, it is resolved in the DESIGN first and
+  /// transcribed back here — not decided at this call site.
+  static const double actionHeight = 40;
 
   /// An action pill's horizontal padding — `padding: '0 20px'`.
   ///
@@ -271,34 +278,53 @@ class DabblerCardTicket extends StatelessWidget {
   /// action pill in the product to satisfy a grid the source did not use here.
   static const double actionPadding = 20;
 
-  /// The dashed rule's dash and gap lengths.
+  /// The dashed rule's dash and gap lengths — **2 on, 2 off**.
   ///
-  /// **Not design-source values.** The source writes
-  /// `borderTop: '1px dashed var(--outline-card)'` and leaves the dash pattern
-  /// to the browser, which has no specified length — Blink draws roughly 2:2 at
-  /// 1px. Flutter has no dashed border, so the pattern must be named somewhere;
-  /// [DabblerSpacing.space1] (3) on and 3 off is the nearest grid value to what
-  /// the browsers actually paint, and it is a step rather than a magic number.
-  static const double dashLength = DabblerSpacing.space1;
+  /// The source writes `borderTop: '1px dashed var(--outline-card)'` and leaves
+  /// the pattern to the renderer. Flutter has no dashed border, so the pattern
+  /// must be named somewhere, and it is named as what the design actually
+  /// paints: measured off the rendered specimen, the rule's period is ~4px with
+  /// the dash marginally longer than the gap — Blink's 1px dashed stroke.
+  ///
+  /// **This was [DabblerSpacing.space1] (3) on, 3 off** — chosen because 3 is a
+  /// grid step, which made the rule a third coarser than the design draws it.
+  /// 2 is off the base-3 grid and is transcribed anyway: a dash pattern is a
+  /// stroke texture, not a layout measure, and the grid has no claim on it.
+  static const double dashLength = 2;
 
   /// The gap between dashes. See [dashLength].
-  static const double dashGap = DabblerSpacing.space1;
+  static const double dashGap = 2;
 
-  /// **A KNOWN DEFECT pending `DECISIONS.md` D-004.**
+  /// **A MEASURED, UNCLOSEABLE COLOUR DELTA — the missing `--accent-indigo`.**
   ///
-  /// `CardTicket.jsx` fills the `indigo` strip with `var(--accent-indigo)`,
-  /// which `tokens/colors.css` never declares. `cxo` ruled (D-004) that this is
-  /// a real omission: the token is `#5C50E6`, it will be declared in the CSS,
-  /// then transcribed to `DabblerPalette.accentIndigo`, and only then does this
-  /// call site change. Until that sequence completes, `indigo` resolves to
-  /// [DabblerPalette.socialInfo] (`--social-info`, `#6366F1`).
+  /// The rendered specimen paints this strip `rgb(92, 80, 230)` — `#5C50E6`,
+  /// read off `components/cards/cards.card.html` with `getComputedStyle`. That
+  /// is `--accent-indigo`, which `tokens/colors.css` never declares and which
+  /// [DabblerPalette] therefore has no entry for. This resolves instead to
+  /// [DabblerPalette.socialInfo] (`--social-info`, `#6366F1`), pending
+  /// `DECISIONS.md` D-004.
   ///
-  /// **That stand-in is a defect, not a close-enough approximation** — the
-  /// wording, and the value, are `lib/src/surfaces/avatar.dart`'s, because it
-  /// is the same defect. `cxo` measured the contrast loss there; a strip is a
-  /// larger area than a badge, so the loss is at least as visible here. This is
-  /// the third call site (`avatar.dart`, `fab.dart`, this file) and all three
-  /// move together. Do not treat this line as settled, and do not copy it.
+  /// ## Why the drawn value is NOT written here
+  ///
+  /// It was, briefly, and `test/tokens/dabbler_palette_test.dart` —
+  /// *"no `Color(0x...)` literal outside the palette files"* — correctly
+  /// rejected it. That gate is right and this file is not on its allowlist: a
+  /// colour reaching a pixel from anywhere but the palette is exactly the drift
+  /// it exists to stop, and routing around it would trade one defect for a
+  /// worse one.
+  ///
+  /// So the stand-in stays **and the token gap is reported**. This is the one
+  /// difference on this card that cannot be closed from `lib/src/cards/`: it
+  /// closes when `--accent-indigo` (`#5C50E6`) is declared in
+  /// `tokens/colors.css` and transcribed to `DabblerPalette.accentIndigo`,
+  /// which is `lib/src/tokens/`'s surface, not this one. Then this method
+  /// becomes `=> DabblerPalette.accentIndigo` and the delta is gone.
+  ///
+  /// Until then the strip is `#6366F1` where the design draws `#5C50E6` —
+  /// a ~6% hue shift on the largest flat colour area of the card, visible
+  /// side by side. Do not treat this line as settled, and do not copy it: the
+  /// same gap sits at `lib/src/surfaces/avatar.dart` and
+  /// `lib/src/controls/fab.dart` and all three move together.
   static Color indigoFill(DabblerColors colors) => DabblerPalette.socialInfo;
 
   /// The strip's fill for [header], resolved against [colors].
@@ -380,13 +406,23 @@ class DabblerCardTicket extends StatelessWidget {
   static TextStyle codeStyleFor(TextDirection direction) =>
       DabblerType.callout.resolveForDirection(direction);
 
-  /// The organiser line — `fontSize: 14, lineHeight: '19px'`.
+  /// The organiser line — `fontSize: 14, lineHeight: '19px'`, transcribed
+  /// literally.
   ///
-  /// **The ramp has no 14.** `.t-footnote` (13/18, weight 400) is the nearest
-  /// step and the one the system uses for a muted line under a title; taking it
-  /// loses 1px of size rather than introducing a step the ramp does not have.
+  /// **The ramp has no 14, and the design draws 14.** Measured on the rendered
+  /// specimen: `14px / 19px`, weight 400, `rgb(140, 140, 140)`. This resolved
+  /// to `.t-footnote` (13/18) on the argument that it was the nearest step and
+  /// the ramp should win. That is the substitution this pass is undoing: the
+  /// ramp having no 14 is a **reported gap in the ramp**, not a reason to draw
+  /// the organiser a pixel smaller than every other surface draws it.
+  ///
+  /// The step's face, script resolution and fallbacks are kept — only the two
+  /// metrics the ramp cannot express are overridden.
   static TextStyle organiserStyleFor(TextDirection direction) =>
-      DabblerType.footnote.resolveForDirection(direction);
+      DabblerType.footnote.resolveForDirection(direction).copyWith(
+            fontSize: 14,
+            height: 19 / 14,
+          );
 
   /// The title — `fontSize: 22, lineHeight: '28px', fontWeight: 500` set in
   /// `var(--font-sans)`.
@@ -458,13 +494,18 @@ class DabblerCardTicket extends StatelessWidget {
     );
   }
 
-  /// The coloured header strip: code at the leading end, date at the trailing.
+  /// The coloured header strip: code at the leading end, date at the trailing,
+  /// with the white body's rounded top corners drawn over its bottom edge.
+  ///
+  /// See [_BodyCap] for the second half of that sentence, which this file used
+  /// to declare impossible.
   Widget _strip(DabblerColors colors, TextDirection direction) {
     final TextStyle style = codeStyleFor(direction)
         .copyWith(color: headerInkOf(header, colors));
+    final Color fill = headerFillOf(header, colors);
 
-    return Container(
-      color: headerFillOf(header, colors),
+    final Widget band = Container(
+      color: fill,
       padding: stripPadding,
       child: Row(
         children: <Widget>[
@@ -482,6 +523,20 @@ class DabblerCardTicket extends StatelessWidget {
           ],
         ],
       ),
+    );
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        band,
+        PositionedDirectional(
+          start: 0,
+          end: 0,
+          bottom: -radius,
+          height: radius,
+          child: _BodyCap(fill: fill, body: colors.surfaceCard),
+        ),
+      ],
     );
   }
 
@@ -653,6 +708,59 @@ class DabblerCardTicket extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The white body's two rounded top corners, drawn over the coloured strip.
+///
+/// ## This is the "structural simplification" this file used to declare, undone
+///
+/// The class doc above carried a long, deliberate note saying the source nests
+/// an outer coloured box and an inner white box with its own `borderRadius: 24`,
+/// that composing on [DabblerCard] gives one white surface with a straight
+/// strip edge, and that the delta was "two 24px corners on an internal seam"
+/// not worth the cost.
+///
+/// **It is worth the cost. It is the single most visible difference between the
+/// built card and the design** — measured on the rendered specimen, where the
+/// strip's outer box is `background: #5C50E6; border-radius: 24px; overflow:
+/// hidden` and the body inside it is `background: #fff; border-radius: 24px`,
+/// so the colour shows through in the body's two top corner notches.
+///
+/// And it needs neither a second nested card nor a change to the slot contract.
+/// [DabblerCard] lays `media` and the padded body out as siblings of one
+/// [Column] over a single clipped surface, so a `media` child that paints past
+/// its own height paints over the body and is clipped by the card radius — no
+/// layout height is consumed and the body does not move. That is what this is:
+/// a [radius]-tall strip hung below the band by [PositionedDirectional], filled
+/// with the header colour and then capped with the body colour under a
+/// top-only [radius] corner. What is left uncovered is exactly the two notches.
+///
+/// It paints before the body's text because `media` precedes the body in that
+/// [Column], so no glyph is overdrawn.
+class _BodyCap extends StatelessWidget {
+  const _BodyCap({required this.fill, required this.body});
+
+  /// The strip's colour, showing through the corner notches.
+  final Color fill;
+
+  /// The body's colour — `--surface-card`, the card's own fill.
+  final Color body;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(color: fill),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: body,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(DabblerCardTicket.radius),
+          ),
+        ),
+        child: const SizedBox.expand(),
       ),
     );
   }

@@ -284,13 +284,24 @@ void main() {
   });
 
   group('the body', () {
-    testWidgets('organiser, title and price render with their ramp steps',
+    testWidgets('organiser is the drawn 14/19; title and price keep their steps',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(_specimen()));
 
       final TextStyle organiser =
           tester.widget<Text>(find.text('Reform Padel Club')).style!;
-      expect(organiser.fontSize, DabblerType.footnote.fontSize);
+      // TOKEN CONFLICT, asserted deliberately: the design draws the organiser
+      // at `font-size: 14px; line-height: 19px` — measured on the rendered
+      // specimen `components/cards/cards.card.html` with `getComputedStyle`.
+      // **The ramp has no 14.** This asserted `.t-footnote` (13/18) on the
+      // reasoning that the nearest step should win; that snapped the organiser
+      // a pixel under every surface that draws it, and it is the class of
+      // substitution the fidelity pass exists to undo.
+      //
+      // Do NOT "restore" `DabblerType.footnote.fontSize` here. The ramp gap is
+      // reported; if a 14 step is added, this becomes a reference to it.
+      expect(organiser.fontSize, 14);
+      expect(organiser.height, 19 / 14);
       expect(organiser.color, _colors().textSecondary);
 
       final TextStyle title =
@@ -337,9 +348,16 @@ void main() {
           tester.widget<DabblerCard>(find.byType(DabblerCard));
       final Size size = tester.getSize(find.byWidget(card.child!));
       expect(size.height, DabblerSizing.borderDefault);
-      // The dash pattern is a named grid step, not a magic number.
-      expect(DabblerCardTicket.dashLength, DabblerSpacing.space1);
-      expect(DabblerCardTicket.dashGap, DabblerSpacing.space1);
+      // GRID CONFLICT, asserted deliberately: the rule's drawn period is ~4px
+      // — Blink's 1px dashed stroke, measured on the rendered specimen. This
+      // asserted `DabblerSpacing.space1` (3 on, 3 off) because 3 is a grid
+      // step, which drew the rule a third coarser than the design.
+      //
+      // 2 is off the base-3 grid on purpose. A dash pattern is a stroke
+      // texture, not a layout measure, and the grid has no claim on it — so do
+      // not snap these back to `space1`.
+      expect(DabblerCardTicket.dashLength, 2);
+      expect(DabblerCardTicket.dashGap, 2);
     });
   });
 
@@ -392,7 +410,7 @@ void main() {
       expect(find.byType(DabblerFocusRing), findsNothing);
     });
 
-    testWidgets('a pill clears --touch-target-min, not the source\'s 40',
+    testWidgets('a pill is the drawn 40, under --touch-target-min',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(_specimen(
         actions: const <DabblerTicketAction>[
@@ -400,8 +418,19 @@ void main() {
         ],
       )));
 
-      expect(DabblerCardTicket.actionHeight, DabblerSizing.touchTargetMin);
-      expect(DabblerCardTicket.actionHeight, greaterThanOrEqualTo(44.0));
+      // TOKEN + ACCESSIBILITY CONFLICT, asserted deliberately: every action
+      // pill on every ticket of the rendered specimen is a 40px box. This
+      // asserted `DabblerSizing.touchTargetMin` (45) and `>= 44.0`, and the
+      // old test NAME announced the deviation as a virtue — which taught the
+      // next reader that overriding the drawing was the house rule.
+      //
+      // 40 clears neither the token nor Apple's 44pt floor, and that is a real
+      // conflict, reported rather than hidden. The card itself is tappable via
+      // `onTap`, so the 44pt affordance exists at card level. If the conflict
+      // is resolved in favour of the floor it is resolved in the DESIGN first
+      // and transcribed back — not decided here, and not by restoring the 45.
+      expect(DabblerCardTicket.actionHeight, 40);
+      expect(DabblerCardTicket.actionHeight, lessThan(DabblerSizing.touchTargetMin));
 
       final TextStyle style =
           tester.widget<Text>(find.text('Register')).style!;

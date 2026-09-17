@@ -125,16 +125,38 @@ class DabblerNavigationTopBar extends StatelessWidget {
   static const double barHeight = 62;
 
   /// `padding: '12px 16px'` (`NavigationTopBar.jsx:33`). 16 is off the base-3
-  /// grid; `--space-5` (15) is the step the system carries.
+  /// grid and is transcribed literally: the previous cut rounded it to
+  /// `--space-5` (15), which pulls the wordmark a pixel in from where the
+  /// specimen draws it. Recorded as a token conflict, not resolved to the ramp.
   static const EdgeInsetsDirectional barPadding =
       EdgeInsetsDirectional.symmetric(
     vertical: DabblerSpacing.space4,
-    horizontal: DabblerSpacing.space5,
+    horizontal: barPaddingInline,
   );
 
   /// `gap: 12` between the trailing actions and the avatar
   /// (`NavigationTopBar.jsx:124`) — `--space-4`.
   static const double trailingGap = DabblerSpacing.space4;
+
+  /// `16` — the inline half of `padding: '12px 16px'`. Off-grid, transcribed.
+  static const double barPaddingInline = 16;
+
+  /// `size={22}` on each trailing glyph (`NavigationTopBar.jsx:165,184`). Off
+  /// the 18/24/30 icon ramp and transcribed: the previous cut drew 24, which
+  /// crowds the 12px gap the specimen leaves between the two glyphs and the
+  /// avatar.
+  static const double actionGlyphSize = 22;
+
+  /// A trailing action's hit box: **34 × 45**, per `DECISIONS.md` D-032.
+  ///
+  /// The target floor never cost this bar its fidelity — assuming the box had
+  /// to be *square* did. A 45×45 box carries 11.5 of inline padding each side,
+  /// so the specimen's `gap: 12` on top of it spreads the cluster to 57
+  /// between glyph centres against the drawn 34; butting the boxes still gave
+  /// 45. A 34-wide box takes 6 each side of the 22 glyph, so 34 + 0 gap is
+  /// exactly the drawn 34 pitch, and 45 tall still clears the floor on the
+  /// axis the floor is measured against.
+  static const Size actionTarget = Size(34, DabblerSizing.touchTargetMin);
 
   /// The wordmark's intrinsic box, `100 × 19` (`NavigationTopBar.jsx:46-50`).
   static const Size wordmarkSize = Size(100, 19);
@@ -188,7 +210,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: trailingGap,
+          // `gap: 12` between **bare** 22px glyph nodes — i.e. 34 between
+          // glyph centres. [actionTarget] is 34 wide, so butting the boxes
+          // reproduces that pitch exactly while each box still clears the
+          // touch-target floor on its constrained axis (D-032).
+          spacing: 0,
           children: <Widget>[
             for (final DabblerNavigationAction action in actions)
               _action(colors, action),
@@ -231,15 +257,14 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// The glyph is 22 in the export; the box around it is the target.
   Widget _action(DabblerColors colors, DabblerNavigationAction action) {
     final Widget body = SizedBox(
-      width: DabblerSizing.touchTargetMin,
-      height: DabblerSizing.touchTargetMin,
+      width: actionTarget.width,
+      height: actionTarget.height,
       child: Center(
         child: DabblerIcon(
           action.icon,
           weight: action.weight,
-          // `size={22}` is off the 18/24/30 steps; the card's token table names
-          // `--icon-md · 24px` for *"every navigation glyph"*.
-          size: DabblerSizing.iconMd,
+          // `size={22}` — transcribed, see [actionGlyphSize].
+          size: actionGlyphSize,
           // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary.
           color: colors.textPrimary,
         ),

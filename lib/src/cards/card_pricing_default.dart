@@ -215,20 +215,46 @@ class DabblerCardPricing extends StatelessWidget {
   /// the class doc's rhythm note.
   static const double slotGap = DabblerSpacing.stackTight;
 
-  /// The selection indicator's side — `width: 24, height: 24` on both dumps,
-  /// which is [DabblerSizing.iconMd], the native icon grid. No deviation.
-  static const double indicatorSide = DabblerSizing.iconMd;
+  /// The selection indicator's side — **28**, transcribed literally.
+  ///
+  /// Measured on the rendered specimen
+  /// (`components/cards/cards.card.html`): both the selected tick disc and the
+  /// unselected ring are 28×28 boxes. The earlier dumps read 24 and this
+  /// resolved to [DabblerSizing.iconMd] on that reading; the drawn control is
+  /// 4px larger in each axis, which on a 186×123 tile is visible.
+  ///
+  /// 28 is not a step of [DabblerSizing] — the icon grid runs 18 / 24 / 32 —
+  /// so the value is written out and the **gap is reported**. The indicator is
+  /// a control, not an icon, so snapping it onto the icon grid was never the
+  /// right constraint anyway.
+  static const double indicatorSide = 28;
 
   /// The indicator's ring width — `2px` on both dumps, expressed as two
   /// hairlines so no raw number is written.
   static const double indicatorBorderWidth = DabblerSizing.borderDefault * 2;
 
-  /// The tick's size inside the disc.
+  /// The tick's width — `8`, the drawn `<svg width="8">`.
   ///
-  /// The source draws an 8×5.5 path in a 10×8 box. Neither is an icon step and
-  /// neither is square; [DabblerSizing.iconSm] (18) is the ramp step that fits
-  /// a 24px disc with the source's margin left around it.
-  static const double tickSize = DabblerSizing.iconSm;
+  /// **This was [DabblerSizing.iconSm] (18) drawn as `DabblerIcon('check')`,
+  /// and `check` is not a glyph this package can resolve.** `iconsax_flutter`
+  /// declares `tick_circle` and `tick_square` and no bare tick, so the name
+  /// fell through [DabblerIconRegistry.resolve]'s contract to the placeholder
+  /// and the selected tile rendered a garbled mark instead of a check —
+  /// confirmed on the built gallery.
+  ///
+  /// The design does not draw an icon here. It draws a three-point polyline,
+  /// `M 0 2.5 L 2.8 5.5 L 8 0`, in an `8 × 5.5` box with a round cap and join —
+  /// read off the specimen's flattened `<path>`, whose ±0.9 outset gives the
+  /// stroke width in [tickStrokeWidth]. [_Tick] draws exactly that.
+  static const double tickWidth = 8;
+
+  /// The tick's height — `5.5`, the drawn `<svg height="5.5">`.
+  static const double tickHeight = 5.5;
+
+  /// The tick's stroke — `1.8`, recovered from the flattened path's ±0.9
+  /// outset about the polyline. Round cap and round join, as the outset's
+  /// arcs show.
+  static const double tickStrokeWidth = 1.8;
 
   /// The trial pill's inset from the leading edge — [DabblerSpacing.space5]
   /// (15), for the source's off-grid `left: 14`.
@@ -241,24 +267,41 @@ class DabblerCardPricing extends StatelessWidget {
   /// carries weight 400, so the source's weight is applied on top of the step
   /// rather than a new step being invented — the precedent
   /// `lib/src/surfaces/badge.dart` set and `card_house.dart` followed.
+  /// **The leading is the drawn 22.5, not the step's 20.** The specimen sets
+  /// `line-height: 22.5px` inline — an explicit value in the export, not an
+  /// inherited default (the body computes `line-height: normal`). The step's
+  /// size and face are the ramp's; only the leading the ramp cannot express is
+  /// overridden, and the 1.5-ratio leading the pricing tile uses throughout is
+  /// **reported** as a ramp gap rather than flattened onto the step.
   static TextStyle planStyleFor(TextDirection direction) =>
-      DabblerType.subheadline
-          .resolveForDirection(direction)
-          .copyWith(fontWeight: DabblerType.bold);
+      DabblerType.subheadline.resolveForDirection(direction).copyWith(
+            fontWeight: DabblerType.bold,
+            height: 22.5 / 15,
+          );
 
   /// [price]'s style: `.t-footnote`, unmodified.
   ///
   /// `--font-size-body-sm` is 13 at weight 400, which is the footnote step
   /// exactly.
+  /// **The leading is the drawn 19.5, not the step's 18** — see
+  /// [planStyleFor] for why the override is the faithful reading.
   static TextStyle priceStyleFor(TextDirection direction) =>
-      DabblerType.footnote.resolveForDirection(direction);
+      DabblerType.footnote
+          .resolveForDirection(direction)
+          .copyWith(height: 19.5 / 13);
 
   /// The style of [priceNote] and [billingNote]: `.t-caption-2`, unmodified.
   ///
   /// `--font-size-overline` is 11 at weight 400, which is the caption-2 step
   /// exactly.
+  /// **The leading is the drawn 16.5, not the step's 13** — the widest of the
+  /// three gaps, and the one that most changes the tile: two note lines set at
+  /// 13 instead of 16.5 pull the card 7px short of the drawn height. See
+  /// [planStyleFor].
   static TextStyle noteStyleFor(TextDirection direction) =>
-      DabblerType.caption2.resolveForDirection(direction);
+      DabblerType.caption2
+          .resolveForDirection(direction)
+          .copyWith(height: 16.5 / 11);
 
   /// Which [DabblerCard] shell a tile in state [selected] is drawn on.
   ///
@@ -391,11 +434,10 @@ class DabblerCardPricing extends StatelessWidget {
         ),
       ),
       child: selected
-          ? DabblerIcon(
-              'check',
-              weight: DabblerIconWeight.bold,
-              size: tickSize,
-              color: colors.onBrand,
+          ? SizedBox(
+              width: tickWidth,
+              height: tickHeight,
+              child: CustomPaint(painter: _TickPainter(color: colors.onBrand)),
             )
           : null,
     );
@@ -423,4 +465,41 @@ class DabblerCardPricing extends StatelessWidget {
       ],
     );
   }
+}
+
+/// The selected tile's tick — the design's own polyline, not an icon.
+///
+/// See [DabblerCardPricing.tickWidth] for why this is painted rather than
+/// resolved through [DabblerIconRegistry]: there is no bare tick glyph in
+/// `iconsax_flutter` to resolve to.
+class _TickPainter extends CustomPainter {
+  const _TickPainter({required this.color});
+
+  /// `--color-on-brand` — the disc's ink.
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double sx = size.width / DabblerCardPricing.tickWidth;
+    final double sy = size.height / DabblerCardPricing.tickHeight;
+
+    // `M 0 2.5 L 2.8 5.5 L 8 0`, transcribed point for point.
+    final Path path = Path()
+      ..moveTo(0, 2.5 * sy)
+      ..lineTo(2.8 * sx, 5.5 * sy)
+      ..lineTo(8 * sx, 0);
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = DabblerCardPricing.tickStrokeWidth * sx
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_TickPainter oldDelegate) => oldDelegate.color != color;
 }

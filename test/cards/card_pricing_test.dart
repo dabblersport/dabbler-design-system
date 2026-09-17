@@ -235,12 +235,29 @@ void main() {
         DabblerCardPricing.indicatorBorderWidth,
       );
 
-      final DabblerIcon tick = tester.widget<DabblerIcon>(
-        find.byType(DabblerIcon),
+      // THIS ASSERTED A DEFECT: the tick was `DabblerIcon('check')`, and
+      // `check` is not a name this package can resolve — `iconsax_flutter`
+      // declares `tick_circle` and `tick_square` and no bare tick, so it fell
+      // through `DabblerIconRegistry.resolve` to the placeholder and the
+      // selected tile rendered a garbled mark. Confirmed on the built gallery.
+      //
+      // The design does not draw an icon here at all. It draws a three-point
+      // polyline, `M 0 2.5 L 2.8 5.5 L 8 0`, in an `8 x 5.5` box with a round
+      // cap and join — read off the specimen's flattened `<path>`. So there is
+      // no icon to assert, and reinstating one would reinstate the placeholder.
+      expect(find.byType(DabblerIcon), findsNothing);
+
+      final Size tick = tester.getSize(
+        find.descendant(
+          of: find.byType(DabblerCardPricing),
+          matching: find.byType(CustomPaint),
+        ).first,
       );
-      expect(tick.name, 'check');
-      expect(tick.size, DabblerCardPricing.tickSize);
-      expect(tick.color, colors.onBrand);
+      expect(
+        tick,
+        const Size(DabblerCardPricing.tickWidth,
+            DabblerCardPricing.tickHeight),
+      );
     });
 
     testWidgets('unselected — an empty --outline-strong ring',
@@ -260,7 +277,7 @@ void main() {
       expect(find.byType(DabblerIcon), findsNothing);
     });
 
-    testWidgets('is 24×24 in both states — the source, and the icon grid',
+    testWidgets('is the drawn 28x28 in both states, off the icon grid',
         (WidgetTester tester) async {
       for (final bool selected in <bool>[true, false]) {
         await tester.pumpWidget(
@@ -279,8 +296,16 @@ void main() {
             matching: find.byType(Container),
           ),
         );
-        expect(size, const Size(24, 24));
-        expect(DabblerCardPricing.indicatorSide, DabblerSizing.iconMd);
+        // TOKEN CONFLICT, asserted deliberately: the rendered specimen draws
+        // both the selected tick disc and the unselected ring as 28x28 boxes.
+        // This asserted 24 / `DabblerSizing.iconMd`, which drew the control
+        // 4px short in each axis on a 186x123 tile.
+        //
+        // 28 is off the icon grid (18 / 24 / 32) and that gap is reported. The
+        // indicator is a CONTROL, not an icon, so the icon grid was never the
+        // right constraint — do not snap this back to `iconMd`.
+        expect(size, const Size(28, 28));
+        expect(DabblerCardPricing.indicatorSide, 28);
       }
     });
   });

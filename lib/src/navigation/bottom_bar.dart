@@ -147,11 +147,14 @@ class DabblerNavigationCreateItem {
 /// ancestor [SafeArea] consumes that padding for its subtree, so the value read
 /// here is already `0`. Set [safeArea] to `false` to opt out entirely.
 ///
-/// ## Flat
+/// ## Flat, with the two exceptions D-031 names
 ///
-/// The source draws a drop shadow under both the action and the menu card. The
-/// package is a flat system — no shadow outside `Dialog` and `FAB`'s own
-/// documented exception — so neither is drawn here.
+/// The source draws a drop shadow under both the action and the menu card, and
+/// the previous cut dropped both on a blanket flatness reading.
+/// `DECISIONS.md` **D-031** settles it: flatness holds, but `--elevation-2` is
+/// scoped to **transient overlays**, not to Dialog alone, so the **create
+/// menu** carries it; and the **action** inherits `FAB`'s own existing
+/// documented shadow exception. Nothing else in this widget is elevated.
 class DabblerNavigationBottomBar extends StatefulWidget {
   /// Creates a bottom navigation bar.
   const DabblerNavigationBottomBar({
@@ -235,14 +238,35 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   /// doc — this cannot double-apply under an ancestor [SafeArea].
   final bool safeArea;
 
-  /// Every destination's hit box, and the action's diameter floor:
-  /// `--touch-target-min` (45), which clears the ticket's 44 floor.
+  /// Every destination's hit box: `height: 44` / `width: 44`
+  /// (`NavigationBottomBar.jsx:141,143`).
   ///
-  /// **Deviation, documented.** The source's item is `height: 44`
-  /// (`NavigationBottomBar.jsx:141`); the card's own token table names
-  /// `--touch-target-min · 45px` as *"the floor every navigation target
-  /// clears"*. 45 satisfies both, so the token wins over the inline value.
-  static const double itemSize = DabblerSizing.touchTargetMin;
+  /// **Transcribed literally, against the token.** `--touch-target-min` is 45
+  /// and the previous cut snapped to it; the rendered specimen draws 44, and a
+  /// 1px taller pill reads as a visibly fatter bar next to the 56 action.
+  /// Recorded as a token conflict rather than resolved in favour of the ramp.
+  static const double itemSize = 44;
+
+  /// `gap: on ? 8 : 0` on the active chip (`NavigationBottomBar.jsx:139`).
+  /// Off the base-3 grid; transcribed rather than rounded to `--space-3` (9).
+  static const double activeGap = 8;
+
+  /// `gap: 8` between create tiles (`NavigationBottomBar.jsx:88`). Off-grid,
+  /// transcribed.
+  static const double createGridGap = 8;
+
+  /// `gap: 7` between a create tile's plate and its label
+  /// (`NavigationBottomBar.jsx:103`). Off-grid, transcribed.
+  static const double createTileGap = 7;
+
+  /// `size={26}` on the action glyph and on each create-tile glyph
+  /// (`NavigationBottomBar.jsx:117,194`). Off the 18/24/30 icon ramp;
+  /// transcribed, because 24 visibly under-fills the 56 action.
+  static const double glyph26 = 26;
+
+  /// `fontSize: 12.5, fontWeight: 500` on the create-tile label
+  /// (`NavigationBottomBar.jsx:119-124`).
+  static const double createLabelSize = 12.5;
 
   /// The create tile's glyph plate height — `height: 62`
   /// (`NavigationBottomBar.jsx:112`).
@@ -494,9 +518,8 @@ class _DabblerNavigationBottomBarState
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        // `gap: on ? 8 : 0`. 8 is off the base-3 grid; `--space-3` (9) is the
-        // step the system carries and the nearest to it.
-        spacing: active ? DabblerSpacing.space3 : 0,
+        // `gap: on ? 8 : 0` — transcribed literally, see [activeGap].
+        spacing: active ? DabblerNavigationBottomBar.activeGap : 0,
         children: <Widget>[
           glyph,
           if (active)
@@ -568,6 +591,13 @@ class _DabblerNavigationBottomBarState
                 decoration: BoxDecoration(
                   color: colors.brandPrimary,
                   borderRadius: DabblerRadius.pillAll,
+                  // D-031: the detached action inherits `FAB`'s own existing
+                  // documented shadow exception — it IS a FAB, at
+                  // [DabblerFab.size], and the source draws the shadow
+                  // (`NavigationBottomBar.jsx:184`). Deliberately
+                  // [DabblerFab.shadow] and not [DabblerElevation.dialogFor];
+                  // `fab.dart` is explicit that the two are different shadows.
+                  boxShadow: DabblerFab.shadow,
                 ),
                 child: AnimatedRotation(
                   turns: open ? DabblerNavigationBottomBar.actionOpenTurns : 0,
@@ -576,10 +606,9 @@ class _DabblerNavigationBottomBarState
                   child: DabblerIcon(
                     widget.actionIcon,
                     weight: DabblerIconWeight.bold,
-                    // The card's token table: `--icon-md · 24px` is *"every
-                    // navigation glyph — the native Iconsax grid"*. The source's
-                    // inline 26 is off that grid and off the 18/24/30 steps.
-                    size: DabblerSizing.iconMd,
+                    // `size={26}` (`NavigationBottomBar.jsx:194`) — off the
+                    // 18/24/30 ramp, transcribed: 24 under-fills the 56 disc.
+                    size: DabblerNavigationBottomBar.glyph26,
                     color: colors.onBrand,
                   ),
                 ),
@@ -593,7 +622,7 @@ class _DabblerNavigationBottomBarState
 
   /// The create menu: a card of tiles that replaces the pill **in flow**.
   ///
-  /// `padding: 12` (`--space-4`), `gap: 8` → `--space-3` (9, the nearest step),
+  /// `padding: 12` (`--space-4`), `gap: 8` (off-grid, transcribed),
   /// `borderRadius: var(--radius-xxl)` (`NavigationBottomBar.jsx:84-100`).
   Widget _menu(DabblerColors colors) {
     final List<DabblerNavigationCreateItem> tiles = widget.createItems;
@@ -605,7 +634,7 @@ class _DabblerNavigationBottomBarState
       for (int start = 0; start < tiles.length; start += columns)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: DabblerSpacing.space3,
+          spacing: DabblerNavigationBottomBar.createGridGap,
           children: <Widget>[
             for (int i = start; i < start + columns; i++)
               Expanded(
@@ -638,6 +667,12 @@ class _DabblerNavigationBottomBarState
         curve: DabblerMotion.easeOut,
         builder: (BuildContext context, double t, Widget? child) => Opacity(
           opacity: t,
+          // On the first frame `t` is 0, and an [Opacity] of 0 drops its
+          // subtree from the semantics tree. The menu publishes
+          // [SemanticsRole.menu], which asserts *"a menu cannot be empty"* —
+          // so the enter animation's own first frame tripped it. The tiles are
+          // a real menu throughout the fade; keep them announced.
+          alwaysIncludeSemantics: true,
           child: Transform.scale(
             scale: 0.92 + 0.08 * t,
             // `transformOrigin: bottom left|right` — the inline end, bottom.
@@ -652,10 +687,21 @@ class _DabblerNavigationBottomBarState
           decoration: BoxDecoration(
             color: colors.surfaceCard,
             borderRadius: DabblerRadius.xxlAll,
+            // `DECISIONS.md` **D-031**: the create menu joins Dialog in
+            // carrying `--elevation-2`, the system's one legal shadow, which
+            // the ruling scopes to transient overlays rather than to Dialog
+            // alone. The source draws a shadow here
+            // (`NavigationBottomBar.jsx:90`) and the previous cut dropped it
+            // on a blanket flatness reading.
+            //
+            // [DabblerElevation]'s own doc still says *"Dialog (DS-702)
+            // only"*. That is now stale; the tokens file is not this ticket's
+            // to edit, so it is reported rather than changed here.
+            boxShadow: DabblerElevation.dialogFor(colors.brightness),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            spacing: DabblerSpacing.space3,
+            spacing: DabblerNavigationBottomBar.createGridGap,
             children: rows,
           ),
         ),
@@ -666,8 +712,8 @@ class _DabblerNavigationBottomBarState
   Widget _tile(DabblerColors colors, DabblerNavigationCreateItem tile) {
     final Widget body = Column(
       mainAxisSize: MainAxisSize.min,
-      // `gap: 7` → `--space-2` (6), the nearest step.
-      spacing: DabblerSpacing.space2,
+      // `gap: 7` — transcribed literally, see [createTileGap].
+      spacing: DabblerNavigationBottomBar.createTileGap,
       children: <Widget>[
         Container(
           height: DabblerNavigationBottomBar.createTileHeight,
@@ -679,7 +725,9 @@ class _DabblerNavigationBottomBarState
           ),
           child: DabblerIcon(
             tile.icon,
-            size: DabblerSizing.iconMd,
+            // `size={26}` (`NavigationBottomBar.jsx:117`) — off-ramp,
+            // transcribed.
+            size: DabblerNavigationBottomBar.glyph26,
             color: colors.textPrimary,
           ),
         ),
@@ -688,22 +736,25 @@ class _DabblerNavigationBottomBarState
           textAlign: TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          // `NavigationBottomBar.jsx:121` sets this label to `--text-body`,
-          // which is referenced exactly once in the whole design source and
-          // declared nowhere in `tokens/`. On the web it silently inherits;
-          // Flutter cannot inherit a name that does not exist.
+          // `fontSize: 12.5, fontWeight: 500, color: var(--text-body)`
+          // (`NavigationBottomBar.jsx:119-124`).
           //
-          // **Resolved by `DECISIONS.md` D-007(1):** `--text-body` is a
-          // **defect, not a missing token** — it is not added to `colors.css`.
-          // The create-tile label instead takes the same role its sibling
-          // label in this same widget already takes: the destination-item
-          // label at `:503-510`, which is [DabblerType.subheadline] at
-          // `--brand-primary`, weight medium. The ruling names the mechanism
-          // (mirror the sibling), not a hex, so nothing is invented here.
-          style: DabblerType.subheadline
+          // `--text-body` is referenced exactly once in the whole design source
+          // and declared nowhere in `tokens/`; **`DECISIONS.md` D-007(1)** rules
+          // it a defect rather than a missing token. The rendered specimen
+          // paints it as ordinary body ink on the card, so it resolves to
+          // [DabblerColors.textPrimary] here.
+          //
+          // The previous cut instead mirrored the *destination* label —
+          // subheadline (15) at `--brand-primary` — which draws the tiles'
+          // captions half again too large and purple against a white card. The
+          // drawing wins: 12.5 / medium / body ink.
+          style: DabblerType.caption1
               .resolveForDirection(Directionality.of(context))
               .copyWith(
-                color: colors.brandPrimary,
+                fontSize: DabblerNavigationBottomBar.createLabelSize,
+                height: 1.25,
+                color: colors.textPrimary,
                 fontWeight: DabblerType.medium,
               ),
         ),
@@ -713,6 +764,14 @@ class _DabblerNavigationBottomBarState
     return Semantics(
       container: true,
       button: true,
+      // `role="menuitem"` (`NavigationBottomBar.jsx:101`). Also a framework
+      // requirement, not just a transcription: a node carrying
+      // [SemanticsRole.menu] asserts *"a menu cannot be empty"* unless its
+      // children carry [SemanticsRole.menuItem]. The menu published the role
+      // and the tiles did not, so opening the create menu tripped the
+      // assertion — invisible until the gallery gained a specimen that opens
+      // it.
+      role: SemanticsRole.menuItem,
       label: tile.label,
       onTap: () => _create(tile.id),
       child: ExcludeSemantics(

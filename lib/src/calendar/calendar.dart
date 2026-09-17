@@ -374,6 +374,10 @@ class DabblerCalendar extends StatelessWidget {
   /// (`Calendar.jsx:29`).
   static const double chipHeight = 30;
 
+  /// `fontSize: 14` on a month/year chip (`Calendar.jsx:31`). Off the type
+  /// ramp; transcribed.
+  static const double chipFontSize = 14;
+
   /// The key of the previous-month control.
   static const Key previousMonthKey = ValueKey<String>(
     'DabblerCalendar.previous',
@@ -690,12 +694,14 @@ class DabblerCalendar extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              // `fontSize: 14, fontWeight: 600` (`Calendar.jsx:31`). The ramp has
-              // no 14; `.t-footnote` (13) is the nearest step and is what DS-103a
-              // says to round to rather than invent one.
+              // `fontSize: 14, fontWeight: 600` (`Calendar.jsx:31`). 14 is
+              // transcribed literally below: the ramp has no 14, and rounding
+              // to `.t-footnote` (13) draws the month/year chips a step small
+              // against the specimen. Recorded as a ramp conflict.
               style: DabblerType.footnote
                   .resolveForDirection(direction)
                   .copyWith(
+                    fontSize: chipFontSize,
                     color: colors.textPrimary,
                     fontWeight: DabblerType.semibold,
                   ),

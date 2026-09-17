@@ -152,17 +152,18 @@ void main() {
     });
   });
 
-  group('geometry — the tokens, and the deviations written down', () {
-    testWidgets('radius is --radius-lg, not the source literal 16', (
+  group('geometry — the drawn literals, with the token conflicts named', () {
+    testWidgets('radius is the source literal 16, which no ramp step carries', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(_host(const DabblerInputRow(title: 'x')));
-      expect(_surface(tester).radius, DabblerRadius.lg);
-      expect(DabblerInputRow.defaultRadius, DabblerRadius.lg);
+      expect(_surface(tester).radius, 16);
+      expect(DabblerInputRow.defaultRadius, 16);
       expect(DabblerRadius.lg, 12);
+      expect(DabblerRadius.xl, 18);
     });
 
-    testWidgets('padding is --space-5 on both axes and mirrors in RTL', (
+    testWidgets('padding is the drawn 14 block / 16 inline, and mirrors in RTL', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(_host(const DabblerInputRow(title: 'x')));
@@ -170,14 +171,14 @@ void main() {
       expect(
         DabblerInputRow.defaultPadding,
         const EdgeInsetsDirectional.symmetric(
-          vertical: DabblerSpacing.space5,
-          horizontal: DabblerSpacing.space5,
+          vertical: 14,
+          horizontal: 16,
         ),
       );
 
       final Rect ltrRow = tester.getRect(find.byType(DabblerInputRow));
       final Rect ltr = tester.getRect(find.text('x'));
-      expect(ltr.left - ltrRow.left, closeTo(DabblerSpacing.space5, 0.01));
+      expect(ltr.left - ltrRow.left, closeTo(16, 0.01));
 
       await tester.pumpWidget(
         _host(const DabblerInputRow(title: 'x'), direction: TextDirection.rtl),
@@ -186,7 +187,7 @@ void main() {
       final Rect rtl = tester.getRect(find.text('x'));
       expect(
         rtlRow.right - rtl.right,
-        closeTo(DabblerSpacing.space5, 0.01),
+        closeTo(16, 0.01),
         reason: 'the inline start inset moves to the right in RTL',
       );
     });
@@ -278,7 +279,7 @@ void main() {
       );
     });
 
-    testWidgets('both lines take their ramp leading, not the .5px source', (
+    testWidgets('both lines take the drawn .5px leadings, not the ramp step', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -286,8 +287,8 @@ void main() {
       );
       final TextStyle title = tester.widget<Text>(find.text('a')).style!;
       final TextStyle subtitle = tester.widget<Text>(find.text('b')).style!;
-      expect(title.height! * title.fontSize!, closeTo(20, 0.01));
-      expect(subtitle.height! * subtitle.fontSize!, closeTo(18, 0.01));
+      expect(title.height! * title.fontSize!, closeTo(22.5, 0.01));
+      expect(subtitle.height! * subtitle.fontSize!, closeTo(19.5, 0.01));
     });
   });
 
@@ -312,7 +313,10 @@ void main() {
 
       final DabblerFocusRing ring =
           tester.widget<DabblerFocusRing>(find.byType(DabblerFocusRing));
-      expect(ring.borderRadius, DabblerRadius.lgAll);
+      expect(
+        ring.borderRadius,
+        const BorderRadius.all(Radius.circular(DabblerInputRow.defaultRadius)),
+      );
       expect(ring.width, DabblerFocusRing.ringWidth);
 
       await tester.tap(find.byType(DabblerInputRow));
@@ -514,8 +518,14 @@ void main() {
   });
 
   group('composed, not restated', () {
-    test('every geometry constant is a token', () {
-      expect(DabblerInputRow.defaultRadius, DabblerRadius.lg);
+    test('every geometry constant is a token, or a named drawn literal', () {
+      // Overturned 2026-09-17 by the CEO's visual-fidelity ruling: the radius,
+      // the padding and the two leadings are the source's own literals, and
+      // the class doc names the token each one conflicts with. Everything the
+      // ramp CAN express still comes from the ramp.
+      expect(DabblerInputRow.defaultRadius, 16);
+      expect(DabblerInputRow.titleLeading, 22.5);
+      expect(DabblerInputRow.subtitleLeading, 19.5);
       expect(DabblerInputRow.slotGap, DabblerSpacing.stackDefault);
       expect(DabblerInputRow.minHeight, DabblerSizing.touchTargetMin);
       expect(DabblerChevron.size, DabblerSizing.iconSm);
@@ -552,10 +562,11 @@ void main() {
         reason: 'the press timing is DabblerMotion s, not this file s',
       );
       expect(
-        RegExp(r'=\s*16\s*;|=\s*14\s*;|=\s*45\s*;|=\s*12\s*;|=\s*18\s*;')
-            .hasMatch(code),
+        RegExp(r'=\s*45\s*;|=\s*12\s*;|=\s*18\s*;').hasMatch(code),
         isFalse,
-        reason: 'the source literals are taken through tokens, never restated',
+        reason: 'a value the ramp DOES express is read from the ramp; only '
+            'the four drawn values no token carries (16, 14, 22.5, 19.5) are '
+            'written literally, each named in the class doc',
       );
       expect(
         RegExp(r'EdgeInsets\.only|EdgeInsets\.fromLTRB|left:|right:')

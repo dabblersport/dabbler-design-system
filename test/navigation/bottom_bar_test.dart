@@ -155,13 +155,23 @@ void main() {
       );
     });
 
-    testWidgets('every navigation glyph is --icon-md (24)',
+    testWidgets('a destination glyph is --icon-md; the action is the drawn 26',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
-      for (final DabblerIcon icon
-          in tester.widgetList<DabblerIcon>(find.byType(DabblerIcon))) {
+      final List<DabblerIcon> glyphs =
+          tester.widgetList<DabblerIcon>(find.byType(DabblerIcon)).toList();
+
+      // The four destinations are `size={24}` (`NavigationBottomBar.jsx:158`),
+      // which is `--icon-md` and on the 18/24/30 ramp.
+      for (final DabblerIcon icon in glyphs.take(glyphs.length - 1)) {
         expect(icon.size, DabblerSizing.iconMd);
       }
+
+      // The action is `size={26}` (`NavigationBottomBar.jsx:194`) — OFF that
+      // ramp, and transcribed literally, because 24 visibly under-fills the 56
+      // disc. This test previously asserted 24 for every glyph, which is what
+      // pinned the action to the ramp instead of to the drawing.
+      expect(glyphs.last.size, DabblerNavigationBottomBar.glyph26);
     });
   });
 
@@ -216,8 +226,8 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
       final Size action = tester.getSize(find.byType(DabblerIcon).last);
-      // The glyph is icon-md inside a 56 plate; assert the plate.
-      expect(action.width, DabblerSizing.iconMd);
+      // The glyph is the drawn 26 inside a 56 plate; assert both.
+      expect(action.width, DabblerNavigationBottomBar.glyph26);
       final Size plate = tester.getSize(find.ancestor(
         of: find.byType(AnimatedRotation),
         matching: find.byType(Container),
@@ -310,7 +320,7 @@ void main() {
     });
 
     testWidgets(
-        'the create-tile label mirrors the destination label — D-007(1)',
+        'the create-tile label is the drawn 12.5 in body ink — D-007(1)',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(defaultMenuOpen: true)),
@@ -321,13 +331,20 @@ void main() {
           tester.widget<Text>(find.text('Create game')).style!;
       final DabblerColors colors = _colors();
 
-      // D-007(1): `--text-body` is a defect, not a token. The label takes the
-      // destination-item label's role — subheadline (15) at `--brand-primary`,
-      // weight medium — and not the muted secondary ink it used to guess.
-      expect(style.fontSize, DabblerType.subheadline.fontSize);
-      expect(style.color, colors.brandPrimary);
+      // `fontSize: 12.5, fontWeight: 500, color: var(--text-body)`
+      // (`NavigationBottomBar.jsx:119-124`). D-007(1) rules `--text-body` a
+      // defect rather than a missing token; the rendered specimen paints these
+      // captions as ordinary body ink on the white card, small and centred.
+      //
+      // This test previously asserted subheadline (15) at `--brand-primary`,
+      // mirroring the *destination* label. That draws the tiles' captions half
+      // again too large and purple, which is not what the specimen shows — so
+      // the assertion, and the name that announced it as the rule, are
+      // corrected to the drawing. 12.5 is off the type ramp and is transcribed.
+      expect(style.fontSize, DabblerNavigationBottomBar.createLabelSize);
+      expect(style.color, colors.textPrimary);
       expect(style.fontWeight, DabblerType.medium);
-      expect(style.color, isNot(colors.textSecondary));
+      expect(style.color, isNot(colors.brandPrimary));
     });
 
     testWidgets('the action rotates 45 degrees while open',
@@ -576,22 +593,44 @@ void main() {
   });
 
   group('flat, themed, and no hardcoded colour', () {
-    testWidgets('nothing in the bar paints a shadow',
+    testWidgets('only the two surfaces D-031 names are elevated; no gradients',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(defaultMenuOpen: true)),
       );
       await tester.pumpAndSettle();
+
+      // `DECISIONS.md` **D-031**: flatness holds, but `--elevation-2` is scoped
+      // to transient overlays rather than to Dialog alone, so the create menu
+      // carries it; and the action inherits `FAB`'s own existing documented
+      // shadow exception. The source draws both
+      // (`NavigationBottomBar.jsx:90,184`).
+      //
+      // This test previously asserted that NOTHING in the bar was elevated,
+      // which is what pinned the blanket-flatness reading that dropped two
+      // shadows the design draws. It now pins the exceptions instead: exactly
+      // two elevated surfaces, each with the shadow that belongs to it, and
+      // still no gradient anywhere.
+      final List<List<BoxShadow>> elevated = <List<BoxShadow>>[];
       for (final Container box in tester.widgetList<Container>(find.descendant(
         of: find.byType(DabblerNavigationBottomBar),
         matching: find.byType(Container),
       ))) {
         final Decoration? decoration = box.decoration;
         if (decoration is BoxDecoration) {
-          expect(decoration.boxShadow ?? const <BoxShadow>[], isEmpty);
           expect(decoration.gradient, isNull);
+          final List<BoxShadow> shadow =
+              decoration.boxShadow ?? const <BoxShadow>[];
+          if (shadow.isNotEmpty) {
+            elevated.add(shadow);
+          }
         }
       }
+
+      expect(elevated, hasLength(2));
+      // The menu is first in the tree, the action second.
+      expect(elevated.first, DabblerElevation.dialogFor(_colors().brightness));
+      expect(elevated.last, DabblerFab.shadow);
     });
 
     testWidgets('the pill re-tints with the section theme',

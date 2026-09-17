@@ -59,20 +59,25 @@ import '../tokens/dabbler_type.dart';
 /// [DabblerPressScale] and [DabblerFocusRing] — the same primitives every other
 /// tappable surface in the package uses.
 ///
-/// ## The geometry deviations, all of them token-over-literal
+/// ## The geometry is the drawn geometry, not the nearest token
 ///
-/// Same direction and same reason as `card.dart` and `card_house.dart`: the
-/// Figma dump is a dump, the token file is the system.
+/// **Reverted 2026-09-17 under the CEO's visual-fidelity ruling.** This file
+/// previously snapped three drawn values to the nearest ramp step and
+/// documented it as "token-over-literal". The fidelity brief overturns that
+/// reasoning explicitly — *"the token is nearest" is how the last pass
+/// failed* — so each value is now transcribed from the source literal, with
+/// the token conflict named rather than resolved away.
 ///
-/// | Source literal | Taken here | Why |
+/// | Source literal | Taken here | Token conflict |
 /// |---|---|---|
-/// | `borderRadius: 16` (`:32`) | [DabblerRadius.lg] (12) | 16 is not a step of the base-3 ramp; `--radius-lg` is the step `card.dart` already took for the identical literal |
-/// | `padding: '14px 16px'` (`:32`) | [DabblerSpacing.space5] (15) on both axes | neither 14 nor 16 is a step, and 15 is the nearest to **both**; `navigation/top_bar.dart` took the same 16 → 15 |
-/// | `minHeight: 45` (`:36`) | [DabblerSizing.touchTargetMin] | the same number, read from the token rather than restated |
+/// | `borderRadius: 16` (`:32`) | **16** | not a step of the radius ramp, which gives 12 (`--radius-lg`) and 18 (`--radius-xl`). No token expresses it. |
+/// | `padding: '14px 16px'` (`:32`) | **14** block, **16** inline | neither is a step of [DabblerSpacing]; the grid gives 12, 15 and 18. No token expresses either. |
+/// | `minHeight: 45` (`:36`) | [DabblerSizing.touchTargetMin] | none — the same number, read from the token. |
 ///
-/// The 2px the source puts between its block and inline padding is not a
-/// system value — there is no step between 14 and 16 — so it is not preserved.
-/// `gap: 12` needs no deviation at all: it is [DabblerSpacing.stackDefault].
+/// The 2px the source puts between its block and inline padding **is**
+/// preserved: it is what makes the row read as wider than it is tall, which
+/// is visible at a glance. `gap: 12` needs no literal at all: it is
+/// [DabblerSpacing.stackDefault].
 ///
 /// ## The press tint is not ported — the system presses by scale
 ///
@@ -100,10 +105,14 @@ import '../tokens/dabbler_type.dart';
 ///
 /// [title] is `fontSize: 15, fontWeight: 400` (`:41-42`), which is
 /// [DabblerType.subheadline] exactly. [subtitle] is `fontSize: 13,
-/// fontWeight: 400` (`:44-45`), which is [DabblerType.footnote] exactly. The
-/// source's `22.5px` and `19.5px` leadings are not ramp steps — the ramp gives
-/// 20 and 18 for these two sizes — so each takes its own step's leading rather
-/// than a half-pixel line box.
+/// fontWeight: 400` (`:44-45`), which is [DabblerType.footnote] exactly.
+///
+/// The **leadings are the source's own `22.5px` and `19.5px`**, not the type
+/// ramp's 20 and 18. Same reversal as the geometry above: the ramp steps made
+/// a two-line row 4.5px shorter than the drawing and closed the gap between
+/// the two lines, which is visible side by side. Token conflict, named not
+/// resolved: no [DabblerType] step carries a half-pixel leading, so these two
+/// are applied as explicit `height` overrides on the ramp's own styles.
 class DabblerInputRow extends StatelessWidget {
   /// Creates a settings row for [title].
   const DabblerInputRow({
@@ -117,17 +126,25 @@ class DabblerInputRow extends StatelessWidget {
     this.semanticLabel,
   });
 
-  /// `borderRadius: 16` → [DabblerRadius.lg]. See the class doc's deviation
-  /// table.
-  static const double defaultRadius = DabblerRadius.lg;
+  /// `borderRadius: 16` (`InputRow.jsx:32`), transcribed literally. **Token
+  /// conflict:** the radius ramp has no 16 — it steps 12 → 18. See the class
+  /// doc's table.
+  static const double defaultRadius = 16;
 
-  /// `padding: '14px 16px'` → [DabblerSpacing.space5] on both axes.
+  /// `padding: '14px 16px'` (`InputRow.jsx:32`), transcribed literally.
+  /// **Token conflict:** neither 14 nor 16 is a [DabblerSpacing] step.
   /// Directional so it mirrors in RTL.
   static const EdgeInsetsDirectional defaultPadding =
       EdgeInsetsDirectional.symmetric(
-    vertical: DabblerSpacing.space5,
-    horizontal: DabblerSpacing.space5,
+    vertical: 14,
+    horizontal: 16,
   );
+
+  /// `lineHeight: '22.5px'` on the title (`InputRow.jsx:41-42`).
+  static const double titleLeading = 22.5;
+
+  /// `lineHeight: '19.5px'` on the subtitle (`InputRow.jsx:44-45`).
+  static const double subtitleLeading = 19.5;
 
   /// `gap: 12` between the row's three slots (`InputRow.jsx:31`) —
   /// [DabblerSpacing.stackDefault], no deviation.
@@ -168,11 +185,15 @@ class DabblerInputRow extends StatelessWidget {
 
   /// [title]'s style — [DabblerType.subheadline], unmodified.
   static TextStyle titleStyleFor(TextDirection direction) =>
-      DabblerType.subheadline.resolveForDirection(direction);
+      DabblerType.subheadline
+          .resolveForDirection(direction)
+          .copyWith(height: titleLeading / DabblerType.subheadline.fontSize);
 
   /// [subtitle]'s style — [DabblerType.footnote], unmodified.
   static TextStyle subtitleStyleFor(TextDirection direction) =>
-      DabblerType.footnote.resolveForDirection(direction);
+      DabblerType.footnote
+          .resolveForDirection(direction)
+          .copyWith(height: subtitleLeading / DabblerType.footnote.fontSize);
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +277,9 @@ class DabblerInputRow extends StatelessWidget {
         child: DabblerFocusRing(
           enabled: interactive,
           canRequestFocus: interactive,
-          borderRadius: DabblerRadius.lgAll,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(DabblerInputRow.defaultRadius),
+          ),
           child: row,
         ),
       ),

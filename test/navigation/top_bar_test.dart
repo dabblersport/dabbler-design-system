@@ -139,7 +139,7 @@ void main() {
   });
 
   group('AC1 — touch targets, measured', () {
-    testWidgets('each trailing action clears 44x44',
+    testWidgets('each trailing action is the ruled 34x45 box — D-032',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(DabblerNavigationTopBar(
         actions: <DabblerNavigationAction>[
@@ -158,7 +158,17 @@ void main() {
         final Size size = tester.getSize(
           find.byElementPredicate((Element e) => identical(e, box)),
         );
-        expect(size.width, greaterThanOrEqualTo(kTargetFloor));
+        // `DECISIONS.md` **D-032**: the target floor never cost this bar its
+        // fidelity — assuming the hit box had to be *square* did. A 45x45 box
+        // carries 11.5 of inline padding each side, so the specimen's `gap: 12`
+        // on top spread the cluster to 57 between glyph centres against the
+        // drawn 34. The ruled box is 34 x 45: 34 reproduces the drawn pitch
+        // exactly when the boxes are butted, and 45 still clears the floor on
+        // the constrained axis.
+        //
+        // This test previously required >= 44 on BOTH axes, which is what made
+        // a square box look mandatory. It now pins the ruled geometry.
+        expect(size, DabblerNavigationTopBar.actionTarget);
         expect(size.height, greaterThanOrEqualTo(kTargetFloor));
       }
     });
@@ -201,7 +211,7 @@ void main() {
   });
 
   group('AC1 — DS-300 icons and DS-200 focus/press', () {
-    testWidgets('every glyph is --icon-md (24) and linear by default',
+    testWidgets('every glyph is the drawn 22 and linear by default',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationTopBar(actions: _actions)),
@@ -211,7 +221,11 @@ void main() {
       expect(icons.map((DabblerIcon i) => i.name),
           <String>['sms', 'notification-bing']);
       for (final DabblerIcon icon in icons) {
-        expect(icon.size, DabblerSizing.iconMd);
+        // `size={22}` (`NavigationTopBar.jsx:165,184`) — OFF the 18/24/30 icon
+        // ramp, transcribed literally. This test previously asserted
+        // `--icon-md` (24), which is what pinned the glyphs to the ramp and
+        // crowded the 12px gap the specimen leaves between them and the avatar.
+        expect(icon.size, DabblerNavigationTopBar.actionGlyphSize);
         expect(icon.weight, DabblerIconWeight.linear);
         expect(icon.color, _colors().textPrimary);
       }

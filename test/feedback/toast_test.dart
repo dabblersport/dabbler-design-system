@@ -1,4 +1,5 @@
 import 'package:dabbler_design_system/src/feedback/toast.dart';
+import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/interaction/focus_ring.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
@@ -377,14 +378,40 @@ void main() {
       expect(theme.size, DabblerSizing.iconSm);
     });
 
-    testWidgets('no icon is rendered by default — the package has no icon '
-        'dependency yet', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerToast(message: 'no glyph')));
+    testWidgets('the tone glyph is rendered by default; noIcon suppresses it',
+        (WidgetTester tester) async {
+      // The name this test used to carry — *"no icon is rendered by default —
+      // the package has no icon dependency yet"* — announced a deviation as if
+      // it were the rule. The premise has been false since DS-300 shipped
+      // `DabblerIcon`, and the assertion was what pinned Toast (and Banner)
+      // rendering with no status glyph at all, which is not something the
+      // design ever draws: `status-feedback.card.html` shows every tone with
+      // its Iconsax glyph, bold at 18.
+      await tester.pumpWidget(
+        _host(const DabblerToast(tone: DabblerToastTone.success, message: 'ok')),
+      );
+      await tester.pumpAndSettle();
+
+      final DabblerIcon glyph = tester.widget<DabblerIcon>(find.descendant(
+        of: find.byType(DabblerToast),
+        matching: find.byType(DabblerIcon),
+      ));
+      expect(glyph.name, DabblerToastTone.success.glyph);
+      expect(glyph.weight, DabblerIconWeight.bold);
+      expect(glyph.size, DabblerSizing.iconSm);
+
+      // The source distinguishes an omitted `icon` from an explicit
+      // `icon={null}`; `dabblerToastNoIcon` is that second case.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpWidget(_host(const DabblerToast(
+        message: 'no glyph',
+        icon: dabblerToastNoIcon,
+      )));
       await tester.pumpAndSettle();
       expect(
         find.descendant(
           of: find.byType(DabblerToast),
-          matching: find.byType(Icon),
+          matching: find.byType(DabblerIcon),
         ),
         findsNothing,
       );

@@ -190,7 +190,7 @@ void main() {
   });
 
   group('DabblerSection type and colour come from the tokens', () {
-    testWidgets('title is title3 at textPrimary, subtitle footnote at '
+    testWidgets('title is title3 at --weight-light, subtitle footnote at '
         'textSecondary', (WidgetTester tester) async {
       await tester.pumpWidget(
         _host(
@@ -205,7 +205,12 @@ void main() {
           tester.widget<Text>(find.text('Upcoming games')).style!;
       expect(title.fontSize, DabblerType.title3.fontSize);
       expect(title.height! * title.fontSize!, DabblerType.title3.latinLeading);
-      expect(title.fontWeight, DabblerType.regular);
+      // `fontWeight: 300` (`Section.jsx:19-20`) — `--weight-light`, NOT
+      // `.t-title-3`'s own regular default. This test previously asserted
+      // regular, which is what left the section heading a full step heavier
+      // than the specimen draws it — the single most visible thing about a
+      // Section.
+      expect(title.fontWeight, DabblerType.light);
       expect(title.color, colors.textPrimary);
 
       final TextStyle subtitle =

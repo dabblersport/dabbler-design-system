@@ -229,8 +229,13 @@ class DabblerBadge extends StatelessWidget {
   /// which is the stated source of the palette layer and is enforced by
   /// `test/tokens/dabbler_palette_test.dart`.
   ///
-  /// `DabblerColors.info.base` — `#6366F1` under `main`, the nearest indigo the
-  /// palette actually declares — is what this tone paints today. This is the
+  /// `DabblerColors.info.base` is what this tone paints today. **Corrected
+  /// 2026-09-17 against the rendered specimen:** this comment used to call that
+  /// value `#6366F1`, "the nearest indigo the palette actually declares". It is
+  /// neither. [DabblerPalette.info500] is **`#3B82F6`** — a blue, not an indigo
+  /// — so the gap is wider than it was written to be. Measured side by side,
+  /// the specimen paints `rgb(92, 80, 230)` and this paints `rgb(59, 130, 246)`:
+  /// visibly bluer, not a near-match. This is the
   /// same hand-off `lib/src/controls/fab.dart` raised on KAN-222 for the FAB's
   /// `indigo` tone: adopting `--accent-indigo` widens the palette's stated
   /// source, which is a `cto`/`cxo` call rather than a developer's, and both
@@ -281,7 +286,16 @@ class DabblerBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             if (icon != null) ...<Widget>[
-              icon!,
+              // `color: t.fg` sits on the badge in `Badge.jsx:40`, so the
+              // glyph inherits it as `currentColor` — the specimen's `pill`
+              // dot is literally `background: currentColor`, and neither
+              // icon-bearing badge passes a colour of its own. Without this
+              // the glyph fell back to `textPrimary` and read as a foreign
+              // ink on the six dark-filled tones.
+              IconTheme.merge(
+                data: IconThemeData(color: foreground),
+                child: icon!,
+              ),
               const SizedBox(width: iconGap),
             ],
             Text(
