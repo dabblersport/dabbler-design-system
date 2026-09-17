@@ -287,6 +287,105 @@ void main() {
     });
   });
 
+  // ----- Controlled open, the path Select (DS-601) and PickerField need -----
+  group('controlled open', () {
+    /// An owner that holds `open` itself, as `Select` does.
+    Widget controlled({
+      required ValueNotifier<bool> open,
+      Size size = _wide,
+    }) {
+      return _host(
+        ValueListenableBuilder<bool>(
+          valueListenable: open,
+          builder: (BuildContext context, bool value, _) => DabblerMenu(
+            open: value,
+            onOpenChanged: (bool next) => open.value = next,
+            trigger: _trigger,
+            items: _threeItems(),
+          ),
+        ),
+        size: size,
+      );
+    }
+
+    testWidgets('flipping open to true from the owner opens it',
+        (WidgetTester tester) async {
+      // Regression, DS-601: the owner's rebuild reaches didUpdateWidget during
+      // the build phase, where OverlayPortalController.show asserts.
+      final ValueNotifier<bool> open = ValueNotifier<bool>(false);
+      addTearDown(open.dispose);
+      await tester.pumpWidget(controlled(open: open));
+      expect(find.text('share game'), findsNothing);
+
+      open.value = true;
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('share game'), findsOneWidget);
+    });
+
+    testWidgets('flipping it back to false closes it',
+        (WidgetTester tester) async {
+      final ValueNotifier<bool> open = ValueNotifier<bool>(true);
+      addTearDown(open.dispose);
+      await tester.pumpWidget(controlled(open: open));
+      await tester.pumpAndSettle();
+      expect(find.text('share game'), findsOneWidget);
+
+      open.value = false;
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('share game'), findsNothing);
+    });
+
+    testWidgets('a menu that starts open shows without a tap',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(_host(
+        DabblerMenu(open: true, trigger: _trigger, items: _threeItems()),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('share game'), findsOneWidget);
+    });
+
+    testWidgets('an owner that ignores onOpenChanged keeps it shut',
+        (WidgetTester tester) async {
+      final List<bool> reported = <bool>[];
+      await tester.pumpWidget(_host(
+        DabblerMenu(
+          open: false,
+          onOpenChanged: reported.add,
+          trigger: _trigger,
+          items: _threeItems(),
+        ),
+      ));
+      await _openMenu(tester);
+      expect(reported, <bool>[true]);
+      expect(find.text('share game'), findsNothing);
+    });
+
+    testWidgets('the controlled path works at sheet width too',
+        (WidgetTester tester) async {
+      final ValueNotifier<bool> open = ValueNotifier<bool>(false);
+      addTearDown(open.dispose);
+      await tester.pumpWidget(controlled(open: open, size: _phone));
+      open.value = true;
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.byType(DabblerSheet), findsOneWidget);
+    });
+
+    testWidgets('Escape routes through onOpenChanged, not internal state',
+        (WidgetTester tester) async {
+      final ValueNotifier<bool> open = ValueNotifier<bool>(true);
+      addTearDown(open.dispose);
+      await tester.pumpWidget(controlled(open: open));
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(open.value, isFalse);
+      expect(find.text('share game'), findsNothing);
+    });
+  });
+
   // ----- AC2: the Sheet presentation below 480px -----
   group('sheet below 480px (AC2)', () {
     testWidgets('a phone-width viewport renders the items in a Sheet',

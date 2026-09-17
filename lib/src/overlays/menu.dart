@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
@@ -427,6 +428,10 @@ class _DabblerMenuState extends State<DabblerMenu> {
 
   bool _uncontrolledOpen = false;
 
+  /// Whether a deferred portal change is already queued, so a rebuild storm
+  /// inside one frame does not queue several.
+  bool _syncQueued = false;
+
   bool get _open => widget.open ?? _uncontrolledOpen;
 
   @override
@@ -434,6 +439,7 @@ class _DabblerMenuState extends State<DabblerMenu> {
     super.initState();
     // The controller is only usable once the [OverlayPortal] has built and
     // attached itself, so an initially-open menu shows on the first frame.
+    // [_syncPortal] defers the show itself; this only starts it.
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       if (mounted) {
         _syncPortal();
@@ -447,7 +453,46 @@ class _DabblerMenuState extends State<DabblerMenu> {
     _syncPortal();
   }
 
+  /// Brings the portal into line with [_open].
+  ///
+  /// **Deferred whenever this runs inside a frame's build phase**, in both
+  /// directions. A controlled menu is opened and closed by its owner
+  /// rebuilding with a new `open`, which reaches this state through
+  /// [didUpdateWidget] — and `didUpdateWidget` always runs in
+  /// [SchedulerPhase.persistentCallbacks], where **both**
+  /// [OverlayPortalController.show] and `hide` assert
+  /// (`overlay.dart:2068` and `:2080`): either would mutate the overlay's
+  /// child list while the tree is being built. Queuing the change for the end
+  /// of the frame applies it on the very next one.
+  ///
+  /// Found by DS-601, which cannot work around it: `Select` owns `open`
+  /// because its arrow rotation, its `focused || open` border and its focus
+  /// return all read it, so the state change is always the owner's rebuild.
   void _syncPortal() {
+    if (_open == _portal.isShowing) {
+      return;
+    }
+    final SchedulerPhase phase = SchedulerBinding.instance.schedulerPhase;
+    final bool duringFrame = phase == SchedulerPhase.persistentCallbacks ||
+        phase == SchedulerPhase.midFrameMicrotasks;
+    if (!duringFrame) {
+      _apply();
+      return;
+    }
+    if (_syncQueued) {
+      return;
+    }
+    _syncQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      _syncQueued = false;
+      if (mounted) {
+        _apply();
+      }
+    });
+  }
+
+  /// Shows or hides the portal now. Only called outside the build phase.
+  void _apply() {
     if (_open && !_portal.isShowing) {
       _portal.show();
     } else if (!_open && _portal.isShowing) {
@@ -461,12 +506,8 @@ class _DabblerMenuState extends State<DabblerMenu> {
     }
     widget.onOpenChanged?.call(value);
     // A controlled menu whose owner ignores the callback stays put, which is
-    // the source's behaviour too.
-    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      if (mounted) {
-        _syncPortal();
-      }
-    });
+    // the source's behaviour too; one whose owner honours it arrives back
+    // through [didUpdateWidget].
     _syncPortal();
   }
 
