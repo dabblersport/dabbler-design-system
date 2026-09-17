@@ -364,7 +364,11 @@ void main() {
       };
       for (final MapEntry<String, double> e in measured.entries) {
         expect(actual[e.key], closeTo(e.value, 0.01), reason: e.key);
-        expect(e.value, lessThan(4.5), reason: '${e.key} is a known AA gap');
+        expect(
+          actual[e.key],
+          lessThan(4.5),
+          reason: '${e.key} is a known AA gap',
+        );
       }
     });
 
