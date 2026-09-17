@@ -413,6 +413,32 @@ class DabblerTypeStyle {
   /// divided through; [TextStyle.leadingDistribution] is set to
   /// [TextLeadingDistribution.even] so the extra room lands evenly above and
   /// below, as a CSS line box distributes it.
+  ///
+  /// ## Why [TextDecoration.none] is set explicitly
+  ///
+  /// It looks redundant — the design draws no underline anywhere, so why say
+  /// so? Because **a style that omits `decoration` does not clear an inherited
+  /// one.** `MaterialApp` installs Flutter's `_errorTextStyle` as the app-wide
+  /// [DefaultTextStyle] (`flutter/lib/src/material/app.dart`): `underline`, in
+  /// `0xFFFFFF00` yellow, `double`, labelled *"fallback style; consider putting
+  /// your text in a Material"*. A [Material] overrides it per screen, so most
+  /// screens never see it. Where there is no [Material] ancestor, a component's
+  /// own style wins on size, colour and weight and **loses on decoration**,
+  /// which is why the result read as broken rather than merely unstyled: a
+  /// [DabblerButton] with no [Material] above it measured
+  /// `decoration=underline color=yellow style=double size=14.0` — the `14.0` is
+  /// this style landing correctly with the underline coming through beneath it.
+  ///
+  /// **This is not just a consumer forgetting a wrapper.** Overlays are exposed
+  /// even in an app whose every screen uses a `Scaffold`: `dialog.dart` and
+  /// `sheet_route.dart` are `PopupRoute`s and `menu.dart` goes through
+  /// `Overlay.of`, so an overlay entry is a *sibling* of the screen, not a
+  /// descendant of its [Material], and never inherits one. The defect therefore
+  /// reaches every consumer, `dabbler-code` included.
+  ///
+  /// Setting it here rather than wrapping components in
+  /// `Material(type: transparency)` is deliberate: the wrapper would put
+  /// Material back into the **appearance** path, which `D-017` forbids.
   TextStyle resolve([DabblerTypeScript script = DabblerTypeScript.latin]) =>
       TextStyle(
         fontFamily: DabblerType.fontFamilyFor(role, script),
@@ -423,6 +449,7 @@ class DabblerTypeStyle {
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,
         fontFeatures: DabblerType.numeralFeatures,
+        decoration: TextDecoration.none,
       );
 
   /// Resolves the step for the script implied by [direction].
