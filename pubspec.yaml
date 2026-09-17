@@ -8,6 +8,13 @@ environment:
   flutter: ">=3.10.0"
 
 dependencies:
+  # KAN-235 / DECISIONS.md T-083 — cto-approved at component time.
+  iconsax_flutter: ^1.0.0
+  # KAN-226 / DECISIONS.md T-084 — cto-approved at component time. The Dart
+  # Multiavatar port. This constraint MUST stay identical to dabbler-code's
+  # (`pubspec.yaml:140`): that identity is what keeps one seed producing one
+  # face across the product, so a one-sided bump is a defect, not an upgrade.
+  random_avatar: ^0.0.8
 
 dev_dependencies:
   flutter_test:
