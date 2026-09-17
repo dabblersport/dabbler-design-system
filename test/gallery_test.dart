@@ -18,7 +18,7 @@ void main() {
     testWidgets('pumps, and lists every registered entry', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(const GalleryApp());
+      await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
       await tester.pumpAndSettle();
 
       expect(
@@ -30,7 +30,7 @@ void main() {
       );
       // AC6 — the count the app shows is the count that is registered.
       expect(
-        find.text('Dabbler Design System (${galleryEntries.length})'),
+        find.text('COMPONENTS (${galleryEntries.length})'),
         findsOneWidget,
       );
       // Every title is unique, so the index does not silently hide an entry
@@ -89,7 +89,21 @@ void main() {
               'A gallery entry that throws is a component defect or a broken '
               "specimen; fix it in that component's own gallery file.",
         );
-        expect(find.text(entry.title), findsWidgets);
+        // The entry screen splits '<Component> — <subject>' the way the
+        // design's specimen pages do: the component names the page and the
+        // subject becomes the band label above the specimen, which the design
+        // renders uppercase. So the full title is no longer one string on
+        // screen — both halves are, separately.
+        final int at = entry.title.indexOf(' — ');
+        if (at < 0) {
+          expect(find.text(entry.title), findsWidgets);
+        } else {
+          expect(find.text(entry.title.substring(0, at)), findsWidgets);
+          expect(
+            find.text(entry.title.substring(at + 3).toUpperCase()),
+            findsWidgets,
+          );
+        }
       });
     }
   });
