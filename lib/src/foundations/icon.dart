@@ -13,10 +13,12 @@ import '../tokens/dabbler_geometry.dart';
 /// deliberately does not expose the other four, *"because nothing in the
 /// product consumes them"* — so this enum has two values and not six.
 enum DabblerIconWeight {
-  /// `linear` — the default weight. `Iconsax.<name>`.
+  /// `linear` — the default weight. The **outline** glyph, which
+  /// `iconsax_flutter` ships as `Iconsax.<name>_copy`.
   linear,
 
-  /// `bold` — the filled variant, `Iconsax.<name>_copy`.
+  /// `bold` — the filled variant. The **solid** glyph, which
+  /// `iconsax_flutter` ships as `Iconsax.<name>`.
   ///
   /// The card reserves it for **active tabs and primary actions**; everything
   /// else is [linear].
@@ -32,16 +34,27 @@ enum DabblerIconOutcome {
   resolved,
 
   /// The name exists, but not in the requested weight, so the other weight was
-  /// drawn. Only ever bold → linear; see [DabblerIconRegistry].
+  /// drawn. Only ever linear → bold; see [DabblerIconRegistry].
   ///
-  /// Of the 1,988 keys `iconsax_flutter` declares, **16 named glyphs have a
-  /// linear weight and no `_copy` bold** (plus 24 unnamed `uniXXXX` codepoint
-  /// leftovers) — `refresh-2`, the one T-083 names, plus
+  /// **Re-derived 2026-09-17 after the weight mapping was corrected.** These
+  /// two lists swapped roles when `<name>` and `<name>_copy` swapped meaning,
+  /// so they are measured again from `Iconsax.items` rather than carried over:
+  /// the names below used to be recorded as "linear with no bold" and are in
+  /// fact the opposite.
+  ///
+  /// Of the 2,012 keys `iconsax_flutter` declares, **16 named glyphs ship only
+  /// the solid weight and have no `_copy` outline** (plus 24 unnamed `uniXXXX`
+  /// codepoint leftovers) — `refresh-2`, the one T-083 names, plus
   /// `arrow-right-4`, `arrow-square-right`, `bootsrap`, `bootstrap`,
   /// `celsius-cel`, `document-copy1`, `drop`, `google-1`, `google-drive`,
   /// `google-paly`, `google-play`, `import-3`, `notification-circle`,
-  /// `shield` and `shield-security`. Measured from `Iconsax.items`, and the
-  /// test re-derives the count rather than restating it.
+  /// `shield` and `shield-security`. A `linear` request for one of these is
+  /// what raises this outcome. The test re-derives the count rather than
+  /// restating it.
+  ///
+  /// **None of them is in [DabblerIconRegistry.vocabulary]** — all 40 names the
+  /// product actually draws ship both weights, so this path is robustness for
+  /// a name passed from outside the vocabulary, never a thing a screen hits.
   ///
   /// The right glyph in the wrong weight is closer to the design than a
   /// placeholder, so this is preferred over [missing].
@@ -129,20 +142,21 @@ class DabblerIconResolution {
 ///
 /// For a kebab-case `name` at a `weight`, first hit wins:
 ///
-/// 1. **The requested weight.** `linear` looks up `<snake_name>`; `bold` looks
-///    up `<snake_name>_copy`. A hit is [DabblerIconOutcome.resolved].
-/// 2. **The other weight — bold falls back to linear before it falls back to
-///    the placeholder.** A `bold` request whose `_copy` is absent draws the
-///    linear glyph: [DabblerIconOutcome.weightFallback], warned once. There
+/// 1. **The requested weight.** `linear` looks up `<snake_name>_copy`; `bold`
+///    looks up `<snake_name>`. A hit is [DabblerIconOutcome.resolved].
+/// 2. **The other weight — linear falls back to bold before it falls back to
+///    the placeholder.** A `linear` request whose `_copy` is absent draws the
+///    solid glyph: [DabblerIconOutcome.weightFallback], warned once. There
 ///    are 16 such named glyphs, listed on
 ///    [DabblerIconOutcome.weightFallback].
 ///
-///    A `linear` request never falls back to bold — linear is the app's
-///    default weight, and a filled glyph standing in for an outline one is a
-///    visible style error, whereas the reverse is a near-miss. Seven keys are
-///    bold-only (`video-slash`, `hex-hex`, `icon-another`, `mini-music-sqaure`,
-///    `triangle-3rd`, `triangle-another`, `celsius-cel-`); asked for at
-///    `linear` they go to the placeholder, deliberately.
+///    A `bold` request never falls back to linear. Bold is reserved for active
+///    tabs and primary actions, where an outline glyph standing in for a solid
+///    one reads as an *inactive* control — a state error, not a style one,
+///    which is worse than a visibly absent glyph. Seven keys are outline-only
+///    (`video-slash`, `hex-hex`, `icon-another`, `mini-music-sqaure`,
+///    `triangle-3rd`, `triangle-another`, `celsius-cel-`); asked for at `bold`
+///    they go to the placeholder, deliberately. None is in [vocabulary].
 /// 3. **Missing.** The name is not in Iconsax under either weight:
 ///    [DabblerIconOutcome.missing], warned once, reported in debug, and
 ///    [DabblerIcon] draws a visible neutral placeholder at the requested size
@@ -194,8 +208,12 @@ abstract final class DabblerIconRegistry {
     'more-2', 'refresh', 'refresh-2', 'logout', 'login',
   ];
 
-  /// The suffix `iconsax_flutter` gives the bold variant of every glyph.
-  static const String boldSuffix = '_copy';
+  /// The suffix `iconsax_flutter` gives the **outline** variant of a glyph.
+  ///
+  /// Renamed from `boldSuffix` on 2026-09-17: `_copy` is the linear side, not
+  /// the bold one. The old name asserted the inverted mapping in its own
+  /// identifier, which is how the defect survived review — see [keyFor].
+  static const String linearSuffix = '_copy';
 
   static final Set<String> _warned = <String>{};
 
@@ -215,13 +233,37 @@ abstract final class DabblerIconRegistry {
     warn = debugPrint;
   }
 
-  /// The `Iconsax.items` key for a kebab-case [name] at [weight].
+  /// The `Iconsax.items` key for a kebab-case [name] at [weight]:
+  /// `bold` → `Iconsax.<name>`, `linear` → `Iconsax.<name>_copy`, with `-`
+  /// becoming `_`.
   ///
-  /// The mapping the design source itself states: `linear` → `Iconsax.<name>`,
-  /// `bold` → `Iconsax.<name>_copy`, with `-` becoming `_`.
+  /// ## This was the other way round until 2026-09-17, and it was wrong
+  ///
+  /// The previous mapping — `linear` → `Iconsax.<name>`, `bold` →
+  /// `Iconsax.<name>_copy` — cited the design source as its authority, quoting
+  /// `Icon.jsx`'s own `linear`/`bold` vocabulary. **That was a category error,
+  /// and it is the same one this whole fidelity pass exists to correct: a
+  /// written statement believed over the drawing.** The design source names the
+  /// *weights*; it says nothing about which asset `iconsax_flutter` ships
+  /// behind `<name>` versus `<name>_copy`, and the package documents neither.
+  ///
+  /// Rendered side by side against `components/foundations/foundations.card.html`
+  /// the answer is not ambiguous. The design's `linear` row draws **outlines**
+  /// and its `bold` row draws **solids**. Under the old mapping our gallery
+  /// drew the exact reverse: the row built with [DabblerIconWeight.linear] came
+  /// out solid black, and the [DabblerIconWeight.bold] row came out as purple
+  /// outlines. So `Iconsax.<name>` is the **solid** glyph and
+  /// `Iconsax.<name>_copy` is the **outline** one.
+  ///
+  /// Every icon in the package was drawn at the wrong weight until this flip —
+  /// a uniformly heavy default where the design is a light outline.
+  ///
+  /// **Do not "restore" the old mapping from the design source's prose.** If
+  /// this needs re-checking, re-check it the way it was found: render the
+  /// specimen page and the gallery's Icon entry side by side and look.
   static String keyFor(String name, DabblerIconWeight weight) {
     final String snake = name.replaceAll('-', '_');
-    return weight == DabblerIconWeight.bold ? '$snake$boldSuffix' : snake;
+    return weight == DabblerIconWeight.linear ? '$snake$linearSuffix' : snake;
   }
 
   static void _warnOnce(String key, String message) {
@@ -249,24 +291,27 @@ abstract final class DabblerIconRegistry {
       );
     }
 
-    // 2 — bold falls back to linear before it falls back to the placeholder.
-    if (weight == DabblerIconWeight.bold) {
-      final String linearKey = keyFor(name, DabblerIconWeight.linear);
-      final IconData? linear = Iconsax.items[linearKey];
-      if (linear != null) {
+    // 2 — linear falls back to bold before it falls back to the placeholder.
+    // Inverted with the mapping on 2026-09-17: it is the `_copy` (outline) side
+    // that is missing for 16 named glyphs, so linear is the request that can
+    // come up short. See [keyFor].
+    if (weight == DabblerIconWeight.linear) {
+      final String boldKey = keyFor(name, DabblerIconWeight.bold);
+      final IconData? bold = Iconsax.items[boldKey];
+      if (bold != null) {
         _warnOnce(
           'weight:$name',
-          '[Dabbler DS] Icon "$name" has no bold weight in iconsax_flutter '
-          '("$linearKey$boldSuffix" is not declared) — drawing the linear '
+          '[Dabbler DS] Icon "$name" has no linear weight in iconsax_flutter '
+          '("$boldKey$linearSuffix" is not declared) — drawing the bold '
           'glyph instead. The right glyph in the wrong weight is closer to the '
           'design than a placeholder.',
         );
         return DabblerIconResolution(
           requestedName: name,
-          resolvedKey: linearKey,
+          resolvedKey: boldKey,
           requestedWeight: weight,
-          resolvedWeight: DabblerIconWeight.linear,
-          glyph: linear,
+          resolvedWeight: DabblerIconWeight.bold,
+          glyph: bold,
           outcome: DabblerIconOutcome.weightFallback,
         );
       }
@@ -277,7 +322,9 @@ abstract final class DabblerIconRegistry {
     _warnOnce(
       'missing:$name',
       '[Dabbler DS] Icon "$name" is not an Iconsax glyph — no '
-      '"${keyFor(name, DabblerIconWeight.linear)}" in iconsax_flutter. '
+      // The base key is the canonical name; `_copy` is the outline variant of
+      // it, so naming the base is what tells the reader what to look up.
+      '"${keyFor(name, DabblerIconWeight.bold)}" in iconsax_flutter. '
       'Rendering the missing-glyph placeholder. Check the kebab-case name '
       'against app.iconsax.io.',
     );
@@ -310,8 +357,11 @@ abstract final class DabblerIconRegistry {
 ///
 /// [name] is the kebab-case Iconsax name exactly as shown at app.iconsax.io
 /// (`home-2`, `search-normal`, `tick-circle`); it is resolved internally to
-/// `Iconsax.<name>` for [DabblerIconWeight.linear] and `Iconsax.<name>_copy`
-/// for [DabblerIconWeight.bold], which is the mapping the source states.
+/// `Iconsax.<name>_copy` for [DabblerIconWeight.linear] and `Iconsax.<name>`
+/// for [DabblerIconWeight.bold] — the mapping the glyphs actually **draw**,
+/// which is the reverse of what this line claimed until 2026-09-17. See
+/// [DabblerIconRegistry.keyFor] for how that was found and why the design
+/// source's prose is not the authority on it.
 /// Bold is for active tabs and primary actions. [size] defaults to
 /// [DabblerSizing.iconMd] (24) — *"the native Iconsax grid, and `Icon`'s own
 /// default"* — with [DabblerSizing.iconSm] (18) and [DabblerSizing.iconLg] (30)
