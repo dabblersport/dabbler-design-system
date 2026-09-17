@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
-import '../surfaces/badge.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_palette.dart';
@@ -354,22 +353,27 @@ class DabblerCardTicket extends StatelessWidget {
         DabblerTicketStatusTone.expired => DabblerColors.tagExpired,
       };
 
-  /// [tone] expressed as the [DabblerStatusColor] [DabblerBadge] consumes.
+  /// The status pill's vertical padding — `padding: '5px 12px'`
+  /// (`CardTicket.jsx:34`).
   ///
-  /// The tag palette is a surface/ink **pair**; `DabblerStatusColor` wants
-  /// four roles. `surface` takes the pair's surface and `strong` its ink, which
-  /// are the only two [DabblerBadge] reads. `base` and `solid` are filled with
-  /// the ink so neither can silently paint a colour the tag palette does not
-  /// contain — the badge never reads them.
-  static DabblerStatusColor statusColorOf(DabblerTicketStatusTone tone) {
-    final DabblerToneColor pair = toneColorOf(tone);
-    return DabblerStatusColor(
-      base: pair.ink,
-      surface: pair.surface,
-      strong: pair.ink,
-      solid: pair.ink,
-    );
-  }
+  /// **Off the base-3 grid, and transcribed anyway**, for the same reason
+  /// [actionPadding] is: 5 is not a step of [DabblerSpacing], and snapping it
+  /// to 3 or 6 would make every status pill in the product shorter or taller
+  /// than the source draws it.
+  static const double statusPaddingY = 5;
+
+  /// The status pill's horizontal padding — the `12px` of `'5px 12px'`, which
+  /// **is** a grid step.
+  static const double statusPaddingX = DabblerSpacing.space4;
+
+  /// The status pill's text style — `fontSize: 13, lineHeight: '18px',
+  /// fontWeight: 500` (`CardTicket.jsx:35`), which is `.t-footnote` at the
+  /// ticket's own weight.
+  ///
+  /// See [_statusPill] for why this is the ticket's own style and not
+  /// `DabblerBadge`'s.
+  static TextStyle statusStyleFor(TextDirection direction) =>
+      _sansAt(DabblerType.footnote, direction, DabblerType.medium);
 
   /// The strip's text style — `fontSize: 17, lineHeight: '22px',
   /// fontWeight: 500`, which is `.t-callout` exactly. No deviation.
@@ -514,12 +518,59 @@ class DabblerCardTicket extends StatelessWidget {
         ),
         if (status != null) ...<Widget>[
           const SizedBox(width: rowGap),
-          DabblerBadge(
-            label: status!,
-            status: statusColorOf(statusTone),
-          ),
+          _statusPill(direction),
         ],
       ],
+    );
+  }
+
+  /// The status pill — built in place, **not** by composing [DabblerBadge].
+  ///
+  /// ## Why this is literal, and why it must stay literal
+  ///
+  /// **`DECISIONS.md` D-015** (`cxo`, 2026-09-17) ruled against composing
+  /// `DabblerBadge` here, reversing the deliberate system-over-literal choice
+  /// this file originally made and documented. That earlier choice is the
+  /// reason this note is long: without it a reader sees a bespoke pill beside a
+  /// perfectly good shared Badge and "fixes" it back.
+  ///
+  /// `CardTicket` carries a complete, self-contained type scale — 13/18, 15/20,
+  /// 17/22, 22/28, 28/34, every step at weight 500
+  /// (`CardTicket.jsx:35,44,65,78,86`). `DabblerBadge` is **11px Bold with a
+  /// 20% hairline**. Composing it would put the one element of the ticket that
+  /// sits off the ticket's own scale into the ticket, and draw a border the
+  /// ticket draws nowhere else. In D-015's words: *"System-over-literal was the
+  /// right instinct and the wrong call here"* — the "system" being imposed is
+  /// the generic badge, and `CardTicket` is deliberately not generic.
+  ///
+  /// **This is not the same call as the pricing card's trial pill**, which
+  /// correctly keeps `DabblerBadge`. D-020 draws the line explicitly: one step
+  /// of one ramp on the same role is drift, but a whole type scale *plus* a
+  /// border is a different voice.
+  ///
+  /// So the pill reads its eleven tones straight from [toneColorOf] — a
+  /// surface/ink pair — instead of going through `DabblerStatusColor`'s
+  /// four-role hairline/solid conventions, which it has no use for.
+  /// [statusPaddingY], [statusPaddingX], [DabblerRadius.pill] and
+  /// [statusStyleFor] are `CardTicket.jsx:33-36` transcribed, with **no
+  /// border**.
+  Widget _statusPill(TextDirection direction) {
+    final DabblerToneColor pair = toneColorOf(statusTone);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: statusPaddingY,
+        horizontal: statusPaddingX,
+      ),
+      decoration: BoxDecoration(
+        color: pair.surface,
+        borderRadius: DabblerRadius.pillAll,
+      ),
+      child: Text(
+        status!,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: statusStyleFor(direction).copyWith(color: pair.ink),
+      ),
     );
   }
 

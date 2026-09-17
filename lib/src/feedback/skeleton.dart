@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_palette.dart';
 
 /// The shapes [DabblerSkeleton] can take, transcribed from the design source
@@ -219,7 +220,10 @@ class _DabblerSkeletonState extends State<DabblerSkeleton>
     return AnimatedBuilder(
       animation: _controller,
       builder: (BuildContext context, Widget? child) => Opacity(
-        opacity: pulseOpacityAt(_controller.value + offset),
+        opacity: DabblerMotion.pulseOpacityAt(
+          _controller.value + offset,
+          minOpacity: DabblerSkeleton.pulseMinOpacity,
+        ),
         child: child,
       ),
       child: box,
@@ -325,17 +329,4 @@ class _DabblerSkeletonState extends State<DabblerSkeleton>
       ),
     );
   }
-}
-
-/// The source keyframe `0%,100%{opacity:1} 50%{opacity:.55}` eased in and out,
-/// sampled at [t] cycles (fractional; values outside `[0,1)` wrap).
-///
-/// Exposed for the test, which checks the curve's endpoints and midpoint rather
-/// than pumping frames.
-double pulseOpacityAt(double t) {
-  final double cycle = t % 1.0;
-  // 0 → .5 travels down to the minimum, .5 → 1 returns.
-  final double leg = cycle < 0.5 ? cycle * 2 : (1 - cycle) * 2;
-  final double eased = Curves.easeInOut.transform(leg);
-  return 1 + (DabblerSkeleton.pulseMinOpacity - 1) * eased;
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
 
 /// The three sizes [DabblerSpinner] comes in, transcribed from the design
 /// source `components/feedback/Spinner.d.ts` (*"Sizes: sm 18px · md 24px ·
@@ -235,7 +236,13 @@ class _DabblerSpinnerState extends State<DabblerSpinner>
         animation: _controller,
         builder: (BuildContext context, Widget? child) => reduceMotion
             // The source's substitution: the ring holds still and breathes.
-            ? Opacity(opacity: pulseOpacityAt(_controller.value), child: child)
+            ? Opacity(
+                opacity: DabblerMotion.pulseOpacityAt(
+                  _controller.value,
+                  minOpacity: DabblerSpinner.pulseMinOpacity,
+                ),
+                child: child,
+              )
             : Transform.rotate(
                 angle: _controller.value * 2 * math.pi,
                 child: child,
@@ -253,20 +260,6 @@ class _DabblerSpinnerState extends State<DabblerSpinner>
   }
 }
 
-/// The source keyframe `0%,100%{opacity:1} 50%{opacity:.55}` eased in and out,
-/// sampled at [t] cycles (fractional; values outside `[0,1)` wrap).
-///
-/// Exposed so the test can check the curve's endpoints and midpoint rather than
-/// pumping frames and reading opacities back out of the tree. Deliberately a
-/// copy of the same curve in `skeleton.dart` rather than an import: two
-/// components in the same layer should not depend on each other, and the shared
-/// thing is the design source's keyframe, not one of them.
-double pulseOpacityAt(double t) {
-  final double cycle = t % 1.0;
-  final double leg = cycle < 0.5 ? cycle * 2 : (1 - cycle) * 2;
-  final double eased = Curves.easeInOut.transform(leg);
-  return 1 + (DabblerSpinner.pulseMinOpacity - 1) * eased;
-}
 
 /// Paints the track circle and the indicator arc, both inset by half the stroke
 /// so the ring sits entirely inside the size's box — the source's

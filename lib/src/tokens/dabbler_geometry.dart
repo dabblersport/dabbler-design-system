@@ -97,9 +97,11 @@ abstract final class DabblerSpacing {
 
 /// The radius ramp — `--radius-*` in `tokens/spacing.css`.
 ///
-/// The ramp is base-3 like the spacing scale. Each step carries the source's
-/// own note about what it is for; components pick a step by that role rather
-/// than by eyeballing a corner.
+/// The ramp is base-3 like the spacing scale, with one ruled exception:
+/// [card] (16), added by `cxo` ruling **D-018** because nine of the nine card
+/// shells in the design source draw it and none draws a base-3 step. Each step
+/// carries the source's own note about what it is for; components pick a step
+/// by that role rather than by eyeballing a corner.
 abstract final class DabblerRadius {
   const DabblerRadius._();
 
@@ -109,10 +111,32 @@ abstract final class DabblerRadius {
   /// `--radius-md` — 9px. Buttons.
   static const double md = 9;
 
-  /// `--radius-lg` — 12px. Cards, icon tiles.
+  /// `--radius-lg` — 12px. **The corner of a tile *inside* a card**, not the
+  /// corner of a card.
+  ///
+  /// `tokens/spacing.css:27` annotates this step *"cards, icon tiles"*, which
+  /// conflates two different corners: `CardHouse.jsx` draws 16 for its shell
+  /// (`:9`) and 12 for the icon tile inside it (`:36`), in the same file. `cxo`
+  /// ruling **D-018** settles the split — 12 is the inner tile, [card] (16) is
+  /// the card. The source's own annotation is amended on the design side under
+  /// KAN-261; this step's value is unchanged.
   static const double lg = 12;
 
-  /// `--radius-xl` — 18px. Sheets, modals, cards.
+  /// **16px — the card corner.** Added by `cxo` ruling **D-018**.
+  ///
+  /// Not a base-3 step, and deliberately so: all nine top-level card shells in
+  /// the design source draw `borderRadius: 16` (`CardEventLarge:9`,
+  /// `CardEventMedium:21`, `CardEventSmall:21`, `CardActiveRoom:10`,
+  /// `CardPricingDefault:8`, `CardPricingSelected:8`, `CardHouse:9`,
+  /// `CardPoll:9`, `CardRoom:8`) and not one draws 12. D-018: *"Where a comment
+  /// and nine drawings disagree, the drawings are the design system."* 18 was
+  /// considered and rejected — it is base-3, but it is the corner sheets and
+  /// modals draw, and snapping the specimen's 16 onto it is a visible change.
+  ///
+  /// Not yet declared in `tokens/spacing.css`; that half is KAN-261.
+  static const double card = 16;
+
+  /// `--radius-xl` — 18px. Sheets, modals.
   static const double xl = 18;
 
   /// `--radius-xxl` — 24px. Text fields, search.
@@ -125,12 +149,14 @@ abstract final class DabblerRadius {
   static const BorderRadius smAll = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius mdAll = BorderRadius.all(Radius.circular(md));
   static const BorderRadius lgAll = BorderRadius.all(Radius.circular(lg));
+  static const BorderRadius cardAll = BorderRadius.all(Radius.circular(card));
   static const BorderRadius xlAll = BorderRadius.all(Radius.circular(xl));
   static const BorderRadius xxlAll = BorderRadius.all(Radius.circular(xxl));
   static const BorderRadius pillAll = BorderRadius.all(Radius.circular(pill));
 
-  /// The six steps in source order, smallest first.
-  static const List<double> ramp = <double>[sm, md, lg, xl, xxl, pill];
+  /// The seven steps in ascending order, smallest first. [card] (16) sits
+  /// between [lg] (12) and [xl] (18) — see D-018.
+  static const List<double> ramp = <double>[sm, md, lg, card, xl, xxl, pill];
 }
 
 /// Sizing constants — the `/* Sizing */` block of `tokens/spacing.css`.

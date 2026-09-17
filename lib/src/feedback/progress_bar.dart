@@ -3,6 +3,7 @@ import 'package:flutter/semantics.dart';
 
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 
 /// The two track heights [DabblerProgressBar] can take, transcribed from
@@ -360,7 +361,10 @@ class _DabblerProgressBarState extends State<DabblerProgressBar>
       return AnimatedBuilder(
         animation: _controller,
         builder: (BuildContext context, Widget? child) => Opacity(
-          opacity: progressPulseOpacityAt(_controller.value),
+          opacity: DabblerMotion.pulseOpacityAt(
+            _controller.value,
+            minOpacity: DabblerProgressBar.pulseMinOpacity,
+          ),
           child: child,
         ),
         child: bar,
@@ -394,16 +398,3 @@ double progressSweepOffsetAt(double t) {
       (DabblerProgressBar.sweepEnd - DabblerProgressBar.sweepStart) * eased;
 }
 
-/// `dbl-pulse` — `0%,100%{opacity:1} 50%{opacity:.55}` eased in and out,
-/// sampled at [t] cycles.
-///
-/// The same curve `DabblerSkeleton.pulseOpacityAt` resolves; it is repeated
-/// rather than shared because the two components must not couple through a
-/// private helper, and the duplication is four lines against a cross-import
-/// between two unrelated feedback components.
-double progressPulseOpacityAt(double t) {
-  final double cycle = t % 1.0;
-  final double leg = cycle < 0.5 ? cycle * 2 : (1 - cycle) * 2;
-  final double eased = Curves.easeInOut.transform(leg);
-  return 1 + (DabblerProgressBar.pulseMinOpacity - 1) * eased;
-}

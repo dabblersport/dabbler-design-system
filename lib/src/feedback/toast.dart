@@ -8,6 +8,7 @@ import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_neutral_status.dart';
 import '../tokens/dabbler_type.dart';
 
 /// The tones a [DabblerToast] can take, transcribed from `ToastTone` in
@@ -698,12 +699,15 @@ class _DabblerToastState extends State<DabblerToast>
     final DabblerStatusColor? resolved =
         status == null ? null : colors.status(status);
 
-    // `statusTones` / `statusHairline` in overlay.jsx:160-173.
-    final Color surface = resolved?.surface ?? colors.surfaceCard;
-    final Color ink = resolved?.strong ?? colors.textPrimary;
+    // `statusTones` / `statusHairline` in overlay.jsx:160-173. The neutral
+    // triple is not re-derived here: it is the one shared definition
+    // [dabblerNeutralStatus], which Badge composes too (KAN-266).
+    final DabblerStatusColor tone = resolved ?? dabblerNeutralStatus(colors);
+    final Color surface = tone.surface;
+    final Color ink = tone.strong;
     final Color hairline = resolved == null
-        ? colors.borderDefault
-        : resolved.strong.withValues(alpha: 0.20);
+        ? tone.base
+        : tone.strong.withValues(alpha: 0.20);
 
     final bool reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;

@@ -151,6 +151,10 @@ void main() {
         decoration.borderRadius,
         const BorderRadius.all(Radius.circular(DabblerRadius.lg)),
       );
+      // D-018: the well keeps 12 while the shell moves to 16. The two corners
+      // must not collapse back onto one another — that nesting reading as a
+      // single surface is the defect the ruling exists to fix.
+      expect(DabblerCardHouse.wellRadius, isNot(DabblerCard.defaultRadius));
 
       final Size size = tester.getSize(
         find.descendant(

@@ -100,9 +100,10 @@ void main() {
           _colors().borderDefault);
       expect(DabblerCard.borderWidthOf(card.variant),
           DabblerSizing.borderDefault);
-      // `--radius-lg` is a token in the source, so nothing is overridden.
+      // The card corner is a token, so nothing is overridden here; D-018
+      // moved that token from `--radius-lg` (12) to the ruled 16 card step.
       expect(card.radius, isNull);
-      expect(DabblerCard.defaultRadius, DabblerRadius.lg);
+      expect(DabblerCard.defaultRadius, DabblerRadius.card);
     });
 
     testWidgets('page composes no card, because the source gives it no frame',

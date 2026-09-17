@@ -8,6 +8,13 @@ environment:
   flutter: ">=3.10.0"
 
 dependencies:
+  # KAN-263 — this package ships widgets (`package:flutter` imports across
+  # lib/), so it must declare the SDK it ships against directly. Before this,
+  # Flutter reached lib/ only transitively via `flutter_test` in
+  # dev_dependencies, which a consumer such as `dabbler-code` must never be
+  # asked to rely on.
+  flutter:
+    sdk: flutter
   # KAN-235 / DECISIONS.md T-083 — cto-approved at component time.
   iconsax_flutter: ^1.0.0
   # KAN-226 / DECISIONS.md T-084 — cto-approved at component time. The Dart

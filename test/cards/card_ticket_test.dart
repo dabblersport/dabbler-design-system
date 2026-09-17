@@ -1,7 +1,6 @@
 import 'package:dabbler_design_system/src/cards/card.dart';
 import 'package:dabbler_design_system/src/cards/card_ticket.dart';
 import 'package:dabbler_design_system/src/interaction/focus_ring.dart';
-import 'package:dabbler_design_system/src/surfaces/badge.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
@@ -194,27 +193,56 @@ void main() {
     });
   });
 
-  group('the status pill composes DS-501\'s Badge', () {
-    testWidgets('a status renders one badge; no status renders none',
+  // DECISIONS.md D-015 — the pill is literal, 13px/weight 500/no border, and
+  // is NOT DabblerBadge (11px Bold + a 20% hairline). These assertions are the
+  // guard against it being "fixed" back to composing Badge.
+  group('the status pill is literal, per D-015', () {
+    testWidgets('a status renders one pill; no status renders none',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(_specimen()));
-      expect(find.byType(DabblerBadge), findsOneWidget);
+      expect(find.text('Upcoming'), findsOneWidget);
 
       await tester.pumpWidget(_host(_specimen(status: null)));
-      expect(find.byType(DabblerBadge), findsNothing);
+      expect(find.text('Upcoming'), findsNothing);
     });
 
-    testWidgets('the badge is handed the tag pair, not a decorative tone',
+    testWidgets('the pill is 13px at weight 500 on the tag pair\'s ink',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(
         _specimen(tone: DabblerTicketStatusTone.success),
       ));
 
-      final DabblerBadge badge =
-          tester.widget<DabblerBadge>(find.byType(DabblerBadge));
-      expect(badge.status, isNotNull);
-      expect(badge.status!.surface, DabblerColors.tagSuccess.surface);
-      expect(badge.status!.strong, DabblerColors.tagSuccess.ink);
+      final TextStyle style =
+          tester.widget<Text>(find.text('Upcoming')).style!;
+      expect(style.fontSize, 13);
+      expect(style.fontSize, DabblerType.footnote.fontSize);
+      expect(style.fontWeight, DabblerType.medium);
+      expect(style.color, DabblerColors.tagSuccess.ink);
+    });
+
+    testWidgets('the pill has the tag surface, the pill radius and NO border',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(_host(
+        _specimen(tone: DabblerTicketStatusTone.success),
+      ));
+
+      final Container pill = tester.widget<Container>(
+        find.ancestor(
+          of: find.text('Upcoming'),
+          matching: find.byType(Container),
+        ).first,
+      );
+      final BoxDecoration decoration = pill.decoration! as BoxDecoration;
+      expect(decoration.color, DabblerColors.tagSuccess.surface);
+      expect(decoration.border, isNull);
+      expect(decoration.borderRadius, DabblerRadius.pillAll);
+      expect(
+        pill.padding,
+        const EdgeInsets.symmetric(
+          vertical: DabblerCardTicket.statusPaddingY,
+          horizontal: DabblerCardTicket.statusPaddingX,
+        ),
+      );
     });
 
     test('the seven workflow tones map to their own --tag-* pair', () {
@@ -249,8 +277,8 @@ void main() {
     test('every tone resolves — the table has no hole', () {
       for (final DabblerTicketStatusTone tone
           in DabblerTicketStatusTone.values) {
-        expect(DabblerCardTicket.statusColorOf(tone).surface,
-            DabblerCardTicket.toneColorOf(tone).surface);
+        expect(DabblerCardTicket.toneColorOf(tone).surface, isNotNull);
+        expect(DabblerCardTicket.toneColorOf(tone).ink, isNotNull);
       }
     });
   });

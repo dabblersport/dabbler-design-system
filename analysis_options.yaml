@@ -1,9 +1,1 @@
 include: package:flutter_lints/flutter.yaml
-
-linter:
-  rules:
-    # KAN-214 requires a pubspec with zero `dependencies:` entries, so
-    # package:flutter reaches lib/ transitively through flutter_test rather
-    # than through a direct declaration. This package has no runtime
-    # dependencies for the rule to guard, so it is off by design.
-    depend_on_referenced_packages: false

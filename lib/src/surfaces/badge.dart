@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_neutral_status.dart';
 import '../tokens/dabbler_type.dart';
 
 /// The eight **decorative** badge tones.
@@ -177,22 +178,18 @@ class DabblerBadge extends StatelessWidget {
 
   /// The source's fifth `status` value, `neutral`, resolved against [colors].
   ///
-  /// `overlay.jsx:161` declares it outside the `--color-status-*` API, from the
-  /// paper ramp: surface `--surface-card`, strong ink `--ink`, base
-  /// `--outline-card`. `statusHairline` (`overlay.jsx:171`) then returns that
-  /// bare `--outline-card` for `neutral` instead of a 20% mix, which
-  /// [hairlineFor] reproduces by recognising this exact value.
+  /// The triple itself — surface `--surface-card`, strong ink `--ink`, base
+  /// `--outline-card`, all from `overlay.jsx:161` — lives in
+  /// [dabblerNeutralStatus], which carries the full provenance and the reason
+  /// `neutral` sits outside the `--color-status-*` API. Badge composes it
+  /// rather than re-deriving it (KAN-266): `DabblerToastTone.neutral` wants the
+  /// identical triple, and two sites wanting the same three values is a role.
   ///
-  /// [DabblerStatusColor.solid] has no neutral counterpart in the source. It is
-  /// filled with the same ink as [DabblerStatusColor.strong], which is the only
-  /// value on which white text clears AA; Badge itself never reads it.
+  /// `statusHairline` (`overlay.jsx:171`) returns that bare `--outline-card`
+  /// for `neutral` instead of a 20% mix, which [hairlineFor] reproduces by
+  /// recognising this exact value.
   static DabblerStatusColor neutralStatusOf(DabblerColors colors) =>
-      DabblerStatusColor(
-        base: colors.borderDefault,
-        surface: colors.surfaceCard,
-        strong: colors.textPrimary,
-        solid: colors.textPrimary,
-      );
+      dabblerNeutralStatus(colors);
 
   /// The fill for [tone], resolved against [colors].
   static Color backgroundOf(DabblerBadgeTone tone, DabblerColors colors) =>

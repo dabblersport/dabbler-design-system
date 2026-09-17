@@ -102,14 +102,16 @@ void main() {
 
     test('the whole chrome difference is one expression', () {
       // `Default` (the tick) is the SELECTED tile; `Selected` (the empty ring)
-      // is the unselected one. See the class doc's inversion table.
+      // is the unselected one — the kit's symbol names are inverted. Per D-019
+      // the enum is named by what it draws, so this mapping is the obvious one
+      // and stays that way.
       expect(
         DabblerCardPricing.variantOf(selected: true),
-        DabblerCardVariant.pricing,
+        DabblerCardVariant.pricingSelected,
       );
       expect(
         DabblerCardPricing.variantOf(selected: false),
-        DabblerCardVariant.pricingSelected,
+        DabblerCardVariant.pricingUnselected,
       );
     });
 
@@ -156,7 +158,7 @@ void main() {
       final DabblerCard card = tester.widget<DabblerCard>(
         find.byType(DabblerCard),
       );
-      expect(card.variant, DabblerCardVariant.pricing);
+      expect(card.variant, DabblerCardVariant.pricingSelected);
       // `backgroundColor: var(--neutral-white)`, `2px solid var(--purple-600)`
       // — CardPricingDefault.jsx.
       expect(
@@ -181,7 +183,7 @@ void main() {
       final DabblerCard card = tester.widget<DabblerCard>(
         find.byType(DabblerCard),
       );
-      expect(card.variant, DabblerCardVariant.pricingSelected);
+      expect(card.variant, DabblerCardVariant.pricingUnselected);
       // `backgroundColor: var(--neutral-200)`, `2px solid var(--neutral-400)`
       // — CardPricingSelected.jsx.
       expect(

@@ -1,10 +1,19 @@
 import 'package:dabbler_design_system/src/feedback/progress_bar.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_motion.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The shared curve ([DabblerMotion.pulseOpacityAt]) bound to the bar's own
+/// floor, so the assertions below read exactly as they did when the function
+/// lived in `progress_bar.dart`. Only its home changed, not its output.
+double progressPulseOpacityAt(double t) => DabblerMotion.pulseOpacityAt(
+      t,
+      minOpacity: DabblerProgressBar.pulseMinOpacity,
+    );
 
 /// The one theme the bar resolves its colours through. `main` is the `:root`
 /// default of `tokens/colors.css`.

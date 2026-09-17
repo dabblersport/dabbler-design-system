@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../foundations/icon.dart';
+import '../interaction/focus_ring.dart';
+import '../interaction/press_scale.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -275,26 +278,29 @@ class DabblerBanner extends StatelessWidget {
       label: action!.label,
       excludeSemantics: true,
       onTap: action!.onPressed,
-      child: GestureDetector(
-        key: actionTargetKey,
-        behavior: HitTestBehavior.opaque,
-        onTap: action!.onPressed,
-        child: Container(
-          constraints: const BoxConstraints(
-            minHeight: DabblerSizing.touchTargetMin,
-          ),
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: DabblerSpacing.space4,
-          ),
-          alignment: AlignmentDirectional.center,
-          decoration: BoxDecoration(
-            borderRadius: DabblerRadius.mdAll,
-            border: Border.all(
-              color: hairline,
-              width: DabblerSizing.borderDefault,
+      child: _interactive(
+        enabled: action!.onPressed != null,
+        child: GestureDetector(
+          key: actionTargetKey,
+          behavior: HitTestBehavior.opaque,
+          onTap: action!.onPressed,
+          child: Container(
+            constraints: const BoxConstraints(
+              minHeight: DabblerSizing.touchTargetMin,
             ),
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: DabblerSpacing.space4,
+            ),
+            alignment: AlignmentDirectional.center,
+            decoration: BoxDecoration(
+              borderRadius: DabblerRadius.mdAll,
+              border: Border.all(
+                color: hairline,
+                width: DabblerSizing.borderDefault,
+              ),
+            ),
+            child: Text(action!.label, style: style),
           ),
-          child: Text(action!.label, style: style),
         ),
       ),
     );
@@ -312,25 +318,65 @@ class DabblerBanner extends StatelessWidget {
       // reaches the tappable one.
       excludeSemantics: true,
       onTap: onDismiss,
-      child: GestureDetector(
-        key: dismissTargetKey,
-        behavior: HitTestBehavior.opaque,
-        onTap: onDismiss,
-        child: SizedBox(
-          width: DabblerSizing.touchTargetMin,
-          height: DabblerSizing.touchTargetMin,
-          child: Center(
-            child: Icon(
-              // Stand-in for the source's Iconsax `close-circle`; the package
-              // has no icon dependency yet (a `cto` hand-off), and a dismiss
-              // control with no glyph would be unusable rather than merely
-              // unstyled. Geometry and colour are the source's.
-              Icons.cancel_outlined,
-              size: DabblerSizing.iconSm,
-              color: ink,
+      child: _interactive(
+        enabled: onDismiss != null,
+        child: GestureDetector(
+          key: dismissTargetKey,
+          behavior: HitTestBehavior.opaque,
+          onTap: onDismiss,
+          child: SizedBox(
+            width: DabblerSizing.touchTargetMin,
+            height: DabblerSizing.touchTargetMin,
+            child: Center(
+              // The source's Iconsax `close-circle`, drawn for real since
+              // T-083 adopted `iconsax_flutter` and DS-300 (KAN-235) shipped
+              // the registry. It was `Icons.cancel_outlined` as a documented
+              // stand-in until KAN-262; the hand-off has happened, so the
+              // stand-in and its caveat are gone.
+              child: DabblerIcon(
+                'close-circle',
+                size: DabblerSizing.iconSm,
+                color: ink,
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Wraps one of the banner's two targets in DS-200's shared interaction
+  /// primitives (KAN-258).
+  ///
+  /// Both targets were bare [GestureDetector]s, written in parallel with
+  /// DS-200 rather than after it, so neither showed the focus ring or the
+  /// press scale every other control in the cut has. The source marks both
+  /// `.dbl-focus .dbl-press`.
+  ///
+  /// The wrap is inside the caller's [Semantics], which carries
+  /// `excludeSemantics: true`: [DabblerFocusRing] inserts a [Focus] and
+  /// [DabblerPressScale.gesture] a [Listener], neither of which publishes a
+  /// semantics node, so each target still exposes exactly one tappable node.
+  /// [DabblerPressScale.gesture] uses a [Listener] rather than a
+  /// [GestureDetector], so it never competes in the gesture arena with the tap
+  /// recogniser below it.
+  ///
+  /// Neither primitive lays anything out — the ring is painted outside the
+  /// child's bounds and the scale is a transform — so the targets' measured
+  /// [DabblerSizing.touchTargetMin] boxes are untouched.
+  static Widget _interactive({
+    required bool enabled,
+    required Widget child,
+  }) {
+    return DabblerFocusRing(
+      enabled: enabled,
+      canRequestFocus: enabled,
+      // Both targets are drawn on --radius-md: the action by its own outlined
+      // Container, the dismiss by the round `close-circle` glyph it carries.
+      borderRadius: DabblerRadius.mdAll,
+      child: DabblerPressScale.gesture(
+        enabled: enabled,
+        child: child,
       ),
     );
   }

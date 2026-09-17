@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../interaction/focus_ring.dart';
+import '../interaction/press_scale.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_palette.dart';
@@ -81,15 +83,30 @@ enum DabblerFabTone {
 ///
 /// ## Press and focus
 ///
-/// Press is the source's `transform: scale(0.96)` over `80ms ease`, and a
-/// disabled FAB does not react at all — `FAB.jsx` withholds every handler when
+/// Press is the source's `transform: scale(0.96)` over `80ms`, and a disabled
+/// FAB does not react at all — `FAB.jsx` withholds every handler when
 /// `disabled`. Focus draws a [DabblerColors.focusRing] outline outside the
 /// button, which the web source gets from the UA and Flutter does not.
 ///
-/// Both behaviours live in the private `_FabInteraction` helper below. DS-200
-/// is introducing shared press/focus primitives; when it lands, that helper
-/// should be deleted and this widget folded onto it. It is deliberately one
-/// small class so that fold is a deletion rather than a rewrite.
+/// Both behaviours are DS-200's shared primitives — [DabblerPressScale] and
+/// [DabblerFocusRing] — since KAN-257. The private `_FabInteraction` helper
+/// KAN-222 wrote as a stand-in is deleted; this is that fold.
+///
+/// **[pressedScale] survives the fold.** `DabblerPressScale` defaults to the
+/// system's `--press-scale` of 0.98, but `FAB.jsx` draws the FAB at 0.96 and
+/// that is the value passed here. A FAB is 56×56 and floats over content, so
+/// its press reads at a different amplitude from an inline control's; the
+/// source states it separately and this component keeps it.
+///
+/// **The curve changes, intentionally.** `FAB.jsx` writes
+/// `transition: transform 80ms ease`, and the local helper transcribed
+/// `Curves.ease` literally. [DabblerPressScale] hardcodes
+/// [DabblerMotion.easeOut] (`--ease-out`, `cubic-bezier(.2, 0, .2, 1)`), which
+/// `tokens/spacing.css` calls the system's only easing curve. Folding onto the
+/// primitive therefore moves the FAB from `ease` to `--ease-out`. That is
+/// recorded here as a deliberate correction toward the one shared curve, not
+/// an accident of composition — KAN-257 AC4. The duration (80ms) and the scale
+/// (0.96) are unchanged.
 class DabblerFab extends StatelessWidget {
   /// Creates a FAB carrying [child].
   ///
@@ -220,9 +237,8 @@ class DabblerFab extends StatelessWidget {
       enabled: enabled,
       onTap: onPressed,
       child: ExcludeSemantics(
-        child: _FabInteraction(
-          onPressed: onPressed,
-          focusRing: colors.focusRing,
+        child: _interactive(
+          enabled: enabled,
           child: Opacity(
             opacity: enabled ? 1 : disabledOpacity,
             child: Container(
@@ -260,82 +276,42 @@ class DabblerFab extends StatelessWidget {
       ),
     );
   }
-}
 
-/// Press-scale and focus-ring behaviour for [DabblerFab].
-///
-/// **Temporary.** DS-200 is writing the shared press/focus primitives for the
-/// whole system and was not available when KAN-222 was built. This helper is
-/// the local stand-in: it does exactly what `FAB.jsx` does and nothing more, so
-/// that folding it onto DS-200 is a deletion. Do not grow it, and do not reuse
-/// it from another component — use DS-200 instead.
-class _FabInteraction extends StatefulWidget {
-  const _FabInteraction({
-    required this.child,
-    required this.onPressed,
-    required this.focusRing,
-  });
-
-  final Widget child;
-  final VoidCallback? onPressed;
-  final Color focusRing;
-
-  @override
-  State<_FabInteraction> createState() => _FabInteractionState();
-}
-
-class _FabInteractionState extends State<_FabInteraction> {
-  bool _pressed = false;
-  bool _focused = false;
-
-  void _setPressed(bool value) {
-    if (_pressed == value) return;
-    setState(() => _pressed = value);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bool enabled = widget.onPressed != null;
-
-    // The source withholds every handler when disabled rather than guarding
-    // inside them, so a disabled FAB has no pressed state to get stuck in.
-    final Widget scaled = AnimatedScale(
-      scale: _pressed ? DabblerFab.pressedScale : 1,
-      duration: DabblerFab.pressDuration,
-      curve: Curves.ease,
-      child: widget.child,
-    );
-
-    // The focus ring the browser draws for the web source and Flutter does not:
-    // a hairline-pair outline one base-3 step outside the button.
-    final Widget ringed = Container(
-      padding: const EdgeInsets.all(DabblerSpacing.space1),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(DabblerFab.cornerRadius + DabblerSpacing.space1),
-        ),
-        border: Border.all(
-          color: _focused && enabled ? widget.focusRing : Colors.transparent,
-          width: DabblerSizing.borderDefault * 2,
-        ),
+  /// Wraps the painted FAB body in DS-200's two shared interaction primitives.
+  ///
+  /// Replaces the deleted `_FabInteraction` helper (KAN-257). The order is the
+  /// one the helper had: [DabblerFocusRing] outside, so the ring is painted
+  /// around the button's laid-out bounds and never moves with the press, and
+  /// [DabblerPressScale] inside, so only the button shrinks.
+  ///
+  /// [DabblerPressScale.gesture] drives itself from a [Listener], which does
+  /// not enter the gesture arena, so the [GestureDetector] below keeps the tap
+  /// unchallenged. When disabled, the source withholds every handler rather
+  /// than guarding inside them, so no detector is built at all and there is no
+  /// pressed state to get stuck in.
+  Widget _interactive({required bool enabled, required Widget child}) {
+    final Widget ringed = DabblerFocusRing(
+      enabled: enabled,
+      canRequestFocus: enabled,
+      borderRadius: const BorderRadius.all(Radius.circular(cornerRadius)),
+      child: DabblerPressScale.gesture(
+        enabled: enabled,
+        // 0.96, not the system's 0.98 — see the class dartdoc.
+        scale: pressedScale,
+        child: child,
       ),
-      child: scaled,
     );
 
-    if (!enabled) return ringed;
+    if (!enabled) {
+      return ringed;
+    }
 
-    return Focus(
-      onFocusChange: (bool value) => setState(() => _focused = value),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onPressed,
-        onTapDown: (_) => _setPressed(true),
-        onTapUp: (_) => _setPressed(false),
-        onTapCancel: () => _setPressed(false),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: ringed,
-        ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onPressed,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: ringed,
       ),
     );
   }

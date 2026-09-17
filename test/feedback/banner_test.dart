@@ -1,6 +1,9 @@
 import 'package:dabbler_design_system/src/feedback/banner.dart';
+import 'package:dabbler_design_system/src/foundations/icon.dart';
+import 'package:dabbler_design_system/src/interaction/focus_ring.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -305,6 +308,96 @@ void main() {
       final Rect text = tester.getRect(find.text('title'));
       expect(dismiss.right, lessThan(text.left),
           reason: 'in RTL the inline end is the left edge');
+    });
+  });
+
+  group('KAN-258 — both targets are folded onto the DS-200 interaction layer',
+      () {
+    /// The press-scale animation driving the target behind [key].
+    AnimatedScale scaleOf(WidgetTester tester, Key key) =>
+        tester.widget<AnimatedScale>(find
+            .ancestor(of: find.byKey(key), matching: find.byType(AnimatedScale))
+            .first);
+
+    Widget bothTargets() => DabblerBanner(
+          tone: DabblerBannerTone.warning,
+          title: 'verification needed',
+          message: 'add a phone number before you can host games.',
+          action: DabblerBannerAction(label: 'verify now', onPressed: () {}),
+          onDismiss: () {},
+        );
+
+    for (final MapEntry<String, Key> target in <String, Key>{
+      'action': DabblerBanner.actionTargetKey,
+      'dismiss': DabblerBanner.dismissTargetKey,
+    }.entries) {
+      testWidgets('the ${target.key} target carries a DabblerFocusRing',
+          (WidgetTester tester) async {
+        await tester.pumpWidget(_host(bothTargets()));
+        expect(
+          find.ancestor(
+            of: find.byKey(target.value),
+            matching: find.byType(DabblerFocusRing),
+          ),
+          findsAtLeastNWidgets(1),
+          reason: 'the source marks both targets .dbl-focus',
+        );
+      });
+
+      testWidgets('the ${target.key} target presses to the shared press scale',
+          (WidgetTester tester) async {
+        await tester.pumpWidget(_host(bothTargets()));
+        expect(scaleOf(tester, target.value).scale, 1);
+
+        final TestGesture gesture = await tester
+            .startGesture(tester.getCenter(find.byKey(target.value)));
+        await tester.pump();
+        expect(scaleOf(tester, target.value).scale, DabblerMotion.pressScale,
+            reason: 'the source marks both targets .dbl-press');
+        expect(scaleOf(tester, target.value).duration, DabblerMotion.fast);
+        expect(scaleOf(tester, target.value).curve, DabblerMotion.easeOut);
+
+        await gesture.up();
+        await tester.pumpAndSettle();
+        expect(scaleOf(tester, target.value).scale, 1);
+      });
+
+      testWidgets('the ${target.key} target still exposes one tappable node',
+          (WidgetTester tester) async {
+        final SemanticsHandle handle = tester.ensureSemantics();
+        await tester.pumpWidget(_host(bothTargets()));
+        final String label = target.value == DabblerBanner.actionTargetKey
+            ? 'verify now'
+            : DabblerBanner.defaultDismissSemanticLabel;
+        expect(find.bySemanticsLabel(label), findsOneWidget);
+        expect(
+          tester.getSemantics(find.bySemanticsLabel(label)).getSemanticsData()
+              .flagsCollection.isButton,
+          isTrue,
+        );
+        handle.dispose();
+      });
+    }
+  });
+
+  group('KAN-262 — the dismiss glyph is the source\'s close-circle', () {
+    testWidgets('the dismiss button draws DabblerIcon(close-circle)',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _host(DabblerBanner(title: 'game cancelled', onDismiss: () {})),
+      );
+      final DabblerIcon icon = tester.widget<DabblerIcon>(find.descendant(
+        of: find.byKey(DabblerBanner.dismissTargetKey),
+        matching: find.byType(DabblerIcon),
+      ));
+      expect(icon.name, 'close-circle');
+      expect(icon.size, DabblerSizing.iconSm);
+      expect(
+        icon.color,
+        _colors().status(DabblerStatusTone.info).strong,
+        reason: 'the glyph takes the tone ink, as the Material stand-in did',
+      );
+      expect(find.byIcon(Icons.cancel_outlined), findsNothing);
     });
   });
 }

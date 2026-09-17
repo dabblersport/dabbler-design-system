@@ -55,15 +55,18 @@ import 'card.dart';
 /// A filled tick is the universal mark of the chosen option and an empty ring
 /// the universal mark of the unchosen one, so the symbol named *Selected*
 /// paints the unselected state and the one named *Default* paints the selected
-/// state. `selected: true` therefore resolves to [DabblerCardVariant.pricing] —
-/// the `Default` symbol's shell — and `selected: false` to
-/// [DabblerCardVariant.pricingSelected].
+/// state. `selected: true` therefore resolves to
+/// [DabblerCardVariant.pricingSelected] and `selected: false` to
+/// [DabblerCardVariant.pricingUnselected].
 ///
-/// **[DabblerCardVariant.pricingSelected] is consequently a misleading name**:
-/// DS-800 transcribed the kit's labels faithfully, which was the right call for
-/// a shell enum, but it means the variant called `pricingSelected` is the one an
-/// *unselected* plan is drawn on. That enum is another ticket's surface and is
-/// not renamed here; it is reported to the orchestrator with KAN-249.
+/// **The enum no longer carries the inversion.** `cxo` ruling **D-019** renamed
+/// both values by what they draw rather than by the kit's symbol labels:
+/// today's `pricingSelected` was called `pricing` (the `Default` symbol's
+/// shell) and today's `pricingUnselected` was called `pricingSelected`. That is
+/// why [variantOf] below reads as the obvious line and not a surprising one —
+/// it is correct as written, and restoring the old names would re-introduce the
+/// defect. The kit's own symbol names are corrected on the design side under
+/// KAN-261.
 ///
 /// ## It composes [DabblerCard] and adds no chrome
 ///
@@ -260,13 +263,17 @@ class DabblerCardPricing extends StatelessWidget {
   /// Which [DabblerCard] shell a tile in state [selected] is drawn on.
   ///
   /// **This single expression is the whole chrome difference between the kit's
-  /// two symbols**, and the reason KAN-249 AC1 asks for one file. Note the
-  /// inversion the class doc explains: a selected tile takes the variant the kit
-  /// calls `pricing` (its `Default` symbol), and an unselected tile the one it
-  /// calls `pricingSelected`.
+  /// two symbols**, and the reason KAN-249 AC1 asks for one file.
+  ///
+  /// It reads as the obvious line — `selected: true` →
+  /// [DabblerCardVariant.pricingSelected] — and that is deliberate. `cxo`
+  /// ruling **D-019** renamed the two variants by what they paint precisely so
+  /// that no call site can be wrong by reading. The inversion lives in the
+  /// kit's symbol names (`Card/Pricing/Default` paints the chosen plan), which
+  /// the class doc records; it is not in this mapping.
   static DabblerCardVariant variantOf({required bool selected}) => selected
-      ? DabblerCardVariant.pricing
-      : DabblerCardVariant.pricingSelected;
+      ? DabblerCardVariant.pricingSelected
+      : DabblerCardVariant.pricingUnselected;
 
   /// The label a tile falls back to when [semanticLabel] is null: its own text,
   /// joined with `, ` in reading order, with the trial pill last.

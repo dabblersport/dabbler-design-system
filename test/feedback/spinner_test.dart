@@ -1,10 +1,19 @@
 import 'dart:math' as math;
 
 import 'package:dabbler_design_system/src/feedback/spinner.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_motion.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The shared curve ([DabblerMotion.pulseOpacityAt]) bound to the spinner's own
+/// floor, so the assertions below read exactly as they did when the function
+/// lived in `spinner.dart`. Only its home changed, not its output.
+double pulseOpacityAt(double t) => DabblerMotion.pulseOpacityAt(
+      t,
+      minOpacity: DabblerSpinner.pulseMinOpacity,
+    );
 
 /// The design source's own numbers, restated here so the test asserts against
 /// `components/feedback/Spinner.jsx` rather than against the widget's

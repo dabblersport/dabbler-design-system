@@ -26,14 +26,25 @@ enum DabblerCardVariant {
   /// shell `EmptyState` (`size: 'inline'`) and the panel cards use.
   white,
 
-  /// `var(--surface-card)` with a **2px** `--color-brand-primary` border —
-  /// `CardPricingDefault`, whose Figma dump writes the same border out as four
-  /// `2px solid var(--purple-600)` edges.
-  pricing,
-
-  /// `var(--surface-sunken)` with a 2px `--outline-card` border —
-  /// `CardPricingSelected`.
+  /// **The chosen plan.** `var(--surface-card)` with a **2px**
+  /// `--color-brand-primary` border — drawn by the kit's `CardPricingDefault`,
+  /// whose Figma dump writes the same border out as four
+  /// `2px solid var(--purple-600)` edges, and which paints the filled brand
+  /// disc with a tick.
+  ///
+  /// Named by what it draws, not by the kit's symbol name, per `cxo` ruling
+  /// **D-019**: the kit's two pricing symbols are inverted, `Default` painting
+  /// the selected state and `Selected` the unselected one. This value was
+  /// called `pricing` until D-019. Do not "fix" it back.
   pricingSelected,
+
+  /// **Every other plan.** `var(--surface-sunken)` with a 2px `--outline-card`
+  /// border — drawn by the kit's `CardPricingSelected`, which paints an empty
+  /// grey ring.
+  ///
+  /// Named by what it draws, per **D-019**. This value was called
+  /// `pricingSelected` until D-019, which is the inverted reading.
+  pricingUnselected,
 }
 
 /// Card — the shared card chrome every `CardXxx` in the system composes.
@@ -93,17 +104,21 @@ enum DabblerCardVariant {
 /// system. The tint is a web-era component-local behaviour that the interaction
 /// layer superseded; see [DabblerMotion.pressScale].
 ///
-/// ## Radius: the ramp wins over the Figma literal
+/// ## Radius: 16 is the card corner, and it is a real step
 ///
-/// `Card.jsx` writes `radius: 16` as a literal on all five variants, and 16 is
-/// **not a step of the base-3 ramp** — `tokens/spacing.css` has `--radius-lg:
-/// 12px` annotated *"cards, icon tiles"* and `--radius-xl: 18px` annotated
-/// *"sheets, modals, cards (glass)"*. The literal is a Figma dump; the token
-/// file is the system. [defaultRadius] is therefore [DabblerRadius.lg], the one
-/// step the source itself names for cards, and the package's ban on raw
-/// geometry values means 16 could not have been written here anyway. A variant
-/// that genuinely needs another step passes [radius] — `CardTicket` draws at
-/// `24` (`DabblerRadius.xxl`) and is expected to.
+/// `Card.jsx` writes `radius: 16` as a literal on all five variants. This file
+/// once took [DabblerRadius.lg] (12) instead, on the grounds that 16 was not a
+/// step of the base-3 ramp and `tokens/spacing.css:27` annotated `--radius-lg`
+/// *"cards, icon tiles"*. **`cxo` ruling D-018 reverses that**: all nine
+/// top-level card shells in the source draw 16 and not one draws 12, and
+/// `CardHouse.jsx` draws 16 for its shell (`:9`) and 12 for the icon tile
+/// inside it (`:36`) in the same file — so the annotation was conflating two
+/// different corners, not naming one. 12 is the corner of a tile *inside* a
+/// card; 16 is the card. [defaultRadius] is therefore [DabblerRadius.card], a
+/// real step added for exactly this job, so the package's ban on raw geometry
+/// values still holds. A variant that genuinely needs another step passes
+/// [radius] — `CardTicket` draws at `24` ([DabblerRadius.xxl]) and is expected
+/// to.
 ///
 /// ## Padding: 18, not 16
 ///
@@ -191,8 +206,11 @@ class DabblerCard extends StatelessWidget {
   /// the kit's `overflow: hidden`, and is what keeps [media] inside the radius.
   final Clip clipBehavior;
 
-  /// `--radius-lg` (12) — `tokens/spacing.css:27`, *"cards, icon tiles"*.
-  static const double defaultRadius = DabblerRadius.lg;
+  /// **16** — [DabblerRadius.card], the card corner ruled by `cxo` **D-018**.
+  ///
+  /// Was [DabblerRadius.lg] (12). See the class doc's *Radius* section for why
+  /// that reading of `tokens/spacing.css:27` was wrong.
+  static const double defaultRadius = DabblerRadius.card;
 
   /// `--card-padding` → `--space-6` (18) — `tokens/spacing.css:17`.
   static const EdgeInsets defaultPadding =
@@ -209,11 +227,11 @@ class DabblerCard extends StatelessWidget {
   static DabblerSurfaceVariant surfaceVariantOf(DabblerCardVariant variant) {
     return switch (variant) {
       DabblerCardVariant.white ||
-      DabblerCardVariant.pricing =>
+      DabblerCardVariant.pricingSelected =>
         DabblerSurfaceVariant.card,
       DabblerCardVariant.standard ||
       DabblerCardVariant.outlined ||
-      DabblerCardVariant.pricingSelected =>
+      DabblerCardVariant.pricingUnselected =>
         DabblerSurfaceVariant.sunken,
     };
   }
@@ -224,10 +242,10 @@ class DabblerCard extends StatelessWidget {
       // `var(--surface-sunken)` — the tonal card fill, neutral-200 in light.
       DabblerCardVariant.standard ||
       DabblerCardVariant.outlined ||
-      DabblerCardVariant.pricingSelected =>
+      DabblerCardVariant.pricingUnselected =>
         colors.surfaceSunken,
       // `var(--surface-card)`.
-      DabblerCardVariant.white || DabblerCardVariant.pricing =>
+      DabblerCardVariant.white || DabblerCardVariant.pricingSelected =>
         colors.surfaceCard,
     };
   }
@@ -239,10 +257,10 @@ class DabblerCard extends StatelessWidget {
       // `1px solid var(--outline-card)` / `2px solid var(--outline-card)`.
       DabblerCardVariant.outlined ||
       DabblerCardVariant.white ||
-      DabblerCardVariant.pricingSelected =>
+      DabblerCardVariant.pricingUnselected =>
         colors.borderDefault,
       // `2px solid var(--color-brand-primary)`.
-      DabblerCardVariant.pricing => colors.brandPrimary,
+      DabblerCardVariant.pricingSelected => colors.brandPrimary,
     };
   }
 
@@ -254,8 +272,8 @@ class DabblerCard extends StatelessWidget {
       DabblerCardVariant.outlined ||
       DabblerCardVariant.white =>
         DabblerSizing.borderDefault,
-      DabblerCardVariant.pricing ||
-      DabblerCardVariant.pricingSelected =>
+      DabblerCardVariant.pricingSelected ||
+      DabblerCardVariant.pricingUnselected =>
         DabblerSizing.borderDefault * 2,
     };
   }

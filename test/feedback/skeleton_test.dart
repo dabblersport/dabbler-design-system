@@ -1,8 +1,17 @@
 import 'package:dabbler_design_system/src/feedback/skeleton.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_motion.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// The shared curve ([DabblerMotion.pulseOpacityAt]) bound to the skeleton's
+/// own floor, so the assertions below read exactly as they did when the
+/// function lived in `skeleton.dart`. Only its home changed, not its output.
+double pulseOpacityAt(double t) => DabblerMotion.pulseOpacityAt(
+      t,
+      minOpacity: DabblerSkeleton.pulseMinOpacity,
+    );
 
 /// Wraps a skeleton in the minimum a widget test needs, with reduced motion
 /// optionally forced on the way the platform would force it.

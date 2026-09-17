@@ -48,16 +48,23 @@ import 'card.dart';
 /// action slot. Nothing about the map's intent is lost; it was simply written
 /// from the card's top half. Reported to the orchestrator with KAN-233.
 ///
-/// ## The three geometry deviations, all of them token-over-literal
+/// ## The two remaining geometry deviations, both token-over-literal
 ///
-/// Same direction as [DabblerCard]'s own two, and for the same stated reason —
+/// Same direction as [DabblerCard]'s own, and for the same stated reason —
 /// the Figma dump is a dump, the token file is the system:
 ///
 /// | Source literal | Taken here | Why |
 /// |---|---|---|
-/// | `borderRadius: 16` on the card | [DabblerCard.defaultRadius] (12) | 16 is not a step of the base-3 ramp; `--radius-lg` is annotated *"cards"* |
 /// | `padding: "16px"` on the row | [DabblerCard.defaultPadding] (18) | `--card-padding` is `--space-6` |
 /// | pill `height: 41` | [DabblerSizing.touchTargetMin] (45) | `--touch-target-min` is 45 and clears Apple's 44pt floor; 41 does not |
+///
+/// **The shell's corner is no longer a deviation.** This file used to record
+/// `borderRadius: 16` as taken at [DabblerCard.defaultRadius] (12). `cxo`
+/// ruling **D-018** made 16 a real step ([DabblerRadius.card]) and moved
+/// [DabblerCard.defaultRadius] onto it, so the shell now draws the source's
+/// own 16 — inherited, with no override at the [DabblerCard] call site below.
+/// [wellRadius] (12) is unchanged and is the reason the split matters: the
+/// icon tile inside this card must not share the card's corner.
 ///
 /// The row's own `gap: 12` needs no deviation: it is [DabblerSpacing.stackDefault]
 /// exactly, and so is the gap [DabblerCard] already puts between its slots.
@@ -147,8 +154,11 @@ class DabblerCardHouse extends StatelessWidget {
   /// change the row's height for no source-backed reason.
   static const double wellSide = 64;
 
-  /// The well's corner radius — `borderRadius: 12`, which *is*
-  /// [DabblerRadius.lg] exactly, annotated *"cards, icon tiles"*. No deviation.
+  /// The well's corner radius — `borderRadius: 12` (`CardHouse.jsx:36`), which
+  /// *is* [DabblerRadius.lg] exactly. No deviation, and unchanged by D-018:
+  /// that ruling names 12 the corner of a tile *inside* a card, which is
+  /// precisely this well, while the shell above it takes
+  /// [DabblerRadius.card] (16).
   static const double wellRadius = DabblerRadius.lg;
 
   /// The gap between the well and the text column — `gap: 12`

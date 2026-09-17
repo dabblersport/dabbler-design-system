@@ -82,16 +82,21 @@ void main() {
       expect(DabblerSpacing.cardPadding, 18);
     });
 
-    testWidgets('the default radius is --radius-lg (12)',
+    testWidgets('the default radius is the 16 card corner — D-018',
         (WidgetTester tester) async {
       await tester
           .pumpWidget(_host(const DabblerCard(child: Text('body'))));
 
+      // cxo ruling D-018: all nine card shells in the source draw 16 and none
+      // draws 12, so 16 is a real step and the card takes it. `--radius-lg`
+      // (12) is the corner of a tile *inside* a card, not of a card.
       expect(
         _decoration(tester).borderRadius,
-        const BorderRadius.all(Radius.circular(DabblerRadius.lg)),
+        const BorderRadius.all(Radius.circular(DabblerRadius.card)),
       );
-      expect(DabblerCard.defaultRadius, DabblerRadius.lg);
+      expect(DabblerCard.defaultRadius, DabblerRadius.card);
+      expect(DabblerRadius.card, 16);
+      expect(DabblerCard.defaultRadius, isNot(DabblerRadius.lg));
     });
 
     testWidgets('radius is overridable for the variants that need another step',
@@ -155,10 +160,12 @@ void main() {
       expect((decoration.border! as Border).top.width, 1);
     });
 
-    testWidgets('pricing is --surface-card with a 2px brand border',
+    // D-019: named by what they draw. `pricingSelected` was `pricing`, and
+    // `pricingUnselected` was `pricingSelected`, until that ruling.
+    testWidgets('pricingSelected is --surface-card with a 2px brand border',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(const DabblerCard(
-        variant: DabblerCardVariant.pricing,
+        variant: DabblerCardVariant.pricingSelected,
         child: Text('b'),
       )));
 
@@ -169,10 +176,10 @@ void main() {
       expect((decoration.border! as Border).top.width, 2);
     });
 
-    testWidgets('pricingSelected is --surface-sunken with a 2px outline',
+    testWidgets('pricingUnselected is --surface-sunken with a 2px outline',
         (WidgetTester tester) async {
       await tester.pumpWidget(_host(const DabblerCard(
-        variant: DabblerCardVariant.pricingSelected,
+        variant: DabblerCardVariant.pricingUnselected,
         child: Text('b'),
       )));
 

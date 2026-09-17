@@ -22,9 +22,11 @@
 /// ```
 ///
 /// Note that the kit's two symbol names are inverted with respect to what they
-/// paint — the symbol called `Selected` draws the *unselected* tile. The
-/// reasoning, the evidence and the consequence for
-/// `DabblerCardVariant.pricingSelected` are recorded in full on
+/// paint — the symbol called `Selected` draws the *unselected* tile. `cxo`
+/// ruling **D-019** keeps that inversion out of the Dart enum, whose two values
+/// are named by what they draw. The reasoning, the evidence and the
+/// consequence for `DabblerCardVariant.pricingSelected` /
+/// `DabblerCardVariant.pricingUnselected` are recorded in full on
 /// [DabblerCardPricing]; they are not restated here, because a second copy of
 /// that argument is exactly the drift AC1 is guarding against.
 library;

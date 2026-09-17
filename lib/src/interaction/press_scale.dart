@@ -1,46 +1,13 @@
 import 'package:flutter/widgets.dart';
 
-/// The system's motion constants, transcribed from the design source
-/// `tokens/spacing.css:58-62`.
-///
-/// They live here, beside the first primitive that needs them, because the
-/// package has **no motion token file yet** — `lib/src/tokens/` carries colour,
-/// geometry and type only. `DabblerScrim` imports them from here rather than
-/// restating them. When a motion-token ticket lands they should move to
-/// `lib/src/tokens/`, unchanged; the values below are the source's, not a
-/// reinterpretation of them.
-///
-/// `guidelines/measurements.html:136-139` records what each duration is for:
-/// * [fast] — press, tint change.
-/// * [base] — indicator slides, expand/collapse, toast enter, overlay fade.
-/// * [slow] — sheet and dialog enter.
-abstract final class DabblerMotion {
-  /// `--motion-fast: 80ms` — press and tint change.
-  static const Duration fast = Duration(milliseconds: 80);
+import '../tokens/dabbler_motion.dart';
 
-  /// `--motion-base: 120ms` — indicator slides, expand/collapse, overlay fade.
-  static const Duration base = Duration(milliseconds: 120);
-
-  /// `--motion-slow: 200ms` — sheet and dialog enter.
-  static const Duration slow = Duration(milliseconds: 200);
-
-  /// `--ease-out: cubic-bezier(.2, 0, .2, 1)` — the system's only easing curve.
-  static const Cubic easeOut = Cubic(0.2, 0, 0.2, 1);
-
-  /// `--press-scale: .98` — the system's **only** press transform
-  /// (`guidelines/measurements.html:111`).
-  static const double pressScale = 0.98;
-
-  /// Whether the platform has asked for reduced motion.
-  ///
-  /// The design source drops every animation under
-  /// `@media (prefers-reduced-motion: reduce)`
-  /// (`components/foundations/overlay.jsx:34-45`). Reading it through
-  /// [MediaQuery.maybeDisableAnimationsOf] — and defaulting to `false` when no
-  /// [MediaQuery] is in scope — matches `lib/src/feedback/skeleton.dart:168`.
-  static bool reduceMotion(BuildContext context) =>
-      MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-}
+/// `DabblerMotion` moved to `lib/src/tokens/dabbler_motion.dart`, where the
+/// rest of the tokens live. It was declared in this file only because no motion
+/// token file existed when DS-200 landed. It is re-exported here so the import
+/// path every call site already pins keeps resolving; new code should import
+/// the token file directly.
+export '../tokens/dabbler_motion.dart' show DabblerMotion;
 
 /// Press scale — the one press affordance in the system.
 ///
