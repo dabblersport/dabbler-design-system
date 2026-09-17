@@ -30,3 +30,64 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # KAN-254 / DS-103b — the four faces DabblerType names, vendored as local
+  # binaries. No `google_fonts` runtime dependency (AC1): a design system that
+  # needs the network to render its own type is not a design system.
+  #
+  # Two roles x two scripts, exactly as `tokens/typography.css` declares them:
+  #
+  #   | role    | Latin  | Arabic     |
+  #   |---------|--------|------------|
+  #   | display | Gloock | Wingx      |
+  #   | sans    | Glory  | Meral Sans |
+  #
+  # The `family:` names below are the BARE names in DabblerType; because they
+  # ship inside this package, a consumer addresses them as
+  # `packages/dabbler_design_system/<family>`, which is what
+  # DabblerType.fontFamilyFor builds. Flutter registers both spellings from
+  # this one declaration.
+  #
+  # Weights: only the five the ramp names (--weight-light..bold, 300-700) are
+  # vendored. Glory's 100/200/800 and Meral Sans's thin/extralight/extrabold/
+  # black exist in the design bundle but no ramp step reaches them, so
+  # bundling them would be dead payload.
+  #
+  # Gloock and Glory are SIL OFL 1.1 (fonts/OFL-Gloock.txt, fonts/OFL-Glory.txt)
+  # and are the real Figma-kit faces, fetched from Google Fonts as static
+  # instances. Wingx and Meral Sans are copied from the design bundle's own
+  # `assets/fonts/` and carry no licence metadata — flagged in the DS-103b
+  # report, not resolved here.
+  fonts:
+    - family: Gloock
+      fonts:
+        - asset: fonts/Gloock-Regular.ttf
+          weight: 400
+    - family: Glory
+      fonts:
+        - asset: fonts/Glory-Light.ttf
+          weight: 300
+        - asset: fonts/Glory-Regular.ttf
+          weight: 400
+        - asset: fonts/Glory-Medium.ttf
+          weight: 500
+        - asset: fonts/Glory-SemiBold.ttf
+          weight: 600
+        - asset: fonts/Glory-Bold.ttf
+          weight: 700
+    - family: Wingx
+      fonts:
+        - asset: fonts/Wingx-Regular.otf
+          weight: 400
+    - family: Meral Sans
+      fonts:
+        - asset: fonts/meral-sans-light.ttf
+          weight: 300
+        - asset: fonts/meral-sans-regular.ttf
+          weight: 400
+        - asset: fonts/meral-sans-medium.ttf
+          weight: 500
+        - asset: fonts/meral-sans-semibold.ttf
+          weight: 600
+        - asset: fonts/meral-sans-bold.ttf
+          weight: 700
