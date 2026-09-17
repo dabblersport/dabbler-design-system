@@ -1,5 +1,5 @@
-/// The gallery's appearance state — which of the seven [DabblerTheme]s and
-/// which brightness the whole app renders under.
+/// The gallery's appearance state — which of the seven [DabblerTheme]s, which
+/// brightness and which reading direction the whole app renders under.
 ///
 /// ## Why this is a scope above the app, not a widget inside it
 ///
@@ -29,13 +29,15 @@ import 'package:flutter/material.dart';
 
 import '../tokens/dabbler_colors.dart';
 
-/// The gallery's current appearance: one theme, one brightness preference.
+/// The gallery's current appearance: one theme, one brightness preference, one
+/// reading direction.
 @immutable
 class GalleryAppearance {
   /// Creates an appearance.
   const GalleryAppearance({
     this.theme = DabblerTheme.main,
     this.mode = ThemeMode.light,
+    this.direction = TextDirection.ltr,
   });
 
   /// Which of the seven section themes the gallery resolves colours under.
@@ -60,20 +62,46 @@ class GalleryAppearance {
   /// [GalleryThemeSwitcher]; it is just no longer what a cold open shows.
   final ThemeMode mode;
 
+  /// The reading direction the whole app — including overlays — renders under.
+  ///
+  /// RTL behaviour is specified across this package in dartdoc and asserted in
+  /// widget tests, and until this axis existed none of it had ever been looked
+  /// at: the calendar's Saturday-first week, the code input's deliberately
+  /// unmirrored digit boxes, the slider's inverted pointer and the date
+  /// field's LTR-pinned editable were all claims nobody could see. This is the
+  /// control that renders them.
+  ///
+  /// [TextDirection] rather than a locale: the gallery flips *direction*, not
+  /// language. A specimen whose text stays English under
+  /// [TextDirection.rtl] is behaving correctly — mirrored layout is this
+  /// axis's subject, and localized content is a separate question owned
+  /// elsewhere.
+  ///
+  /// The default is [TextDirection.ltr], for the same reason [mode] defaults
+  /// to light: a cold open shows what the design leads with.
+  final TextDirection direction;
+
   /// This appearance with [theme] replaced.
   GalleryAppearance withTheme(DabblerTheme theme) =>
-      GalleryAppearance(theme: theme, mode: mode);
+      GalleryAppearance(theme: theme, mode: mode, direction: direction);
 
   /// This appearance with [mode] replaced.
   GalleryAppearance withMode(ThemeMode mode) =>
-      GalleryAppearance(theme: theme, mode: mode);
+      GalleryAppearance(theme: theme, mode: mode, direction: direction);
+
+  /// This appearance with [direction] replaced.
+  GalleryAppearance withDirection(TextDirection direction) =>
+      GalleryAppearance(theme: theme, mode: mode, direction: direction);
 
   @override
   bool operator ==(Object other) =>
-      other is GalleryAppearance && other.theme == theme && other.mode == mode;
+      other is GalleryAppearance &&
+      other.theme == theme &&
+      other.mode == mode &&
+      other.direction == direction;
 
   @override
-  int get hashCode => Object.hash(theme, mode);
+  int get hashCode => Object.hash(theme, mode, direction);
 }
 
 /// Holds the gallery's [GalleryAppearance] and rebuilds [builder] with it.
@@ -87,6 +115,10 @@ class GalleryAppearance {
 ///         theme: galleryTheme(appearance.theme, Brightness.light),
 ///         darkTheme: galleryTheme(appearance.theme, Brightness.dark),
 ///         themeMode: appearance.mode,
+///         builder: (BuildContext context, Widget? child) => Directionality(
+///           textDirection: appearance.direction,
+///           child: child ?? const SizedBox.shrink(),
+///         ),
 ///         home: const GalleryHomeScreen(),
 ///       ),
 /// )
@@ -144,6 +176,10 @@ abstract class GalleryThemeController {
 
   /// Switches to [mode] from the next frame.
   void setMode(ThemeMode mode);
+
+  /// Renders everything — pages and overlays alike — under [direction] from
+  /// the next frame.
+  void setDirection(TextDirection direction);
 }
 
 class _GalleryThemeScopeState extends State<GalleryThemeScope>
@@ -164,6 +200,13 @@ class _GalleryThemeScopeState extends State<GalleryThemeScope>
   void setMode(ThemeMode mode) {
     if (mode != _appearance.mode) {
       setState(() => _appearance = _appearance.withMode(mode));
+    }
+  }
+
+  @override
+  void setDirection(TextDirection direction) {
+    if (direction != _appearance.direction) {
+      setState(() => _appearance = _appearance.withDirection(direction));
     }
   }
 

@@ -70,9 +70,20 @@ class GalleryApp extends StatelessWidget {
         // fallback underlines every label in yellow. GalleryPaper installs it
         // for the screens, but menus, sheets, dialogs and toasts build from
         // the Navigator's context — above any page — so they need it here.
-        builder: (BuildContext context, Widget? child) => DefaultTextStyle(
-          style: galleryTextStyle(context),
-          child: DabblerToastProvider(child: child ?? const SizedBox.shrink()),
+        // The Directionality sits here for the same reason, and it is the
+        // whole point of the axis: a menu, a sheet, a dialog or a toast builds
+        // from the Navigator's context, so a Directionality installed on a
+        // screen would mirror the page and leave every overlay unmirrored —
+        // which would look like proof while proving nothing. Installed above
+        // the Navigator, it overrides the one WidgetsApp derives from the
+        // locale, and every route and overlay resolves under it.
+        builder: (BuildContext context, Widget? child) => Directionality(
+          textDirection: appearance.direction,
+          child: DefaultTextStyle(
+            style: galleryTextStyle(context),
+            child:
+                DabblerToastProvider(child: child ?? const SizedBox.shrink()),
+          ),
         ),
         home: GalleryHomeScreen(entries: entries),
       ),

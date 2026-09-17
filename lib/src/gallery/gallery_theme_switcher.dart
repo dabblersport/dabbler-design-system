@@ -1,4 +1,4 @@
-/// The gallery's theme and brightness control.
+/// The gallery's theme, brightness and direction control.
 ///
 /// `DabblerColors.resolve` answers for **seven themes × two brightnesses =
 /// fourteen distinct instances**, and a gallery that renders whichever one the
@@ -20,10 +20,11 @@
 /// advertising the wrong system. Nothing here reads `Theme.of(context)`; the
 /// paint comes from [DabblerColors] through the components themselves.
 ///
-/// Two menus rather than a menu plus a chip row: three [DabblerChip]s for the
-/// brightness modes measure ~250 logical pixels next to the theme trigger, and
-/// an app bar on a phone-width viewport has nowhere to put that. A menu is the
-/// same control at a fixed ~100px.
+/// Menus rather than chip rows: three [DabblerChip]s for the brightness modes
+/// measure ~250 logical pixels next to the theme trigger, and an app bar on a
+/// phone-width viewport has nowhere to put that. A menu is the same control at
+/// a fixed ~100px, and the direction picker is the third of them for exactly
+/// the same reason — it is a third axis, not a bolted-on toggle.
 library;
 
 // `material.dart` for [ThemeMode] and nothing else: it is the mechanism
@@ -50,6 +51,16 @@ String galleryThemeLabel(DabblerTheme theme) => switch (theme) {
       DabblerTheme.shade => 'Shade',
     };
 
+/// The display name of a [TextDirection], as the gallery labels the axis.
+///
+/// The short forms are deliberate: 'Left to right' and 'Right to left' are
+/// nearly twice the width of the widest theme label and would be the only
+/// triggers in the row that set the app bar's height on a phone.
+String galleryDirectionLabel(TextDirection direction) => switch (direction) {
+      TextDirection.ltr => 'LTR',
+      TextDirection.rtl => 'RTL',
+    };
+
 /// The display name of a [ThemeMode].
 String galleryModeLabel(ThemeMode mode) => switch (mode) {
       ThemeMode.light => 'Light',
@@ -68,6 +79,9 @@ class GalleryThemeSwitcher extends StatefulWidget {
   /// The `id` prefix that marks a menu entry as a brightness choice.
   static const String modeEntryPrefix = 'mode.';
 
+  /// The `id` prefix that marks a menu entry as a direction choice.
+  static const String directionEntryPrefix = 'direction.';
+
   @override
   State<GalleryThemeSwitcher> createState() => _GalleryThemeSwitcherState();
 }
@@ -83,6 +97,7 @@ class GalleryThemeSwitcher extends StatefulWidget {
 class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
   bool _themeOpen = false;
   bool _modeOpen = false;
+  bool _directionOpen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +173,38 @@ class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
               size: DabblerButtonSize.small,
               semanticLabel: 'Brightness: ${galleryModeLabel(appearance.mode)}',
               onPressed: () => setState(() => _modeOpen = !_modeOpen),
+            ),
+          ),
+          const SizedBox(width: DabblerSpacing.space2),
+          DabblerMenu(
+            label: 'Direction',
+            open: _directionOpen,
+            onOpenChanged: (bool open) =>
+                setState(() => _directionOpen = open),
+            items: <DabblerMenuEntry>[
+              for (final TextDirection direction in TextDirection.values)
+                DabblerMenuEntry(
+                  id: '${GalleryThemeSwitcher.directionEntryPrefix}'
+                      '${direction.name}',
+                  label: galleryDirectionLabel(direction),
+                  selected: direction == appearance.direction,
+                ),
+            ],
+            onSelected: (DabblerMenuEntry entry) => controller.setDirection(
+              TextDirection.values.byName(
+                entry.id!.substring(
+                  GalleryThemeSwitcher.directionEntryPrefix.length,
+                ),
+              ),
+            ),
+            trigger: DabblerButton(
+              label: galleryDirectionLabel(appearance.direction),
+              tone: DabblerButtonTone.outlined,
+              size: DabblerButtonSize.small,
+              semanticLabel:
+                  'Direction: ${galleryDirectionLabel(appearance.direction)}',
+              onPressed: () =>
+                  setState(() => _directionOpen = !_directionOpen),
             ),
           ),
         ],
