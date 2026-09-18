@@ -314,6 +314,18 @@ class _GroupLanding extends StatelessWidget {
 /// a property of a card. The width is [GalleryIndexTile.width] — 300, the
 /// catalogue's own — and the [Wrap] decides the rest. Two per row just above
 /// the rail breakpoint is the correct answer there, not a degraded one.
+///
+/// **Measured, from the opposite direction to that reasoning:** at a 1527px
+/// viewport the `Components` landing lays its nine group cards out **four**
+/// across. Nobody chose four. It is what 1527 minus the rail, the hairline
+/// and the two paddings does to a 300px card, and it is the evidence that
+/// this grid targets no column count at all — a layout aiming at three would
+/// have had to stop it.
+///
+/// The rejected 320 is kept here deliberately rather than deleted. A number
+/// that was tried and ruled against is cheaper to read with its reason
+/// attached than to rediscover later with a confident rationale and no
+/// memory of why it was dropped. It is history, not a value: no code reads it.
 class _CardGrid extends StatelessWidget {
   const _CardGrid({required this.children});
 
