@@ -56,16 +56,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 
-/// The monospace stack the design's `code` and `.mono` rules ask for
-/// (`ui-monospace,monospace`), spelled as a Flutter fallback chain.
-const List<String> _monoFallback = <String>[
-  'ui-monospace',
-  'SFMono-Regular',
-  'SF Mono',
-  'Menlo',
-  'Consolas',
-  'monospace',
-];
+part 'gallery_page_markup.dart';
 
 /// The page's inherited text style.
 ///
@@ -101,6 +92,7 @@ class GalleryPaper extends StatelessWidget {
     required this.child,
     this.header,
     this.scrollController,
+    this.scrollable = true,
   });
 
   /// The page body, laid out below [header].
@@ -114,9 +106,21 @@ class GalleryPaper extends StatelessWidget {
   /// Optional controller, so a screen can restore scroll position.
   final ScrollController? scrollController;
 
+  /// Whether the page scrolls its body. `false` hands the child a bounded
+  /// height so it can scroll itself — what a page with a side rail needs,
+  /// since a rail inside this scroll view would scroll away with the content.
+  final bool scrollable;
+
+  /// The body padding, exposed because a body that scrolls itself applies it.
+  static const EdgeInsets bodyPadding = EdgeInsets.fromLTRB(
+      DabblerSpacing.space8, DabblerSpacing.space6,
+      DabblerSpacing.space8, DabblerSpacing.space11);
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
+    final Widget body =
+        Align(alignment: AlignmentDirectional.topStart, child: child);
     return DefaultTextStyle(
       style: galleryTextStyle(context),
       child: ColoredBox(
@@ -127,19 +131,13 @@ class GalleryPaper extends StatelessWidget {
             children: <Widget>[
               ?header,
               Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(
-                    DabblerSpacing.space8,
-                    DabblerSpacing.space6,
-                    DabblerSpacing.space8,
-                    DabblerSpacing.space11,
-                  ),
-                  child: Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: child,
-                  ),
-                ),
+                child: scrollable
+                    ? SingleChildScrollView(
+                        controller: scrollController,
+                        padding: bodyPadding,
+                        child: body,
+                      )
+                    : Padding(padding: bodyPadding, child: body),
               ),
             ],
           ),
@@ -356,60 +354,6 @@ class GalleryUsage extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Splits [markup] into the plain, bold and code runs the design draws.
-List<InlineSpan> _spans(String markup, TextStyle base, DabblerColors colors) {
-  final RegExp pattern = RegExp(r'\*\*(.+?)\*\*|`([^`]+)`');
-  final List<InlineSpan> spans = <InlineSpan>[];
-  int cursor = 0;
-
-  for (final RegExpMatch match in pattern.allMatches(markup)) {
-    if (match.start > cursor) {
-      spans.add(TextSpan(text: markup.substring(cursor, match.start)));
-    }
-    final String? bold = match.group(1);
-    if (bold != null) {
-      spans.add(
-        TextSpan(
-          text: bold,
-          style: base.copyWith(
-            color: colors.textPrimary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    } else {
-      spans.add(_codeChip(match.group(2)!, base, colors));
-    }
-    cursor = match.end;
-  }
-  if (cursor < markup.length) {
-    spans.add(TextSpan(text: markup.substring(cursor)));
-  }
-  return spans;
-}
-
-/// `.usage code` — a sunken chip, radius 4, 1px/4px padding, 12px mono.
-InlineSpan _codeChip(String code, TextStyle base, DabblerColors colors) {
-  return WidgetSpan(
-    alignment: PlaceholderAlignment.middle,
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-      decoration: BoxDecoration(
-        color: colors.surfaceSunken,
-        borderRadius: const BorderRadius.all(Radius.circular(4)),
-      ),
-      child: Text(
-        code,
-        style: base.copyWith(
-          fontFamily: _monoFallback.first,
-          fontFamilyFallback: _monoFallback.sublist(1),
-          height: 1.2,
-        ),
-      ),
-    ),
-  );
 }
 
 /// Monospace metadata — the design's `.mono`: 11px mono in `--muted`.

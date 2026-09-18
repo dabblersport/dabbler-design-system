@@ -29,6 +29,27 @@
 /// There is no flat list kept alongside this: the grid below is built from
 /// the grouping and from nothing else, so an entry with no band would not
 /// render at all.
+///
+/// ## Why the side navigation lives in this file (KAN-328, D-045 / D-046)
+///
+/// Because [GalleryIndex._bands] is the one derivation of the band list and
+/// `cxo` ruled that the navigation must call it rather than derive its own. A
+/// second derivation is how D-044 gets undone quietly: that ruling bands
+/// foundations on `page.startsWith('foundations/')` and deliberately NOT on
+/// `group == null`, and the two predicates are equal today and fail
+/// differently tomorrow. One shared private method makes nav/index drift
+/// impossible by construction instead of caught afterwards — and a private
+/// method can only be shared inside its own library, which is what puts the
+/// rail here rather than in a file of its own.
+///
+/// D-046: gallery chrome, not a component. Nothing here is public beyond what
+/// this file already exported, nothing new reaches the barrel, the band
+/// headings are [GallerySectionLabel] (its own doc comment says it is exposed
+/// separately for exactly this second caller), the rows reuse
+/// [GalleryIndexTile]'s press tint through [_Pressable] rather than inventing
+/// a second tappable-row interaction, and colour comes from [DabblerColors]
+/// by role. D-017 is satisfied by composition: no `Drawer`, no
+/// `NavigationRail`, no `ListTile`, no shadow.
 library;
 
 // `scheduler.dart` for the post-frame callback that releases the press
@@ -39,8 +60,15 @@ import 'package:flutter/widgets.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import 'docs/doc_loader.dart';
+import 'docs/doc_page.dart';
+import 'docs/doc_specimen_resolver.dart';
+import 'docs/doc_view.dart';
 import 'gallery_entry.dart';
 import 'gallery_page.dart';
+
+part 'gallery_index_order.dart';
+part 'gallery_index_rail.dart';
 
 /// The catalogue band: every registered entry as a tappable tile.
 class GalleryIndex extends StatelessWidget {
@@ -96,23 +124,10 @@ class GalleryIndex extends StatelessWidget {
       );
     }
 
-    return GallerySections(
-      children: <Widget>[
-        const GalleryUsage(
-          '**The Dabbler design system.** Every specimen below renders under '
-          'the theme and brightness chosen above — seven section themes across '
-          'two brightnesses, fourteen palettes in all. Open a tile to see that '
-          'component on its own page.',
-        ),
-        for (final (String name, List<GalleryEntry> band) in _bands())
-          GalleryGroup(
-            name: '$name (${band.length})',
-            children: <Widget>[
-              for (final GalleryEntry entry in band)
-                GalleryIndexTile(entry: entry, onTap: () => onOpen(entry)),
-            ],
-          ),
-      ],
+    return _IndexLayout(
+      bands: _bands(),
+      entries: entries,
+      onOpen: onOpen,
     );
   }
 }
@@ -153,7 +168,27 @@ class GalleryIndexTile extends StatefulWidget {
 /// is applied in a post-frame callback, by which time the push has finished
 /// and the tree is unlocked. Pressing *down* is never inside a lock, so that
 /// edge is applied immediately and the tint still appears at once.
-class _GalleryIndexTileState extends State<GalleryIndexTile> {
+///
+/// This was `_GalleryIndexTileState`'s own state until KAN-328. It became a
+/// widget of its own so the band rail's rows carry the **same** interaction
+/// rather than a second one written beside it (`cxo`, D-046) — the tile and
+/// the row now differ only in what they paint.
+class _Pressable extends StatefulWidget {
+  const _Pressable({
+    required this.onTap,
+    required this.builder,
+    this.semanticLabel,
+  });
+
+  final VoidCallback onTap;
+  final Widget Function(BuildContext context, bool pressed) builder;
+  final String? semanticLabel;
+
+  @override
+  State<_Pressable> createState() => _PressableState();
+}
+
+class _PressableState extends State<_Pressable> {
   final ValueNotifier<bool> _pressed = ValueNotifier<bool>(false);
 
   @override
@@ -171,13 +206,9 @@ class _GalleryIndexTileState extends State<GalleryIndexTile> {
 
   @override
   Widget build(BuildContext context) {
-    final DabblerColors colors = DabblerColors.of(context);
-    final TextDirection direction = Directionality.of(context);
-    final (String component, String? subject) = _split(widget.entry.title);
-
     return Semantics(
       button: true,
-      label: widget.entry.title,
+      label: widget.semanticLabel,
       child: GestureDetector(
         onTap: widget.onTap,
         onTapDown: (_) => _pressed.value = true,
@@ -188,48 +219,62 @@ class _GalleryIndexTileState extends State<GalleryIndexTile> {
           child: ValueListenableBuilder<bool>(
             valueListenable: _pressed,
             builder: (BuildContext context, bool pressed, Widget? child) =>
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 90),
-                  width: GalleryIndexTile.width,
-                  padding: const EdgeInsets.all(DabblerSpacing.space5),
-                  decoration: BoxDecoration(
-                    color: pressed ? colors.surfaceSunken : colors.surfaceCard,
-                    border: Border.all(color: colors.borderDefault),
-                    borderRadius: DabblerRadius.lgAll,
-                  ),
-                  child: child,
-                ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  component,
-                  style: DabblerType.callout
-                      .resolveForDirection(direction)
-                      .copyWith(color: colors.textPrimary),
-                ),
-                if (subject != null) ...<Widget>[
-                  const SizedBox(height: DabblerSpacing.space1),
-                  Text(
-                    subject,
-                    style: DabblerType.caption1
-                        .resolveForDirection(direction)
-                        .copyWith(color: colors.textTertiary),
-                  ),
-                ],
-                if (widget.entry.description != null) ...<Widget>[
-                  const SizedBox(height: DabblerSpacing.space3),
-                  Text(
-                    widget.entry.description!,
-                    style: DabblerType.caption1
-                        .resolveForDirection(direction)
-                        .copyWith(color: colors.textSecondary, height: 1.5),
-                  ),
-                ],
-              ],
-            ),
+                widget.builder(context, pressed),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GalleryIndexTileState extends State<GalleryIndexTile> {
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    final TextDirection direction = Directionality.of(context);
+    final (String component, String? subject) = _split(widget.entry.title);
+
+    return _Pressable(
+      onTap: widget.onTap,
+      semanticLabel: widget.entry.title,
+      builder: (BuildContext context, bool pressed) => AnimatedContainer(
+        duration: const Duration(milliseconds: 90),
+        width: GalleryIndexTile.width,
+        padding: const EdgeInsets.all(DabblerSpacing.space5),
+        decoration: BoxDecoration(
+          color: pressed ? colors.surfaceSunken : colors.surfaceCard,
+          border: Border.all(color: colors.borderDefault),
+          borderRadius: DabblerRadius.lgAll,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              component,
+              style: DabblerType.callout
+                  .resolveForDirection(direction)
+                  .copyWith(color: colors.textPrimary),
+            ),
+            if (subject != null) ...<Widget>[
+              const SizedBox(height: DabblerSpacing.space1),
+              Text(
+                subject,
+                style: DabblerType.caption1
+                    .resolveForDirection(direction)
+                    .copyWith(color: colors.textTertiary),
+              ),
+            ],
+            if (widget.entry.description != null) ...<Widget>[
+              const SizedBox(height: DabblerSpacing.space3),
+              Text(
+                widget.entry.description!,
+                style: DabblerType.caption1
+                    .resolveForDirection(direction)
+                    .copyWith(color: colors.textSecondary, height: 1.5),
+              ),
+            ],
+          ],
         ),
       ),
     );

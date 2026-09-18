@@ -127,6 +127,11 @@ class GalleryHomeScreen extends StatelessWidget {
         subtitle: 'Every component, under all fourteen palettes.',
         trailing: GalleryThemeSwitcher(),
       ),
+      // The catalogue owns its own scrolling (KAN-328): above
+      // `_sideNavBreakpoint` it puts a band rail beside the scrolling pane,
+      // and a rail inside this page's scroll view would scroll away with the
+      // content and stop being a rail.
+      scrollable: false,
       child: GalleryIndex(
         entries: entries,
         onOpen: (GalleryEntry entry) => Navigator.of(context).push(
