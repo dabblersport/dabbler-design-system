@@ -31,6 +31,25 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  # The documentation corpus (D-041(a)), read at runtime by
+  # `lib/src/gallery/docs/doc_loader.dart` through `rootBundle`.
+  #
+  # FOUR lines, not one: Flutter's directory asset form is NOT recursive. A bare
+  # `assets/documentation/` bundles only the two files sitting directly in it
+  # (`start-here.md`, `_order.md`) and silently misses all 57 section pages —
+  # which presents as a loader bug, not as a manifest omission. Every directory
+  # that actually holds files is named.
+  #
+  # CEILING (T-085): the corpus is inherited by every consumer of this package —
+  # Flutter does not tree-shake declared assets. Measured 332 KB at 59 pages
+  # (2026-09-18), against 824 KB of fonts already shipped. If it passes 1 MB,
+  # these assets move to a sibling package that only the gallery depends on.
+  assets:
+    - assets/documentation/
+    - assets/documentation/foundations/
+    - assets/documentation/components/
+    - assets/documentation/patterns/
+
   # KAN-254 / DS-103b — the four faces DabblerType names, vendored as local
   # binaries. No `google_fonts` runtime dependency (AC1): a design system that
   # needs the network to render its own type is not a design system.
