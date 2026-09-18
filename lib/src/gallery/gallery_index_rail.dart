@@ -1,4 +1,5 @@
-/// The documentation rail — `KAN-328`, plus the shell half of `KAN-327`.
+/// The documentation rail — `KAN-328`, plus the shell half of `KAN-327`, plus
+/// the three-level collapsing rail and the collection routing.
 ///
 /// A `part` of `gallery_index.dart`, not a library of its own: everything here
 /// is private, so nothing new reaches the barrel (`D-046` — the navigation is
@@ -7,6 +8,12 @@
 /// and reuses [GalleryIndexTile]'s press tint through [_Pressable] rather than
 /// inventing a second tappable-row interaction. No `Drawer`, no
 /// `NavigationRail`, no `ListTile`, no shadow (`D-017`).
+///
+/// The pieces around it are parts of the same library, and every type in them
+/// is private: the shell that holds the rail beside the content pane is
+/// `gallery_index_shell.dart`, the row language, filter field and doc pane are
+/// `gallery_index_rail_rows.dart`, and the section and group landing pages and
+/// the card are `gallery_index_collections.dart`.
 part of 'gallery_index.dart';
 
 /// The width at or above which the rail is shown — **D-045**, with `cxo`'s
@@ -45,6 +52,11 @@ part of 'gallery_index.dart';
 /// it — content pane 663, two tiles 615, 48px spare rather than 49. 1000
 /// itself is ruled rather than measured: no source declares it, it is the
 /// first round hundred above the floor.
+///
+/// The collection pages do not move this threshold: `D-053(b)` made their
+/// card [GalleryIndexTile.width] — the same 300 the derivation above is
+/// written from — so two across at the floor is the same arithmetic, not a
+/// second one.
 const double _sideNavBreakpoint = 1000;
 
 /// The rail's width, including its own padding — **D-045**, `cxo` 2026-09-18.
@@ -64,179 +76,83 @@ const double _sideNavBreakpoint = 1000;
 /// deliberately rather than by accident — see there.
 const double _railWidth = 288;
 
-/// The catalogue, with the documentation rail beside it above
-/// [_sideNavBreakpoint].
+/// The rail: `_order.md`'s own section → group → band → entry walk, in the
+/// order it is authored in, collapsed to the level the reader is working at.
 ///
-/// **Below the breakpoint the rail does not render and NOTHING replaces it**
-/// — no drawer, no hamburger, no off-canvas pane (D-045(c)). The reason is not
-/// stylistic: the index below already *is* a sectioned navigation
-/// ([GalleryIndex._bands]), so a slide-over would put a second copy of it over
-/// a screen already showing it.
-class _IndexLayout extends StatefulWidget {
-  const _IndexLayout({
-    required this.bands,
-    required this.entries,
-    required this.onOpen,
-  });
-
-  final List<(String, List<GalleryEntry>)> bands;
-
-  /// Every registered entry — what a doc page's `@specimen` lines resolve
-  /// through.
-  final List<GalleryEntry> entries;
-
-  final void Function(GalleryEntry entry) onOpen;
-
-  @override
-  State<_IndexLayout> createState() => _IndexLayoutState();
-}
-
-class _IndexLayoutState extends State<_IndexLayout> {
-  static const DabblerDocLoader _loader = DabblerDocLoader();
-
-  late final Future<_DocOrder> _order = _loadOrder();
-  late final DabblerDocSpecimenResolver _resolver =
-      DabblerDocSpecimenResolver(widget.entries);
-
-  /// The documentation page the pane is showing, or `null` for the catalogue.
-  _DocOrderEntry? _page;
-
-  Future<_DocOrder> _loadOrder() async {
-    final String? raw = await _loader.loadRaw(_DocOrder.assetName);
-    if (raw == null) {
-      return _DocOrder.unavailable(
-        'the bundle has no `assets/documentation/${_DocOrder.assetName}`',
-      );
-    }
-    return _DocOrder.parse(raw);
-  }
-
-  /// The catalogue: the index exactly as it is without a rail.
-  Widget _catalogue() {
-    return GallerySections(
-      children: <Widget>[
-        const GalleryUsage(
-          '**The Dabbler design system.** Every specimen below renders under '
-          'the theme and brightness chosen above — seven section themes across '
-          'two brightnesses, fourteen palettes in all. Open a tile to see that '
-          'component on its own page.',
-        ),
-        for (final (String name, List<GalleryEntry> band) in widget.bands)
-          GalleryGroup(
-            name: '$name (${band.length})',
-            children: <Widget>[
-              for (final GalleryEntry entry in band)
-                GalleryIndexTile(
-                  entry: entry,
-                  onTap: () => widget.onOpen(entry),
-                ),
-            ],
-          ),
-      ],
-    );
-  }
-
-  /// The pane swaps rather than the navigator pushing: a pushed route covers
-  /// the whole screen, rail included, and a rail the reader loses the moment
-  /// they use it is not a rail.
-  Widget _pane() {
-    final _DocOrderEntry? page = _page;
-    if (page == null) {
-      return SingleChildScrollView(
-        child: Align(
-          alignment: AlignmentDirectional.topStart,
-          child: _catalogue(),
-        ),
-      );
-    }
-    return _DocPane(
-      key: ValueKey<String>(page.page),
-      entry: page,
-      loader: _loader,
-      resolver: _resolver,
-      onClose: () => setState(() => _page = null),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        // GalleryPaper's padding is already outside this widget, so it is
-        // added back rather than the constant being adjusted: the threshold
-        // is a viewport figure.
-        final double viewport =
-            constraints.maxWidth + GalleryPaper.bodyPadding.horizontal;
-        if (viewport < _sideNavBreakpoint) {
-          return SingleChildScrollView(
-            child: Align(
-              alignment: AlignmentDirectional.topStart,
-              child: _catalogue(),
-            ),
-          );
-        }
-
-        return FutureBuilder<_DocOrder>(
-          future: _order,
-          builder: (BuildContext context, AsyncSnapshot<_DocOrder> snapshot) {
-            final _DocOrder? order = snapshot.data;
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                SizedBox(
-                  width: _railWidth,
-                  child: order == null
-                      ? const SizedBox.shrink()
-                      : _DocRail(
-                          order: order,
-                          selected: _page?.page,
-                          onOpen: (_DocOrderEntry entry) =>
-                              setState(() => _page = entry),
-                          onCatalogue: () => setState(() => _page = null),
-                        ),
-                ),
-                // GalleryRule's hairline, drawn on the other axis: separation
-                // is a 1px line in `--outline-card`, never a shadow (D-046).
-                SizedBox(
-                  width: 1,
-                  child: ColoredBox(
-                    color: DabblerColors.of(context).borderDefault,
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                      start: DabblerSpacing.space8,
-                    ),
-                    child: _pane(),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-/// The rail: `_order.md`'s own section -> group -> band -> entry walk, in the
-/// order it is authored in.
+/// ## Three levels, and what a tap on each does
+///
+/// | level | row | tap |
+/// |---|---|---|
+/// | section | `Components` | opens the section landing and expands it |
+/// | group | `4 · Selection and input` | opens the group landing and expands it |
+/// | page | `Select` | opens the document |
+///
+/// A section or group row that is **already selected** collapses instead, so
+/// one gesture both navigates and folds and there is no second hit target
+/// competing with the row. The disclosure glyph shows which of the two the
+/// next tap will do.
+///
+/// Before this, group rows had `onTap: () {}` — they were labels wearing a
+/// row's clothes. They are destinations now, which is the substance of the
+/// collection-page work: a group is a thing you can be *at*, not only a
+/// heading above the things you can be at.
 class _DocRail extends StatelessWidget {
   const _DocRail({
     required this.order,
     required this.selected,
+    required this.expanded,
+    required this.filter,
+    required this.onToggle,
     required this.onOpen,
-    required this.onCatalogue,
+    required this.onOpenPage,
   });
 
   final _DocOrder order;
 
-  /// The page path currently in the pane, or `null` for the catalogue.
-  final String? selected;
+  /// The current [_PaneTarget.key].
+  final String selected;
 
-  final void Function(_DocOrderEntry entry) onOpen;
-  final VoidCallback onCatalogue;
+  /// The keys of expanded sections and groups.
+  final Set<String> expanded;
+
+  final TextEditingController filter;
+  final void Function(String key) onToggle;
+  final void Function(_PaneTarget target) onOpen;
+  final void Function(_DocOrderEntry entry) onOpenPage;
+
+  /// Whether [text] matches the current query. An empty query matches
+  /// everything, which is what makes the filter additive rather than a mode.
+  bool _matches(String text) {
+    final String query = filter.text.trim().toLowerCase();
+    return query.isEmpty || text.toLowerCase().contains(query);
+  }
+
+  bool get _filtering => filter.text.trim().isNotEmpty;
+
+  /// A section is shown while filtering if its own name matches or anything
+  /// under it does — otherwise a filter would hide the only row that says
+  /// where the matches live.
+  bool _sectionVisible(_DocOrderSection section) =>
+      _matches(section.title) ||
+      section.groups.any(_groupVisible);
+
+  bool _groupVisible(_DocOrderGroup group) =>
+      _matches(group.name) ||
+      group.entries.any((_DocOrderEntry e) => _matches(e.title));
+
+  /// While filtering every visible level is open: a match hidden inside a
+  /// collapsed group is a match the reader cannot see, which is the one
+  /// failure a filter must not have.
+  bool _isExpanded(String key) => _filtering || expanded.contains(key);
+
+  /// Navigating to a row that is already where you are folds it instead.
+  void _rowTap(_PaneTarget target) {
+    if (selected == target.key && expanded.contains(target.key)) {
+      onToggle(target.key);
+      return;
+    }
+    onOpen(target);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -246,21 +162,25 @@ class _DocRail extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(bottom: DabblerSpacing.space4),
+            child: _FilterField(controller: filter),
+          ),
           _NavRow(
             label: 'All specimens',
             emphasised: true,
-            selected: selected == null,
-            onTap: onCatalogue,
+            selected: selected == const _CataloguePane().key,
+            onTap: () => onOpen(const _CataloguePane()),
           ),
           // `start-here.md` is linked from the file's lead prose rather than
           // from a bullet — the 58th of its 58 links, and the only one under
           // no section. A top-level row is also where a reader expects it.
-          if (order.startHere != null)
+          if (order.startHere != null && _matches(order.startHere!.title))
             _NavRow(
               label: order.startHere!.title,
               emphasised: true,
               selected: selected == order.startHere!.page,
-              onTap: () => onOpen(order.startHere!),
+              onTap: () => onOpen(_PagePane(order.startHere!)),
             ),
           if (order.isUnavailable)
             Padding(
@@ -270,45 +190,67 @@ class _DocRail extends StatelessWidget {
               ),
             ),
           for (final _DocOrderSection section in order.sections)
-            if (section.entries.isNotEmpty) ..._section(section),
+            if (section.entries.isNotEmpty && _sectionVisible(section))
+              ..._section(section),
         ],
       ),
     );
   }
 
   List<Widget> _section(_DocOrderSection section) {
+    final String key = _SectionPane(section).key;
+    final bool open = _isExpanded(key);
+
     return <Widget>[
-      const SizedBox(height: DabblerSpacing.space6),
-      Padding(
-        padding: const EdgeInsets.only(bottom: DabblerSpacing.space3),
-        child: GallerySectionLabel(section.title),
+      const SizedBox(height: DabblerSpacing.space5),
+      _NavRow(
+        label: section.title,
+        emphasised: true,
+        expanded: open,
+        selected: selected == key,
+        onTap: () => _rowTap(_SectionPane(section)),
       ),
-      for (final _DocOrderGroup group in section.groups) ...<Widget>[
-        // A section whose bullets hang directly off it (Foundations,
-        // Patterns) parses to one implicit group named after the section;
-        // repeating that name would draw a nesting level the file does not
-        // have.
-        if (group.name != section.title)
-          _NavRow(
-            label: group.number == null
-                ? group.name
-                : '${group.number} · ${group.name}',
-            // The authored clause after the heading's em dash — *orienting
-            // the user: where they are, and how they move*. It is editorial
-            // judgement written into `_order.md` for a reader who does not
-            // yet know which group their problem lives in, which is exactly
-            // the reader looking at a nav, so it is shown rather than parsed
-            // and dropped.
-            detail: group.tagline,
-            emphasised: true,
-            selected: false,
-            onTap: () {},
-          ),
+      if (open)
+        for (final _DocOrderGroup group in section.groups)
+          if (_groupVisible(group)) ..._group(section, group),
+    ];
+  }
+
+  List<Widget> _group(_DocOrderSection section, _DocOrderGroup group) {
+    // A section whose bullets hang directly off it (Foundations, Patterns)
+    // parses to one implicit group named after the section; drawing a row for
+    // it would draw a nesting level the file does not have, so its entries
+    // hang off the section row instead.
+    final bool implicit = _isImplicitGroup(section, group);
+    final String key = _GroupPane(section, group).key;
+    final bool open = implicit || _isExpanded(key);
+
+    return <Widget>[
+      if (!implicit)
+        _NavRow(
+          label: group.number == null
+              ? group.name
+              : '${group.number} · ${group.name}',
+          // The authored clause after the heading's em dash — *orienting the
+          // user: where they are, and how they move*. It is editorial
+          // judgement written into `_order.md` for a reader who does not yet
+          // know which group their problem lives in, which is exactly the
+          // reader looking at a nav, so it is shown rather than parsed and
+          // dropped.
+          detail: group.tagline,
+          emphasised: true,
+          indented: true,
+          expanded: open,
+          selected: selected == key,
+          onTap: () => _rowTap(_GroupPane(section, group)),
+        ),
+      if (open)
         for (final _DocOrderBand band in group.bands) ...<Widget>[
-          if (band.label != null)
+          if (band.label != null &&
+              band.entries.any((_DocOrderEntry e) => _matches(e.title)))
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                DabblerSpacing.space4,
+              padding: EdgeInsetsDirectional.fromSTEB(
+                DabblerSpacing.space4 + (implicit ? 0 : DabblerSpacing.space4),
                 DabblerSpacing.space3,
                 0,
                 DabblerSpacing.space1,
@@ -316,164 +258,15 @@ class _DocRail extends StatelessWidget {
               child: GallerySectionLabel(band.label!),
             ),
           for (final _DocOrderEntry entry in band.entries)
-            _NavRow(
-              label: entry.title,
-              indented: true,
-              selected: selected == entry.page,
-              onTap: () => onOpen(entry),
-            ),
-        ],
-      ],
-    ];
-  }
-}
-
-/// One rail row.
-///
-/// ## The wrap is deliberate, which is the whole point
-///
-/// At a 288 rail a third-level row has about 252px of text, and the three
-/// longest titles — *Telling the user something happened* is the worst at
-/// ~280px — do not fit on one line. `cxo` ruled that a two-line row is
-/// acceptable and an **accidental** one is not, and left the mechanism here.
-///
-/// The mechanism chosen is **wrap to at most two lines, then ellipsize**, with
-/// the full title always on the [Semantics] node. Two lines because the titles
-/// are prose and their tail is what distinguishes them (*Telling the user
-/// something happened* versus *Nothing to show*) — a one-line ellipsis would
-/// cut exactly the distinguishing half. The ellipsis is the floor under it, so
-/// a longer title added tomorrow degrades visibly rather than silently
-/// clipping, and a screen reader is never given the truncated string.
-class _NavRow extends StatelessWidget {
-  const _NavRow({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    this.detail,
-    this.emphasised = false,
-    this.indented = false,
-  });
-
-  final String label;
-
-  /// A second line under [label] — a group's authored tagline. Held to the
-  /// same two-line rule as the label itself.
-  final String? detail;
-  final bool selected;
-  final VoidCallback onTap;
-
-  /// A group heading or a top-level destination: ink rather than soft ink.
-  final bool emphasised;
-
-  /// A leaf under a group.
-  final bool indented;
-
-  @override
-  Widget build(BuildContext context) {
-    final DabblerColors colors = DabblerColors.of(context);
-    final TextDirection direction = Directionality.of(context);
-
-    return _Pressable(
-      onTap: onTap,
-      // The untruncated strings, so an ellipsis is never what a screen reader
-      // is given.
-      semanticLabel: detail == null ? label : '$label. $detail',
-      builder: (BuildContext context, bool pressed) => AnimatedContainer(
-        duration: const Duration(milliseconds: 90),
-        padding: EdgeInsetsDirectional.fromSTEB(
-          indented ? DabblerSpacing.space4 : DabblerSpacing.space3,
-          DabblerSpacing.space2,
-          DabblerSpacing.space3,
-          DabblerSpacing.space2,
-        ),
-        decoration: BoxDecoration(
-          color: pressed || selected ? colors.surfaceSunken : null,
-          borderRadius: DabblerRadius.smAll,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: DabblerType.footnote
-                  .resolveForDirection(direction)
-                  .copyWith(
-                    color: selected || emphasised
-                        ? colors.textPrimary
-                        : colors.textSecondary,
-                    fontWeight: selected || emphasised
-                        ? FontWeight.w600
-                        : FontWeight.w400,
-                  ),
-            ),
-            if (detail != null)
-              Text(
-                detail!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: DabblerType.caption2
-                    .resolveForDirection(direction)
-                    .copyWith(color: colors.textTertiary, height: 1.4),
+            if (_matches(entry.title))
+              _NavRow(
+                label: entry.title,
+                indented: true,
+                depth: implicit ? 0 : 1,
+                selected: selected == entry.page,
+                onTap: () => onOpenPage(entry),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// One documentation page in the content pane.
-///
-/// The render itself is [DabblerDocPageView], which already existed and is not
-/// restyled here (`D-041(c)4`); this is the loading seam around it, which is
-/// the shell half `KAN-327` asks for.
-class _DocPane extends StatefulWidget {
-  const _DocPane({
-    super.key,
-    required this.entry,
-    required this.loader,
-    required this.resolver,
-    required this.onClose,
-  });
-
-  final _DocOrderEntry entry;
-  final DabblerDocLoader loader;
-  final DabblerDocSpecimenResolver resolver;
-  final VoidCallback onClose;
-
-  @override
-  State<_DocPane> createState() => _DocPaneState();
-}
-
-class _DocPaneState extends State<_DocPane> {
-  late final Future<DabblerDocPage> _page = widget.loader.load(
-    widget.entry.page,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Align(
-        alignment: AlignmentDirectional.topStart,
-        child: FutureBuilder<DabblerDocPage>(
-          future: _page,
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<DabblerDocPage> snapshot,
-          ) {
-            final DabblerDocPage? page = snapshot.data;
-            if (page == null) {
-              // A frame or two: the corpus is in the bundle, so this resolves
-              // immediately in practice. Never a Material progress indicator.
-              return const SizedBox(height: DabblerSpacing.space11);
-            }
-            return DabblerDocPageView(page: page, resolver: widget.resolver);
-          },
-        ),
-      ),
-    );
+        ],
+    ];
   }
 }

@@ -69,6 +69,9 @@ import 'gallery_page.dart';
 
 part 'gallery_index_order.dart';
 part 'gallery_index_rail.dart';
+part 'gallery_index_rail_rows.dart';
+part 'gallery_index_collections.dart';
+part 'gallery_index_shell.dart';
 
 /// The catalogue band: every registered entry as a tappable tile.
 class GalleryIndex extends StatelessWidget {
@@ -135,7 +138,7 @@ class GalleryIndex extends StatelessWidget {
 /// One entry's tile — the design's `.card`: white surface, 1px `--outline-card`
 /// border, `--radius-lg`, 16px padding, with the press tint the design's own
 /// tappable `Card` describes.
-class GalleryIndexTile extends StatefulWidget {
+class GalleryIndexTile extends StatelessWidget {
   /// Creates a tile.
   const GalleryIndexTile({super.key, required this.entry, required this.onTap});
 
@@ -150,7 +153,16 @@ class GalleryIndexTile extends StatefulWidget {
   static const double width = 300;
 
   @override
-  State<GalleryIndexTile> createState() => _GalleryIndexTileState();
+  Widget build(BuildContext context) {
+    final (String component, String? subject) = _split(entry.title);
+    return _GalleryCard(
+      title: component,
+      subject: subject,
+      description: entry.description,
+      semanticLabel: entry.title,
+      onTap: onTap,
+    );
+  }
 }
 
 /// ## Releasing the press is deferred to the next frame
@@ -227,16 +239,78 @@ class _PressableState extends State<_Pressable> {
   }
 }
 
-class _GalleryIndexTileState extends State<GalleryIndexTile> {
+/// **The one card treatment in this gallery** — `D-053(b)`.
+///
+/// ## Why there is exactly one of these
+///
+/// This was `GalleryIndexTile`'s own build method until `D-053`. The
+/// collection pages needed a card too, and `cxo` ruled that **two card
+/// treatments in one gallery is the defect** — which file holds the shared one
+/// being the implementer's call. It is here because this is where the paint
+/// was already written and where the catalogue's tile still reads it from; a
+/// sibling written beside it would have been identical by intention and
+/// divergent by the first edit.
+///
+/// The paint is unchanged from the tile, line for line: `--surface-card` on a
+/// 1px `--outline-card` border at `--radius-lg`, [DabblerSpacing.space5]
+/// padding, [GalleryIndexTile.width], and [_Pressable]'s 90ms
+/// `--surface-sunken` press tint.
+///
+/// ## No fixed height, no `maxLines`, no ellipsis — `D-053(b)`
+///
+/// Ragged card bottoms are what the catalogue already does, and they are the
+/// correct trade: truncating authored prose to tidy a grid spends the payload
+/// to buy neatness. A [Wrap] row is as tall as its tallest card and the next
+/// row starts below it, which costs nothing but a ragged edge.
+///
+/// ## [description] is markup, not a string — `D-053(i)`
+///
+/// It renders through [GalleryUsage], whose type is already this card's
+/// description role exactly (`caption1`, `--ink-soft`, height 1.5) and which
+/// additionally paints the design's two inline treatments. That is not a
+/// flourish: `_order.md:166` writes *"Skeleton, Spinner, ProgressBar or
+/// Button's `loading` state"*, and a bare [Text] would paint the backticks.
+/// **One of the 57 descriptions is affected** — which is the shape of case a
+/// [Text] passes on 56 of and fails on, silently, on the one.
+///
+/// On a description with no markup the two are identical, so routing the
+/// catalogue's own tiles through it is a strict superset and not a change of
+/// appearance. [GalleryUsage.maxWidth] is 640 and never binds inside a 300px
+/// card.
+class _GalleryCard extends StatelessWidget {
+  const _GalleryCard({
+    required this.title,
+    required this.onTap,
+    this.subject,
+    this.description,
+    this.semanticLabel,
+  });
+
+  /// The card's name, at `callout` in `--ink`.
+  final String title;
+
+  /// A second line at `caption1` in `--muted` — the catalogue tile's *what
+  /// this entry shows* half. `null` on a collection card, which has no such
+  /// half.
+  final String? subject;
+
+  /// The authored one-liner, in [GalleryUsage]'s markup. `null` where there
+  /// is none.
+  final String? description;
+
+  /// The untruncated announcement, where it differs from [title].
+  final String? semanticLabel;
+
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
-    final (String component, String? subject) = _split(widget.entry.title);
 
     return _Pressable(
-      onTap: widget.onTap,
-      semanticLabel: widget.entry.title,
+      onTap: onTap,
+      semanticLabel: semanticLabel ?? title,
       builder: (BuildContext context, bool pressed) => AnimatedContainer(
         duration: const Duration(milliseconds: 90),
         width: GalleryIndexTile.width,
@@ -251,7 +325,7 @@ class _GalleryIndexTileState extends State<GalleryIndexTile> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              component,
+              title,
               style: DabblerType.callout
                   .resolveForDirection(direction)
                   .copyWith(color: colors.textPrimary),
@@ -259,20 +333,15 @@ class _GalleryIndexTileState extends State<GalleryIndexTile> {
             if (subject != null) ...<Widget>[
               const SizedBox(height: DabblerSpacing.space1),
               Text(
-                subject,
+                subject!,
                 style: DabblerType.caption1
                     .resolveForDirection(direction)
                     .copyWith(color: colors.textTertiary),
               ),
             ],
-            if (widget.entry.description != null) ...<Widget>[
+            if (description != null) ...<Widget>[
               const SizedBox(height: DabblerSpacing.space3),
-              Text(
-                widget.entry.description!,
-                style: DabblerType.caption1
-                    .resolveForDirection(direction)
-                    .copyWith(color: colors.textSecondary, height: 1.5),
-              ),
+              GalleryUsage(description!),
             ],
           ],
         ),
