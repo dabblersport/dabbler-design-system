@@ -66,18 +66,27 @@ import 'dabbler_type.dart';
 /// The type token specimens.
 const List<GalleryEntry> typeGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'type/faces',
+    page: 'foundations/type',
+    group: null,
     title: 'Type — the four faces',
     description: 'Gloock, Wingx, Glory and Meral Sans, each set in itself, '
         'with its coverage and its provenance.',
     builder: _faces,
   ),
   GalleryEntry(
+    id: 'type/ramp',
+    page: 'foundations/type',
+    group: null,
     title: 'Type — the complete ramp, Latin and Arabic',
     description: 'All twelve declared styles side by side in both scripts, '
         'each labelled with its size, leading and weight.',
     builder: _scale,
   ),
   GalleryEntry(
+    id: 'type/weights',
+    page: 'foundations/type',
+    group: null,
     title: 'Type — weights, and the values outside the ramp',
     description: 'The five weight tokens, then Button\'s 16/14/12-at-600 '
         'shown as what D-024 says it is: a second ramp, not three steps.',

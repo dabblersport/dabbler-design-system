@@ -10,6 +10,9 @@ import 'skeleton.dart';
 /// Skeleton's specimens.
 const List<GalleryEntry> skeletonGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'skeleton',
+    page: 'components/skeleton',
+    group: GalleryPurpose.statusAndFeedback,
     title: 'Skeleton — variants',
     description: 'Text, rect, circle and card. Decorative: the whole widget '
         'is wrapped in ExcludeSemantics.',

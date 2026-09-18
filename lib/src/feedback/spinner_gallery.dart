@@ -10,6 +10,9 @@ import 'spinner.dart';
 /// Spinner's specimens.
 const List<GalleryEntry> spinnerGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'spinner',
+    page: 'components/spinner',
+    group: GalleryPurpose.statusAndFeedback,
     title: 'Spinner — sizes and tones',
     description: 'Every size and tone. The label is what assistive technology '
         'announces.',

@@ -21,6 +21,9 @@ import 'icon_tile.dart';
 /// IconTile's specimens.
 const List<GalleryEntry> iconTileGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'icon-tile',
+    page: 'components/icon-tile',
+    group: GalleryPurpose.contentContainers,
     title: 'IconTile — the 45×45 tinted glyph container',
     description: 'Default tint · overridden tint · with a SportIcon, then '
         'every DabblerIconTileTone and the bold-weight form.',

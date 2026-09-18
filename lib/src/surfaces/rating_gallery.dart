@@ -17,6 +17,9 @@ import 'rating.dart';
 /// Rating's specimens.
 const List<GalleryEntry> ratingGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'rating',
+    page: 'components/rating',
+    group: GalleryPurpose.identityAndStatus,
     title: 'Rating — evaluation',
     description: 'Read-only (value, halves, count, sizes) and the interactive '
         'radio group, as the identity specimen draws them.',

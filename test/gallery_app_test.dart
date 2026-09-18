@@ -31,12 +31,27 @@ void main() {
       find.widgetWithText(GalleryPageHeader, 'Dabbler Design System'),
       findsOneWidget,
     );
-    // The count moved off the title and onto the catalogue band's label,
-    // which the design renders uppercase.
-    expect(
-      find.text('COMPONENTS (${galleryEntries.length})'),
-      findsOneWidget,
-    );
+    // KAN-295 replaced the single COMPONENTS band with one band per purpose
+    // group, plus a Foundations band, so the count is now per band. The sum
+    // of the band counts is still every registered entry, which is what this
+    // was checking.
+    final int foundations = galleryEntries
+        .where((GalleryEntry e) => e.page.startsWith('foundations/'))
+        .length;
+    expect(find.text('FOUNDATIONS ($foundations)'), findsOneWidget);
+    int banded = foundations;
+    for (final GalleryPurpose purpose in GalleryPurpose.values) {
+      final int n = galleryEntries
+          .where((GalleryEntry e) => e.group == purpose)
+          .length;
+      if (n == 0) continue;
+      banded += n;
+      expect(
+        find.text('${purpose.label.toUpperCase()} ($n)'),
+        findsOneWidget,
+      );
+    }
+    expect(banded, galleryEntries.length);
   });
 
   testWidgets('the index is a list of the registered entries, not the '

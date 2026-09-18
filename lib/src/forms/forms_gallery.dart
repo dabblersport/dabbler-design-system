@@ -138,39 +138,60 @@ Widget _sections(List<Widget> sections) => Column(
 /// The form family's specimens.
 const List<GalleryEntry> formsGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'field-shell',
+    page: 'components/field-shell',
+    group: GalleryPurpose.selectionAndInput,
     title: 'Fields — the shared shell and its five states',
     description: 'The anatomy pair and the rest / filled / helper / error / '
         'disabled matrix, over the raw FieldShell holding each state open.',
     builder: _fields,
   ),
   GalleryEntry(
+    id: 'text-field/variants',
+    page: 'components/text-field',
+    group: GalleryPurpose.selectionAndInput,
     title: 'TextField — the five variants',
     description: 'standard · search · password · multiline · select, closed '
         'and open.',
     builder: _textFieldVariants,
   ),
   GalleryEntry(
+    id: 'checkbox/selection-controls',
+    page: 'components/checkbox',
+    group: GalleryPurpose.selectionAndInput,
     title: 'Selection — checkbox, radio, toggle',
     description: 'Each control across off, on and both disabled forms.',
     builder: _selection,
   ),
   GalleryEntry(
+    id: 'select',
+    page: 'components/select',
+    group: GalleryPurpose.selectionAndInput,
     title: 'Select — choosing from a list',
     description: 'Single, multiple, searchable and disabled.',
     builder: _selects,
   ),
   GalleryEntry(
+    id: 'slider/value-controls',
+    page: 'components/slider',
+    group: GalleryPurpose.selectionAndInput,
     title: 'Slider and Stepper',
     description: 'Distance, price range, marks and disabled; both stepper '
         'sizes with their bound, error and disabled states.',
     builder: _valueControls,
   ),
   GalleryEntry(
+    id: 'picker-field/pickers',
+    page: 'components/picker-field',
+    group: GalleryPurpose.selectionAndInput,
     title: 'Pickers — date, time, picker field and code',
     description: 'The typed-or-picked fields, closed, plus the OTP boxes.',
     builder: _pickers,
   ),
   GalleryEntry(
+    id: 'input-row',
+    page: 'components/input-row',
+    group: GalleryPurpose.selectionAndInput,
     title: 'InputRow',
     description: 'The settings row: plain, with a subtitle, with a chevron '
         'and with a toggle.',

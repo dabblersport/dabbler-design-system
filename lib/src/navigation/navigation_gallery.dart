@@ -22,6 +22,9 @@ const double _phoneWidth = 384;
 /// Navigation's specimens.
 const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'top-bar',
+    page: 'components/top-bar',
+    group: GalleryPurpose.navigation,
     title: 'Navigation — top bar',
     description: 'The wordmark, the two actions and the account avatar, as the '
         'specimen exports it. Safe-area padding is off here so the bar reads '
@@ -29,6 +32,9 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
     builder: _topBar,
   ),
   GalleryEntry(
+    id: 'bottom-bar',
+    page: 'components/bottom-bar',
+    group: GalleryPurpose.navigation,
     title: 'Navigation — bottom bar',
     description: 'The split bar at phone width: closed, with the create menu '
         'open, and in RTL. Tap create to open the menu.',

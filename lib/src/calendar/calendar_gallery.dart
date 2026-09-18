@@ -12,12 +12,18 @@ import 'time_picker.dart';
 /// Calendar's specimens.
 const List<GalleryEntry> calendarGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'calendar',
+    page: 'components/calendar',
+    group: GalleryPurpose.dateAndTime,
     title: 'Calendar — month grid',
     description: 'A fixed month so the specimen does not change under review, '
         'with and without the confirm/cancel actions.',
     builder: _calendars,
   ),
   GalleryEntry(
+    id: 'time-picker',
+    page: 'components/time-picker',
+    group: GalleryPurpose.dateAndTime,
     title: 'TimePicker — hour, minute, period',
     description: 'The three wheels at the default minute step.',
     builder: _timePickers,

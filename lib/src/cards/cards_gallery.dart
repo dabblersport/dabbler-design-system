@@ -23,22 +23,34 @@ import 'empty_state.dart';
 /// The card family's specimens.
 const List<GalleryEntry> cardsGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'card/variants',
+    page: 'components/card',
+    group: GalleryPurpose.contentContainers,
     title: 'Card — variants',
     description: 'The base card in every DabblerCardVariant.',
     builder: _cards,
   ),
   GalleryEntry(
+    id: 'card-event/densities',
+    page: 'components/card-event',
+    group: GalleryPurpose.contentContainers,
     title: 'Card — event, large / medium / small',
     description: 'The three event densities.',
     builder: _events,
   ),
   GalleryEntry(
+    id: 'card-house/composed',
+    page: 'components/card-house',
+    group: GalleryPurpose.contentContainers,
     title: 'Card — house, pricing, ticket',
     description: 'The venue card, both pricing states, and the ticket with '
         'its header tones and status tones.',
     builder: _others,
   ),
   GalleryEntry(
+    id: 'empty-state',
+    page: 'components/empty-state',
+    group: GalleryPurpose.statusAndFeedback,
     title: 'EmptyState — inline and page',
     description: 'Both sizes, with and without an action.',
     builder: _emptyStates,

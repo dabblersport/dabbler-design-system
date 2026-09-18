@@ -61,6 +61,9 @@ import 'dabbler_type.dart';
 /// The bidirectionality comparison specimen.
 const List<GalleryEntry> directionGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'bidirectionality',
+    page: 'foundations/bidirectionality',
+    group: null,
     title: 'Direction — where mirroring stops',
     description: 'Six RTL contracts, each rendered LTR and RTL side by side. '
         'The subject is not that the system mirrors; it is what deliberately '

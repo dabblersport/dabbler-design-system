@@ -35,12 +35,18 @@ import 'button.dart';
 /// Button's specimens.
 const List<GalleryEntry> buttonGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'button/tones',
+    page: 'components/button',
+    group: GalleryPurpose.actions,
     title: 'Button — tones × states',
     description: 'Every tone against rest, small, pressed, focus, loading and '
         'disabled — the matrix the design page draws.',
     builder: _matrix,
   ),
   GalleryEntry(
+    id: 'button/sizes',
+    page: 'components/button',
+    group: GalleryPurpose.actions,
     title: 'Button — sizes, icons & full width',
     description: 'The icon tone, leading icons, and the 320×52 full size.',
     builder: _sizesAndIcons,

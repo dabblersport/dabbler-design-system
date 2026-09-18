@@ -72,24 +72,36 @@ import 'dabbler_type.dart';
 /// The colour token specimens.
 const List<GalleryEntry> colorsGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'colour/brand',
+    page: 'foundations/colour',
+    group: null,
     title: 'Colour — brand ladders and the seven section themes',
     description: 'The five primitive brand ramps, then all seven themes '
         'resolved side by side at the current brightness.',
     builder: _brand,
   ),
   GalleryEntry(
+    id: 'colour/surfaces',
+    page: 'foundations/colour',
+    group: null,
     title: 'Colour — surfaces, ink and outline',
     description: 'The shared paper ramp and every semantic surface, text and '
         'border role, resolved under the current (theme, brightness) pair.',
     builder: _surfaces,
   ),
   GalleryEntry(
+    id: 'colour/status',
+    page: 'foundations/colour',
+    group: null,
     title: 'Colour — status, tags and decorative tones',
     description: 'The four status tones in all four roles, the seven workflow '
         'tags and the three decorative tiles.',
     builder: _status,
   ),
   GalleryEntry(
+    id: 'colour/contrast',
+    page: 'foundations/colour',
+    group: null,
     title: 'Colour — contrast, measured live',
     description: 'Every status pair measured from the resolved tokens at '
         'render time, not transcribed. Switch theme or brightness and the '

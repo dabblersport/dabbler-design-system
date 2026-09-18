@@ -22,18 +22,27 @@ import 'sports.dart';
 /// The foundations' specimens.
 const List<GalleryEntry> foundationsGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'icons/vocabulary',
+    page: 'foundations/icons',
+    group: null,
     title: 'Icon — the app vocabulary',
     description: 'The specimen\'s sixteen names in both weights — linear in '
         'ink, bold in brand — then the three sizes and the full vocabulary.',
     builder: _icons,
   ),
   GalleryEntry(
+    id: 'sports/icon',
+    page: 'foundations/sports',
+    group: null,
     title: 'SportIcon — every sport',
     description: 'DabblerSport.values in both weights, each on its documented '
         'Iconsax fallback until the licensed set is registered.',
     builder: _sportIcons,
   ),
   GalleryEntry(
+    id: 'sports/background',
+    page: 'foundations/sports',
+    group: null,
     title: 'SportBackground — every variant',
     description: 'The 160×284 artwork frame per sport. Nothing is registered '
         'in this package, so every frame is the "not registered" state.',

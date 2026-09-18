@@ -19,6 +19,9 @@ import 'scrim.dart';
 /// The interaction layer's specimens.
 const List<GalleryEntry> interactionGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'interaction',
+    page: 'foundations/interaction',
+    group: null,
     title: 'Interaction — focus ring, press scale, scrim',
     description: 'The three primitives every other component composes. Tab '
         'to the first to raise a real keyboard-focus ring.',

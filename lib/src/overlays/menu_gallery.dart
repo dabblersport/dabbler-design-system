@@ -26,6 +26,9 @@ const List<DabblerMenuEntry> _entries = <DabblerMenuEntry>[
 /// Menu's specimens.
 const List<GalleryEntry> menuGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'menu/placements',
+    page: 'components/menu',
+    group: GalleryPurpose.presentation,
     title: 'Menu — placements, and the list on its own',
     description: 'Tap a trigger to open. DabblerMenuList is the same content '
         'without the overlay, for layout review.',

@@ -17,6 +17,9 @@ import 'accordion.dart';
 /// Accordion's specimens.
 const List<GalleryEntry> accordionGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'accordion',
+    page: 'components/accordion',
+    group: GalleryPurpose.contentContainers,
     title: 'Accordion — plain, card, and the Collapse under it',
     description:
         'Collapsible sections for content that is secondary but not hidden. '

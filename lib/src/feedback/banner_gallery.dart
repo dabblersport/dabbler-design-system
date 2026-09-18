@@ -10,6 +10,9 @@ import 'banner.dart';
 /// Banner's specimens.
 const List<GalleryEntry> bannerGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'banner/tones',
+    page: 'components/banner',
+    group: GalleryPurpose.statusAndFeedback,
     title: 'Banner — tones',
     description: 'Every DabblerBannerTone, plus an action and a dismiss.',
     builder: _banners,

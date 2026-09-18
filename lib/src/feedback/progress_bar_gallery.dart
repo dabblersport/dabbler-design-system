@@ -10,6 +10,9 @@ import 'progress_bar.dart';
 /// ProgressBar's specimens.
 const List<GalleryEntry> progressBarGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'progress-bar',
+    page: 'components/progress-bar',
+    group: GalleryPurpose.statusAndFeedback,
     title: 'ProgressBar — tones, sizes, indeterminate',
     description: 'Determinate at 0.6 in every tone and size, then the '
         'indeterminate sweep.',

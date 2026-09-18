@@ -16,6 +16,9 @@ import 'toast.dart';
 /// Toast's specimens.
 const List<GalleryEntry> toastGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'toast/tones',
+    page: 'components/toast',
+    group: GalleryPurpose.statusAndFeedback,
     title: 'Toast — tones (trigger)',
     description: 'Each button shows a real toast through DabblerToasts, '
         'queued and capped by the controller the app installs.',

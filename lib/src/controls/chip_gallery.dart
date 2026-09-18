@@ -24,6 +24,9 @@ import 'chip.dart';
 /// Chip's specimens.
 const List<GalleryEntry> chipGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'chip',
+    page: 'components/chip',
+    group: GalleryPurpose.actions,
     title: 'Chip — selection & filtering',
     description: 'A filter row: static chips, plus two interactive sport chips '
         'with an 18px leading icon. Tap one to move the selection.',

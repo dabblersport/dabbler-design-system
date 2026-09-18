@@ -11,6 +11,9 @@ import 'divider.dart';
 /// Divider's specimens.
 const List<GalleryEntry> dividerGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'divider',
+    page: 'components/divider',
+    group: GalleryPurpose.structure,
     title: 'Divider — horizontal, labelled, vertical',
     description: 'Hairline by default; strong for a section break.',
     builder: _dividers,

@@ -11,6 +11,9 @@ import 'surface.dart';
 /// Surface's specimens.
 const List<GalleryEntry> surfaceGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'surface/variants',
+    page: 'components/surface',
+    group: GalleryPurpose.contentContainers,
     title: 'Surface — variants',
     description: 'Every DabblerSurfaceVariant. Flat throughout: no shadow, '
         'no gradient, no blur.',

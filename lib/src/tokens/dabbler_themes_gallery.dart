@@ -68,6 +68,9 @@ import 'dabbler_type.dart';
 /// The theme/brightness comparison specimens.
 const List<GalleryEntry> themesGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'themes/palettes',
+    page: 'foundations/themes',
+    group: null,
     title: 'Themes — one control across all fourteen palettes',
     description: 'The same card rendered simultaneously under seven themes at '
         'both brightnesses. Not the header switcher: every cell holds its own '
@@ -75,6 +78,9 @@ const List<GalleryEntry> themesGalleryEntries = <GalleryEntry>[
     builder: _component,
   ),
   GalleryEntry(
+    id: 'themes/paper',
+    page: 'foundations/themes',
+    group: null,
     title: 'Themes — paper shared, brand retinted',
     description: 'The invariant as hex, read live: thirteen paper roles '
         'identical down every row, three brand roles different in every cell.',

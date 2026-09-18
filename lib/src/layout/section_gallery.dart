@@ -11,6 +11,9 @@ import 'section.dart';
 /// Section's specimens.
 const List<GalleryEntry> sectionGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'section',
+    page: 'components/section',
+    group: GalleryPurpose.contentContainers,
     title: 'Section — title, subtitle and action',
     description: 'The standard grouping header a screen repeats down a page.',
     builder: _sections,

@@ -15,6 +15,9 @@ import 'tooltip.dart';
 /// Tooltip's specimens.
 const List<GalleryEntry> tooltipGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'tooltip',
+    page: 'components/tooltip',
+    group: GalleryPurpose.presentation,
     title: 'Tooltip — the label for a control with no visible text',
     description: 'Hover or focus a trigger. Never the only carrier of '
         'essential information.',

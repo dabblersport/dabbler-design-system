@@ -21,6 +21,9 @@ import 'fab.dart';
 /// Fab's specimens.
 const List<GalleryEntry> fabGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'fab/tones',
+    page: 'components/fab',
+    group: GalleryPurpose.actions,
     title: 'FAB — tones',
     description: '56×56 on a 21px squircle corner. The FAB carries the '
         "system's one documented shadow exception.",

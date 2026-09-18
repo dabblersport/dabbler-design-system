@@ -7,20 +7,28 @@
 /// uppercase label, and the things themselves laid out as cards in a wrapping
 /// grid with air around them — `Group` in every `*.card.html`.
 ///
-/// ## Why one tile per entry, in one band
+/// ## Why the bands are purpose groups (KAN-295)
 ///
-/// The design's own bands (`SHELLS`, `KIT COMPOSITIONS`, `TICKET`) group by
-/// what a specimen *is*, and [GalleryEntry] carries no such grouping — the
-/// title's `'<Component> — <what it shows>'` convention is all there is, and
-/// inventing an area taxonomy here would mean editing all 24 component
-/// `*_gallery.dart` files to declare one. Those files belong to their
-/// components, not to the gallery shell.
+/// This comment used to argue the opposite: that [GalleryEntry] carried no
+/// grouping, that the title convention was all there was, and that inventing
+/// a taxonomy here would mean editing every component `*_gallery.dart` file.
+/// Both halves of that are now false. The taxonomy is not invented — it is
+/// `DECISIONS.md` D-033(b)'s nine purpose groups, spelled and ordered by
+/// `assets/documentation/_order.md`, which is the reader-journey ordering the
+/// documentation itself uses. And editing all 33 gallery files is not a cost
+/// to be avoided; it is what KAN-295 did, so each entry now declares its own
+/// [GalleryEntry.group] beside its own specimen, in the file that owns it.
 ///
-/// So the catalogue is one band of equal tiles in title order, which is
-/// alphabetical by component and therefore already puts a component's entries
-/// next to each other. The tile itself carries the split: the component name
-/// reads as the tile's title and the rest of the entry title as its subject,
-/// so the grid scans by component without a taxonomy existing.
+/// So the catalogue is one band per group, in `_order.md`'s order, preceded
+/// by a Foundations band. Foundations come first and are not one of the nine:
+/// the nine classify components, and a foundation entry declares
+/// `group: null` and is placed by the section its [GalleryEntry.page] names
+/// (`foundations/…` versus `components/…`) — the documentation tree's own
+/// split, not a tenth group.
+///
+/// There is no flat list kept alongside this: the grid below is built from
+/// the grouping and from nothing else, so an entry with no band would not
+/// render at all.
 library;
 
 // `scheduler.dart` for the post-frame callback that releases the press
@@ -45,8 +53,39 @@ class GalleryIndex extends StatelessWidget {
   /// Opens one entry's own page.
   final void Function(GalleryEntry entry) onOpen;
 
+  /// The bands, in `_order.md`'s order: foundations, then the nine groups.
+  ///
+  /// An entry reaches exactly one band. Foundations is chosen by the section
+  /// [GalleryEntry.page] names rather than by `group == null` alone, so a
+  /// component entry that forgot its group would land nowhere and be visibly
+  /// missing rather than quietly filed under foundations.
+  List<(String, List<GalleryEntry>)> _bands() {
+    final List<GalleryEntry> foundations = entries
+        .where((GalleryEntry e) => e.page.startsWith('foundations/'))
+        .toList();
+
+    return <(String, List<GalleryEntry>)>[
+      if (foundations.isNotEmpty) ('Foundations', foundations),
+      for (final GalleryPurpose purpose in GalleryPurpose.values)
+        if (entries.any((GalleryEntry e) => e.group == purpose))
+          (
+            purpose.label,
+            entries.where((GalleryEntry e) => e.group == purpose).toList(),
+          ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    assert(
+      GalleryEntry.duplicateIds(entries).isEmpty,
+      'Two gallery entries declare the same id: '
+      '${GalleryEntry.duplicateIds(entries)}. An id is what a documentation '
+      "page's @specimen line resolves through, so a collision makes that "
+      'line ambiguous. Ids are unique across the whole registry, not per '
+      'file.',
+    );
+
     if (entries.isEmpty) {
       // Kept from the old index, and still describing a real regression
       // rather than a first-run state: every component failing to register.
@@ -65,13 +104,14 @@ class GalleryIndex extends StatelessWidget {
           'two brightnesses, fourteen palettes in all. Open a tile to see that '
           'component on its own page.',
         ),
-        GalleryGroup(
-          name: 'Components (${entries.length})',
-          children: <Widget>[
-            for (final GalleryEntry entry in entries)
-              GalleryIndexTile(entry: entry, onTap: () => onOpen(entry)),
-          ],
-        ),
+        for (final (String name, List<GalleryEntry> band) in _bands())
+          GalleryGroup(
+            name: '$name (${band.length})',
+            children: <Widget>[
+              for (final GalleryEntry entry in band)
+                GalleryIndexTile(entry: entry, onTap: () => onOpen(entry)),
+            ],
+          ),
       ],
     );
   }

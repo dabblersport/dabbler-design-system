@@ -20,6 +20,9 @@ import 'badge.dart';
 /// Badge's specimens.
 const List<GalleryEntry> badgeGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'badge/tones',
+    page: 'components/badge',
+    group: GalleryPurpose.identityAndStatus,
     title: 'Badge — tones and statuses',
     description: 'tone — decorative, the kit\'s own non-semantic names. '
         'status — semantic, overrides tone.',

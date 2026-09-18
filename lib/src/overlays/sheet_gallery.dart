@@ -15,6 +15,9 @@ import 'sheet.dart';
 /// Sheet's specimens.
 const List<GalleryEntry> sheetGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'sheet/detents',
+    page: 'components/sheet',
+    group: GalleryPurpose.presentation,
     title: 'Sheet — detents and footer (trigger)',
     description: 'A half-height sheet, and a two-detent sheet with a footer.',
     builder: _sheets,

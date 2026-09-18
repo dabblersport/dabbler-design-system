@@ -52,24 +52,36 @@ import 'dabbler_type.dart';
 /// The geometry token specimens.
 const List<GalleryEntry> geometryGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'spacing-geometry/spacing',
+    page: 'foundations/spacing-geometry',
+    group: null,
     title: 'Spacing — the base-3 scale and its aliases',
     description: 'All eleven steps drawn at their literal pixel width, then '
         'the six semantic aliases and the step each one IS.',
     builder: _spacing,
   ),
   GalleryEntry(
+    id: 'spacing-geometry/radius',
+    page: 'foundations/spacing-geometry',
+    group: null,
     title: 'Radius — the ramp, and the 16-versus-12 card corner',
     description: 'Seven steps including D-018\'s 16px card corner, then the '
         'nested figure that shows why 16 and 12 are different corners.',
     builder: _radius,
   ),
   GalleryEntry(
+    id: 'spacing-geometry/sizing',
+    page: 'foundations/spacing-geometry',
+    group: null,
     title: 'Sizing — touch target, borders, icon sizes',
     description: 'The 45px floor, the two stroke widths at real thickness, '
         'and the three icon sizes.',
     builder: _sizing,
   ),
   GalleryEntry(
+    id: 'spacing-geometry/elevation',
+    page: 'foundations/spacing-geometry',
+    group: null,
     title: 'Elevation — the no-shadow law and its one exception',
     description: 'Flat by default. --elevation-2 is the only legal shadow and '
         'is reserved for Dialog.',

@@ -15,6 +15,9 @@ import 'dialog.dart';
 /// Dialog's specimens.
 const List<GalleryEntry> dialogGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'dialog/sizes',
+    page: 'components/dialog',
+    group: GalleryPurpose.presentation,
     title: 'Dialog — sizes (trigger)',
     description: 'Every DabblerDialogSize, pushed as a real route.',
     builder: _dialogs,

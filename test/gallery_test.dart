@@ -28,17 +28,34 @@ void main() {
             'An empty index is the regression the placeholder copy now '
             'describes: no component reached galleryEntries.',
       );
-      // AC6 — the count the app shows is the count that is registered.
-      expect(
-        find.text('COMPONENTS (${galleryEntries.length})'),
-        findsOneWidget,
-      );
+      // AC6 — every registered entry reaches exactly one band. KAN-295 split
+      // the single COMPONENTS band into a Foundations band plus one band per
+      // purpose group, so the counts are per band and must still sum to the
+      // registry.
+      int banded = galleryEntries
+          .where((GalleryEntry e) => e.page.startsWith('foundations/'))
+          .length;
+      expect(find.text('FOUNDATIONS ($banded)'), findsOneWidget);
+      for (final GalleryPurpose purpose in GalleryPurpose.values) {
+        final int n = galleryEntries
+            .where((GalleryEntry e) => e.group == purpose)
+            .length;
+        if (n == 0) continue;
+        banded += n;
+        expect(
+          find.text('${purpose.label.toUpperCase()} ($n)'),
+          findsOneWidget,
+        );
+      }
+      expect(banded, galleryEntries.length);
       // Every title is unique, so the index does not silently hide an entry
-      // behind another's row.
+      // behind another's row. Ids likewise — the index asserts on that, and
+      // this states it where a reader of the test can see it.
       expect(
         galleryEntries.map((GalleryEntry e) => e.title).toSet(),
         hasLength(galleryEntries.length),
       );
+      expect(GalleryEntry.duplicateIds(galleryEntries), isEmpty);
     });
 
     // AC4 — each entry's builder is pumped in the app's own theme. A

@@ -49,6 +49,9 @@ import 'dabbler_type.dart';
 /// The motion token specimens.
 const List<GalleryEntry> motionGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'motion/durations',
+    page: 'foundations/motion',
+    group: null,
     title: 'Motion — durations and the easing curve',
     description: 'The three durations running the same travel under the '
         'system\'s one curve, on a loop, so 80/120/200 can be compared '
@@ -56,6 +59,9 @@ const List<GalleryEntry> motionGalleryEntries = <GalleryEntry>[
     builder: _durations,
   ),
   GalleryEntry(
+    id: 'motion/press-scale',
+    page: 'foundations/motion',
+    group: null,
     title: 'Motion — press scale, and the FAB deviation',
     description: 'Press either target. 0.98 is the system\'s only press '
         'transform; the FAB\'s 0.96 is a documented exception, labelled as '
@@ -63,6 +69,9 @@ const List<GalleryEntry> motionGalleryEntries = <GalleryEntry>[
     builder: _press,
   ),
   GalleryEntry(
+    id: 'motion/reduced',
+    page: 'foundations/motion',
+    group: null,
     title: 'Motion — reduced motion',
     description: 'What the platform is currently asking for, and the same '
         'travel with the reduced-motion rule applied.',

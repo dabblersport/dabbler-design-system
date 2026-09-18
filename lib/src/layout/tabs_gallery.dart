@@ -16,6 +16,9 @@ const List<DabblerTabItem> _items = <DabblerTabItem>[
 /// Tabs' specimens.
 const List<GalleryEntry> tabsGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'tabs/variants',
+    page: 'components/tabs',
+    group: GalleryPurpose.navigation,
     title: 'Tabs — variants',
     description: 'Underline and segmented, plus the panel that follows the '
         'selected id.',

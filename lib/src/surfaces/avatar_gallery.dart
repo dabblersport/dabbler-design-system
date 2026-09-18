@@ -21,6 +21,9 @@ import 'avatar.dart';
 /// Avatar's specimens.
 const List<GalleryEntry> avatarGalleryEntries = <GalleryEntry>[
   GalleryEntry(
+    id: 'avatar',
+    page: 'components/avatar',
+    group: GalleryPurpose.identityAndStatus,
     title: 'Avatar — sizes, badges and groups',
     description: 'Sizes xs 28 · sm 36 · md 48 · lg 64 · xl 80; the three badge '
         'tones; and AvatarGroup with its +N overflow.',
