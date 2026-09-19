@@ -227,21 +227,6 @@ class DabblerRandomAvatarPortrait extends DabblerAvatarPortraitBuilder {
 /// only as good as the caller: **pass the same stable identifier the app
 /// passes.** A display name here and a user id there gives one person two faces,
 /// and nothing will report it.
-///
-/// ## `indigo` is a KNOWN DEFECT pending `DECISIONS.md` D-004
-///
-/// `Avatar.jsx` fills the `indigo` badge with `var(--accent-indigo)`, which
-/// `tokens/colors.css` never declares. `cxo` ruled (D-004) that this is a real
-/// omission: the token is `#5C50E6`, it will be declared in the CSS, then
-/// transcribed to `DabblerPalette.accentIndigo`, and only then does this call
-/// site change. Until that sequence completes, `indigo` resolves to
-/// [DabblerPalette.socialInfo] (`--social-info`, `#6366F1`).
-///
-/// **That stand-in is a defect, not a close-enough approximation.** `cxo`
-/// measured it: white on `--social-info` is 4.47:1 where white on
-/// `--accent-indigo` is 5.61:1, so the substitution lowers badge contrast below
-/// what the intended token delivers. A ticket is open to remove it — do not
-/// treat this line as settled, and do not copy the pattern.
 class DabblerAvatar extends StatelessWidget {
   /// An avatar for [seed] at [size].
   const DabblerAvatar({
@@ -293,7 +278,7 @@ class DabblerAvatar extends StatelessWidget {
       switch (tone) {
         DabblerAvatarBadgeTone.primary => colors.brandPrimary,
         DabblerAvatarBadgeTone.accent => colors.accent,
-        DabblerAvatarBadgeTone.indigo => DabblerPalette.socialInfo,
+        DabblerAvatarBadgeTone.indigo => DabblerPalette.accentIndigo,
       };
 
   @override

@@ -187,16 +187,16 @@ void main() {
       }
     });
 
-    test('indigo is the documented approximation, and is theme-invariant', () {
-      // `--accent-indigo` is referenced by Avatar.jsx and declared nowhere in
-      // tokens/colors.css. The port resolves it to the one declared indigo.
+    test('indigo is --accent-indigo, and is theme-invariant', () {
+      // `Avatar.jsx` fills the indigo badge with `var(--accent-indigo)`, now
+      // declared in tokens/colors.css and transcribed to the palette.
       for (final DabblerTheme theme in DabblerTheme.values) {
         expect(
           DabblerAvatar.badgeFill(_colors(theme), DabblerAvatarBadgeTone.indigo),
-          DabblerPalette.socialInfo,
+          DabblerPalette.accentIndigo,
         );
       }
-      expect(DabblerPalette.socialInfo, const Color(0xFF6366F1));
+      expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
     });
 
     testWidgets('the badge paints its tone fill', (WidgetTester tester) async {

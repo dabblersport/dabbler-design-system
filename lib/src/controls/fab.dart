@@ -213,18 +213,8 @@ class DabblerFab extends StatelessWidget {
         DabblerFabTone.dark => colors.textPrimary,
       };
 
-  /// **Approximation, pending a token.** `FAB.jsx` paints the `default` tone
-  /// with `--accent-indigo`, which is `rgb(92, 80, 230)` — but that token is
-  /// declared only in `tokens/figma/fig-tokens.css`, **not** in
-  /// `tokens/colors.css`. [DabblerPalette] is contractually a transcription of
-  /// `colors.css`'s `:root` block and its test enforces that, so `#5C50E6`
-  /// cannot legally be added here by this ticket.
-  ///
-  /// [DabblerPalette.socialInfo] (`#6366F1`) is the nearest indigo the palette
-  /// actually declares and is what this tone paints today. Raised on KAN-222 as
-  /// a hand-off: adopting `--accent-indigo` means widening the palette's stated
-  /// source beyond `colors.css`, which is a `cto`/`cxo` call, not a developer's.
-  static const Color _indigo = DabblerPalette.socialInfo;
+  /// `--accent-indigo`, the fill `FAB.jsx` gives the `default` tone.
+  static const Color _indigo = DabblerPalette.accentIndigo;
 
   @override
   Widget build(BuildContext context) {

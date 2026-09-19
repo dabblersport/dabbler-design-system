@@ -41,10 +41,11 @@ import 'package:flutter_test/flutter_test.dart';
 /// expected-failure list is longer than its finding is a gate people learn to
 /// ignore.
 ///
-/// The consequence is recorded rather than hidden: the second scope is asserted
-/// separately in *`--accent-indigo` is still missing from the hand-authored
-/// colors.css*, below, so D-004's finding stays visible under this gate even
-/// though the recursive scope does not catch it.
+/// The second scope this header used to describe — a separate pin asserting
+/// `--accent-indigo` was absent from the hand-authored `colors.css` — is gone.
+/// KAN-261 declared the token there and KAN-264 transcribed it to
+/// [DabblerPalette.accentIndigo], so D-004's finding is closed and the pin was
+/// deleted exactly as its own failure reason instructed.
 ///
 /// ## The expected-failure state (AC4)
 ///
@@ -61,12 +62,10 @@ import 'package:flutter_test/flutter_test.dart';
 ///
 /// A `skip:` or an exclusion list would have done neither.
 ///
-/// **AC4 as written expected two names; one of the two does not hold.**
-/// `--accent-indigo` **is** declared, at `tokens/figma/fig-tokens.css:5`. D-004
-/// rules it an omission from `colors.css` specifically, which is a narrower
-/// finding than "undeclared in `tokens/`" — so it is pinned by the colors.css
-/// test below rather than by this one. Reported to the orchestrator as a
-/// divergence from the AC rather than resolved silently.
+/// **AC4 as written expected two names; only `--text-body` remains.**
+/// `--accent-indigo` was the other, and it is now declared in both
+/// `tokens/figma/fig-tokens.css:5` and the hand-authored `tokens/colors.css`,
+/// so it is no longer pinned anywhere in this file.
 ///
 /// ## Mutation evidence (AC3)
 ///
@@ -238,30 +237,6 @@ void main() {
           reason: 'D-007(1) ruled --text-body a defect, NOT a token to add to '
               'colors.css — if it is now declared, that resolution was not the '
               'one ruled',
-      );
-    });
-
-    test('--accent-indigo is still missing from the hand-authored colors.css',
-        () {
-      // D-004/KAN-261. The recursive scope above does not catch it, because
-      // `tokens/figma/fig-tokens.css:5` declares it — so it is pinned here
-      // instead, and this is the second scope the header describes.
-      final Set<String> handAuthored = <String>{};
-      for (final File file in Directory('${project.path}/tokens')
-          .listSync()
-          .whereType<File>()
-          .where((File f) => f.path.endsWith('.css'))) {
-        handAuthored.addAll(RegExp(r'(--[a-zA-Z0-9-]+)\s*:')
-            .allMatches(file.readAsStringSync())
-            .map((RegExpMatch m) => m.group(1)!));
-      }
-      expect(declared.contains('--accent-indigo'), isTrue,
-          reason: 'expected the Figma mirror to declare it');
-      expect(
-        handAuthored.contains('--accent-indigo'),
-        isFalse,
-        reason: 'KAN-261 has landed — delete this test, and note in D-004 that '
-            'the finding is closed',
       );
     });
 

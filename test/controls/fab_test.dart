@@ -1,6 +1,7 @@
 import 'package:dabbler_design_system/src/controls/fab.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -74,9 +75,11 @@ void main() {
         theme: DabblerTheme.main,
         brightness: Brightness.light,
       );
-      // `FAB.jsx` TONES: primary -> --color-brand-primary,
-      // accent -> --color-accent, dark -> --surface-sunken.
+      // `FAB.jsx` TONES: default -> --accent-indigo,
+      // primary -> --color-brand-primary, accent -> --color-accent,
+      // dark -> --surface-sunken.
       final Map<DabblerFabTone, Color> expected = <DabblerFabTone, Color>{
+        DabblerFabTone.indigo: DabblerPalette.accentIndigo,
         DabblerFabTone.primary: colors.brandPrimary,
         DabblerFabTone.accent: colors.accent,
         DabblerFabTone.dark: colors.surfaceSunken,

@@ -180,6 +180,12 @@ abstract final class DabblerPalette {
   static const Color brightS700 = Color(0xFF572C00);
 
 
+  // --- Standalone accent ---
+
+  /// `--accent-indigo` — `#5C50E6`.
+  static const Color accentIndigo = Color(0xFF5C50E6);
+
+
   // --- Surface and neutral foundation ---
 
   /// `--surface-page` — `#F5F0E6`.
@@ -278,8 +284,8 @@ abstract final class DabblerPalette {
   /// `--tag-pending-surface` — `#FDEDE3`.
   static const Color tagPendingSurface = Color(0xFFFDEDE3);
 
-  /// `--tag-pending-ink` — `#B4530E`.
-  static const Color tagPendingInk = Color(0xFFB4530E);
+  /// `--tag-pending-ink` — `#A34A08`.
+  static const Color tagPendingInk = Color(0xFFA34A08);
 
   /// `--tag-progress-surface` — `#DBEAFB`.
   static const Color tagProgressSurface = Color(0xFFDBEAFB);
