@@ -8,8 +8,8 @@ Sources  : lib/src/calendar/time_picker.dart:84-182 (DabblerTimePicker's
            lib/src/calendar/calendar_gallery.dart:21 (specimen title:
            "TimePicker — hour, minute, period")
            DECISIONS.md D-030 (read in full this session), D-023 (read in
-           full, prior session — the same blocked-tone/action-sizing
-           treatment as Calendar's)
+           full, prior session — the action-row sizing correction and the
+           `text` tone, since shipped; the same treatment as Calendar's)
 
 Direction: NO section. TimePicker's own "RTL" note states explicitly
 "nothing in this file reverses a list, and nothing is keyed off direction"

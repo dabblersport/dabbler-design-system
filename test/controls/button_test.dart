@@ -433,7 +433,7 @@ void main() {
     });
 
     test('there is one widget, not thirteen', () {
-      // The merge is the point of DS-400: 9 tones × 3 sizes are modifiers on
+      // The merge is the point of DS-400: 10 tones × 3 sizes are modifiers on
       // DabblerButton and nothing else is exported from the file.
       final String source = _code();
       final Iterable<String> publicClasses = RegExp(r'^class (\w+)', multiLine: true)
