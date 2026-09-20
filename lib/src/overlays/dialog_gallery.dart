@@ -39,18 +39,17 @@ Widget _dialogs(BuildContext context) => GalleryWrap(
                 title: 'Leave this game?',
                 description: 'Your spot goes back to the pool.',
                 onClose: () => Navigator.of(context).pop(),
-                actions: <Widget>[
-                  DabblerButton(
-                    label: 'Cancel',
-                    tone: DabblerButtonTone.neutral,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  DabblerButton(
-                    label: 'Leave',
-                    tone: DabblerButtonTone.destructive,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
+                // Leaving a game is destructive, so the flag paints the
+                // primary action rather than a hand-picked tone.
+                destructive: true,
+                secondaryAction: DabblerDialogAction(
+                  label: 'Cancel',
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                primaryAction: DabblerDialogAction(
+                  label: 'Leave',
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
               ),
             ),
           ),

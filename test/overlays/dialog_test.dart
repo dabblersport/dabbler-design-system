@@ -1,4 +1,5 @@
 import 'package:dabbler_design_system/src/tokens/dabbler_motion.dart';
+import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/interaction/scrim.dart';
 import 'package:dabbler_design_system/src/overlays/dialog.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
@@ -253,16 +254,135 @@ void main() {
   });
 
   group('the action row', () {
-    const List<Widget> actions = <Widget>[
-      SizedBox(height: 45, child: Text('stay')),
-      SizedBox(height: 45, child: Text('leave')),
-    ];
+    // KAN-267 — the row is built from the typed pair, so the fixture is two
+    // DabblerDialogActions rather than two arbitrary widgets.
+    const DabblerDialogAction stay = DabblerDialogAction(label: 'stay');
+    const DabblerDialogAction leave = DabblerDialogAction(label: 'leave');
+
+    DabblerButton buttonAt(WidgetTester tester, Key key) =>
+        tester.widget<DabblerButton>(find.byKey(key));
+
+    testWidgets('AC2 — destructive paints the primary with the error tone', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerDialog(
+            title: 'leave?',
+            destructive: true,
+            secondaryAction: stay,
+            primaryAction: leave,
+          ),
+        ),
+      );
+      expect(
+        buttonAt(tester, DabblerDialog.primaryActionKey).tone,
+        DabblerButtonTone.destructive,
+        reason: 'Dialog.d.ts:18 — destructive paints the primary action',
+      );
+      expect(
+        buttonAt(tester, DabblerDialog.secondaryActionKey).tone,
+        DabblerButtonTone.outlined,
+        reason: 'the secondary is outlined whatever the flag says',
+      );
+    });
+
+    testWidgets('AC2 — destructive outranks a per-action tone', (
+      WidgetTester tester,
+    ) async {
+      // `Dialog.d.ts:6` — "Button tone; ignored when destructive is set".
+      await tester.pumpWidget(
+        host(
+          const DabblerDialog(
+            title: 'leave?',
+            destructive: true,
+            primaryAction: DabblerDialogAction(
+              label: 'leave',
+              tone: DabblerButtonTone.secondary,
+            ),
+          ),
+        ),
+      );
+      expect(
+        buttonAt(tester, DabblerDialog.primaryActionKey).tone,
+        DabblerButtonTone.destructive,
+      );
+    });
+
+    testWidgets('without the flag the primary is primary, or its own tone', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(const DabblerDialog(title: 'leave?', primaryAction: leave)),
+      );
+      expect(
+        buttonAt(tester, DabblerDialog.primaryActionKey).tone,
+        DabblerButtonTone.primary,
+      );
+
+      await tester.pumpWidget(
+        host(
+          const DabblerDialog(
+            title: 'leave?',
+            primaryAction: DabblerDialogAction(
+              label: 'leave',
+              tone: DabblerButtonTone.filled,
+            ),
+          ),
+        ),
+      );
+      expect(
+        buttonAt(tester, DabblerDialog.primaryActionKey).tone,
+        DabblerButtonTone.filled,
+      );
+    });
+
+    testWidgets('the secondary falls back to onClose (Dialog.jsx:102)', (
+      WidgetTester tester,
+    ) async {
+      int closed = 0;
+      await tester.pumpWidget(
+        host(
+          DabblerDialog(
+            title: 'leave?',
+            onClose: () => closed++,
+            secondaryAction: const DabblerDialogAction(label: 'stay'),
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(DabblerDialog.secondaryActionKey));
+      await tester.pump();
+      expect(closed, 1,
+          reason: 'a secondary with no callback of its own closes the dialog');
+    });
+
+    testWidgets('both actions stretch full width when stacked', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerDialog(
+            title: 'leave?',
+            secondaryAction: stay,
+            primaryAction: leave,
+          ),
+          size: const Size(359, 600),
+        ),
+      );
+      // `fullWidth={stack}` — Dialog.jsx:101 and :104.
+      expect(buttonAt(tester, DabblerDialog.primaryActionKey).fullWidth, isTrue);
+      expect(
+        buttonAt(tester, DabblerDialog.secondaryActionKey).fullWidth,
+        isTrue,
+      );
+    });
 
     testWidgets('is a row aligned to the end at wide widths', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        host(const DabblerDialog(title: 'leave?', actions: actions)),
+        host(const DabblerDialog(title: 'leave?',
+              secondaryAction: stay, primaryAction: leave)),
       );
       final Row row = tester.widget<Row>(find.byKey(DabblerDialog.actionsKey));
       expect(row.mainAxisAlignment, MainAxisAlignment.end);
@@ -273,7 +393,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const DabblerDialog(title: 'leave?', actions: actions),
+          const DabblerDialog(title: 'leave?',
+              secondaryAction: stay, primaryAction: leave),
           size: const Size(359, 600),
         ),
       );
@@ -288,7 +409,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const DabblerDialog(title: 'leave?', actions: actions),
+          const DabblerDialog(title: 'leave?',
+              secondaryAction: stay, primaryAction: leave),
           size: const Size(360, 600),
         ),
       );
@@ -301,7 +423,8 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const DabblerDialog(title: 'leave?', actions: actions),
+          const DabblerDialog(title: 'leave?',
+              secondaryAction: stay, primaryAction: leave),
           textDirection: TextDirection.rtl,
         ),
       );
@@ -394,16 +517,83 @@ void main() {
       expect(closed, 0);
     });
 
-    testWidgets('Enter runs onConfirm (Dialog.prompt.md:55)', (
+    testWidgets('Enter fires primaryAction (Dialog.prompt.md:51)', (
       WidgetTester tester,
     ) async {
       int confirmed = 0;
       await tester.pumpWidget(
-        host(DabblerDialog(title: 'leave?', onConfirm: () => confirmed++)),
+        host(
+          DabblerDialog(
+            title: 'leave?',
+            primaryAction: DabblerDialogAction(
+              label: 'leave',
+              onPressed: () => confirmed++,
+            ),
+          ),
+        ),
       );
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
-      expect(confirmed, 1);
+      expect(confirmed, 1,
+          reason: 'Enter must reach the action itself, not a parallel '
+              'onConfirm callback');
+    });
+
+    testWidgets('Enter does nothing when there is no primary action', (
+      WidgetTester tester,
+    ) async {
+      int closed = 0;
+      await tester.pumpWidget(
+        host(DabblerDialog(title: 'leave?', onClose: () => closed++)),
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(closed, 0, reason: 'Enter is not a close key');
+    });
+
+    testWidgets('a focused action button takes Enter, not the dialog', (
+      WidgetTester tester,
+    ) async {
+      // `Dialog.jsx:46-48` — the browser activates a focused button on Enter,
+      // so the dialog's own handler stands down. Without the transcribed
+      // guard, Tabbing to Cancel and pressing Enter would confirm.
+      int primary = 0;
+      int secondary = 0;
+      await tester.pumpWidget(
+        host(
+          DabblerDialog(
+            title: 'leave?',
+            secondaryAction: DabblerDialogAction(
+              label: 'stay',
+              onPressed: () => secondary++,
+            ),
+            primaryAction: DabblerDialogAction(
+              label: 'leave',
+              onPressed: () => primary++,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // The same way button_test focuses a button: from its GestureDetector,
+      // whose nearest ancestor Focus is the button's own node.
+      Focus.maybeOf(
+        tester.element(
+          find
+              .descendant(
+                of: find.byKey(DabblerDialog.secondaryActionKey),
+                matching: find.byType(GestureDetector),
+              )
+              .first,
+        ),
+      )!.requestFocus();
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(primary, 0, reason: 'the focused Cancel must not confirm');
+      expect(secondary, 1, reason: 'the focused button takes the key');
     });
   });
 

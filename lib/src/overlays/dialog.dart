@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../controls/button.dart';
 import '../tokens/dabbler_motion.dart';
 import '../interaction/scrim.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+
+part 'dialog_panel.dart';
 
 /// The two panel widths a [DabblerDialog] can take, transcribed from the
 /// `MAX_WIDTH` map of the design source `components/overlays/Dialog.jsx:16`
@@ -25,6 +28,41 @@ enum DabblerDialogSize {
   /// not a radius, so no [DabblerSpacing] step expresses them; they are the
   /// source's own container widths, copied verbatim from `Dialog.jsx:16`.
   final double maxWidth;
+}
+
+/// One of a [DabblerDialog]'s two actions — `Dialog.d.ts:3-8`'s
+/// `DialogAction`.
+///
+/// A value, not a widget: the dialog builds the [DabblerButton] itself, which
+/// is how `Dialog.prompt.md:77`'s rule — *"actions are `Button` instances —
+/// never raw `<button>`s"* — becomes something the type system enforces
+/// rather than something a caller is asked to remember.
+@immutable
+class DabblerDialogAction {
+  /// Creates an action.
+  const DabblerDialogAction({
+    required this.label,
+    this.onPressed,
+    this.tone,
+  });
+
+  /// The button's label.
+  final String label;
+
+  /// Run when the action fires. Null renders the button disabled.
+  ///
+  /// On [DabblerDialog.secondaryAction] a null callback falls back to
+  /// [DabblerDialog.onClose] instead of disabling — `Dialog.jsx:102`'s
+  /// `secondaryAction.onPress || onClose`.
+  final VoidCallback? onPressed;
+
+  /// Overrides the primary action's tone.
+  ///
+  /// **Ignored when [DabblerDialog.destructive] is set** — `Dialog.d.ts:6`
+  /// says so in as many words, and `Dialog.jsx:52` implements it as
+  /// `destructive ? 'destructive' : (tone || 'primary')`. Unused on the
+  /// secondary action, which is always [DabblerButtonTone.outlined].
+  final DabblerButtonTone? tone;
 }
 
 /// Dialog — the modal that interrupts to get one decision.
@@ -61,15 +99,21 @@ enum DabblerDialogSize {
 ///
 /// ## Actions
 ///
-/// [actions] is a slot of arbitrary widgets rather than a typed
-/// `primaryAction` / `secondaryAction` pair, because Button (DS-400) does not
-/// exist yet in this package. The source's rule is *"actions are `Button`
-/// instances — never raw `<button>`s"* (`Dialog.prompt.md:77`), which cannot be
-/// enforced against a component that has not been written. **Follow-up:** once
-/// DS-400 lands, this slot should gain the typed action pair and the
-/// `destructive` flag that paints the primary action with
-/// `--color-status-error-solid` (`Dialog.d.ts:14`). Reported to the
-/// orchestrator with this ticket.
+/// [secondaryAction] then [primaryAction], in that order — `Dialog.jsx:101`
+/// and `:104`. Both are [DabblerDialogAction] values and the dialog builds the
+/// buttons, so `Dialog.prompt.md:77`'s *"actions are `Button` instances —
+/// never raw `<button>`s"* is enforced by the type rather than trusted.
+///
+/// The primary takes [DabblerButtonTone.primary], or
+/// [DabblerDialogAction.tone] if given, or [DabblerButtonTone.destructive]
+/// when [destructive] is set — which outranks `tone`, per `Dialog.d.ts:6`.
+/// The secondary is always [DabblerButtonTone.outlined] (`Dialog.jsx:101`) and
+/// falls back to [onClose] when it carries no callback of its own.
+///
+/// **This replaced an untyped `actions: List<Widget>` slot** (KAN-267), which
+/// existed only because Button did not yet exist in this package. With it went
+/// `onConfirm`: Enter now activates [primaryAction] itself, so there is no
+/// second callback that could disagree with the button the user can see.
 ///
 /// Below a 360px viewport the action row stacks vertically and each action is
 /// stretched to full width (`Dialog.prompt.md:57-59`, and the `stack`
@@ -81,10 +125,14 @@ enum DabblerDialogSize {
 ///   returns to the invoking element on close.
 /// * Escape closes when [dismissible].
 /// * A press on the scrim closes when [dismissible].
-/// * Enter runs [onConfirm] — the source's *"`Enter` triggers the primary
-///   action"* (`Dialog.prompt.md:55`). It is a callback rather than a lookup
-///   into [actions] for the reason above: with an untyped slot there is no
-///   primary action to find.
+/// * Enter fires [primaryAction] — *"`Enter` triggers the primary action"*
+///   (`Dialog.prompt.md:51`). **Unless an action button already holds focus**,
+///   in which case that button takes the key: `Dialog.jsx:46-48` skips its own
+///   handler when the event target is a `button`, because the browser
+///   activates a focused button on Enter natively. [DabblerButton] binds
+///   `ActivateIntent` and does the same, so the guard is transcribed rather
+///   than dropped — without it, Tabbing to Cancel and pressing Enter would
+///   confirm.
 /// * Body scroll lock (`Dialog.prompt.md:53`) has no Flutter counterpart and
 ///   is deliberately not ported: the route is modal and the content beneath it
 ///   receives no pointers, which is what the CSS lock exists to achieve.
@@ -104,10 +152,11 @@ class DabblerDialog extends StatefulWidget {
     this.title,
     this.description,
     this.child,
-    this.actions = const <Widget>[],
+    this.primaryAction,
+    this.secondaryAction,
+    this.destructive = false,
     this.size = DabblerDialogSize.md,
     this.dismissible = true,
-    this.onConfirm,
     this.scrimDismissLabel,
   });
 
@@ -130,8 +179,18 @@ class DabblerDialog extends StatefulWidget {
   /// A custom body, placed under [description].
   final Widget? child;
 
-  /// The action row. Arbitrary widgets — see the class doc for why.
-  final List<Widget> actions;
+  /// The confirming action, drawn last in the row. Enter fires it.
+  final DabblerDialogAction? primaryAction;
+
+  /// The dismissing action, drawn first. Always
+  /// [DabblerButtonTone.outlined]; falls back to [onClose] when it carries no
+  /// callback.
+  final DabblerDialogAction? secondaryAction;
+
+  /// Paints [primaryAction] with `--color-status-error-solid`
+  /// ([DabblerButtonTone.destructive]) — `Dialog.d.ts:18`. Outranks
+  /// [DabblerDialogAction.tone]. Defaults to false.
+  final bool destructive;
 
   /// Which of the two panel widths to use. Defaults to
   /// [DabblerDialogSize.md].
@@ -139,9 +198,6 @@ class DabblerDialog extends StatefulWidget {
 
   /// Whether Escape and a scrim press close the dialog. Defaults to true.
   final bool dismissible;
-
-  /// Run when Enter is pressed inside the panel. See the class doc.
-  final VoidCallback? onConfirm;
 
   /// The semantics label for the scrim's dismiss gesture, handed to
   /// [DabblerScrim.dismissLabel]. This package ships no strings of its own, so
@@ -158,6 +214,12 @@ class DabblerDialog extends StatefulWidget {
 
   /// Identifies the action row, so a test can assert its axis.
   static const Key actionsKey = Key('DabblerDialog.actions');
+
+  /// Identifies the primary action's button.
+  static const Key primaryActionKey = Key('DabblerDialog.primaryAction');
+
+  /// Identifies the secondary action's button.
+  static const Key secondaryActionKey = Key('DabblerDialog.secondaryAction');
 
   @override
   State<DabblerDialog> createState() => _DabblerDialogState();
@@ -229,7 +291,10 @@ class _DabblerDialogState extends State<DabblerDialog> {
     final Widget panel = _Panel(
       title: widget.title,
       description: widget.description,
-      actions: widget.actions,
+      primaryAction: widget.primaryAction,
+      secondaryAction: widget.secondaryAction,
+      destructive: widget.destructive,
+      onClose: widget.onClose,
       size: widget.size,
       colors: colors,
       child: widget.child,
@@ -270,7 +335,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
         shortcuts: <ShortcutActivator, Intent>{
           const SingleActivator(LogicalKeyboardKey.escape):
               const DismissIntent(),
-          if (widget.onConfirm != null)
+          if (widget.primaryAction != null)
             const SingleActivator(LogicalKeyboardKey.enter):
                 const _ConfirmIntent(),
         },
@@ -284,7 +349,25 @@ class _DabblerDialogState extends State<DabblerDialog> {
             ),
             _ConfirmIntent: CallbackAction<_ConfirmIntent>(
               onInvoke: (_ConfirmIntent intent) {
-                widget.onConfirm?.call();
+                // `Dialog.jsx:46-48` returns early when the key landed on a
+                // button: the browser already activates a focused button on
+                // Enter. [DabblerButton] binds `ActivateIntent`, so the same
+                // hand-off is made explicit here — otherwise this shortcut,
+                // sitting nearer the focused node than the app's default
+                // binding, would swallow the key and confirm the dialog while
+                // Cancel was focused.
+                final BuildContext? focused =
+                    FocusManager.instance.primaryFocus?.context;
+                if (focused != null &&
+                    focused.findAncestorWidgetOfExactType<DabblerButton>() !=
+                        null) {
+                  Actions.maybeInvoke<ActivateIntent>(
+                    focused,
+                    const ActivateIntent(),
+                  );
+                  return null;
+                }
+                widget.primaryAction?.onPressed?.call();
                 return null;
               },
             ),
@@ -318,166 +401,6 @@ class _DabblerDialogState extends State<DabblerDialog> {
 /// Enter's intent. Private: the accelerator is Dialog's, not an API.
 class _ConfirmIntent extends Intent {
   const _ConfirmIntent();
-}
-
-/// The panel itself — fill, hairline, radius, padding, shadow and content.
-class _Panel extends StatelessWidget {
-  const _Panel({
-    required this.title,
-    required this.description,
-    required this.child,
-    required this.actions,
-    required this.size,
-    required this.colors,
-  });
-
-  final String? title;
-  final String? description;
-  final Widget? child;
-  final List<Widget> actions;
-  final DabblerDialogSize size;
-  final DabblerColors colors;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextDirection direction = Directionality.of(context);
-    final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final double viewportHeight = MediaQuery.sizeOf(context).height;
-    final bool stack = viewportWidth < DabblerDialog.stackBelowWidth;
-
-    final List<Widget> column = <Widget>[];
-
-    void addGap() {
-      if (column.isNotEmpty) {
-        // `gap: var(--space-4)` on the panel column, Dialog.jsx:80.
-        column.add(const SizedBox(height: DabblerSpacing.space4));
-      }
-    }
-
-    if (title != null) {
-      column.add(
-        Text(
-          title!,
-          // `.t-title-3`, `--color-text-primary` (Dialog.jsx:83).
-          style: DabblerType.title3
-              .resolveForDirection(direction)
-              .copyWith(color: colors.textPrimary),
-        ),
-      );
-    }
-    if (description != null) {
-      addGap();
-      column.add(
-        Text(
-          description!,
-          // `.t-body`, `--color-text-secondary` (Dialog.jsx:85).
-          style: DabblerType.body
-              .resolveForDirection(direction)
-              .copyWith(color: colors.textSecondary),
-        ),
-      );
-    }
-    if (child != null) {
-      addGap();
-      column.add(child!);
-    }
-    if (actions.isNotEmpty) {
-      addGap();
-      column.add(
-        // `marginBlockStart: var(--space-2)` on the action row,
-        // Dialog.jsx:95.
-        Padding(
-          padding: const EdgeInsetsDirectional.only(top: DabblerSpacing.space2),
-          child: _Actions(stack: stack, actions: actions),
-        ),
-      );
-    }
-
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: size.maxWidth,
-        // `maxHeight: calc(100dvh - var(--space-11))`, Dialog.jsx:73.
-        maxHeight: viewportHeight - DabblerSpacing.space11,
-      ),
-      // `width: '100%'` with the max width above (Dialog.jsx:72): the panel
-      // fills the gutter-inset width until it reaches its cap.
-      child: SizedBox(
-        width: double.infinity,
-        child: DecoratedBox(
-          key: DabblerDialog.panelKey,
-          decoration: BoxDecoration(
-            // `--surface-card` fill with the `--outline-card` 1px hairline,
-            // `--radius-xl` (Dialog.jsx:75-78).
-            color: colors.surfaceCard,
-            borderRadius: DabblerRadius.xlAll,
-            border: Border.all(
-              color: colors.borderDefault,
-              width: DabblerSizing.borderDefault,
-            ),
-            // The one legal shadow in the system. See the class doc.
-            boxShadow: DabblerElevation.dialogFor(colors.brightness),
-          ),
-          child: ClipRRect(
-            borderRadius: DabblerRadius.xlAll,
-            child: SingleChildScrollView(
-              // `overflowY: auto` — the panel scrolls internally rather than
-              // pushing past the viewport cap (Dialog.jsx:74).
-              padding: const EdgeInsets.all(DabblerSpacing.space8),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: column,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The action row: `justify-content: flex-end` with a `--space-3` gap, which
-/// stacks to a full-width column below 360px (`Dialog.jsx:88-94`).
-///
-/// `flex-end` is the *end* of the reading direction, so [MainAxisAlignment.end]
-/// mirrors under RTL on its own — which is the source's stated RTL behaviour
-/// (`Dialog.prompt.md:62-64`) and the reason no `left`/`right` appears here.
-class _Actions extends StatelessWidget {
-  const _Actions({required this.stack, required this.actions});
-
-  final bool stack;
-  final List<Widget> actions;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Widget> spaced = <Widget>[];
-    for (int i = 0; i < actions.length; i++) {
-      if (i > 0) {
-        spaced.add(
-          stack
-              ? const SizedBox(height: DabblerSpacing.space3)
-              : const SizedBox(width: DabblerSpacing.space3),
-        );
-      }
-      spaced.add(actions[i]);
-    }
-
-    if (stack) {
-      return Column(
-        key: DabblerDialog.actionsKey,
-        mainAxisSize: MainAxisSize.min,
-        // `fullWidth` on both buttons when stacked, Dialog.jsx:98 and :101.
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: spaced,
-      );
-    }
-    return Row(
-      key: DabblerDialog.actionsKey,
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: spaced,
-    );
-  }
 }
 
 /// Pushes a [DabblerDialog] as a modal route and completes with its result.
