@@ -529,10 +529,12 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
           onPressed: widget.onConfirm,
           disabled: widget.onConfirm == null,
         ),
-        DabblerCalendarTextAction(
+        DabblerButton(
           key: DabblerTimePicker.cancelKey,
           label: widget.cancelLabel,
+          tone: DabblerButtonTone.text,
           onPressed: widget.onCancel,
+          disabled: widget.onCancel == null,
         ),
       ],
     );

@@ -78,7 +78,9 @@ DabblerColors _colors({
 
 void main() {
   group('AC1 — the tone enum', () {
-    test('is exactly the nine values the ticket names, in source order', () {
+    test('is exactly the ten values the ticket names, in source order', () {
+      // KAN-279/D-023(3) added `text` after `outlined`, the slot it occupies in
+      // `Button.jsx`'s TONES map.
       expect(
         DabblerButtonTone.values.map((DabblerButtonTone t) => t.name).toList(),
         <String>[
@@ -88,6 +90,7 @@ void main() {
           'neutral',
           'filled',
           'outlined',
+          'text',
           'destructive',
           'iconLabel',
           'icon',
@@ -122,6 +125,7 @@ void main() {
         DabblerButtonTone.neutral: (c.surfaceSunken, c.textPrimary),
         DabblerButtonTone.filled: (c.textPrimary, c.surfaceCard),
         DabblerButtonTone.outlined: (Colors.transparent, c.textPrimary),
+        DabblerButtonTone.text: (Colors.transparent, c.textPrimary),
         DabblerButtonTone.destructive: (c.error.solid, DabblerPalette.paper),
         DabblerButtonTone.iconLabel: (c.surfaceSunken, c.textPrimary),
         DabblerButtonTone.icon: (c.textPrimary, c.surfaceCard),
@@ -151,6 +155,51 @@ void main() {
           reason: '$tone border',
         );
       }
+    });
+
+    testWidgets('KAN-279 — `text` paints no fill and no hairline', (
+      WidgetTester tester,
+    ) async {
+      // The tone is `outlined` minus the hairline: the label alone. Asserted in
+      // every theme and mode, because a fill leaking back in under one section
+      // theme is exactly the regression this tone cannot survive.
+      for (final DabblerTheme theme in DabblerTheme.values) {
+        for (final Brightness brightness in Brightness.values) {
+          await tester.pumpWidget(
+            _host(
+              DabblerButton(
+                label: 'cancel',
+                tone: DabblerButtonTone.text,
+                onPressed: () {},
+              ),
+              theme: theme,
+              brightness: brightness,
+            ),
+          );
+          final DabblerColors c = _colors(theme: theme, brightness: brightness);
+          expect(_surface(tester).fill, Colors.transparent,
+              reason: '${theme.name}/${brightness.name} fill');
+          expect(_surface(tester).borderColor, Colors.transparent,
+              reason: '${theme.name}/${brightness.name} border');
+          expect(_labelStyle(tester).color, c.textPrimary,
+              reason: '${theme.name}/${brightness.name} label');
+        }
+      }
+    });
+
+    test('KAN-279 — `text` carries D-023(c) on the tone, not in a comment', () {
+      // AC2: the affordance constraint has to be in the API surface a caller
+      // reads, so it is asserted against the dartdoc rather than trusted.
+      final String doc = File('lib/src/controls/button.dart').readAsStringSync();
+      final int start = doc.indexOf('/// Transparent fill, `--ink` label, **no** hairline');
+      final int end = doc.indexOf('  text,', start);
+      expect(start, greaterThan(-1), reason: 'the `text` dartdoc is gone');
+      expect(end, greaterThan(start));
+      final String block = doc.substring(start, end);
+      expect(block.contains('D-023(c)'), isTrue);
+      expect(block.contains('Never the only action in a group'), isTrue);
+      expect(block.contains('Never the primary action, and never the destructive one'),
+          isTrue);
     });
 
     testWidgets('re-tints with the section theme', (WidgetTester tester) async {

@@ -55,6 +55,30 @@ enum DabblerButtonTone {
   /// tone in the set that actually draws an outline.
   outlined,
 
+  /// Transparent fill, `--ink` label, **no** hairline — the label alone.
+  /// `Button.jsx`'s `text` row: `bg: 'transparent'`, `fg: 'var(--ink)'`,
+  /// `border: null`. [outlined] minus the hairline.
+  ///
+  /// Press and focus are [DabblerButton]'s own `DabblerPressScale` and
+  /// `DabblerFocusRing` wiring, unchanged — a tone selects paint, never
+  /// interaction.
+  ///
+  /// **Affordance constraint, `DECISIONS.md` D-023(c) — binding, not
+  /// stylistic.** With no fill and no hairline, the only thing marking this
+  /// control as pressable is its label, so it reads as a button *by contrast
+  /// with a sibling that paints one*. Therefore:
+  ///
+  /// * **Never the only action in a group.** Alone it is indistinguishable
+  ///   from a line of text, and nothing on screen says it can be tapped.
+  /// * **Never the primary action, and never the destructive one.** The
+  ///   weakest affordance in the set cannot carry the action that matters
+  ///   most, nor the one that cannot be undone — those take [primary] and
+  ///   [destructive].
+  ///
+  /// Its place is the secondary half of a pair: the Cancel beside a Confirm,
+  /// the "See all" beside a section title.
+  text,
+
   /// `--color-status-error-solid` fill, `--paper` label.
   ///
   /// `Button.prompt.md` records the measurement: white on the error-solid step
@@ -306,7 +330,9 @@ class DabblerButton extends StatefulWidget {
         DabblerButtonTone.iconLabel =>
           colors.surfaceSunken,
         DabblerButtonTone.filled || DabblerButtonTone.icon => colors.textPrimary,
-        DabblerButtonTone.outlined => Colors.transparent,
+        DabblerButtonTone.outlined ||
+        DabblerButtonTone.text =>
+          Colors.transparent,
         DabblerButtonTone.destructive => colors.error.solid,
       };
 
@@ -321,6 +347,7 @@ class DabblerButton extends StatefulWidget {
           colors.surfaceCard,
         DabblerButtonTone.neutral ||
         DabblerButtonTone.outlined ||
+        DabblerButtonTone.text ||
         DabblerButtonTone.iconLabel =>
           colors.textPrimary,
         // `--paper`, a fixed white, and not `surfaceCard`: the measured 8.3:1
@@ -333,7 +360,9 @@ class DabblerButton extends StatefulWidget {
   ///
   /// Only [DabblerButtonTone.outlined] has one: `border: '1px solid
   /// var(--outline-card)'`, every other row of the `TONES` map being
-  /// `border: null`.
+  /// `border: null`. That hairline is the whole difference between
+  /// [DabblerButtonTone.outlined] and [DabblerButtonTone.text], which paint
+  /// the same transparent fill and the same `--ink` label.
   static Color? borderColorFor(DabblerColors colors, DabblerButtonTone tone) =>
       tone == DabblerButtonTone.outlined ? colors.borderDefault : null;
 

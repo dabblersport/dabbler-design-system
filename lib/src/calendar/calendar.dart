@@ -874,89 +874,14 @@ class DabblerCalendar extends StatelessWidget {
           onPressed: onConfirm,
           disabled: onConfirm == null,
         ),
-        DabblerCalendarTextAction(
+        DabblerButton(
           key: cancelKey,
           label: cancelLabel,
+          tone: DabblerButtonTone.text,
           onPressed: onCancel,
+          disabled: onCancel == null,
         ),
       ],
-    );
-  }
-}
-
-/// A bare text action: a label, no fill, no border, no glyph.
-///
-/// `Calendar.jsx:74-77` and `TimePicker.jsx:119-122` draw Cancel as text
-/// alone — `height: 40`, `padding: '0 20px'`, `fontSize: 15, fontWeight: 500`,
-/// `color: var(--ink)`, and no background and no outline.
-///
-/// **This is not a [DabblerButton], and that is a reported gap, not a
-/// preference.** DS-401's nine [DabblerButtonTone]s are `primary`, `secondary`,
-/// `accent`, `neutral`, `filled`, `outlined`, `destructive`, `iconLabel` and
-/// `icon`. Every one of them paints a fill or a hairline; there is no text /
-/// ghost tone, so no [DabblerButton] can render this. Rather than fork Button
-/// or widen another ticket's file, this composes DS-200's [DabblerPressScale]
-/// and DS-403's [DabblerFocusRing] directly — the same two primitives
-/// [DabblerButton] composes — and restates no scale factor, no duration, no
-/// curve and no ring geometry. A text tone belongs in DS-401; see the report.
-///
-/// Public because `DabblerTimePicker` needs the same action and a second
-/// private copy would be the duplication this note exists to avoid.
-class DabblerCalendarTextAction extends StatelessWidget {
-  /// Creates a bare text action.
-  const DabblerCalendarTextAction({
-    super.key,
-    required this.label,
-    this.onPressed,
-  });
-
-  /// `height: 40` (`Calendar.jsx:75`). Below [DabblerSizing.touchTargetMin],
-  /// so the target is grown to 45 and the 40 is not drawn at all — there is no
-  /// fill or border for the visual height to be visible in.
-  static const double sourceHeight = 40;
-
-  /// The label.
-  final String label;
-
-  /// Fired on tap. Null disables the action.
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final DabblerColors colors = DabblerColors.of(context);
-    final TextDirection direction = Directionality.of(context);
-    return Semantics(
-      button: true,
-      enabled: onPressed != null,
-      child: DabblerFocusRing(
-        borderRadius: DabblerRadius.pillAll,
-        enabled: onPressed != null,
-        canRequestFocus: onPressed != null,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onPressed,
-          child: DabblerPressScale.gesture(
-            enabled: onPressed != null,
-            child: Container(
-              height: DabblerSizing.touchTargetMin,
-              // `padding: '0 20px'`. 20 is off the base-3 grid and is
-              // transcribed literally, as DS-401 transcribes its own.
-              padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
-              alignment: Alignment.center,
-              child: Text(
-                label,
-                // `fontSize: 15, fontWeight: 500` — `.t-subheadline` at medium.
-                style: DabblerType.subheadline
-                    .resolveForDirection(direction)
-                    .copyWith(
-                      color: colors.textPrimary,
-                      fontWeight: DabblerType.medium,
-                    ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

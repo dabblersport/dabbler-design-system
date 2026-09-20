@@ -47,8 +47,7 @@ import 'package:flutter/widgets.dart';
 ///
 /// **New work uses the `.t-*` ramp.** Where it genuinely cannot, it
 /// **transcribes the source's value literally, with a comment naming D-024** —
-/// exactly as `DabblerCalendarTextAction` already did for its own gap, and as
-/// `DabblerButtonMetrics.labelStyle` does for 16/14/12-at-600. A literal value
+/// exactly as `DabblerButtonMetrics.labelStyle` does for 16/14/12-at-600. A literal value
 /// with a stated provenance is the wanted behaviour here; inventing a ramp
 /// step is not.
 ///
