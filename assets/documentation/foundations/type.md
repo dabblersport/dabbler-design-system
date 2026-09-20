@@ -46,9 +46,9 @@ drawn outside the ramp entirely.
 design source specifies type three different ways across its components, and which one is actually
 the product's type is escalated to the CEO, unresolved. Until it's answered: new work uses the
 existing twelve `.t-*` steps; where it genuinely can't, it transcribes the source's literal value
-with a comment naming the freeze, the same way `Button`'s own label scale and `DabblerCalendarTextAction`
-already do — never promote a private, component-specific value into a new ramp step in the
-meantime.
+with a comment naming the freeze, the same way `DabblerButton.labelStyle` already does for
+its 16/14/12-at-600 — never promote a private, component-specific value into a new ramp step in
+the meantime.
 
 **Never transcribe a value from the design's Figma export file.** It's a diagnostic artefact, not
 a source of truth — the export and the declared type ramp are two genuinely different scales, not
