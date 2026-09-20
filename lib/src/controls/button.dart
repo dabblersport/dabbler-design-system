@@ -121,7 +121,7 @@ enum DabblerButtonSize {
 /// consolidated into the former — the two render the same grid).
 ///
 /// It merges the Figma kit's 13 standalone Button symbols into one widget with
-/// modifiers: nine [DabblerButtonTone]s × three [DabblerButtonSize]s, plus
+/// modifiers: ten [DabblerButtonTone]s × three [DabblerButtonSize]s, plus
 /// [icon], [fullWidth], [disabled] and [loading]. There are no separate
 /// `PrimaryButton` / `SmallButton` / `IconButton` widgets, and adding one would
 /// re-fragment exactly what the source merged.

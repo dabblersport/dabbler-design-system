@@ -1,4 +1,5 @@
 import 'package:dabbler_design_system/src/calendar/calendar.dart';
+import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
@@ -298,6 +299,24 @@ void main() {
       await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
       expect(find.byKey(DabblerCalendar.confirmKey), findsOneWidget);
       expect(find.byKey(DabblerCalendar.cancelKey), findsOneWidget);
+    });
+
+    testWidgets('the footer is Confirm primary, Cancel text (D-023, KAN-279)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
+      DabblerButtonTone toneOf(Key key) =>
+          tester.widget<DabblerButton>(find.byKey(key)).tone;
+
+      // D-023 ruled a chrome-less action beside a filled one. This footer
+      // carried the one-off DabblerCalendarTextAction until KAN-279 deleted
+      // it and pointed the row at the shipped `text` tone; nothing pinned
+      // the result, so the migration was invisible to the suite.
+      expect(toneOf(DabblerCalendar.cancelKey), DabblerButtonTone.text);
+
+      // Confirm takes DabblerButton's default. Asserted explicitly so a
+      // change to that default cannot silently repaint this footer.
+      expect(toneOf(DabblerCalendar.confirmKey), DabblerButtonTone.primary);
     });
   });
 

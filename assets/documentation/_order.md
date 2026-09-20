@@ -130,7 +130,7 @@ lot about the rest.
 
 ### 6 · Actions — letting the user act
 
-- [Button](components/button.md) — the one control for a tappable action, nine tones, three sizes.
+- [Button](components/button.md) — the one control for a tappable action, ten tones, three sizes.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.
 - [Chip](components/chip.md) — filtering and tagging, tappable or static.

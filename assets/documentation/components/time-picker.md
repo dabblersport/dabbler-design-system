@@ -48,8 +48,9 @@ confirm separately.** The design source commits on every change with no intermed
 state, and this widget matches that; don't build a UI expecting a value that hasn't been reported
 yet.
 
-**Don't rely on `DabblerCalendarTextAction` staying public here either.** TimePicker's own Confirm/
-Cancel row uses the same stand-in `Calendar`'s does, for the same reason — see *Change log*.
+**Build this footer out of `Button` too.** TimePicker's Confirm/Cancel row follows `Calendar`'s
+exactly: Cancel is the `text` tone, Confirm is the default `primary`. The shared
+`DabblerCalendarTextAction` stand-in both used to carry is gone — see *Change log*.
 
 ## Axes
 
@@ -69,8 +70,9 @@ failed contrast on this card).
 ## Change log
 
 - D-023 (cxo) — rules the Confirm/Cancel action row adopts
-  `Button` at `medium`, and rules the `text` tone this widget's action row is meant to use once it
-  ships. **Not yet shipped** — `DabblerCalendarTextAction` is still the stand-in.
+  `Button` at `medium`, and rules the `text` tone this widget's action row uses. Shipped by
+  KAN-279 (`a90a784`), which also deleted the `DabblerCalendarTextAction` stand-in. Pinned in
+  `test/calendar/time_picker_test.dart`.
 - D-030 (cxo) — confirms no drawn ruler is required, because
   the design bundle itself doesn't draw one — the listbox replacement above is not a deviation from
   a requirement, it's the correct reading of what was actually specified.

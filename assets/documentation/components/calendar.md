@@ -5,21 +5,24 @@ Group    : Date and time
 Sources  : lib/src/calendar/calendar.dart:1-135 (DabblerCalendarMonth —
            weekdayOrder, defaultFirstWeekdayFor confirmed directly, not
            assumed), :222-332 (DabblerCalendar's full class dartdoc through
-           contrast/touch-target section), :895-920 (DabblerCalendarTextAction
-           — confirmed still present, matching D-035(c)'s claim it hasn't
-           been deleted since D-023's `text` tone hasn't shipped)
+           contrast/touch-target section), :875-882 (the Confirm/Cancel
+           action row — re-read 2026-09-20 after KAN-279; Cancel now passes
+           DabblerButtonTone.text and DabblerCalendarTextAction is gone)
            lib/src/calendar/calendar_gallery.dart:15 (specimen title:
            "Calendar — month grid")
            DECISIONS.md D-023 (read in full, prior session — the action-row
-           sizing correction and the blocked `text` tone), D-030 (read in
+           sizing correction and the `text` tone, since shipped), D-030 (read in
            full this session), D-032 (read in full this session — the
            date-cell pitch correction, not yet shipped)
 
-FINDING carried forward from D-035(c)/D-036(c)'s own text: DabblerCalendarTextAction
-still exists, confirmed directly — it is deleted only once D-023's Button
-`text` tone ships, which per button.md is blocked on KAN-261 having no
-assignable executor. Same "document what renders, link what's blocked"
-treatment as Button's own D-023 disclosure.
+RESOLVED 2026-09-20. This page carried a FINDING that DabblerCalendarTextAction
+still existed, deleted only once D-023's Button `text` tone shipped — which was
+blocked on KAN-261 having no assignable executor. KAN-279 (`a90a784`) shipped
+the tone and deleted the stand-in. Re-measured for this correction rather than
+taken from the commit: `calendar.dart:879` passes DabblerButtonTone.text for
+Cancel, Confirm takes the default `primary` (`button.dart:193`), and
+DabblerCalendarTextAction appears nowhere in lib/ or test/. Both tones are now
+pinned in `test/calendar/calendar_test.dart`.
 
 Direction: DabblerCalendarMonth.defaultFirstWeekdayFor(TextDirection) is a
 real nuance worth getting right — it is NOT the same as "the caller must
@@ -65,9 +68,11 @@ start should pass it rather than assume the direction-based guess is correct for
 range.** This widget never treats the set as a span; a composer that wants range behaviour (a start
 and an end) builds that interpretation on top rather than assuming the widget provides it.
 
-**Don't rely on `DabblerCalendarTextAction` staying public.** It's a stand-in for a `Button` `text`
-tone that doesn't exist yet — see *Change log* — and is deleted the moment that tone ships. Treat it
-as scaffolding, not a stable API to build on elsewhere.
+**Build the action row out of `Button`, not a Calendar-specific action widget.** There used to be
+one — `DabblerCalendarTextAction`, a stand-in for a `Button` `text` tone that did not exist
+yet — and it is gone: the tone shipped and the row now uses it directly. Cancel is `text`,
+Confirm is the default `primary`. Reaching for a component-local button here would re-create
+exactly the scaffolding that was just removed.
 
 ## Axes
 
@@ -103,9 +108,9 @@ contrast).
 ## Change log
 
 - D-023 (cxo) — rules the Confirm/Cancel action row adopts
-  `Button` at its `medium` size, and rules a tenth `Button` tone, `text`, that this widget's action
-  row is meant to use once it ships. **Not yet shipped** — `DabblerCalendarTextAction` is still the
-  stand-in; see the Button page for why the tone itself is blocked.
+  `Button` at its `medium` size, and rules a tenth `Button` tone, `text`, for this widget's action
+  row. Shipped by KAN-279 (`a90a784`), which also deleted the `DabblerCalendarTextAction` stand-in.
+  This page described it as blocked until 2026-09-20, which was true when written and is not now.
 - D-030 (cxo) — confirms no drawn ruler is required on the
   paired `TimePicker`, because the design bundle itself doesn't draw one.
 - D-032 (cxo) — rules the date-cell touch target should paint
