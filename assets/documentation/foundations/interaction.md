@@ -68,6 +68,11 @@ transition becomes instant rather than eased. The scrim's fade becomes instant t
 @figure 2px lib/src/interaction/focus_ring.dart#ringWidth
 @figure 2px lib/src/interaction/focus_ring.dart#ringOffset
 
+@figure 0.98 lib/src/tokens/dabbler_motion.dart#pressScale
+@figure 45% lib/src/tokens/dabbler_colors.dart#resolve
+@figure 65% lib/src/tokens/dabbler_colors.dart#resolve
+
+
 
 ## Change log
 

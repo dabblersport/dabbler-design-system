@@ -63,6 +63,13 @@ Five: `xs` (28), `sm` (36 — the size `AvatarGroup` stacks), `md` (48, the defa
 ### Grouping
 Single avatar, or `AvatarGroup` (overlapping row plus an optional `+N` chip).
 
+@figure 28 lib/src/surfaces/avatar.dart#DabblerAvatarSize
+@figure 36 lib/src/surfaces/avatar.dart#DabblerAvatarSize
+@figure 48 lib/src/surfaces/avatar.dart#DabblerAvatarSize
+@figure 64 lib/src/surfaces/avatar.dart#DabblerAvatarSize
+@figure 80 lib/src/surfaces/avatar.dart#DabblerAvatarSize
+
+
 ## Direction
 
 **In `AvatarGroup`, which avatar reads as "first" changes side under Arabic, while staying on top

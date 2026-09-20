@@ -86,6 +86,20 @@ Touch-target minimum (45), two border widths (hairline 0.5, default 1), three ic
 ### Elevation
 None, except the one reserved Dialog shadow.
 
+@figure 3 lib/src/tokens/dabbler_geometry.dart#space1
+@figure 6 lib/src/tokens/dabbler_geometry.dart#space2
+@figure 9 lib/src/tokens/dabbler_geometry.dart#space3
+@figure 12 lib/src/tokens/dabbler_geometry.dart#space4
+@figure 16 lib/src/tokens/dabbler_geometry.dart#card
+@figure 18 lib/src/tokens/dabbler_geometry.dart#space6
+@figure 24 lib/src/tokens/dabbler_geometry.dart#space8
+@figure 999 lib/src/tokens/dabbler_geometry.dart#pill
+@figure 45 lib/src/tokens/dabbler_geometry.dart#touchTargetMin
+@figure 0.5 lib/src/tokens/dabbler_geometry.dart#borderHairline
+@figure 1 lib/src/tokens/dabbler_geometry.dart#borderDefault
+@figure 30 lib/src/tokens/dabbler_geometry.dart#space9
+
+
 ## Change log
 
 - D-011 (cxo) — confirms Button's own off-grid icon gap and

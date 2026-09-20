@@ -85,6 +85,10 @@ for a known defect in what it currently resolves to), `neutral` (sunken fill), `
 ### State
 Enabled, disabled, loading, full-width.
 
+@figure 320 lib/src/controls/button.dart#fullWidthPx
+@figure 52 lib/src/controls/button.dart#fullHeight
+
+
 ## Direction
 
 **The icon moves to the other side of the label under Arabic, with nothing in the component naming

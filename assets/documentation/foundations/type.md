@@ -82,6 +82,12 @@ Button's own 16/14/12-at-600 label scale — real, shipped, and explicitly not a
 
 @figure 400 D-013
 
+@figure 16 lib/src/controls/button.dart#fontSizeFor
+@figure 14 lib/src/controls/button.dart#fontSizeFor
+@figure 12 lib/src/controls/button.dart#fontSizeFor
+@figure 600 lib/src/tokens/dabbler_type.dart#semibold
+
+
 
 ## Change log
 
@@ -96,4 +102,4 @@ Button's own 16/14/12-at-600 label scale — real, shipped, and explicitly not a
 
 ## Source
 
-`lib/src/tokens/dabbler_type.dart`
+`lib/src/tokens/dabbler_type.dart`, `lib/src/controls/button.dart`

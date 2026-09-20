@@ -53,6 +53,11 @@ spinner invisible against its background.
 `brand` (the default, re-tints with the active section theme), `inherit` (takes the ambient text/
 icon colour), `onBrand` (for a solid brand fill).
 
+@figure 18 lib/src/tokens/dabbler_geometry.dart#iconSm
+@figure 24 lib/src/tokens/dabbler_geometry.dart#iconMd
+@figure 30 lib/src/tokens/dabbler_geometry.dart#iconLg
+
+
 ## Tokens used
 
 Ring colour varies by tone — brand, ambient/inherited, or the ink that sits on a brand fill.

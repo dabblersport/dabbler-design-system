@@ -62,6 +62,11 @@ overlay. `Medium` — a 64×64 leading thumbnail, no overlay. `Small` — a 48×
 overlay (48, not 45 — off-grid values are rejected even when they'd otherwise clear the touch-target
 floor).
 
+@figure 64 lib/src/cards/card_event_large.dart#mediumThumbSide
+@figure 48 lib/src/cards/card_event_large.dart#smallThumbSide
+@figure 45 lib/src/tokens/dabbler_geometry.dart#touchTargetMin
+
+
 ## Direction
 
 **Large's sport-icon overlay sits inset from the leading edge, not a fixed physical side.** Under

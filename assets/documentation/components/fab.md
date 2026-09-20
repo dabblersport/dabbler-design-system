@@ -52,6 +52,9 @@ brand purple — the default), `accent` (the theme's accent pink), `dark` (sunke
 ### State
 Enabled, disabled (45% opacity, every handler withheld — no partial-disabled state).
 
+@figure 45% lib/src/controls/fab.dart#disabledOpacity
+
+
 ## Tokens used
 
 Fill by tone: `brandPrimary` (primary), `accent` (accent), `surfaceSunken` (dark), and the `indigo`

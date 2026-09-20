@@ -81,8 +81,36 @@ final RegExp linkTarget = RegExp(r'\]\([^)]*\)');
 /// A governance or ticket reference — excluded.
 final RegExp reference = RegExp(r'\b(?:[DTPG]-\d+|KAN-\d+)\b');
 
+/// Counts, not figures — `D-043` via `KAN-335`.
+///
+/// A figure is a claim about rendered geometry, resolvable to a declaring
+/// line. A *cardinality* — how many boxes a `CodeInput` shows — is a prop
+/// value the caller chooses; `4` is an example the design source happens to
+/// draw and has no declaring site at all. Pinned by page and numeral rather
+/// than guessed at by grammar, because "is this number a count" is a reading
+/// of the sentence and not a property of the token.
+const Map<String, Set<String>> cardinalityExemptions = <String, Set<String>>{
+  'components/code-input.md': <String>{'4', '6'},
+};
+
 /// A backticked span — excluded where its number is a symbol, not a value.
 final RegExp codeSpan = RegExp(r'`[^`]*`');
+
+/// An `N:N` ratio — `16:9`. Excluded: a ratio is a shape, not a figure, and
+/// neither half resolves to a declaring site of its own (KAN-335/D-043).
+final RegExp ratio = RegExp(r'\d+\s*:\s*\d+');
+
+/// An ordinal range — `titles 1–3`. Those digits name `title1`..`title3`;
+/// they are not measurements and can never carry an `@figure`.
+final RegExp ordinalRange = RegExp(r'\d+\s*[–—-]\s*\d+');
+
+/// Digits inside a name — `ink-950`, `space-11`. The number is part of an
+/// identifier, not a value the prose is claiming.
+///
+/// Three letters minimum, deliberately: `16/14/12-at-600` would otherwise
+/// lose its `600` to the two-letter `at-`, and that 600 is a real weight
+/// figure with a declaring site.
+final RegExp digitsInName = RegExp(r'[A-Za-z]{3,}-\d+');
 
 void main(List<String> args) {
   final List<Finding> findings = <Finding>[];
@@ -166,8 +194,7 @@ void main(List<String> args) {
               'no declaration of `$member` found in $path'));
           continue;
         }
-        if (!RegExp(r'(?<![\w.])' + RegExp.escape(f.numeral) + r'(?![\w.])')
-            .hasMatch(body)) {
+        if (!_occursIn(body, f)) {
           findings.add(Finding(file.path, section.heading, at,
               'the literal ${f.numeral} does not occur inside `$member` in '
               '$path — co-location not proved'));
@@ -196,13 +223,24 @@ void main(List<String> args) {
         };
         if (text.isEmpty) continue;
         for (final String rawLine in text.split('\n')) {
+          // Order matters: names and ranges are stripped before the token
+          // scan, or their digits survive as phantom figures.
           final String scrubbed = rawLine
               .replaceAll(linkTarget, '')
               .replaceAll(reference, '')
-              .replaceAll(codeSpan, '');
+              .replaceAll(codeSpan, '')
+              .replaceAll(digitsInName, '')
+              .replaceAll(ratio, '')
+              .replaceAll(ordinalRange, '');
           for (final RegExpMatch m in numericToken.allMatches(scrubbed)) {
             final String numeral = m.group(1)!;
             if (covered.contains(numeral)) continue;
+            final String relative = file.path.startsWith('$corpusRoot/')
+                ? file.path.substring(corpusRoot.length + 1)
+                : file.path;
+            if (cardinalityExemptions[relative]?.contains(numeral) ?? false) {
+              continue;
+            }
             findings.add(Finding(
               file.path,
               section.heading,
@@ -226,6 +264,46 @@ void main(List<String> args) {
     stdout.writeln(f);
   }
   exit(1);
+}
+
+/// Whether [figure]'s value occurs as a literal inside [body].
+///
+/// **Percentage / fraction equivalence — KAN-335.** Prose writes `45%` where
+/// Dart writes `0.45`, and a plain digit match cannot bridge that: `45` sits
+/// inside `0.45` but is preceded by a dot, which the word-boundary guard
+/// rejects — correctly, or `0.456` would satisfy a claim of `45`. So a
+/// percentage claim is also tried as its fraction, exactly.
+///
+/// Only a `%` value earns the second form. A bare `45` still means 45 and is
+/// never satisfied by `0.45`, because a figure that does not say percent is
+/// not claiming one.
+bool _occursIn(String body, DabblerDocFigure figure) {
+  bool literal(String n) =>
+      RegExp(r'(?<![\w.])' + RegExp.escape(n) + r'(?![\w.])').hasMatch(body);
+
+  if (literal(figure.numeral)) return true;
+
+  // A font weight. Prose writes `600`; Dart writes `FontWeight.w600`, where
+  // the digits sit inside an identifier and the word-boundary guard rightly
+  // refuses them. Same representation problem as the percentage below, and
+  // narrow on purpose: three digits, `w`-prefixed, nothing else. The guard
+  // allows a preceding dot, because the form is always `FontWeight.w600`.
+  if (RegExp(r'^\d{3}$').hasMatch(figure.numeral) &&
+      RegExp('(?<![\\w])w${figure.numeral}(?![\\w])').hasMatch(body)) {
+    return true;
+  }
+
+  if (!figure.value.contains('%')) return false;
+
+  final num? asPercent = num.tryParse(figure.numeral);
+  if (asPercent == null) return false;
+  // `45%` -> `0.45`, `60%` -> `0.6`, `7.5%` -> `0.075`. Trailing zeros are
+  // dropped so 0.60 and 0.6 both match what Dart would actually be written as.
+  final String fraction = (asPercent / 100)
+      .toStringAsFixed(6)
+      .replaceFirst(RegExp(r'0+$'), '')
+      .replaceFirst(RegExp(r'\.$'), '');
+  return literal(fraction);
 }
 
 /// The 1-based line [needle] sits on, or 0 when it cannot be located.
@@ -264,11 +342,18 @@ String? _memberBody(String source, String member) {
       case ')':
         paren--;
       case '{':
-        brace++;
-        sawBrace = true;
+        // A `{` while a paren is open is a NAMED PARAMETER list, not the
+        // body: `resolve({required ...})` would otherwise "close" at the end
+        // of its own parameters and hide everything the member actually does.
+        if (paren == 0) {
+          brace++;
+          sawBrace = true;
+        }
       case '}':
-        brace--;
-        if (sawBrace && brace <= 0) return source.substring(start, i + 1);
+        if (paren == 0) {
+          brace--;
+          if (sawBrace && brace <= 0) return source.substring(start, i + 1);
+        }
       case ';':
         // A declaration with no body at all — a `static const`, a field.
         if (paren <= 0 && brace <= 0) return source.substring(start, i + 1);

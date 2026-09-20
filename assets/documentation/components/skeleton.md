@@ -54,6 +54,9 @@ text bars).
 ### Motion
 Animated (the default — a staggered opacity pulse) or static (`animate: false`).
 
+@figure 60% lib/src/feedback/skeleton.dart#_buildText
+
+
 ## Tokens used
 
 Fill: a single flat sunken-surface tone at every frame — never a second colour, even while

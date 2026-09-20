@@ -62,6 +62,9 @@ stays easy to hit without the box itself growing past what a checkbox should loo
 Unchecked, checked, disabled-unchecked, disabled-checked. Disabled drops the whole row to 50%
 opacity and takes no input, in either checked state.
 
+@figure 50% lib/src/forms/checkbox.dart#disabledOpacity
+
+
 ## Tokens used
 
 Box fill: `brandPrimary` when checked, transparent when not. Box outline: `brandPrimary` when

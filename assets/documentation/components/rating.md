@@ -74,6 +74,11 @@ Read-only (no `onChanged`) or interactive (`onChanged` set).
 ### Value display
 Stars only, or stars with the numeric value and count.
 
+@figure 18 lib/src/tokens/dabbler_geometry.dart#iconSm
+@figure 24 lib/src/tokens/dabbler_geometry.dart#iconMd
+@figure 30 lib/src/tokens/dabbler_geometry.dart#iconLg
+
+
 ## Tokens used
 
 Filled star: the warning status tone's bare indicator role. Empty star: `textTertiary`, the

@@ -57,6 +57,9 @@ as one empty section among others rather than taking over the screen.
 ### Action
 Zero or one.
 
+@figure 45 lib/src/cards/empty_state.dart#wellSide
+
+
 ## Tokens used
 
 `inline` composes `Card` at the `white` variant. `page` composes no card at all — transparent

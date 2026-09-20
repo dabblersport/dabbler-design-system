@@ -70,6 +70,11 @@ defeats the reason it's there.
 at the requested weight — bold asks fall back to linear, never the reverse), `missing` (the name
 does not exist in the font at all — renders the placeholder).
 
+@figure 18 lib/src/tokens/dabbler_geometry.dart#iconSm
+@figure 24 lib/src/tokens/dabbler_geometry.dart#iconMd
+@figure 30 lib/src/tokens/dabbler_geometry.dart#iconLg
+
+
 ## Change log
 
 - T-083 (cto) — adopts `iconsax_flutter` as the single icon
