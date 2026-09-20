@@ -553,6 +553,69 @@ void main() {
         _colors().textSecondary,
       );
     });
+
+    // KAN-317 remediation. The placeholder's disabled behaviour is
+    // VARIANT-DEPENDENT, and the class doc said otherwise until these three
+    // pinned it. Nothing here changes rendering; they record what it is.
+
+    testWidgets('a DISABLED select falls to textTertiary — D-025', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerTextField(
+            variant: DabblerTextFieldVariant.select,
+            placeholder: 'pick a sport',
+            enabled: false,
+          ),
+        ),
+      );
+      // The select draws its own stand-in value, and that Text follows the
+      // field's disabled state — WCAG 1.4.3 exempts an inactive component.
+      expect(
+        tester.widget<Text>(find.text('pick a sport')).style!.color,
+        _colors().textTertiary,
+      );
+    });
+
+    testWidgets('an editable placeholder is textSecondary when enabled', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const DabblerTextField(placeholder: 'your name')),
+      );
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+        isEmpty,
+      );
+      final TextField field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.decoration!.hintStyle!.color, _colors().textSecondary);
+    });
+
+    testWidgets('a DISABLED editable placeholder STAYS textSecondary', (
+      WidgetTester tester,
+    ) async {
+      // The asymmetry this ticket documents. `hintStyle` is set
+      // unconditionally, so the hint does not follow the field's disabled
+      // state the way the select variant's stand-in value does. Recorded, not
+      // changed: altering it would be a D-025 ruling, not a doc fix.
+      await tester.pumpWidget(
+        _host(
+          const DabblerTextField(placeholder: 'your name', enabled: false),
+        ),
+      );
+      final TextField field = tester.widget<TextField>(find.byType(TextField));
+      expect(
+        field.decoration!.hintStyle!.color,
+        _colors().textSecondary,
+        reason: 'the editable hint does not fall to tertiary when disabled — '
+            'only the select variant does',
+      );
+      expect(
+        field.decoration!.hintStyle!.color,
+        isNot(_colors().textTertiary),
+      );
+    });
   });
 
   group('the shell is composed, not restated', () {
