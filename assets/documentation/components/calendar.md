@@ -5,7 +5,7 @@ Group    : Date and time
 Sources  : lib/src/calendar/calendar.dart:1-135 (DabblerCalendarMonth —
            weekdayOrder, defaultFirstWeekdayFor confirmed directly, not
            assumed), :222-332 (DabblerCalendar's full class dartdoc through
-           contrast/touch-target section), :875-882 (the Confirm/Cancel
+           contrast/touch-target section), :870-883 (the Confirm/Cancel
            action row — re-read 2026-09-20 after KAN-279; Cancel now passes
            DabblerButtonTone.text and DabblerCalendarTextAction is gone)
            lib/src/calendar/calendar_gallery.dart:15 (specimen title:
@@ -19,7 +19,7 @@ RESOLVED 2026-09-20. This page carried a FINDING that DabblerCalendarTextAction
 still existed, deleted only once D-023's Button `text` tone shipped — which was
 blocked on KAN-261 having no assignable executor. KAN-279 (`a90a784`) shipped
 the tone and deleted the stand-in. Re-measured for this correction rather than
-taken from the commit: `calendar.dart:879` passes DabblerButtonTone.text for
+taken from the commit: `calendar.dart:880` passes DabblerButtonTone.text for
 Cancel, Confirm takes the default `primary` (`button.dart:193`), and
 DabblerCalendarTextAction appears nowhere in lib/ or test/. Both tones are now
 pinned in `test/calendar/calendar_test.dart`.
