@@ -271,9 +271,16 @@ class _DabblerPickerFieldShellState extends State<DabblerPickerFieldShell> {
                 focusedErrorBorder: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 hintText: widget.placeholder,
-                // D-003(a): a placeholder is text and takes the ink-soft-backed
-                // secondary role, not a surface neutral.
-                hintStyle: textStyle.copyWith(color: colors.textSecondary),
+                // D-003(a): an enabled placeholder is text and takes the
+                // ink-soft-backed secondary role, not a surface neutral.
+                // D-025: disabled, it follows the value onto the tertiary
+                // role, the same rule [DabblerTextField] applies. Every
+                // picker in the system reaches this hint, and `DateField`
+                // and `TimeField` supply a format placeholder by default,
+                // so a disabled empty picker always paints it.
+                hintStyle: textStyle.copyWith(
+                  color: disabled ? colors.textTertiary : colors.textSecondary,
+                ),
                 hintTextDirection: TextDirection.ltr,
                 hintMaxLines: 1,
               ),

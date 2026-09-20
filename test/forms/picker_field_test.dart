@@ -1,5 +1,6 @@
 import 'package:dabbler_design_system/src/forms/picker_field.dart';
 import 'package:dabbler_design_system/src/interaction/focus_ring.dart';
+import 'package:flutter/material.dart' show TextField;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,6 +34,7 @@ void main() {
     required VoidCallback? onOpenPressed,
     bool enabled = true,
     bool open = false,
+    String? placeholder,
   }) {
     return host(
       DabblerPickerFieldShell(
@@ -41,6 +43,7 @@ void main() {
         label: 'Date',
         enabled: enabled,
         open: open,
+        placeholder: placeholder,
         onOpenPressed: onOpenPressed,
       ),
     );
@@ -163,6 +166,54 @@ void main() {
       );
 
       handle.dispose();
+    });
+  });
+
+  /// KAN-336 — D-025 at the SECOND hint site.
+  ///
+  /// This shell owns its own `hintStyle`, reached by every picker in the
+  /// system, and `DateField`/`TimeField` supply a format placeholder by
+  /// default — so a disabled empty picker always paints one. It carried the
+  /// identical unconditional-secondary defect [DabblerTextField] did, and
+  /// had no placeholder-colour coverage at all until these two.
+  group('DabblerPickerFieldShell placeholder colour (KAN-336, D-025)', () {
+    late TextEditingController controller;
+
+    setUp(() => controller = TextEditingController());
+    tearDown(() => controller.dispose());
+
+    TextField hintField(WidgetTester tester) =>
+        tester.widget<TextField>(find.byType(TextField));
+
+    testWidgets('enabled and empty, the hint is textSecondary', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        shell(controller, onOpenPressed: () {}, placeholder: 'DD/MM/YYYY'),
+      );
+      expect(
+        hintField(tester).decoration!.hintStyle!.color,
+        testColors().textSecondary,
+      );
+    });
+
+    testWidgets('disabled and empty, the hint falls to textTertiary', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        shell(
+          controller,
+          onOpenPressed: () {},
+          enabled: false,
+          placeholder: 'DD/MM/YYYY',
+        ),
+      );
+      expect(
+        hintField(tester).decoration!.hintStyle!.color,
+        testColors().textTertiary,
+        reason: 'D-025 applies at this site too — fixing only '
+            'text_field.dart would leave the contradiction in place',
+      );
     });
   });
 }

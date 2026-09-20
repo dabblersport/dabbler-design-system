@@ -554,9 +554,11 @@ void main() {
       );
     });
 
-    // KAN-317 remediation. The placeholder's disabled behaviour is
-    // VARIANT-DEPENDENT, and the class doc said otherwise until these three
-    // pinned it. Nothing here changes rendering; they record what it is.
+    // KAN-317 pinned these; KAN-336 inverted the third of them. The rule is
+    // now uniform: a placeholder is textSecondary enabled, textTertiary
+    // disabled, in every variant. The two mechanisms that carry it — the
+    // editable variants' `hintStyle` and the select's own stand-in Text —
+    // are asserted separately, because only one of them used to be right.
 
     testWidgets('a DISABLED select falls to textTertiary — D-025', (
       WidgetTester tester,
@@ -592,13 +594,14 @@ void main() {
       expect(field.decoration!.hintStyle!.color, _colors().textSecondary);
     });
 
-    testWidgets('a DISABLED editable placeholder STAYS textSecondary', (
+    testWidgets('a DISABLED editable placeholder falls to textTertiary', (
       WidgetTester tester,
     ) async {
-      // The asymmetry this ticket documents. `hintStyle` is set
-      // unconditionally, so the hint does not follow the field's disabled
-      // state the way the select variant's stand-in value does. Recorded, not
-      // changed: altering it would be a D-025 ruling, not a doc fix.
+      // KAN-336 inverted this assertion. It used to pin the opposite, which
+      // was the measured behaviour and NOT the intended one: a disabled
+      // empty field rendered its hint at exactly the enabled colour, so it
+      // was text-identical to an enabled field — the outcome D-025's own
+      // reasoning rejects. The select variant was already correct.
       await tester.pumpWidget(
         _host(
           const DabblerTextField(placeholder: 'your name', enabled: false),
@@ -607,14 +610,32 @@ void main() {
       final TextField field = tester.widget<TextField>(find.byType(TextField));
       expect(
         field.decoration!.hintStyle!.color,
-        _colors().textSecondary,
-        reason: 'the editable hint does not fall to tertiary when disabled — '
-            'only the select variant does',
+        _colors().textTertiary,
+        reason: 'D-025: a disabled placeholder follows the value onto the '
+            'tertiary role, in every variant',
       );
       expect(
         field.decoration!.hintStyle!.color,
-        isNot(_colors().textTertiary),
+        isNot(_colors().textSecondary),
       );
+    });
+
+    testWidgets('the disabled hint is not the only disabled signal', (
+      WidgetTester tester,
+    ) async {
+      // D-025's BOUND, which the exemption above is conditional on: contrast
+      // may never be the only carrier of disabled-ness. Pinned here so the
+      // colour change cannot outlive the thing that licenses it.
+      await tester.pumpWidget(
+        _host(
+          const DabblerTextField(placeholder: 'your name', enabled: false),
+        ),
+      );
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).enabled,
+        isFalse,
+      );
+      expect(_box(tester).fill, DabblerFieldShell.disabledFill(_colors()));
     });
   });
 

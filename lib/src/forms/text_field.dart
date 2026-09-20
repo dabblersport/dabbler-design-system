@@ -72,20 +72,20 @@ enum DabblerTextFieldVariant {
 /// `--color-text-primary`, or `--color-text-tertiary` when disabled. No
 /// literal in this file.
 ///
-/// **The placeholder's disabled behaviour is variant-dependent, and this is
-/// measured, not intended.** It is `--color-text-secondary` in every variant
-/// while the field is enabled. When the field is disabled, the `select`
-/// variant's stand-in value falls to `--color-text-tertiary`, but the
-/// editable variants' hint **stays** `--color-text-secondary` — the
-/// `hintStyle` is set unconditionally at the one call site, so the hint
-/// does not follow the disabled state the way the value does.
+/// The placeholder is `--color-text-secondary` while the field is enabled and
+/// `--color-text-tertiary` once it is disabled, in **every** variant — the
+/// `hintStyle` of the editable variants and the stand-in value the `select`
+/// variant draws when it has none.
 ///
 /// **`D-003(a)`** puts the placeholder on the secondary role: a placeholder is
 /// text under WCAG, so it takes the ink-soft-backed role rather than a surface
 /// neutral. **`D-025`** is the exception WCAG 1.4.3 allows for an inactive
-/// user-interface component, and only the `select` variant currently takes it.
-/// Whether the editable variants should too is a ruling, not a doc fix. The
-/// call sites are the authority — see [placeholder].
+/// user-interface component, and its own reasoning is why the disabled state
+/// takes it: a disabled field whose text is indistinguishable from an enabled
+/// one is the worse accessibility outcome, not the better one. The exemption
+/// is conditional — disabled-ness is also carried by `Semantics(enabled:
+/// false)` and by [DabblerFieldShell]'s disabled fill, never by contrast
+/// alone. The call sites are the authority — see [placeholder].
 ///
 /// ## Reduced motion
 ///
@@ -158,16 +158,16 @@ class DabblerTextField extends StatefulWidget {
 
   /// The empty-state text.
   ///
-  /// `--color-text-secondary` in every variant while the field is enabled
-  /// (`D-003(a)`: a placeholder is text under WCAG, not a surface neutral).
+  /// `--color-text-secondary` while the field is enabled (`D-003(a)`: a
+  /// placeholder is text under WCAG, not a surface neutral), and
+  /// `--color-text-tertiary` once it is disabled (`D-025`: WCAG 1.4.3 exempts
+  /// an inactive user-interface component).
   ///
-  /// **Disabled is where the two variants diverge.** The `select` variant
-  /// draws its own stand-in value and colours it `--color-text-tertiary`
-  /// when disabled (`D-025`: WCAG 1.4.3 exempts an inactive component). The
-  /// editable variants pass this string to Flutter as `hintText`, whose
-  /// `hintStyle` colour is `--color-text-secondary` unconditionally — a
-  /// disabled editable field still renders its placeholder, and still renders
-  /// it secondary. All three cases are pinned in
+  /// **The rule is the same in every variant**, though two different
+  /// mechanisms carry it: the editable variants pass this string to Flutter
+  /// as `hintText` and colour it through `hintStyle`, while `select` draws
+  /// its own stand-in value. A disabled field still renders its placeholder
+  /// in both. Each state of each mechanism is pinned in
   /// `test/forms/text_field_test.dart` so this paragraph cannot drift from
   /// the paint again.
   final String? placeholder;
@@ -371,9 +371,16 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
                 focusedErrorBorder: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
                 hintText: widget.placeholder,
-                // D-003(a): a placeholder is text under WCAG, so it takes the
-                // ink-soft-backed secondary role, never a surface neutral.
-                hintStyle: textStyle.copyWith(color: colors.textSecondary),
+                // D-003(a): an ENABLED placeholder is text under WCAG, so
+                // it takes the ink-soft-backed secondary role, never a
+                // surface neutral. D-025: once the field is disabled, WCAG
+                // 1.4.3 exempts an inactive component and the placeholder
+                // follows the value onto the tertiary role — leaving it
+                // secondary would make a disabled empty field text-identical
+                // to an enabled one, which is the outcome D-025 rejects.
+                hintStyle: textStyle.copyWith(
+                  color: disabled ? colors.textTertiary : colors.textSecondary,
+                ),
                 hintMaxLines: 1,
               ),
             ),
