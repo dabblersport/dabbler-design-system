@@ -71,8 +71,17 @@ class Finding {
 /// Digits, optionally a decimal part, optionally one of the listed units. The
 /// trailing guard is what keeps `80ms` out: a unit this list does not name is
 /// not a figure, and `80` glued to letters is not a bare numeric token.
+///
+/// **A following period is allowed (KAN-335 remediation).** It used to be
+/// barred, which silently hid any figure that ended a sentence — the `48` in
+/// "a multiple of 3 from 3 to 48." went unreported while being a declared
+/// figure, so the gate said clean and was not. Ordered-list markers are what
+/// the bar was really catching, and [orderedListMarker] catches those
+/// structurally instead: a list marker opens its line, a figure does not.
+/// The LEADING guard still rejects `45` inside `0.45`, which is the case that
+/// actually needed a dot rule.
 final RegExp numericToken = RegExp(
-  r'(?<![\w.])(\d+(?:\.\d+)?)(px|pt|%|dp|:1)?(?![\w.%])',
+  r'(?<![\w.])(\d+(?:\.\d+)?)(px|pt|%|dp|:1)?(?![\w%])',
 );
 
 /// A markdown link target — excluded.
@@ -95,6 +104,14 @@ const Map<String, Set<String>> cardinalityExemptions = <String, Set<String>>{
 
 /// A backticked span — excluded where its number is a symbol, not a value.
 final RegExp codeSpan = RegExp(r'`[^`]*`');
+
+/// An ordered-list marker opening a line — `1. `, `2. `.
+///
+/// Structural, not numeric: the digit numbers a step, and every `## Axes`
+/// list in the corpus would otherwise report one phantom figure per item.
+/// Anchored to the line start, which is exactly what separates it from a
+/// figure that happens to end a sentence.
+final RegExp orderedListMarker = RegExp(r'^\s*\d+\.\s');
 
 /// An `N:N` ratio — `16:9`. Excluded: a ratio is a shape, not a figure, and
 /// neither half resolves to a declaring site of its own (KAN-335/D-043).
@@ -229,6 +246,7 @@ void main(List<String> args) {
               .replaceAll(linkTarget, '')
               .replaceAll(reference, '')
               .replaceAll(codeSpan, '')
+              .replaceFirst(orderedListMarker, '')
               .replaceAll(digitsInName, '')
               .replaceAll(ratio, '')
               .replaceAll(ordinalRange, '');

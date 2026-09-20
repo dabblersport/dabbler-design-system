@@ -98,6 +98,7 @@ None, except the one reserved Dialog shadow.
 @figure 0.5 lib/src/tokens/dabbler_geometry.dart#borderHairline
 @figure 1 lib/src/tokens/dabbler_geometry.dart#borderDefault
 @figure 30 lib/src/tokens/dabbler_geometry.dart#space9
+@figure 48 lib/src/tokens/dabbler_geometry.dart#space11
 
 
 ## Change log
