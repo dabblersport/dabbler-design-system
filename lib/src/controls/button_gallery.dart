@@ -7,8 +7,16 @@
 ///
 /// `components/controls/buttons.card.html` lays Button out as a **tones ×
 /// states matrix** — eight tone rows against six state columns — followed by a
-/// row for the icon tone and leading icons, then the three `full` buttons. The
-/// earlier version of this file rendered a `Wrap` of tone swatches and a
+/// row for the icon tone and leading icons, then the three `full` buttons.
+///
+/// **This file now renders NINE tone rows, and the difference is not drift.**
+/// The design page's own `TONES` array holds eight and does not include
+/// `text`, because `D-023`'s design-source step was never executed. The tone
+/// shipped on the Dart side anyway (`KAN-279`), so `KAN-340` added it here:
+/// the eight above is the drawing's count and stays correct as a description
+/// of the drawing.
+///
+/// The earlier version of this file rendered a `Wrap` of tone swatches and a
 /// `fullWidth` bar, which gave the wrong impression of the component twice
 /// over: it never showed the interaction states side by side, and the
 /// full-width bar read as Button's default shape when the design's default is a
