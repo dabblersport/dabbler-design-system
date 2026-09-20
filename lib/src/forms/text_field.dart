@@ -70,7 +70,14 @@ enum DabblerTextFieldVariant {
 /// The leading icon is `--color-brand-primary`; a trailing icon and the
 /// password toggle are `--color-text-secondary`; the value is
 /// `--color-text-primary`, or `--color-text-tertiary` when disabled; the
-/// placeholder is `--color-text-tertiary`. No literal in this file.
+/// placeholder is `--color-text-secondary` while the field is enabled, and
+/// `--color-text-tertiary` only when it is disabled. No literal in this file.
+///
+/// **`D-003(a)`** puts the placeholder on the secondary role: a placeholder is
+/// text under WCAG, so it takes the ink-soft-backed role rather than a surface
+/// neutral. **`D-025`** is the exception for the disabled state, where WCAG
+/// 1.4.3 exempts an inactive user-interface component and the tertiary role
+/// stands. The call sites are the authority — see [placeholder].
 ///
 /// ## Reduced motion
 ///
@@ -141,7 +148,14 @@ class DabblerTextField extends StatefulWidget {
   /// where Enter inserts a newline.
   final ValueChanged<String>? onSubmitted;
 
-  /// The empty-state text, in `--color-text-tertiary`.
+  /// The empty-state text.
+  ///
+  /// `--color-text-secondary` while the field is enabled (`D-003(a)`: a
+  /// placeholder is text under WCAG, not a surface neutral), and
+  /// `--color-text-tertiary` only when it is disabled (`D-025`: WCAG 1.4.3
+  /// exempts an inactive component). Both are applied where the field paints
+  /// — the `hintStyle` of the editable variants, and the stand-in value the
+  /// `select` variant draws when it has none.
   final String? placeholder;
 
   /// The label above the box.
