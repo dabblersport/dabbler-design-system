@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dabbler_design_system/src/controls/button.dart';
+import 'package:dabbler_design_system/src/controls/button_gallery.dart';
+import 'package:dabbler_design_system/src/gallery/gallery_entry.dart';
 import 'package:dabbler_design_system/src/feedback/spinner.dart';
 import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/interaction/focus_ring.dart';
@@ -741,6 +743,37 @@ void main() {
         style.fontFamilyFallback!.first,
         isNot(startsWith('packages/')),
         reason: 'the bare family belongs in the fallback',
+      );
+    });
+  });
+
+  /// KAN-340 — the specimen exhibits the real axis.
+  ///
+  /// `_matrixTones` is a hand-listed set, not [DabblerButtonTone.values], so
+  /// a tone can ship and never be drawn. `text` did exactly that: added by
+  /// D-023 via KAN-279, live at `calendar.dart:880` and
+  /// `time_picker.dart:535`, and absent from the gallery until this ticket.
+  /// The assertion is deliberately the WHOLE SET rather than `text` alone —
+  /// pinning one name would not stop an eleventh tone repeating the defect.
+  group('the Button gallery exhibits every tone (KAN-340)', () {
+    testWidgets('every DabblerButtonTone is drawn somewhere', (
+      WidgetTester tester,
+    ) async {
+      final Set<DabblerButtonTone> drawn = <DabblerButtonTone>{};
+      for (final GalleryEntry entry in buttonGalleryEntries) {
+        await tester.pumpWidget(_host(Builder(builder: entry.builder)));
+        await tester.pump();
+        drawn.addAll(
+          tester
+              .widgetList<DabblerButton>(find.byType(DabblerButton))
+              .map((DabblerButton b) => b.tone),
+        );
+      }
+      expect(
+        drawn,
+        DabblerButtonTone.values.toSet(),
+        reason: 'a tone with no specimen is a tone a reader cannot check '
+            'the implementation against',
       );
     });
   });

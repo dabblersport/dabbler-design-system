@@ -65,6 +65,14 @@ const List<DabblerButtonTone> _matrixTones = <DabblerButtonTone>[
   DabblerButtonTone.neutral,
   DabblerButtonTone.filled,
   DabblerButtonTone.outlined,
+  // KAN-340. `text` shipped with D-023 (KAN-279) and was never added here,
+  // so the one tone with no chrome at all was also the one tone with no
+  // specimen — it renders in production at `calendar.dart:880` and
+  // `time_picker.dart:535` and nowhere a reader could see it. Placed after
+  // `outlined` because that is its enum order and its nearest sibling: the
+  // two paint the same transparent fill and the same ink label, and differ
+  // only in the border.
+  DabblerButtonTone.text,
   DabblerButtonTone.destructive,
   DabblerButtonTone.iconLabel,
 ];
