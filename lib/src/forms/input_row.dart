@@ -91,15 +91,35 @@ import '../tokens/dabbler_type.dart';
 /// other pressable thing in the system, over the same
 /// [DabblerMotion.fast] the source's own transition uses.
 ///
-/// ## `--subtle` is not a text colour — D-003
+/// ## `--subtle` is not a text colour — D-003 and D-027
 ///
 /// The source paints [subtitle] and the [DabblerChevron] in `var(--subtle)`
 /// (`:45`, `:62`). `cxo`'s ruling **D-003** is that `--muted` and `--subtle`
 /// are surface neutrals wrongly exposed as text roles and that `--subtle`, at
-/// 2.15:1, must **never** be used as a text colour. Both therefore take
-/// [DabblerColors.textSecondary], which is the role the system carries for a
-/// second line and a de-emphasised glyph. The same ruling is already recorded
-/// in `lib/src/forms/field_shell.dart`.
+/// 2.15:1, must **never** be used as a text colour. Neither can therefore take
+/// the drawn value — but they do not land in the same place, because they are
+/// not the same kind of thing.
+///
+/// * **[subtitle] — D-003.** It is text, so it takes
+///   [DabblerColors.textSecondary] (`--ink-soft`), the role the system carries
+///   for a second line. The same ruling is already recorded in
+///   `lib/src/forms/field_shell.dart`.
+/// * **[DabblerChevron] — D-027.** It is not text. It is a non-informational
+///   directional glyph, which is `--subtle`'s bounded carve-out in the design
+///   source, so it takes [DabblerColors.textTertiary] (`--muted`) — lighter
+///   than the subtitle, as the drawing has it.
+///
+/// **Why the distinction is load-bearing (D-037).** `InputRow.jsx` draws the
+/// two at different weights, and painting both at `textSecondary` collapsed
+/// that: a chevron reading exactly as heavy as the sentence beside it competes
+/// with content it is meant to sit behind. This is a fidelity correction, not
+/// a contrast one.
+///
+/// **The carve-out is narrow.** D-003(a) permits `--muted` here for a
+/// non-informational directional glyph *only*. It does not license it for a
+/// glyph that carries meaning — a status icon, a sport mark, a badge glyph. A
+/// component wanting the drawn `--subtle` tone is a new role request to `cxo`,
+/// not a call-site re-point.
 ///
 /// ## Typography
 ///
@@ -304,8 +324,10 @@ class DabblerInputRow extends StatelessWidget {
 /// rather than a [Transform] that would flip the glyph's optical weight with
 /// it.
 ///
-/// The tint is [DabblerColors.textSecondary], not the source's `--subtle` —
-/// see [DabblerInputRow]'s D-003 note.
+/// The tint is [DabblerColors.textTertiary], not the source's `--subtle` —
+/// **D-027**: a chevron is a non-informational directional glyph, not text, so
+/// it takes the lighter role and sits behind the row's content rather than
+/// level with it. See [DabblerInputRow]'s D-003/D-027 note.
 class DabblerChevron extends StatelessWidget {
   /// Creates a disclosure chevron.
   const DabblerChevron({super.key, this.color});
@@ -320,7 +342,7 @@ class DabblerChevron extends StatelessWidget {
   /// `arrow-right`.
   static const String backwardIconName = 'arrow-left';
 
-  /// Overrides the tint. Null takes [DabblerColors.textSecondary].
+  /// Overrides the tint. Null takes [DabblerColors.textTertiary].
   final Color? color;
 
   /// The Iconsax name for [direction].
@@ -332,7 +354,7 @@ class DabblerChevron extends StatelessWidget {
     return DabblerIcon(
       iconNameFor(Directionality.of(context)),
       size: size,
-      color: color ?? DabblerColors.of(context).textSecondary,
+      color: color ?? DabblerColors.of(context).textTertiary,
     );
   }
 }

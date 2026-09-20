@@ -483,9 +483,12 @@ void main() {
       );
     });
 
-    testWidgets('takes --color-text-secondary, not --subtle (D-003)', (
+    testWidgets('takes --color-text-tertiary, not --subtle (D-027)', (
       WidgetTester tester,
     ) async {
+      // D-037 moved it off textSecondary: a chevron is a non-informational
+      // directional glyph, not text, and must read lighter than the subtitle
+      // beside it — the weight difference `InputRow.jsx` draws.
       await tester.pumpWidget(_host(const DabblerChevron()));
       final Iterable<Icon> icons = tester.widgetList<Icon>(
         find.descendant(
@@ -494,7 +497,9 @@ void main() {
         ),
       );
       for (final Icon icon in icons) {
-        expect(icon.color, _colors().textSecondary);
+        expect(icon.color, _colors().textTertiary);
+        expect(icon.color, isNot(_colors().textSecondary),
+            reason: 'the chevron must not read as heavy as the subtitle');
         expect(icon.size, DabblerSizing.iconSm);
       }
     });
