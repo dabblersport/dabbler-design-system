@@ -74,9 +74,21 @@ part 'gallery_index_collections.dart';
 part 'gallery_index_shell.dart';
 
 /// The catalogue band: every registered entry as a tappable tile.
-class GalleryIndex extends StatelessWidget {
+class GalleryIndex extends StatefulWidget {
   /// Creates the catalogue.
-  const GalleryIndex({super.key, required this.entries, required this.onOpen});
+  const GalleryIndex({
+    super.key,
+    required this.entries,
+    required this.onOpen,
+    this.loader = const DabblerDocLoader(),
+  });
+
+  /// Reads `_order.md` for the band order.
+  ///
+  /// The seam exists so a test can supply its own bundle and prove the order
+  /// follows the authored file rather than the enum — the two agree today, so
+  /// nothing else could tell them apart. Not a configuration point.
+  final DabblerDocLoader loader;
 
   /// Every registered entry, in registration order.
   final List<GalleryEntry> entries;
@@ -84,20 +96,85 @@ class GalleryIndex extends StatelessWidget {
   /// Opens one entry's own page.
   final void Function(GalleryEntry entry) onOpen;
 
-  /// The bands, in `_order.md`'s order: foundations, then the nine groups.
+  @override
+  State<GalleryIndex> createState() => _GalleryIndexState();
+}
+
+class _GalleryIndexState extends State<GalleryIndex> {
+  /// The nine group names in `_order.md`'s authored order, or null when the
+  /// file cannot be read or parsed — and also while the read is in flight.
   ///
-  /// An entry reaches exactly one band. Foundations is chosen by the section
-  /// [GalleryEntry.page] names rather than by `group == null` alone, so a
-  /// component entry that forgot its group would land nowhere and be visibly
-  /// missing rather than quietly filed under foundations.
-  List<(String, List<GalleryEntry>)> _bands() {
+  /// **A second, narrower read of one authored file — not a shared
+  /// derivation** (`D-049`). The navigation parses `_order.md` for its own
+  /// 58-page object set; this reads the same file for the group ORDER alone
+  /// and calls nothing in that derivation. `cxo`: *two readers of one
+  /// authored file are not two derivations calling each other*, so this does
+  /// not reopen the `D-047`(e) merge that was withdrawn.
+  late final Future<List<String>?> _authoredGroupOrder = _loadGroupOrder();
+
+  Future<List<String>?> _loadGroupOrder() async {
+    final String? raw = await widget.loader.loadRaw(_DocOrder.assetName);
+    if (raw == null) {
+      return null;
+    }
+    final _DocOrder order = _DocOrder.parse(raw);
+    if (order.isUnavailable) {
+      return null;
+    }
+    final List<String> names = <String>[
+      for (final _DocOrderSection section in order.sections)
+        for (final _DocOrderGroup group in section.groups) group.name,
+    ];
+    return names.isEmpty ? null : names;
+  }
+
+  /// The bands: Foundations, then the nine purpose groups.
+  ///
+  /// **Order comes from `_order.md`** (`D-049`, AC3). `GalleryPurpose`'s
+  /// declaration order used to be the spine, which is the "second, divergent
+  /// copy" AC3 exists to prevent: the enum could drift from the authored file
+  /// silently. The enum itself stays — its MEMBERSHIP is ruled by
+  /// `D-033`(b)/`D-038`/`D-044` and is untouched; only its declaration order
+  /// stops being load-bearing here.
+  ///
+  /// **Foundations first is hardcoded on purpose.** That is `D-033`(a)'s own
+  /// section ordering, legitimately transcribed per `D-043` — not the group
+  /// sequence this ticket moved to the file. Entries reach it by the section
+  /// [GalleryEntry.page] names rather than by `group == null`, so a component
+  /// that forgot its group lands nowhere and is visibly missing rather than
+  /// quietly filed under foundations.
+  ///
+  /// **[authored] null is a fallback, never a degradation.** `D-047`(d) ruled
+  /// the index IS the below-1000 navigation and nothing replaces it: the nav
+  /// may show `_DocOrder.unavailable` on a bad file, the index may not. So an
+  /// unreadable `_order.md` — and the frame or two before the read returns —
+  /// falls back to [GalleryPurpose.values] and still renders **every** band. A
+  /// purpose the file does not name is appended rather than dropped, for the
+  /// same reason.
+  List<(String, List<GalleryEntry>)> _bands(List<String>? authored) {
+    final List<GalleryEntry> entries = widget.entries;
     final List<GalleryEntry> foundations = entries
         .where((GalleryEntry e) => e.page.startsWith('foundations/'))
         .toList();
 
+    final List<GalleryPurpose> ordered = <GalleryPurpose>[
+      ...GalleryPurpose.values,
+    ];
+    if (authored != null) {
+      int rank(GalleryPurpose p) {
+        final int at = authored.indexOf(p.label);
+        // Unnamed groups sort after every named one, keeping their enum
+        // order among themselves — present, never dropped.
+        return at < 0 ? authored.length + p.index : at;
+      }
+
+      ordered.sort((GalleryPurpose a, GalleryPurpose b) =>
+          rank(a).compareTo(rank(b)));
+    }
+
     return <(String, List<GalleryEntry>)>[
       if (foundations.isNotEmpty) ('Foundations', foundations),
-      for (final GalleryPurpose purpose in GalleryPurpose.values)
+      for (final GalleryPurpose purpose in ordered)
         if (entries.any((GalleryEntry e) => e.group == purpose))
           (
             purpose.label,
@@ -108,6 +185,7 @@ class GalleryIndex extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<GalleryEntry> entries = widget.entries;
     assert(
       GalleryEntry.duplicateIds(entries).isEmpty,
       'Two gallery entries declare the same id: '
@@ -127,10 +205,17 @@ class GalleryIndex extends StatelessWidget {
       );
     }
 
-    return _IndexLayout(
-      bands: _bands(),
-      entries: entries,
-      onOpen: onOpen,
+    // Renders immediately on the fallback order and settles onto the
+    // authored one when the read returns — never a blank frame, per the
+    // D-047(d) requirement that the index cannot degrade.
+    return FutureBuilder<List<String>?>(
+      future: _authoredGroupOrder,
+      builder: (BuildContext context, AsyncSnapshot<List<String>?> snapshot) =>
+          _IndexLayout(
+        bands: _bands(snapshot.data),
+        entries: entries,
+        onOpen: widget.onOpen,
+      ),
     );
   }
 }
