@@ -105,21 +105,21 @@ from the shared press-scale and focus-ring primitives; nothing here defines its 
 
 ## Change log
 
-- [D-004 (cxo)](../../../../dabbler-docs/DECISIONS.md) — `accent`'s fill is a known, documented defect: it
+- D-004 (cxo) — `accent`'s fill is a known, documented defect: it
   currently stands in with the nearest declared indigo, pending the missing token being declared
   in the design source's own colour file.
-- [D-005 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms the 21px explicit corner on `full` as this
+- D-005 (cxo) — confirms the 21px explicit corner on `full` as this
   system's correct corner for a large primary action, the same exception `Fab` takes.
-- [D-011 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the 8px icon gap and the off-grid paddings on every
+- D-011 (cxo) — the 8px icon gap and the off-grid paddings on every
   size are a deliberate, documented exception, not drift to be corrected.
-- [D-012 (cxo)](../../../../dabbler-docs/DECISIONS.md) — `iconLabel` and `neutral` stay as separate tones
+- D-012 (cxo) — `iconLabel` and `neutral` stay as separate tones
   despite painting identically today.
-- [D-023 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules a tenth tone, `text`, for a chrome-less
+- D-023 (cxo) — rules a tenth tone, `text`, for a chrome-less
   action alongside a filled one (Cancel beside Confirm, a "See all" trailing action). **Known
   defect: not shipped, and blocked rather than merely pending** — the design-source change this
   needs first has no assignable executor today, so there is currently no path to it landing. Do
   not reach for `tone: 'text'`; it does not compile.
-- [D-024 (cxo)](../../../../dabbler-docs/DECISIONS.md) — Button's tone-size label scale stays a private
+- D-024 (cxo) — Button's tone-size label scale stays a private
   scale, not three new steps in the shared type ramp.
 
 ## Source

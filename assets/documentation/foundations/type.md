@@ -82,13 +82,13 @@ Button's own 16/14/12-at-600 label scale — real, shipped, and explicitly not a
 
 ## Change log
 
-- [D-013 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms `title3` at weight 400 is correct
+- D-013 (cxo) — confirms `title3` at weight 400 is correct
   system-wide, correcting a one-off inline style in the design source that no other title-bearing
   component followed.
-- [D-024 (cxo)](../../../../dabbler-docs/DECISIONS.md) — measures the three-way type-specification
+- D-024 (cxo) — measures the three-way type-specification
   split across the design source, rules `typography.css` the sole ramp, and imposes the freeze this
   page describes above.
-- [D-040 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms this page's specimen has shipped and
+- D-040 (cxo) — confirms this page's specimen has shipped and
   ships this page.
 
 ## Source

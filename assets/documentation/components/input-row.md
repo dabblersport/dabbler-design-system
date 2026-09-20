@@ -93,11 +93,11 @@ shared tokens and primitives every other tappable surface reads.
 
 ## Change log
 
-- [D-003 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the subtitle's colour: text under WCAG, so it
+- D-003 (cxo) — the subtitle's colour: text under WCAG, so it
   takes `textSecondary`, never a surface-neutral role.
-- [D-027 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the chevron is not text at all, and is
+- D-027 (cxo) — the chevron is not text at all, and is
   permitted a lighter, non-informational tint in the design source.
-- [D-037 (cxo)](../../../../dabbler-docs/DECISIONS.md) — settles which of the two rulings governs the
+- D-037 (cxo) — settles which of the two rulings governs the
   chevron (D-027) versus the subtitle (D-003), and rules the shipped paint a real defect: the
   chevron must move to `textTertiary` to restore the weight difference the drawing gives it against
   the subtitle. Not yet shipped.

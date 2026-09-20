@@ -63,9 +63,9 @@ border, pill radius — deliberately not composed from `Badge`.
 
 ## Change log
 
-- [D-004 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the `indigo` header tone's fill is the same
+- D-004 (cxo) — the `indigo` header tone's fill is the same
   known, documented defect as Button's `accent`, Fab's `indigo` and Avatar's `indigo` badge tone.
-- [D-015 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the status pill is built literal, at the
+- D-015 (cxo) — the status pill is built literal, at the
   ticket's own type scale, rather than composed from `Badge`.
 
 ## Source

@@ -80,12 +80,12 @@ Overlay well fill: the card surface colour.
 
 ## Change log
 
-- [D-006 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the design source's own event-card nodes are
+- D-006 (cxo) — the design source's own event-card nodes are
   mis-exported settings rows, not event cards; rules this component's geometry directly until the
   correct nodes are re-exported.
-- [D-018 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the card corner is 16, which is what Large's
+- D-018 (cxo) — the card corner is 16, which is what Large's
   cover inherits rather than drawing a second corner of its own.
-- [D-022 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the sport-icon overlay belongs to Large only;
+- D-022 (cxo) — the sport-icon overlay belongs to Large only;
   Medium and Small do not get a smaller version of it.
 
 ## Source

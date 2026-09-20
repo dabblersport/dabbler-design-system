@@ -63,5 +63,5 @@ be seen and acknowledged rather than just shown, that need is itself a sign the 
 
 ## Change log
 
-- [D-016 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules Toast's removal is immediate with no
+- D-016 (cxo) — rules Toast's removal is immediate with no
   exit animation, which is this page's own "Removal is never staged" section applied to all three.

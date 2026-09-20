@@ -92,10 +92,10 @@ the direction-keyed default.
 
 ## Change log
 
-- [D-035 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the same "comparison, not a state" test that
+- D-035 (cxo) — the same "comparison, not a state" test that
   unblocks Themes unblocks this page, and bounds it to the foundation only — per-component Direction
   sections stayed unblocked throughout, verified one at a time by the direction switcher.
-- [D-036 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the test this page's Axes section is built on:
+- D-036 (cxo) — the test this page's Axes section is built on:
   a component gets its own Direction section only for an exception to mirroring or a semantic
   consequence of it, never for uniform mirroring or script selection, both of which are foundation
   facts documented here instead.

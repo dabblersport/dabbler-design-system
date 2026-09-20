@@ -73,7 +73,7 @@ label.
 
 ## Change log
 
-- [D-026 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms the underline-only brand signal is
+- D-026 (cxo) — confirms the underline-only brand signal is
   correct as built and refuses a competing kit treatment that would triple the signal for one state.
 
 ## Source

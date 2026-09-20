@@ -88,13 +88,13 @@ None, except the one reserved Dialog shadow.
 
 ## Change log
 
-- [D-011 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms Button's own off-grid icon gap and
+- D-011 (cxo) — confirms Button's own off-grid icon gap and
   paddings as deliberate, documented exceptions rather than drift to snap to the nearest step.
-- [D-018 (cxo)](../../../../dabbler-docs/DECISIONS.md) — adds the dedicated 16px card-corner step and
+- D-018 (cxo) — adds the dedicated 16px card-corner step and
   rules 12px is the corner of a tile nested inside a card, never the card's own.
-- [D-031 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms Dialog's shadow as the one legal
+- D-031 (cxo) — confirms Dialog's shadow as the one legal
   exception to this system's flatness.
-- [D-040 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms this page's specimen has shipped and
+- D-040 (cxo) — confirms this page's specimen has shipped and
   ships this page.
 
 ## Source

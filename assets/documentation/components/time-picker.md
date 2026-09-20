@@ -68,10 +68,10 @@ failed contrast on this card).
 
 ## Change log
 
-- [D-023 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the Confirm/Cancel action row adopts
+- D-023 (cxo) — rules the Confirm/Cancel action row adopts
   `Button` at `medium`, and rules the `text` tone this widget's action row is meant to use once it
   ships. **Not yet shipped** — `DabblerCalendarTextAction` is still the stand-in.
-- [D-030 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms no drawn ruler is required, because
+- D-030 (cxo) — confirms no drawn ruler is required, because
   the design bundle itself doesn't draw one — the listbox replacement above is not a deviation from
   a requirement, it's the correct reading of what was actually specified.
 

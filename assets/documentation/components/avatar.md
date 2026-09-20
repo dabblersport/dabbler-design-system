@@ -83,12 +83,12 @@ uses the page surface colour, drawn as a real 2px border rather than the source'
 
 ## Change log
 
-- [D-004 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the `indigo` badge tone's fill is the same
+- D-004 (cxo) — the `indigo` badge tone's fill is the same
   known, documented defect as Button's `accent` and Fab's `indigo` tones.
-- [D-031 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms `AvatarGroup`'s separating ring is a
+- D-031 (cxo) — confirms `AvatarGroup`'s separating ring is a
   stroke, not a shadow, and needs no flatness exception — build it as a border in the page surface
   colour, which is exactly what this component does.
-- [T-084 (cto)](../../../../dabbler-docs/DECISIONS.md) — adopts `random_avatar` as the portrait
+- T-084 (cto) — adopts `random_avatar` as the portrait
   generator this component's seed contract is built on.
 
 ## Source

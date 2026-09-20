@@ -70,13 +70,13 @@ brand fill when selected, a plain ring when not. Trial pill: `Badge` at its bran
 
 ## Change log
 
-- [D-019 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the two variant names are corrected to
+- D-019 (cxo) — the two variant names are corrected to
   describe what they paint, reversing the design file's own inverted symbol names.
-- [D-020 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the trial pill stays on `Badge`'s brand tone;
+- D-020 (cxo) — the trial pill stays on `Badge`'s brand tone;
   a one-step drift in the design file is corrected there, not answered with a component override.
-- [D-021 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms the missing CTA is intentional and
+- D-021 (cxo) — confirms the missing CTA is intentional and
   rules the whole-tile selectable-option semantics this component must carry.
-- [D-029 (cxo)](../../../../dabbler-docs/DECISIONS.md) — reaffirms D-020 after re-checking the premise
+- D-029 (cxo) — reaffirms D-020 after re-checking the premise
   that prompted the question.
 
 ## Source

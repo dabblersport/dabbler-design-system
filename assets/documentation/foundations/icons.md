@@ -72,9 +72,9 @@ does not exist in the font at all — renders the placeholder).
 
 ## Change log
 
-- [T-083 (cto)](../../../../dabbler-docs/DECISIONS.md) — adopts `iconsax_flutter` as the single icon
+- T-083 (cto) — adopts `iconsax_flutter` as the single icon
   source and rules the weight-fallback contract this page describes.
-- [D-034 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the Foundations page template this page
+- D-034 (cxo) — rules the Foundations page template this page
   follows.
 
 ## Source

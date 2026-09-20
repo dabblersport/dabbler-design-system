@@ -102,13 +102,13 @@ contrast).
 
 ## Change log
 
-- [D-023 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the Confirm/Cancel action row adopts
+- D-023 (cxo) — rules the Confirm/Cancel action row adopts
   `Button` at its `medium` size, and rules a tenth `Button` tone, `text`, that this widget's action
   row is meant to use once it ships. **Not yet shipped** — `DabblerCalendarTextAction` is still the
   stand-in; see the Button page for why the tone itself is blocked.
-- [D-030 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms no drawn ruler is required on the
+- D-030 (cxo) — confirms no drawn ruler is required on the
   paired `TimePicker`, because the design bundle itself doesn't draw one.
-- [D-032 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the date-cell touch target should paint
+- D-032 (cxo) — rules the date-cell touch target should paint
   at 39 and claim a 42px vertical pitch rather than growing to a full 45, a bounded exception for a
   contiguous grid of peer targets where overlapping hit boxes would select the wrong date. **Not yet
   shipped** — cells currently grow to the full 45px floor.

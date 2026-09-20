@@ -59,7 +59,7 @@ fill, border or radius of its own — Section draws no surface at all.
 
 ## Change log
 
-- [D-013 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the title's type style and weight, correcting
+- D-013 (cxo) — the title's type style and weight, correcting
   a one-off inline style in the design source that no other title-bearing component in the system
   followed.
 

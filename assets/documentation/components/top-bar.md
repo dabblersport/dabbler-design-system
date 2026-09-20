@@ -104,12 +104,12 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 
 ## Change log
 
-- [D-026 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms the transcription's narrow anatomy is
+- D-026 (cxo) — confirms the transcription's narrow anatomy is
   correct as built and refuses widening the API for a greeting-stack variant a different part of the
   design kit draws.
-- [D-032 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the trailing-action hit-box correction
+- D-032 (cxo) — rules the trailing-action hit-box correction
   above (shipped).
-- [D-039 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules `barHeight` becomes a hard 62. Not yet
+- D-039 (cxo) — rules `barHeight` becomes a hard 62. Not yet
   shipped.
 
 ## Source

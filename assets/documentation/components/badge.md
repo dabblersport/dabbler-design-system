@@ -73,11 +73,11 @@ opacity — the one badge configuration that carries a border at all.
 
 ## Change log
 
-- [D-020 (cxo)](../../../../dabbler-docs/DECISIONS.md) — a one-step colour drift in a pricing screen's
+- D-020 (cxo) — a one-step colour drift in a pricing screen's
   trial pill is not grounds for a fill override on this component; the source is corrected instead.
-- [D-028 (cxo)](../../../../dabbler-docs/DECISIONS.md) — Badge is the one site that must not simply be
+- D-028 (cxo) — Badge is the one site that must not simply be
   re-pointed to the export-only `--accent-indigo` value once it's declared properly.
-- [D-029 (cxo)](../../../../dabbler-docs/DECISIONS.md) — reaffirms D-020 after re-checking the premise;
+- D-029 (cxo) — reaffirms D-020 after re-checking the premise;
   confirms decorative tones genuinely carry no border, so there was nothing else to reconcile.
 
 ## Source

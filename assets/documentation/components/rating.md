@@ -82,9 +82,9 @@ non-informational-glyph exception — see the Colour foundation page. Value and 
 
 ## Change log
 
-- [D-025 (cxo)](../../../../dabbler-docs/DECISIONS.md) — establishes the bounded permission for
+- D-025 (cxo) — establishes the bounded permission for
   `textTertiary` on a non-informational glyph, which the empty star relies on.
-- [D-027 (cxo)](../../../../dabbler-docs/DECISIONS.md) — names Rating's empty star directly as one of
+- D-027 (cxo) — names Rating's empty star directly as one of
   the two glyph exceptions to the text-colour rule.
 
 ## Source

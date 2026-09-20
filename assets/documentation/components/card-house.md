@@ -53,7 +53,7 @@ height both come from shared tokens rather than the design file's own literals.
 
 ## Change log
 
-- [D-018 (cxo)](../../../../dabbler-docs/DECISIONS.md) — CardHouse's icon well (12) and shell (16) are
+- D-018 (cxo) — CardHouse's icon well (12) and shell (16) are
   among the measured evidence this ruling is built on: the two corners are deliberately different,
   not a drift to reconcile.
 

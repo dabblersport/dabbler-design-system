@@ -87,7 +87,7 @@ of Dialog's own.
 
 ## Change log
 
-- [D-031 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms Dialog's shadow as the system's one
+- D-031 (cxo) — confirms Dialog's shadow as the system's one
   deliberate exception to flatness.
 
 ## Source

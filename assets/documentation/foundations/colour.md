@@ -118,23 +118,23 @@ overlay).
 
 ## Change log
 
-- [D-003 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the six failing colour pairings: the light ramp
+- D-003 (cxo) — the six failing colour pairings: the light ramp
   is not reopened, the dark ramp's structure is corrected, and `--muted` / `--subtle` were never
   text roles.
-- [D-004 (cxo)](../../../../dabbler-docs/DECISIONS.md) — `--accent-indigo` is an omission from
+- D-004 (cxo) — `--accent-indigo` is an omission from
   `colors.css`, not a value to transcribe from the export file.
-- [D-025 (cxo)](../../../../dabbler-docs/DECISIONS.md) — disabled text stays on `textTertiary`, bounded so
+- D-025 (cxo) — disabled text stays on `textTertiary`, bounded so
   contrast is never the only signal.
-- [D-027 (cxo)](../../../../dabbler-docs/DECISIONS.md) — `--subtle` is still not a text role; the
+- D-027 (cxo) — `--subtle` is still not a text role; the
   glyph-vs-text distinction that bounds its permitted use.
-- [D-028 (cxo)](../../../../dabbler-docs/DECISIONS.md) — `--accent-indigo` is a transcription gap, not a
+- D-028 (cxo) — `--accent-indigo` is a transcription gap, not a
   missing value; Badge is the one site that must not simply be re-pointed to it.
-- [D-034 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the Foundations page template this page
+- D-034 (cxo) — rules the Foundations page template this page
   follows, and that this page does not ship until its own swatch-grid specimen does.
-- [D-037 (cxo)](../../../../dabbler-docs/DECISIONS.md) — bounds `textTertiary`'s non-informational-glyph
+- D-037 (cxo) — bounds `textTertiary`'s non-informational-glyph
   exception to directional/meaningless glyphs only, and rules this documentation never transcribes a
   measured figure into prose.
-- [D-040 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms this page's specimen has shipped and
+- D-040 (cxo) — confirms this page's specimen has shipped and
   ships this page.
 
 ## Source

@@ -77,10 +77,10 @@ brightness; three brand-adjacent roles (`brandPrimary`, `accent`, `focusRing`) r
 
 ## Change log
 
-- [D-033 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rejects a per-page theme rail across the rest
+- D-033 (cxo) — rejects a per-page theme rail across the rest
   of this documentation precisely so theme could mean something on the one page where it's the
   actual subject.
-- [D-035 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules that a state-changing switcher is not a
+- D-035 (cxo) — rules that a state-changing switcher is not a
   specimen of an axis whose subject is comparison, which is why this page's specimen renders all
   fourteen palettes adjacently instead of following the gallery's own switcher.
 

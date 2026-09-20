@@ -62,7 +62,7 @@ surface variant, or one of the three decorative tile roles.
 
 ## Change log
 
-- [D-018 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms the 12px corner as the ruled corner
+- D-018 (cxo) — confirms the 12px corner as the ruled corner
   for a tile nested inside a card, distinct from the card's own 16px corner.
 
 ## Source

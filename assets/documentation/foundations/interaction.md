@@ -67,10 +67,10 @@ transition becomes instant rather than eased. The scrim's fade becomes instant t
 
 ## Change log
 
-- [D-017 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the mechanism-vs-appearance line these three
+- D-017 (cxo) — rules the mechanism-vs-appearance line these three
   primitives sit exactly on: importing Material for behaviour is allowed, inheriting its paint is
   not.
-- [D-034 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the Foundations page template this page
+- D-034 (cxo) — rules the Foundations page template this page
   follows.
 
 ## Source

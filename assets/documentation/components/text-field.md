@@ -77,7 +77,7 @@ Leading icon: `brandPrimary`. Trailing icon and the password toggle: `textSecond
 
 ## Change log
 
-- [D-003 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the placeholder-is-text finding this page's
+- D-003 (cxo) — rules the placeholder-is-text finding this page's
   *Using it* section states; the two call sites in this file already carry it correctly, though the
   file's own class-level comments have not been updated to match.
 

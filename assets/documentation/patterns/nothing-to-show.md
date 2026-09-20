@@ -74,5 +74,5 @@ carries the sole affordance for creating what would fill it, it stays, which is 
 
 ## Change log
 
-- [D-040 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the three-outcome table above and the
+- D-040 (cxo) — rules the three-outcome table above and the
   two bounds on when a section may be omitted.

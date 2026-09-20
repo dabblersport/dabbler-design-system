@@ -65,7 +65,7 @@ status colour set, `neutral` through the ordinary card surface roles.
 
 ## Change log
 
-- [D-016 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms removal is immediate with no exit
+- D-016 (cxo) — confirms removal is immediate with no exit
   animation, correcting the design source's own prompt file to match.
 
 ## Source

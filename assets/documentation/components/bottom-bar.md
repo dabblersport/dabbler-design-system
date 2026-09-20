@@ -73,9 +73,9 @@ action: the same size and shadow as `Fab` — see *Change log*.
 
 ## Change log
 
-- [D-026 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms this component, its RTL contract and
+- D-026 (cxo) — confirms this component, its RTL contract and
   its create menu all stay as built; no change from the greeting-stack question that touched TopBar.
-- [D-031 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the detached create action's shadow inherits
+- D-031 (cxo) — the detached create action's shadow inherits
   Fab's existing flatness exception rather than needing one of its own.
 
 ## Source

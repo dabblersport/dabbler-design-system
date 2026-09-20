@@ -60,7 +60,7 @@ exactly 1px in either orientation.
 
 ## Change log
 
-- [D-014 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms the two-weight mapping follows the
+- D-014 (cxo) — confirms the two-weight mapping follows the
   token file exactly, and that the unused `borderStrong` role elsewhere in the system is not a
   Divider defect — Divider was never meant to reach it.
 

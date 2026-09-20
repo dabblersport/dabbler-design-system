@@ -80,10 +80,10 @@ what a card is specified against).
 
 ## Change log
 
-- [D-018 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the card corner is 16, a dedicated step, not
+- D-018 (cxo) — the card corner is 16, a dedicated step, not
   12; 12 remains the corner of a tile nested inside a card, which is a different thing measuring the
   same as an old, wrong assumption.
-- [D-019 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the pricing variant names, inverted from an
+- D-019 (cxo) — the pricing variant names, inverted from an
   earlier reading — `pricingSelected` draws the chosen plan, `pricingUnselected` every other one.
 
 ## Source

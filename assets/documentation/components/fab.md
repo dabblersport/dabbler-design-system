@@ -62,12 +62,12 @@ token — see *Using it*.
 
 ## Change log
 
-- [D-004 (cxo)](../../../../dabbler-docs/DECISIONS.md) — the `indigo` tone's fill is the same known,
+- D-004 (cxo) — the `indigo` tone's fill is the same known,
   documented defect as Button's `accent`: a stand-in for a token the design source's own colour
   file has not yet declared.
-- [D-005 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms the 21px corner as this system's
+- D-005 (cxo) — confirms the 21px corner as this system's
   deliberate choice over the Figma file's fully-round default.
-- [D-031 (cxo)](../../../../dabbler-docs/DECISIONS.md) — confirms Fab's shadow as this system's one
+- D-031 (cxo) — confirms Fab's shadow as this system's one
   deliberate exception to flatness, and rules that the bottom navigation bar's own floating action
   inherits this same exception rather than needing one of its own.
 

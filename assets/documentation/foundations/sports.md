@@ -74,13 +74,13 @@ through the same registry.
 
 ## Change log
 
-- [D-008 (cxo)](../../../../dabbler-docs/DECISIONS.md) — this system draws thirteen sports, not twelve; a
+- D-008 (cxo) — this system draws thirteen sports, not twelve; a
   drift in the design source's own written description, corrected against what it actually draws.
-- [D-009 (cxo)](../../../../dabbler-docs/DECISIONS.md) — no sport glyph set exists yet; rules the
+- D-009 (cxo) — no sport glyph set exists yet; rules the
   icon-alone prohibition above and specifies what a real set needs to be before it ships.
-- [D-010 (cxo)](../../../../dabbler-docs/DECISIONS.md) — sport background artwork is never bundled into this
+- D-010 (cxo) — sport background artwork is never bundled into this
   package, and rules the fallback-paint and never-sole-carrier requirements above.
-- [D-034 (cxo)](../../../../dabbler-docs/DECISIONS.md) — rules the Foundations page template this page
+- D-034 (cxo) — rules the Foundations page template this page
   follows.
 
 ## Source
