@@ -80,6 +80,9 @@ leading override where the two scripts diverge) and weight.
 ### Outside the ramp
 Button's own 16/14/12-at-600 label scale — real, shipped, and explicitly not a set of ramp steps.
 
+@figure 400 D-013
+
+
 ## Change log
 
 - D-013 (cxo) — confirms `title3` at weight 400 is correct

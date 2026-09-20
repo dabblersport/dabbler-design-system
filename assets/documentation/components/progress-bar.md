@@ -55,6 +55,10 @@ bare status indicator colour.
 ### Mode
 Determinate (a known fraction) or `.indeterminate` (a busy sweep).
 
+@figure 3px lib/src/tokens/dabbler_geometry.dart#space1
+@figure 6px lib/src/tokens/dabbler_geometry.dart#space2
+
+
 ## Direction
 
 **A determinate bar fills from the start edge, and an indeterminate sweep travels start to end —

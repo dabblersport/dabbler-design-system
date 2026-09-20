@@ -58,6 +58,9 @@ Present or absent — an arbitrary leading glyph slot, no trailing equivalent.
 Tappable (`onTap` set — enforced 45px minimum tap target) or static tag (`onTap` null — no enforced
 minimum, renders at natural pill height).
 
+@figure 45px D-032
+
+
 ## Tokens used
 
 Fill and border: the card surface (unselected) or the selected surface variant (selected, brand

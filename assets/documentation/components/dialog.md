@@ -79,6 +79,10 @@ That's built in, not something to lay out defensively around.
 ### Dismissibility
 Dismissible (Escape and a scrim press both close it) or not.
 
+@figure 340px lib/src/overlays/dialog.dart#DabblerDialogSize
+@figure 420px lib/src/overlays/dialog.dart#DabblerDialogSize
+
+
 ## Tokens used
 
 Panel: the flat fill/hairline/radius/type treatment every surface uses, plus the one reserved

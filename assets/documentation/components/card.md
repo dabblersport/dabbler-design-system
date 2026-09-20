@@ -71,6 +71,10 @@ the card's width.
 ### Interactivity
 Tappable (`onTap` set — gets the shared press scale and focus ring) or inert.
 
+@figure 2px lib/src/cards/card.dart#borderWidthOf
+@figure 2px lib/src/cards/card.dart#borderWidthOf
+
+
 ## Tokens used
 
 Fill and border vary by variant — see *Axes* — resolved through the shared colour set. Corner

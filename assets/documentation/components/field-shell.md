@@ -64,6 +64,11 @@ disabled (1px surface hairline) — checked in that precedence, disabled first.
 Centred (the default, vertically centred against the box) or start-aligned (multiline fields only,
 so the label sits against the first line rather than floating mid-box).
 
+@figure 2px lib/src/interaction/focus_ring.dart#ringWidth
+@figure 1px lib/src/tokens/dabbler_geometry.dart#borderDefault
+@figure 1px lib/src/tokens/dabbler_geometry.dart#borderDefault
+
+
 ## Tokens used
 
 Label: `textSecondary` at rest, `brandPrimary` while focused. Border: the surface hairline at rest
@@ -73,4 +78,4 @@ token every field control reads.
 
 ## Source
 
-`lib/src/forms/field_shell.dart`
+`lib/src/forms/field_shell.dart`, `lib/src/interaction/focus_ring.dart`

@@ -56,6 +56,9 @@ sits in the matching list position.
 ### Tab content
 Label (required), optional leading icon slot, optional badge slot.
 
+@figure 2px lib/src/layout/tabs.dart#_indicatorHeight
+
+
 ## Direction
 
 **The keyboard's arrow-key mapping swaps under Arabic — the same semantic-consequence fact

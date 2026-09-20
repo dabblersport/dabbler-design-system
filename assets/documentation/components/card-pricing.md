@@ -63,6 +63,10 @@ border, filled brand disc with a tick.
 ### Trial pill
 Present or absent.
 
+@figure 2px lib/src/cards/card.dart#borderWidthOf
+@figure 2px lib/src/cards/card.dart#borderWidthOf
+
+
 ## Tokens used
 
 Shell: `pricingUnselected` or `pricingSelected` variant of `Card` — see that page. Indicator:
@@ -81,4 +85,5 @@ brand fill when selected, a plain ring when not. Trial pill: `Badge` at its bran
 
 ## Source
 
-`lib/src/cards/card_pricing_default.dart`, `lib/src/cards/card_pricing_selected.dart`
+`lib/src/cards/card_pricing_default.dart`, `lib/src/cards/card_pricing_selected.dart`,
+`lib/src/cards/card.dart`

@@ -52,6 +52,9 @@ a 24px minimum).
 ### Label
 Present (horizontal only) or absent.
 
+@figure 24px lib/src/tokens/dabbler_geometry.dart#space8
+
+
 ## Tokens used
 
 Default weight: `bgTertiary` — the faint paper step, for separating things inside one container.

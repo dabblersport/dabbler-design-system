@@ -99,6 +99,8 @@ Widget _leadBlock(BuildContext context, DabblerDocBlock block) {
     DabblerDocProse(:final String markup) => GalleryUsage(markup),
     // Excluded by the splitter; unreachable, and stated rather than crashed.
     DabblerDocSpecimen() => const SizedBox.shrink(),
+    // See the note in `_DocSection._block`: rendering a figure is cxo's call.
+    DabblerDocFigure() => const SizedBox.shrink(),
   };
 }
 
@@ -173,6 +175,14 @@ class _DocSection extends StatelessWidget {
         return GalleryUsage(markup);
       case DabblerDocSubheading(:final String text):
         return _subheading(context, text);
+      case DabblerDocFigure():
+    // `@figure` draws nothing, deliberately. T-086 puts how a figure's
+    // provenance appears on screen — a muted line, a hover, or nothing at
+    // all — explicitly outside KAN-329 and with `cxo`, not `cto`. The
+    // directive exists for `tool/check_doc_figures.dart`; rendering it is a
+    // ruling this file does not have, and inventing one here would be the
+    // appearance decision D-041(c)4 forbids.
+        return const SizedBox.shrink();
       case DabblerDocSpecimen(:final String id):
         final GalleryEntry? entry = resolver.resolve(id);
         if (entry == null) {

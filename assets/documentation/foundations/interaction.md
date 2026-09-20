@@ -65,6 +65,10 @@ The focus ring has no animation either way, so there's nothing to switch off. Pr
 happens under reduced motion — removing it would leave a press with no feedback at all — but the
 transition becomes instant rather than eased. The scrim's fade becomes instant the same way.
 
+@figure 2px lib/src/interaction/focus_ring.dart#ringWidth
+@figure 2px lib/src/interaction/focus_ring.dart#ringOffset
+
+
 ## Change log
 
 - D-017 (cxo) — rules the mechanism-vs-appearance line these three

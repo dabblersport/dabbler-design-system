@@ -60,6 +60,62 @@ class DabblerDocSubheading extends DabblerDocBlock {
   String toString() => 'DabblerDocSubheading($text)';
 }
 
+/// A block-level `@figure <value> <claim>` line — `T-086`, the mechanism
+/// `D-043`(e) assigned.
+///
+/// `D-043` settled *whether* a figure may be transcribed (ruled, declared or
+/// measured). This is *how* a ruled or declared one proves its claim:
+///
+/// ```
+/// @figure 340px lib/src/overlays/dialog.dart#DabblerDialogSize
+/// @figure 45px D-032
+/// ```
+///
+/// [value] is the figure exactly as the prose already writes it, unit
+/// included. [claim] is one named member — `<path>#<member>` for a declared
+/// figure, or a bare `D-0NN` for a ruled one. Nothing else is legal.
+///
+/// **Block level only**, its own line, never inline — the same rule
+/// `D-042`(g) fixed for [DabblerDocSpecimen], and the reason
+/// `GalleryUsage.markup`'s two-token contract stays untouched.
+///
+/// Parsed here, on the one parse, because `tool/check_doc_figures.dart` and
+/// the renderer must read the same blocks (`T-086`). A second parser is the
+/// failure this whole chain keeps finding.
+class DabblerDocFigure extends DabblerDocBlock {
+  /// Creates a figure directive.
+  const DabblerDocFigure(this.value, this.claim);
+
+  /// The figure as written in the prose — `340px`, `2px`, `400`.
+  final String value;
+
+  /// `<path>#<member>`, or a bare ruling id.
+  final String claim;
+
+  /// The digits of [value], the part a claim is proved against.
+  ///
+  /// `340px` gives `340`; `1.5` gives `1.5`. Empty when [value] carries no
+  /// digits at all, which the gate reports rather than silently passing.
+  String get numeral {
+    final RegExpMatch? m = RegExp(r'\d+(?:\.\d+)?').firstMatch(value);
+    return m?.group(0) ?? '';
+  }
+
+  /// Whether [claim] names a ruling (`D-032`) rather than a source member.
+  bool get isRuling => RegExp(r'^[DTPG]-\d+').hasMatch(claim);
+
+  /// The file part of a `<path>#<member>` claim, or null for a ruling.
+  String? get claimPath =>
+      isRuling || !claim.contains('#') ? null : claim.split('#').first;
+
+  /// The member part of a `<path>#<member>` claim, or null for a ruling.
+  String? get claimMember =>
+      isRuling || !claim.contains('#') ? null : claim.split('#').last;
+
+  @override
+  String toString() => 'DabblerDocFigure($value -> $claim)';
+}
+
 /// A block-level `@specimen <id>` line.
 ///
 /// **Block level only** — its own line inside a section, never inline. That is
@@ -190,6 +246,8 @@ class DabblerDocPage {
 abstract final class DabblerDocSplitter {
   static final RegExp _provenance = RegExp(r'^\s*<!--.*?-->', dotAll: true);
   static final RegExp _specimen = RegExp(r'^@specimen[ \t]+(\S+)[ \t]*$');
+  static final RegExp _figure =
+      RegExp(r'^@figure[ \t]+(\S+)[ \t]+(\S+)[ \t]*$');
 
   /// Removes the leading HTML provenance comment, which is never rendered.
   ///
@@ -276,6 +334,12 @@ abstract final class DabblerDocSplitter {
       if (specimen != null) {
         flush();
         blocks.add(DabblerDocSpecimen(specimen.group(1)!));
+        continue;
+      }
+      final Match? figure = _figure.firstMatch(line.trimRight());
+      if (figure != null) {
+        flush();
+        blocks.add(DabblerDocFigure(figure.group(1)!, figure.group(2)!));
         continue;
       }
       // `### ` closes the paragraph it follows and stands on its own, the way

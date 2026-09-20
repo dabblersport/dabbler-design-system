@@ -49,6 +49,10 @@ similar dense context where a full-size control would overwhelm the row.
 Rest, focused, filled, error, disabled — the same `FieldShell` states, inherited rather than
 redefined.
 
+@figure 39px lib/src/forms/stepper.dart#boxSizeFor
+@figure 45px lib/src/tokens/dabbler_geometry.dart#touchTargetMin
+
+
 ## Direction
 
 **The minus and plus buttons swap sides under Arabic like the rest of the row, but the numeral
