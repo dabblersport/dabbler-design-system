@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
@@ -261,6 +262,7 @@ class DabblerMenu extends StatefulWidget {
   const DabblerMenu({
     super.key,
     this.trigger,
+    this.openOnTriggerTap = true,
     this.items = const <DabblerMenuEntry>[],
     this.placement = DabblerMenuPlacement.bottomStart,
     this.open,
@@ -305,9 +307,54 @@ class DabblerMenu extends StatefulWidget {
   /// source's `cloneElement` adds `aria-haspopup` / `aria-expanded`, and the
   /// Flutter equivalent is the [Semantics] wrapper this widget puts around it.
   ///
-  /// It must be a real interactive element — an icon Button — not a bare span
-  /// (`Menu.prompt.md` — *Composition rules*).
+  /// It must be a real interactive element — a [DabblerButton] or an icon
+  /// button — not a bare span (`Menu.prompt.md` — *Composition rules*).
+  ///
+  /// **A trigger that handles its own gestures is supported, and is the
+  /// recommended shape.** Tapping it opens the menu whether or not it was
+  /// given an `onPressed` of its own, and if it has one, both run — the
+  /// source's `<span onClick>` wrapper works by DOM bubbling and this port
+  /// reproduces that with a [Listener] rather than a competing
+  /// [GestureDetector]. Before KAN-286 the wrapper lost the gesture arena to
+  /// the trigger and the uncontrolled default silently did nothing; a test
+  /// now pins it open.
+  ///
+  /// So the uncontrolled form below is real, not illustrative:
+  ///
+  /// ```dart
+  /// DabblerMenu(
+  ///   trigger: const DabblerButton(label: 'Actions'),
+  ///   items: items,
+  /// )
+  /// ```
+  ///
+  /// Pass [open] and [onOpenChanged] only when the caller needs to own the
+  /// state — driving it from elsewhere, or persisting it.
+  ///
+  /// **A controlled owner must not toggle from its own trigger as well.** This
+  /// wrapper reports every trigger tap through [onOpenChanged] whether the
+  /// menu is controlled or not, exactly as the source's `setOpen` does
+  /// (`Menu.jsx:32-35`). A trigger that toggles too would fire twice per click
+  /// and cancel out — which is what `DabblerSelect` did until KAN-286, where
+  /// its field's `onPressed` had been opening the menu because this wrapper
+  /// could not.
   final Widget? trigger;
+
+  /// Whether a tap on [trigger] toggles the menu. Defaults to true.
+  ///
+  /// The escape hatch for a trigger that must decide for itself when to open —
+  /// the Flutter stand-in for `e.stopPropagation()` on the source's
+  /// `<span onClick>` wrapper, which a [Listener] cannot be prevented from
+  /// seeing the way a DOM handler can.
+  ///
+  /// [DabblerPickerField] is the case it exists for: `PickerField.prompt.md`
+  /// forbids a second way to open the picker, so a tap on the input must land
+  /// on the input and only the trailing button may open. It sets this false
+  /// and drives [onOpenChanged] from that button.
+  ///
+  /// Leave it true for an ordinary trigger. Setting it false on an
+  /// uncontrolled menu leaves nothing able to open the menu at all.
+  final bool openOnTriggerTap;
 
   /// The rows, in order. Separators are entries; see [DabblerMenuEntry].
   final List<DabblerMenuEntry> items;
@@ -501,6 +548,10 @@ class _DabblerMenuState extends State<DabblerMenu> {
     }
   }
 
+  /// Where the pointer went down on the trigger, for the click guard in
+  /// [_TriggerTap]. Null between gestures.
+  Offset? _triggerDownAt;
+
   void _setOpen(bool value) {
     if (widget.open == null) {
       setState(() => _uncontrolledOpen = value);
@@ -584,9 +635,51 @@ class _DabblerMenuState extends State<DabblerMenu> {
       child: Semantics(
         // The source's `aria-haspopup` / `aria-expanded` on the trigger.
         expanded: _open,
-        child: GestureDetector(
+        // KAN-286 — a [Listener], NOT a [GestureDetector].
+        //
+        // The source wraps the trigger in `<span onClick={() => setOpen(!open)}>`
+        // (`Menu.jsx:146`) and relies on DOM bubbling: a click on an inner
+        // `<button>` fires the button's own handler AND reaches this span. The
+        // uncontrolled default therefore works with a gesture-handling trigger
+        // in the web source, which is what this port has to reproduce.
+        //
+        // A wrapping [GestureDetector] cannot: Flutter's gesture arena is
+        // winner-take-all, and a [DabblerButton] trigger claims the tap for its
+        // own press-scale recogniser — which it registers whether or not it was
+        // given an `onPressed`. The wrapper's `onTap` then never fired, so the
+        // documented uncontrolled pattern silently did nothing.
+        //
+        // [Listener] takes raw pointer events without entering the arena, so
+        // both handlers run. That is bubbling, and it is the behaviour the
+        // source describes.
+        child: Listener(
           behavior: HitTestBehavior.opaque,
-          onTap: () => _setOpen(!_open),
+          onPointerDown: (PointerDownEvent event) {
+            _triggerDownAt = event.position;
+          },
+          onPointerCancel: (PointerCancelEvent event) {
+            _triggerDownAt = null;
+          },
+          onPointerUp: (PointerUpEvent event) {
+            // Down-then-up within the slop is a click; a drag that merely ends
+            // here is not. Without this, dragging off the trigger would still
+            // toggle, which `onClick` would not do.
+            final Offset? down = _triggerDownAt;
+            _triggerDownAt = null;
+            if (down == null ||
+                (event.position - down).distance > kTouchSlop) {
+              return;
+            }
+            if (!widget.openOnTriggerTap) {
+              return;
+            }
+            // Controlled or not, the wrapper reports the toggle — the
+            // source's `setOpen` calls `onOpenChange` either way
+            // (`Menu.jsx:32-35`), and `controlled open` pins that here. A
+            // controlled owner must therefore NOT also toggle from its own
+            // trigger, or the click fires twice and cancels out.
+            _setOpen(!_open);
+          },
           child: SizedBox(
             key: _anchorKey,
             width: widget.fullWidth ? double.infinity : null,

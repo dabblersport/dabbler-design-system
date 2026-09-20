@@ -86,14 +86,19 @@ class GalleryThemeSwitcher extends StatefulWidget {
   State<GalleryThemeSwitcher> createState() => _GalleryThemeSwitcherState();
 }
 
-/// ## Why both menus are *controlled*
+/// ## Why these menus are *controlled*
 ///
-/// [DabblerMenu] opens an uncontrolled menu from a [GestureDetector] it wraps
-/// around the trigger. That works for an inert trigger, but [DabblerButton] is
-/// itself a gesture-handling widget and wins the arena, so the wrapper never
-/// sees the tap — the menu simply would not open. The fix is the one the
-/// component already supports and `Select` (DS-601) already uses: own `open`
-/// here, and open it from the button's own `onPressed`.
+/// Because this widget reads the open state back — the trigger's
+/// `semanticLabel` and the checked row both depend on it — not because the
+/// uncontrolled path does not work.
+///
+/// It did not, once: [DabblerMenu] wrapped its trigger in a [GestureDetector]
+/// that a [DabblerButton] beat in the gesture arena, so the tap never reached
+/// it. This file worked around that by toggling from the button's own
+/// `onPressed`. KAN-286 fixed the wrapper — it is a [Listener] now, which does
+/// not enter the arena — and the workaround came out with it: the wrapper
+/// reports every trigger tap through `onOpenChanged`, so toggling here as well
+/// would fire twice per click and cancel out.
 class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
   bool _themeOpen = false;
   bool _modeOpen = false;
@@ -144,7 +149,8 @@ class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
               tone: DabblerButtonTone.outlined,
               size: DabblerButtonSize.small,
               semanticLabel: 'Theme: ${galleryThemeLabel(appearance.theme)}',
-              onPressed: () => setState(() => _themeOpen = !_themeOpen),
+              // Opening is the menu wrapper's; see the class doc.
+              onPressed: () {},
             ),
           ),
           const SizedBox(width: DabblerSpacing.space2),
@@ -172,7 +178,7 @@ class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
               tone: DabblerButtonTone.outlined,
               size: DabblerButtonSize.small,
               semanticLabel: 'Brightness: ${galleryModeLabel(appearance.mode)}',
-              onPressed: () => setState(() => _modeOpen = !_modeOpen),
+              onPressed: () {},
             ),
           ),
           const SizedBox(width: DabblerSpacing.space2),
@@ -203,8 +209,7 @@ class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
               size: DabblerButtonSize.small,
               semanticLabel:
                   'Direction: ${galleryDirectionLabel(appearance.direction)}',
-              onPressed: () =>
-                  setState(() => _directionOpen = !_directionOpen),
+              onPressed: () {},
             ),
           ),
         ],

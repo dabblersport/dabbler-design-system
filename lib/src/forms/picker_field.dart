@@ -61,10 +61,16 @@ part 'picker_field_shell.dart';
 ///
 /// `PickerField.prompt.md` — *Composition rules*: *"Do not add a second way
 /// to open the picker (e.g. opening on focus) — typing must stay possible."*
-/// [DabblerMenu] toggles on any tap on its trigger, so the field it is given
-/// is wrapped in an absorbing [GestureDetector]: the trailing button, being
-/// deeper in the tree, still wins the gesture arena, and a tap on the input or
-/// on blank shell area lands on the input instead of opening the picker.
+/// [DabblerMenu] toggles on any tap on its trigger, so this field turns that
+/// off with [DabblerMenu.openOnTriggerTap] `false` and opens only from the
+/// trailing button, which calls [onOpenChanged] itself. A tap on the input or
+/// on blank shell area focuses the input instead.
+///
+/// It used to rely on an absorbing [GestureDetector] winning the gesture arena
+/// instead. That stopped being a mechanism under KAN-286, where the menu's
+/// wrapper became a [Listener] — which takes pointer events without entering
+/// the arena and so cannot be absorbed. The intent is unchanged and is now
+/// stated rather than inferred from gesture precedence.
 class DabblerPickerField extends StatefulWidget {
   /// Creates a picker field.
   const DabblerPickerField({
@@ -277,6 +283,8 @@ class _DabblerPickerFieldState extends State<DabblerPickerField> {
       fullWidth: true,
       open: widget.open && widget.enabled,
       onOpenChanged: (bool v) => widget.onOpenChanged?.call(v),
+      // See the class doc: only the trailing button opens this field.
+      openOnTriggerTap: false,
       label: widget.label,
       // No rows: the picker is the whole content, which is what the menu's
       // header slot is — the same slot Select puts its search field in.

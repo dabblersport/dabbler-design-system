@@ -1,3 +1,4 @@
+import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/overlays/menu.dart';
 import 'package:dabbler_design_system/src/overlays/sheet.dart';
@@ -289,6 +290,105 @@ void main() {
   });
 
   // ----- Controlled open, the path Select (DS-601) and PickerField need -----
+  group('KAN-286 — an uncontrolled menu opens from a gesture-handling trigger',
+      () {
+    // The defect: the trigger wrapper was a GestureDetector, and Flutter's
+    // arena is winner-take-all, so a DabblerButton trigger claimed the tap for
+    // its press-scale recogniser and the wrapper never fired. The source works
+    // because `<span onClick>` receives the click by DOM bubbling
+    // (`Menu.jsx:146`), which a [Listener] reproduces.
+
+    testWidgets('a DabblerButton trigger with no onPressed opens the menu', (
+      WidgetTester tester,
+    ) async {
+      // Exactly the shape menu_gallery.dart:47 ships, and exactly the shape
+      // the class dartdoc recommends.
+      await tester.pumpWidget(_host(
+        DabblerMenu(
+          label: 'game actions',
+          trigger: const DabblerButton(label: 'Actions'),
+          items: _threeItems(),
+        ),
+      ));
+      expect(find.text('share game'), findsNothing);
+
+      await tester.tap(find.text('Actions'));
+      await tester.pumpAndSettle();
+      expect(find.text('share game'), findsOneWidget,
+          reason: 'the documented uncontrolled pattern must actually open');
+    });
+
+    testWidgets('tapping the trigger again closes it', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(
+        DabblerMenu(
+          label: 'game actions',
+          trigger: const DabblerButton(label: 'Actions'),
+          items: _threeItems(),
+        ),
+      ));
+      await tester.tap(find.text('Actions'));
+      await tester.pumpAndSettle();
+      expect(find.text('share game'), findsOneWidget);
+
+      await tester.tap(find.text('Actions'));
+      await tester.pumpAndSettle();
+      expect(find.text('share game'), findsNothing,
+          reason: 'the wrapper toggles, as `setOpen(!open)` does');
+    });
+
+    testWidgets("the trigger's own onPressed still runs — both fire, as in "
+        'the DOM', (WidgetTester tester) async {
+      int pressed = 0;
+      await tester.pumpWidget(_host(
+        DabblerMenu(
+          label: 'game actions',
+          trigger: DabblerButton(label: 'Actions', onPressed: () => pressed++),
+          items: _threeItems(),
+        ),
+      ));
+      await tester.tap(find.text('Actions'));
+      await tester.pumpAndSettle();
+      expect(pressed, 1, reason: 'the Listener must not steal the tap');
+      expect(find.text('share game'), findsOneWidget,
+          reason: 'and the menu still opens — bubbling, not interception');
+    });
+
+    testWidgets('a drag off the trigger does not toggle it', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(
+        DabblerMenu(
+          label: 'game actions',
+          trigger: const DabblerButton(label: 'Actions'),
+          items: _threeItems(),
+        ),
+      ));
+      final Offset start = tester.getCenter(find.text('Actions'));
+      final TestGesture gesture = await tester.startGesture(start);
+      await gesture.moveBy(const Offset(120, 0));
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(find.text('share game'), findsNothing,
+          reason: 'a Listener sees every pointer up; only a click opens');
+    });
+
+    testWidgets('a non-gesture trigger still opens — no regression', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(
+        DabblerMenu(
+          label: 'game actions',
+          trigger: _trigger,
+          items: _threeItems(),
+        ),
+      ));
+      await _openMenu(tester);
+      expect(find.text('share game'), findsOneWidget);
+    });
+  });
+
   group('controlled open', () {
     /// An owner that holds `open` itself, as `Select` does.
     Widget controlled({

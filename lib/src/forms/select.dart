@@ -342,12 +342,12 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
         // `open={open && !disabled}` (`Select.jsx:88`).
         open: _open && !disabled,
         focusNode: _fieldFocus,
-        onPressed: disabled
-            ? null
-            : () {
-                _fieldFocus.requestFocus();
-                _setOpen(!_open);
-              },
+        // Focus only. Opening is [DabblerMenu]'s trigger wrapper, which
+        // reports the tap through `onOpenChanged` (KAN-286). This used to
+        // toggle `_open` itself because that wrapper was a GestureDetector
+        // this field won in the arena, so the tap never reached it; now that
+        // it does, toggling here as well would open and immediately close.
+        onPressed: disabled ? null : _fieldFocus.requestFocus,
       ),
     );
 
