@@ -1,0 +1,41 @@
+name: CI
+
+# T-087(d) — this package had 1382 tests and two tool/-shaped gates that ran
+# only when a human remembered to run them by hand. This workflow is the fix:
+# every push and every PR now runs the analyzer, the test suite, and the
+# @figure doc-figures gate automatically.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pinned to an exact Flutter version rather than `channel: stable`.
+      # dabbler-code's ci.yml tracks `stable` unpinned, and its own CLAUDE.md
+      # records the failure mode that caused: a future SDK bump can make a
+      # previously-clean lint fatal with no code change in this repo, which is
+      # the same mechanism that killed that project's deploy-web.yml. Pinning
+      # here means a Flutter upgrade is a deliberate, reviewed bump of this
+      # line, not something that lands silently between one push and the
+      # next. Version below is the one all three checks were verified against
+      # (flutter --version) before this workflow was written.
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.1'
+          channel: 'stable'
+
+      - run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-pub --no-fatal-infos
+
+      - name: Test
+        run: flutter test
+
+      - name: Doc figures gate
+        run: dart run tool/check_doc_figures.dart
