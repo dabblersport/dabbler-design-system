@@ -77,6 +77,11 @@ disabled.** Pair it with a second cue — reduced opacity, a distinct fill, a ch
 because a reader cannot tell "dim because unavailable" from "dim because someone chose a weak
 colour" from contrast alone.
 
+**Error and validation text is the one thing "disabled" never dims.** It keeps its status tone and
+never falls to `textTertiary` in any state — a message saying what is wrong has to be readable
+exactly when the control is unusable, because that is when a reader most needs to know why. The
+permission above covers a disabled control's own text, not the message explaining it.
+
 **`textTertiary` may also colour a non-informational directional glyph — a chevron, an empty
 rating star — but never a glyph that carries meaning on its own, like a status icon or a sport
 mark.** This is a narrow, bounded exception, not a general licence for "glyphs are exempt from the
