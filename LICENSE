@@ -1,0 +1,38 @@
+Copyright (c) 2026 Dabbler (dabblersport). All rights reserved.
+
+This repository and its contents — including but not limited to source code,
+design tokens, documentation, and other original works authored by Dabbler —
+are proprietary and confidential. No license, express or implied, to use,
+copy, modify, merge, publish, distribute, sublicense, or sell any part of this
+repository is granted, except by separate written agreement with Dabbler.
+
+Unauthorized copying, reproduction, or distribution of this repository or any
+portion of it, via any medium, is strictly prohibited.
+
+------------------------------------------------------------------------------
+
+THIRD-PARTY FONTS — NOT COVERED BY THIS LICENSE
+
+This repository bundles font files under fonts/ that are third-party works.
+This LICENSE file does not grant, and is not intended to grant, any rights to
+those fonts — Dabbler is licensing only its own code and content above, not
+redistributing font rights it does not hold.
+
+  - fonts/Gloock-Regular.ttf is licensed under the SIL Open Font License,
+    included in this repository at fonts/OFL-Gloock.txt.
+
+  - fonts/Glory-Regular.ttf, fonts/Glory-Light.ttf, fonts/Glory-Medium.ttf,
+    fonts/Glory-SemiBold.ttf, and fonts/Glory-Bold.ttf are licensed under the
+    SIL Open Font License, included in this repository at fonts/OFL-Glory.txt.
+
+  - fonts/Wingx-Regular.otf and the five Meral Sans files
+    (fonts/meral-sans-regular.ttf, fonts/meral-sans-light.ttf,
+    fonts/meral-sans-medium.ttf, fonts/meral-sans-semibold.ttf,
+    fonts/meral-sans-bold.ttf) carry NO license record in this repository.
+    Their rights are not held by Dabbler and are not granted by this file.
+    Do not rely on this LICENSE, or on the presence of these files in this
+    repository, as permission to use, copy, or redistribute them.
+
+Each font remains subject to its own license terms, held by its respective
+rights holder, independent of the license status of the rest of this
+repository.
