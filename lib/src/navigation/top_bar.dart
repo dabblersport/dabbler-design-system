@@ -77,7 +77,6 @@ class DabblerNavigationAction {
 /// | source | here | why |
 /// |---|---|---|
 /// | fixed `width: 384` | fills its parent | a Flutter bar spans the screen; the export's 384 is the Figma frame, and the card calls it *"fixed export geometry"*, not a product width |
-/// | `height: 62` | [barHeight] (62) as a **minimum** | the 45-target actions add up to 45 + 2×12 = 69 of content, so a hard 62 would clip them. See [barHeight] |
 /// | bare 22px glyph nodes | [DabblerNavigationAction] in a 45×45 hit box | AC1 — targets ≥44×44 |
 /// | no focus or press | [DabblerFocusRing] + [DabblerPressScale] | AC1 — DS-200 |
 /// | outer 1px border on all four sides + radius 16 | none | that is the specimen card's own frame around a 384px export, not chrome the bar wears on a screen. Set [border] to restore it |
@@ -115,13 +114,22 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// (`navigation-system.card.html` — *Anatomy*).
   static const String defaultAvatarSeed = 'Alen Rahman';
 
-  /// `height: 62` (`NavigationTopBar.jsx:8`), applied as a **minimum**.
+  /// `height: 62` (`NavigationTopBar.jsx:8`), applied as a **fixed height**.
   ///
-  /// The export's own row is `padding: '12px 16px'` around 22px glyphs, i.e.
-  /// 46 — it fits 62 only because nothing in it is a real target. Raising the
-  /// glyph boxes to the 45 floor this ticket requires makes the content 69
-  /// tall, so pinning 62 would clip it. A minimum keeps the export's height
-  /// wherever the content still fits under it.
+  /// The export draws 62 with a 1px border top and bottom (`:15`, `:17`), so
+  /// the interior is **60**. A 45-tall [actionTarget] centred in 60 leaves
+  /// 7.5 above and below, and the 22px glyph keeps its 28px line box. Nothing
+  /// is clipped and not one painted pixel moves, so the bar takes the drawn
+  /// height exactly — `D-039`. (This port draws no border unless [border] is
+  /// set, so by default the interior is the full 62 and the clearance is 8.5.
+  /// Either way the 45 box fits with room to spare.)
+  ///
+  /// **A hit box is bounded by the pitch between peer targets, never by the
+  /// padding around the drawn mark.** [barPadding]'s 12 is space the target
+  /// may claim, not a wall it must stay inside; the only real bounds are
+  /// another target's claim and the edge of what the component owns. That is
+  /// the rule `D-032` exists to state, and it is why the interior is the
+  /// number that matters here rather than padding-plus-content.
   static const double barHeight = 62;
 
   /// `padding: '12px 16px'` (`NavigationTopBar.jsx:33`). 16 is off the base-3
@@ -225,8 +233,17 @@ class DabblerNavigationTopBar extends StatelessWidget {
     );
 
     Widget bar = Container(
-      constraints: const BoxConstraints(minHeight: barHeight),
-      padding: barPadding,
+      height: barHeight,
+      // Horizontal only. [barPadding]'s vertical 12 is claimable space, not a
+      // wall — see [barHeight]. Applying it here would box the row into
+      // 62 - 24 = 38 and crush the 45-tall [actionTarget] back to 38, which is
+      // the very clipping the old minimum was invented to avoid. Nothing
+      // painted moves: the tallest drawn thing is the 22px glyph in its 28px
+      // line box, and the row centres it either way.
+      padding: EdgeInsetsDirectional.only(
+        start: barPadding.start,
+        end: barPadding.end,
+      ),
       decoration: BoxDecoration(
         // `backgroundColor: 'var(--neutral-100)'`, which is `--surface-page`
         // (`tokens/colors.css:32`).

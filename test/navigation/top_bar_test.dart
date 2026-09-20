@@ -425,7 +425,22 @@ void main() {
       // `--neutral-100` is `--surface-page` — tokens/colors.css:32.
       expect(decoration.color, _colors().bgPrimary);
       expect(decoration.border, isNull);
-      expect(bar.padding, DabblerNavigationTopBar.barPadding);
+      // D-039/KAN-319: the drawn inline padding is applied; the vertical 12
+      // is NOT, because it is claimable space rather than a wall. Boxing the
+      // row into 62 - 24 = 38 would crush the 45-tall actionTarget — the
+      // clipping the old `minHeight` was invented to dodge. barPadding itself
+      // still records the drawn 12/16 and is unchanged.
+      expect(
+        bar.padding,
+        EdgeInsetsDirectional.only(
+          start: DabblerNavigationTopBar.barPadding.start,
+          end: DabblerNavigationTopBar.barPadding.end,
+        ),
+      );
+      expect(DabblerNavigationTopBar.barPadding.top, 12,
+          reason: 'the drawn padding constant is unchanged');
+      expect(bar.constraints?.maxHeight, DabblerNavigationTopBar.barHeight,
+          reason: 'D-039: 62 is a fixed height, not a minimum');
     });
 
     testWidgets('`border: true` restores the specimen outline',
