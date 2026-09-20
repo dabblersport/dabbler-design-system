@@ -137,9 +137,28 @@ class _DocSection extends StatelessWidget {
   static bool _isSubHeading(DabblerDocBlock block) =>
       block is DabblerDocSubheading;
 
-  /// The single gap above `section.blocks[i]`.
-  double _gapBefore(int i) {
-    final DabblerDocBlock block = section.blocks[i];
+  /// The blocks that actually draw.
+  ///
+  /// A `@figure` is provenance for `tool/check_doc_figures.dart` (KAN-329) and
+  /// renders nothing, so it is not a block this ramp can space. Leaving it in
+  /// the sequence cost twice: every directive got a [DabblerSpacing.space4]
+  /// gap wrapped around an invisible widget — 19 of them across 11 `## Axes`
+  /// sections — and, worse, it broke ADJACENCY. `_gapBefore` reads `i - 1` to
+  /// decide whether it is sitting under a sub-heading, and a figure between
+  /// the two made the prose below it look like an ordinary sibling, costing
+  /// the [DabblerSpacing.space2] tight binding D-050(c) rules for exactly
+  /// that pair.
+  ///
+  /// Filtering here rather than special-casing inside [_gapBefore] keeps the
+  /// ramp itself byte-identical to what KAN-333 landed: it still reasons over
+  /// a list of drawn blocks, and it simply is not shown the ones that are not.
+  List<DabblerDocBlock> get _drawnBlocks => section.blocks
+      .where((DabblerDocBlock b) => b is! DabblerDocFigure)
+      .toList(growable: false);
+
+  /// The single gap above `blocks[i]`.
+  double _gapBefore(List<DabblerDocBlock> blocks, int i) {
+    final DabblerDocBlock block = blocks[i];
     // Straight after the `## ` label — see the class doc for why this is 12
     // even for a sub-heading.
     if (i == 0) {
@@ -148,7 +167,7 @@ class _DocSection extends StatelessWidget {
     if (_isSubHeading(block) || block is DabblerDocSpecimen) {
       return DabblerSpacing.space6;
     }
-    if (_isSubHeading(section.blocks[i - 1])) {
+    if (_isSubHeading(blocks[i - 1])) {
       return DabblerSpacing.space2;
     }
     return DabblerSpacing.space4;
@@ -156,14 +175,15 @@ class _DocSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<DabblerDocBlock> drawn = _drawnBlocks;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         GallerySectionLabel(section.heading),
-        for (int i = 0; i < section.blocks.length; i++) ...<Widget>[
-          SizedBox(height: _gapBefore(i)),
-          _block(context, section.blocks[i]),
+        for (int i = 0; i < drawn.length; i++) ...<Widget>[
+          SizedBox(height: _gapBefore(drawn, i)),
+          _block(context, drawn[i]),
         ],
       ],
     );
@@ -176,12 +196,18 @@ class _DocSection extends StatelessWidget {
       case DabblerDocSubheading(:final String text):
         return _subheading(context, text);
       case DabblerDocFigure():
-    // `@figure` draws nothing, deliberately. T-086 puts how a figure's
-    // provenance appears on screen — a muted line, a hover, or nothing at
-    // all — explicitly outside KAN-329 and with `cxo`, not `cto`. The
-    // directive exists for `tool/check_doc_figures.dart`; rendering it is a
-    // ruling this file does not have, and inventing one here would be the
-    // appearance decision D-041(c)4 forbids.
+        // `@figure` draws nothing, deliberately. T-086 puts how a figure's
+        // provenance appears on screen — a muted line, a hover, or nothing at
+        // all — explicitly outside KAN-329 and with `cxo`, not `cto`. The
+        // directive exists for `tool/check_doc_figures.dart`; rendering it is
+        // a ruling this file does not have, and inventing one here would be
+        // the appearance decision D-041(c)4 forbids.
+        //
+        // Unreachable from a section since the ramp fix: [_drawnBlocks]
+        // filters figures out before this switch sees them, so they cost no
+        // gap. Kept because the type is sealed and because [_leadBlock] has
+        // the same obligation — and because a shrink() is the honest answer
+        // if a later caller does reach it.
         return const SizedBox.shrink();
       case DabblerDocSpecimen(:final String id):
         final GalleryEntry? entry = resolver.resolve(id);

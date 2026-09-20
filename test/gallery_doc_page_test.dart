@@ -139,6 +139,97 @@ void main() {
     });
   });
 
+  group('KAN-329 remediation — @figure costs no space', () {
+    // Found by KAN-333's self review: DabblerDocFigure renders
+    // SizedBox.shrink(), but _gapBefore was still spacing it, so every
+    // directive got a 12px gap around an invisible widget — and a figure
+    // between a sub-heading and its prose broke the space2 tight binding
+    // D-050(c) rules for that pair. The ramp now reasons over drawn blocks
+    // only.
+
+    /// The gaps the SECTION ramp emitted, in order.
+    ///
+    /// `GallerySections` puts its own `space8 / rule / space8` between
+    /// top-level children (KAN-333 AC5, untouched), so the section's own
+    /// ramp is what follows that last `space8`. Sliced off here rather than
+    /// asserted around, so a change to the outer separator cannot look like
+    /// a change to the interior ramp.
+    List<double> gaps(WidgetTester tester) {
+      final List<double> all = tester
+          .widgetList<SizedBox>(find.descendant(
+            of: find.byType(DabblerDocPageView),
+            matching: find.byType(SizedBox),
+          ))
+          .where((SizedBox b) =>
+              b.height != null && b.width == null && b.key == null)
+          .map((SizedBox b) => b.height!)
+          .toList();
+      // GallerySections emits `space8 / rule / space8` before each top-level
+      // child, so the section's own ramp is everything after that final 24.
+      final int lastOuter = all.lastIndexOf(DabblerSpacing.space8);
+      return lastOuter < 0 ? all : all.sublist(lastOuter + 1);
+    }
+
+    const String withFigures = '# Colour\n\n'
+        'One sentence.\n\n'
+        'Intro.\n\n'
+        '## Axes\n\n'
+        'First paragraph.\n\n'
+        '@figure 2px lib/src/cards/card.dart#borderWidthOf\n\n'
+        '@figure 1px lib/src/tokens/dabbler_geometry.dart#borderDefault\n\n'
+        'Second paragraph.\n';
+
+    const String withoutFigures = '# Colour\n\n'
+        'One sentence.\n\n'
+        'Intro.\n\n'
+        '## Axes\n\n'
+        'First paragraph.\n\n'
+        'Second paragraph.\n';
+
+    testWidgets('a section with figures spaces exactly like one without',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(_app(
+        page: 'foundations/colour.md',
+        pages: const <String, String>{_colourPath: withoutFigures},
+      ));
+      await tester.pumpAndSettle();
+      final List<double> clean = gaps(tester);
+
+      await tester.pumpWidget(_app(
+        page: 'foundations/colour.md',
+        pages: const <String, String>{_colourPath: withFigures},
+      ));
+      await tester.pumpAndSettle();
+
+      expect(gaps(tester), clean,
+          reason: 'two @figure directives must add no gap at all — they draw '
+              'nothing, so the ramp must not space them');
+    });
+
+    testWidgets('a figure between a sub-heading and its prose keeps space2',
+        (WidgetTester tester) async {
+      // The adjacency half. Without the fix the prose below reads as an
+      // ordinary sibling (12) instead of a heading's own prose (6).
+      const String interposed = '# Colour\n\n'
+          'One sentence.\n\n'
+          'Intro.\n\n'
+          '## Axes\n\n'
+          '### Size\n\n'
+          '@figure 2px lib/src/cards/card.dart#borderWidthOf\n\n'
+          'The prose under the heading.\n';
+      await tester.pumpWidget(_app(
+        page: 'foundations/colour.md',
+        pages: const <String, String>{_colourPath: interposed},
+      ));
+      await tester.pumpAndSettle();
+
+      // label -> sub-heading is 12 (first block), sub-heading -> its prose 6.
+      expect(gaps(tester), <double>[12, 6],
+          reason: 'D-050(c): a sub-heading binds to its own prose at space2, '
+              'and an invisible directive between them cannot break that');
+    });
+  });
+
   group('AC5 — a bad page is visible, never a throw', () {
     testWidgets('navigating to a missing path renders the failure in place',
         (WidgetTester tester) async {
