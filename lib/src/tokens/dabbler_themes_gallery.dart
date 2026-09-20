@@ -102,8 +102,11 @@ Widget _component(BuildContext context) {
       const GalleryUsage(
         '**One component, fourteen palettes, all at once.** Each cell installs '
         'its own `(theme, brightness)` resolution, so none of them follows the '
-        'switcher in the page header. Read across a row: the card surface, the '
-        'ink, the hairline and the neutral button never move — only the filled '
+        'switcher in the page header — and that switcher is gallery chrome, a '
+        'tool for reviewing the system, not a widget the app ships or anyone '
+        'importing this package would use. Read across a row: the card '
+        'surface, the ink, the hairline and the neutral button never move — '
+        'only the filled '
         'button, the link-coloured label and the focus tint retint. Read down '
         'a column: that is the same theme at the other brightness.',
       ),
