@@ -21,8 +21,9 @@ blocked on KAN-261 having no assignable executor. KAN-279 (`a90a784`) shipped
 the tone and deleted the stand-in. Re-measured for this correction rather than
 taken from the commit: `calendar.dart:880` passes DabblerButtonTone.text for
 Cancel, Confirm takes the default `primary` (`button.dart:193`), and
-DabblerCalendarTextAction appears nowhere in lib/ or test/. Both tones are now
-pinned in `test/calendar/calendar_test.dart`.
+DabblerCalendarTextAction appears nowhere in lib/ or in executable test code —
+the name survives only in two test comments recording what the footer used to
+carry. Both tones are now pinned in `test/calendar/calendar_test.dart`.
 
 Direction: DabblerCalendarMonth.defaultFirstWeekdayFor(TextDirection) is a
 real nuance worth getting right — it is NOT the same as "the caller must
