@@ -41,6 +41,36 @@ enum DabblerEmptyStateSize {
 /// at most. Two actions means the screen is really a decision."* — hence the
 /// single [action].
 ///
+/// ## When NOT to use it — the third outcome, `D-040`
+///
+/// An empty region has **three** outcomes, and this component covers two of
+/// them. The third is to draw nothing at all.
+///
+/// | The empty region is… | Outcome |
+/// |---|---|
+/// | the answer to what the user came for | [DabblerEmptyStateSize.page] |
+/// | a subordinate section holding the **only** way to create the first item | [DabblerEmptyStateSize.inline] |
+/// | a subordinate section offering no affordance the user cannot reach elsewhere | **omitted entirely, heading and all** |
+///
+/// The one-line test: **is this empty region the answer to what the user came
+/// for?** If it is not, and it offers nothing the user cannot get to another
+/// way, the section does not appear — an empty card that only says "nothing
+/// here" is chrome charging rent on a screen.
+///
+/// **Two bounds, or this reads as licence to hide things.**
+///
+/// 1. **Never omit where absence is ambiguous with failure.** "No results" and
+///    "the request did not load" must not look alike. A region that might be
+///    empty *because something broke* belongs to the *Telling the user
+///    something happened* pattern, not to this one.
+/// 2. **Never omit the only path to the first item.** If the section holds the
+///    sole affordance for creating the thing, omitting it strands the user
+///    with no way in. That case is exactly what
+///    [DabblerEmptyStateSize.inline] exists for.
+///
+/// This section is here because a component documenting two sizes and no
+/// "when not to use" will keep reproducing the question it just answered.
+///
 /// ## AC1: there is no illustration, and that is the feature
 ///
 /// KAN-242's only acceptance criterion is a **constraint**: *"No elaborate hero
