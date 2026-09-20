@@ -56,14 +56,13 @@ specific one.
 
 ## Specimen
 
-Every tone but one, at every size, plus the icon-only form, loading and disabled — see the
-*Button* section of `controls`'s gallery entries.
+**Every tone has a specimen.** Nine of them fill a tones × states matrix — rest, small, pressed,
+focus, loading, disabled — and `icon`, the tenth, sits with the leading-icon examples below it,
+followed by the `full` size. See the *Button* section of `controls`'s gallery entries.
 
-**`text` is that exception: it has no specimen.** `_matrixTones` (`button_gallery.dart:61-70`) is a
-hand-listed set rather than `DabblerButtonTone.values`, and `text` was never added to it when the
-tone shipped — so the gallery renders nine of the ten. The tone itself is live and in production
-use (`calendar.dart:880`, `time_picker.dart:535`); the gap is in the specimen, not in the
-component. Closing it means editing the gallery, which is Dart and so outside a content ticket.
+Read the matrix for tones and states rather than for a full size grid: `small` is one of its six
+columns and `rest` is `medium`, while `full` is shown on a couple of tones in its own group, not
+once per tone.
 
 ## Using it
 
