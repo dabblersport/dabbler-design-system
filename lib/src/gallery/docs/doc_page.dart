@@ -39,6 +39,27 @@ class DabblerDocProse extends DabblerDocBlock {
   String toString() => 'DabblerDocProse(${markup.length} chars)';
 }
 
+/// A `### ` sub-heading inside a `## ` section.
+///
+/// Its own block kind at the **splitter** level, not a renderer flourish.
+/// Before `KAN-330` the splitter tested `'# '` and `'## '` and nothing else,
+/// so a `### ` line was never a heading of any kind: it fell into the body as
+/// prose and `GalleryUsage` rendered the hashes verbatim — 181 lines across 57
+/// of 58 pages. There was nothing for a renderer to style, which is why this
+/// type has to exist before the treatment can.
+class DabblerDocSubheading extends DabblerDocBlock {
+  /// Creates a sub-heading.
+  const DabblerDocSubheading(this.text);
+
+  /// The heading text, hashes stripped, **as authored** — sentence case is the
+  /// author's, never forced. Uppercasing is `GallerySectionLabel`'s treatment
+  /// for `## `, and borrowing it here would collapse the two levels.
+  final String text;
+
+  @override
+  String toString() => 'DabblerDocSubheading($text)';
+}
+
 /// A block-level `@specimen <id>` line.
 ///
 /// **Block level only** — its own line inside a section, never inline. That is
@@ -111,7 +132,7 @@ class DabblerDocPage {
       assetPath: assetPath,
       kind: DabblerDocVocabulary.kindForAssetPath(assetPath),
       title: 'Page not available',
-      lead: const <DabblerDocProse>[],
+      lead: const <DabblerDocBlock>[],
       sections: <DabblerDocSection>[
         DabblerDocSection(
           heading: 'Page not available',
@@ -133,12 +154,18 @@ class DabblerDocPage {
   /// The `# ` title, or `null` where the page has none.
   final String? title;
 
-  /// The unheaded lead prose between the title and the first `## `.
+  /// The unheaded lead between the title and the first `## `.
+  ///
+  /// Prose **and** `### ` sub-headings. Most component pages open
+  /// `# Toast` / `` ### `DabblerToast` `` — the API name is a sub-heading in
+  /// the lead, so a prose-only lead would silently drop it (KAN-330). A
+  /// block-level `@specimen` is still excluded: the lead is the page's
+  /// opening sentence, and a specimen there has no section to belong to.
   ///
   /// `D-042`(a): exactly two paragraphs, the first a single sentence — the
   /// Definition, then the Intro. Neither gets a heading. This splitter
   /// *preserves* them; it does not enforce the count, which is `KAN-324`'s gate.
-  final List<DabblerDocProse> lead;
+  final List<DabblerDocBlock> lead;
 
   /// The `## ` sections, in document order.
   final List<DabblerDocSection> sections;
@@ -224,7 +251,9 @@ abstract final class DabblerDocSplitter {
       assetPath: assetPath,
       kind: DabblerDocVocabulary.kindForAssetPath(assetPath),
       title: title,
-      lead: _blocks(leadLines).whereType<DabblerDocProse>().toList(),
+      lead: _blocks(leadLines)
+          .where((DabblerDocBlock b) => b is! DabblerDocSpecimen)
+          .toList(),
       sections: sections,
     );
   }
@@ -247,6 +276,14 @@ abstract final class DabblerDocSplitter {
       if (specimen != null) {
         flush();
         blocks.add(DabblerDocSpecimen(specimen.group(1)!));
+        continue;
+      }
+      // `### ` closes the paragraph it follows and stands on its own, the way
+      // `## ` closes a section — KAN-330/D-050(b). Tested before the blank-line
+      // rule so an author who omits the blank line still gets a heading.
+      if (line.startsWith('### ')) {
+        flush();
+        blocks.add(DabblerDocSubheading(line.substring(4).trim()));
         continue;
       }
       if (line.trim().isEmpty) {

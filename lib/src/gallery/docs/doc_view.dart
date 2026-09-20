@@ -15,7 +15,9 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../../tokens/dabbler_colors.dart';
 import '../../tokens/dabbler_geometry.dart';
+import '../../tokens/dabbler_type.dart';
 import '../gallery_entry.dart';
 import '../gallery_page.dart';
 import 'doc_page.dart';
@@ -47,8 +49,8 @@ class DabblerDocPageView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              for (final DabblerDocProse prose in page.lead)
-                GalleryUsage(prose.markup),
+              for (final DabblerDocBlock block in page.lead)
+                _leadBlock(context, block),
             ],
           ),
         for (final DabblerDocSection section in page.sections)
@@ -88,17 +90,50 @@ class DabblerDocPageView extends StatelessWidget {
 ///
 /// A `### ` is not styled here — that is `KAN-330`, deliberately a separate
 /// ticket. This file only decides how much air goes around one.
+/// A lead block — prose, or the `### ` API-name sub-heading most component
+/// pages open with. Same treatment as inside a section; only the container
+/// differs.
+Widget _leadBlock(BuildContext context, DabblerDocBlock block) {
+  return switch (block) {
+    DabblerDocSubheading(:final String text) => _subheading(context, text),
+    DabblerDocProse(:final String markup) => GalleryUsage(markup),
+    // Excluded by the splitter; unreachable, and stated rather than crashed.
+    DabblerDocSpecimen() => const SizedBox.shrink(),
+  };
+}
+
+/// The ruled `### ` treatment — D-050(b).
+///
+/// [DabblerType.caption1] (12px, the **same size** as the prose it heads: the
+/// hierarchy is carried in weight and tone, deliberately not by enlarging),
+/// `w700` against inline bold's `w600`, [DabblerColors.textPrimary] against
+/// the prose's `textSecondary`, sentence case exactly as authored, and no
+/// letterspacing — uppercasing and tracking are `GallerySectionLabel`'s
+/// treatment for `## `, and borrowing them here would collapse the levels.
+Widget _subheading(BuildContext context, String text) {
+  final DabblerColors colors = DabblerColors.of(context);
+  return Text(
+    text,
+    style: DabblerType.caption1
+        .resolveForDirection(Directionality.of(context))
+        .copyWith(color: colors.textPrimary, fontWeight: FontWeight.w700),
+  );
+}
+
 class _DocSection extends StatelessWidget {
   const _DocSection({required this.section, required this.resolver});
 
   final DabblerDocSection section;
   final DabblerDocSpecimenResolver resolver;
 
-  /// A `### ` sub-heading is not its own block type: the splitter breaks prose
-  /// on blank lines, so an authored `### ` on its own line arrives as a
-  /// [DabblerDocProse] whose markup starts with it.
+  /// A `### ` sub-heading.
+  ///
+  /// `KAN-333` had to sniff this off prose markup, because the splitter had no
+  /// `### ` branch. `KAN-330` gave it one, so the test is now the type itself.
+  /// **The ramp is unchanged** — same gaps, same precedence; only the
+  /// recognition moved from a string prefix to [DabblerDocSubheading].
   static bool _isSubHeading(DabblerDocBlock block) =>
-      block is DabblerDocProse && block.markup.trimLeft().startsWith('### ');
+      block is DabblerDocSubheading;
 
   /// The single gap above `section.blocks[i]`.
   double _gapBefore(int i) {
@@ -136,6 +171,8 @@ class _DocSection extends StatelessWidget {
     switch (block) {
       case DabblerDocProse(:final String markup):
         return GalleryUsage(markup);
+      case DabblerDocSubheading(:final String text):
+        return _subheading(context, text);
       case DabblerDocSpecimen(:final String id):
         final GalleryEntry? entry = resolver.resolve(id);
         if (entry == null) {

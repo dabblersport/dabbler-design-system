@@ -346,12 +346,19 @@ class GalleryUsage extends StatelessWidget {
         .resolveForDirection(direction)
         .copyWith(color: colors.textSecondary, height: 1.5);
 
+    // A `- `/`1. ` run is a list, and a list is a layout (hanging indent),
+    // not an inline treatment — KAN-330/D-051(d). Everything else is the one
+    // paragraph it always was.
+    final List<_ListItem>? items = _listItems(markup);
+
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: maxWidth),
-      child: Text.rich(
-        TextSpan(children: _spans(markup, base, colors)),
-        style: base,
-      ),
+      child: items == null
+          ? Text.rich(
+              TextSpan(children: _spans(markup, base, colors)),
+              style: base,
+            )
+          : _listBody(items, base, colors),
     );
   }
 }
