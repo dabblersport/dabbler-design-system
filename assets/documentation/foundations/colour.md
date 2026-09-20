@@ -66,10 +66,11 @@ resolve, which is itself part of what the specimen shows.
 
 ## Using it
 
-**Never draw body text or a placeholder in `textTertiary`.** It fails ordinary text contrast and
-clears AA only at large sizes (24px and up, or 18.66px bold and up) — its legitimate uses are large
-text, icons, non-informational rules, and a disabled control's text. For the measured ratio, see
-the ruling linked in *Change log* rather than a number restated here.
+**Never draw body text, or a placeholder in a field that is still live, in `textTertiary`.** It
+fails ordinary text contrast and clears AA only at large sizes (24px and up, or 18.66px bold and
+up) — its legitimate uses are large text, icons, non-informational rules, and a disabled control's
+text, which includes that control's placeholder. For the measured ratio, see the ruling linked in
+*Change log* rather than a number restated here.
 
 **`textTertiary` may colour disabled text, but contrast is never the only signal that a control is
 disabled.** Pair it with a second cue — reduced opacity, a distinct fill, a changed cursor —
@@ -82,11 +83,13 @@ mark.** This is a narrow, bounded exception, not a general licence for "glyphs a
 text rule." A glyph that is the only place a fact is stated is text, and follows the text rule
 above instead.
 
-**No role in this system's Dart-consumable set is dim enough to draw placeholder or secondary body
-text and still pass — reach for `textSecondary` for both, never anything dimmer.** The design
-source's own token file declares a still-lighter neutral for surface and divider use, but it is not
-exposed as a `DabblerColors` role at all, and no future component should reach for it as if it were
-one — a role that light needs a request to `cxo`, not a workaround at the call site.
+**No role in this system's Dart-consumable set is dim enough to draw an enabled placeholder or
+secondary body text and still pass — reach for `textSecondary` for both, never anything dimmer.**
+"Enabled" is doing real work in that sentence: the floor protects text while it is meant to be
+read, and a disabled control's text sits under the exemption above instead, placeholder included.
+The design source's own token file declares a still-lighter neutral for surface and divider use,
+but it is not exposed as a `DabblerColors` role at all, and no future component should reach for it
+as if it were one — a role that light needs a request to `cxo`, not a workaround at the call site.
 
 ## Axes
 
