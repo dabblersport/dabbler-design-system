@@ -176,14 +176,18 @@ Map<String, Set<String>> _references(Directory project) {
 }
 
 void main() {
+  final Directory? source = _findDesignSource();
+
   late Directory project;
   late Set<String> declared;
   late Map<String, Set<String>> references;
 
   setUpAll(() {
-    final Directory? found = _findDesignSource();
-    expect(found, isNotNull, reason: 'design source not found: */$designSourceSuffix');
-    project = found!;
+    // The source is a sibling checkout; when it is absent the source-backed
+    // assertions cannot run, and the group is skipped rather than passing
+    // vacuously.
+    if (source == null) return;
+    project = source;
     final Directory tokens = Directory('${project.path}/tokens');
     expect(tokens.existsSync(), isTrue, reason: '${tokens.path} not found');
     declared = _declaredTokens(tokens);
@@ -259,5 +263,7 @@ void main() {
       expect(_bareReference.hasMatch('prefer `--text-body` here'), isTrue,
           reason: 'a bare name in prose IS a reference and must be scanned');
     });
-  });
+  }, skip: source == null
+      ? 'design source tokens/*.css not found beside the package'
+      : false);
 }
