@@ -162,9 +162,11 @@ class DabblerDivider extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: DabblerType.caption1
                       .resolveForDirection(Directionality.of(context))
-                      // D-003(a): caption1 is 11px — body-sized, not large
-                      // text — so the label takes the ink-soft-backed
-                      // secondary role, not `--muted`.
+                      // The source paints this `--color-text-tertiary`
+                      // (`Divider.jsx:36`). D-003(a) permits `--muted` only at
+                      // large-text sizes (≥24px, or ≥18.66px bold), and
+                      // caption1 is 12px — body-sized — so the label takes the
+                      // ink-soft-backed secondary role instead.
                       .copyWith(color: colors.textSecondary),
                 ),
                 const SizedBox(width: DabblerSpacing.space4),
