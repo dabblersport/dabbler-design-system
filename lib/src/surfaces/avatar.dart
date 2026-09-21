@@ -432,11 +432,19 @@ class DabblerAvatarGroup extends StatelessWidget {
 
     double width = n == 0 ? 0 : d + (n - 1) * _step;
     if (overflow > 0) {
+      // The chip is as wide as `+N` needs, never the bare minimum: a
+      // [PositionedDirectional] with only `start` set hands its child unbounded
+      // horizontal constraints, so a chip laid out inside a [SizedBox] sized to
+      // [_chipMinWidth] painted up to 32px **outside** the group and overlapped
+      // whatever followed it in a row. Measured rather than assumed — see
+      // [_OverflowChip.widthFor].
+      final double chipWidth = _OverflowChip.widthFor(context, overflow);
       items.add(PositionedDirectional(
         start: n * _step,
+        width: chipWidth,
         child: _OverflowChip(count: overflow, colors: colors, height: d),
       ));
-      width = n * _step + _chipMinWidth;
+      width = n * _step + chipWidth;
     }
     if (items.isEmpty) return const SizedBox.shrink();
 
@@ -461,6 +469,41 @@ class _OverflowChip extends StatelessWidget {
   final int count;
   final DabblerColors colors;
   final double height;
+
+  /// The chip's label, `+N`.
+  static String labelFor(int count) => '+$count';
+
+  /// The chip's own width: `+N` laid out in [textStyleFor], plus the horizontal
+  /// padding on both sides, floored at
+  /// [DabblerAvatarGroup._chipMinWidth] — the source's `minWidth: 28` and
+  /// `padding: '0 8px'` read as the two halves of one rule rather than as a
+  /// fixed box.
+  ///
+  /// Measured through a [TextPainter] at the ambient [TextScaler], so a user
+  /// who has scaled their text up still gets a chip that contains its label.
+  static double widthFor(BuildContext context, int count) {
+    final TextPainter painter = TextPainter(
+      text: TextSpan(
+        text: labelFor(count),
+        style: textStyleFor(context, DabblerColors.of(context)),
+      ),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout();
+    final double width = painter.width + 2 * DabblerAvatarGroup._chipPadding;
+    painter.dispose();
+    return width < DabblerAvatarGroup._chipMinWidth
+        ? DabblerAvatarGroup._chipMinWidth
+        : width;
+  }
+
+  /// The label's style — `--muted` ink at the 11px bold caption step.
+  static TextStyle textStyleFor(BuildContext context, DabblerColors colors) =>
+      DabblerType.caption2
+          .resolveForDirection(Directionality.of(context))
+          .copyWith(color: colors.textSecondary, fontWeight: DabblerType.bold);
+
   @override
   Widget build(BuildContext context) => Container(
         height: height,
@@ -476,10 +519,11 @@ class _OverflowChip extends StatelessWidget {
               color: colors.bgPrimary, width: DabblerAvatar._ringWidth),
         ),
         child: Text(
-          '+$count',
-          style: DabblerType.caption2
-              .resolveForDirection(Directionality.of(context))
-              .copyWith(color: colors.textSecondary, fontWeight: DabblerType.bold),
+          labelFor(count),
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.clip,
+          style: textStyleFor(context, colors),
         ),
       );
 }
