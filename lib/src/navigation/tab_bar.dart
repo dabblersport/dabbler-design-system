@@ -27,10 +27,10 @@ import 'bottom_bar.dart' show DabblerNavigationItem;
 /// | Part | Source | Here |
 /// |---|---|---|
 /// | bar width | `width: 384`, `maxWidth: 384` (`:8,10`) | [barWidth], as a **max** |
-/// | bar height | `height: 47` (`:9`) | [barHeight], fixed |
+/// | bar height | `height: 47` (`:9`), **content-box** | [barContentHeight]; drawn height is [barHeight] |
 /// | bar corner | `borderRadius: 16` (`:13`) | [DabblerRadius.card] |
 /// | bar outline | `1px solid var(--neutral-400)` ×4 (`:14-17`) | [DabblerColors.borderDefault] |
-/// | clipping | `overflow: "hidden"` (`:12`) | [ClipRRect] — see [barHeight] |
+/// | clipping | `overflow: "hidden"` (`:12`) | [ClipRRect] — corners only; see [barHeight] |
 /// | row fill | `var(--neutral-white)` (`:27`) | [DabblerColors.surfaceCard] |
 /// | row outline | a **second** `1px solid var(--neutral-400)` ×4 (`:28-31`) | [DabblerColors.borderDefault] |
 /// | one tab | `flexGrow: 1` (`:47`) | [Expanded], so the four share the width |
@@ -87,22 +87,51 @@ class DabblerNavigationTabBar extends StatelessWidget {
   /// marooned.
   static const double barWidth = 384;
 
-  /// `height: 47` (`NavigationTabBar.jsx:9`), fixed.
+  /// `height: 47` (`NavigationTabBar.jsx:9`) — the shell's **content** height,
+  /// which is not the height the bar draws at. See [barHeight].
+  static const double barContentHeight = 47;
+
+  /// The height the bar actually occupies: **49**.
   ///
-  /// The row inside is 46 at its natural size — 1 border + 12 padding + the 20
-  /// line box + 12 padding + 1 border — inside a 45 content box, so the export
-  /// overflows it by 1 and `overflow: hidden` (`:12`) takes that pixel off the
-  /// block end. That is reproduced rather than tidied away: growing the shell to
-  /// 48 to "fit" would make the strip a pixel taller than every drawing of it.
-  static const double barHeight = 47;
+  /// **Corrected under KAN-292's visual bar.** The export writes `height: 47`
+  /// and this port first read that as the total, making the strip 47 tall. It
+  /// is not the total. Neither the shell nor `styles.css` sets
+  /// `box-sizing: border-box` — only the tab does (`:45`) — so the browser's
+  /// default content-box applies and the shell's four 1px borders (`:14-17`)
+  /// sit *outside* the 47. The specimen rendered headless from
+  /// `navigation.card.html` measures **49 rows of ink**: border at rows 0-1,
+  /// content at 2-46, border at 47-48. So the drawn bar is
+  /// [barContentHeight] + 2, and this is that number.
+  ///
+  /// The row inside still overflows, and is still clipped — but by 3, not by 1.
+  /// See [rowHeight].
+  static const double barHeight =
+      barContentHeight + 2 * DabblerSizing.borderDefault;
+
+  /// The inner row's natural height: **50**, inside a [barContentHeight] of 47.
+  ///
+  /// 1 border + 12 padding + the 24 glyph + 12 padding + 1 border. The tab is a
+  /// flex column with `alignItems: "center"` (`:44`), so its height is its
+  /// content's — and its content is the 24px glyph, not the 20px
+  /// [glyphLineHeight] of the span around it.
+  ///
+  /// The row overflows the content box by 3 and `overflow: "hidden"` (`:12`)
+  /// takes those 3 off the block end, which is why **the row's bottom border is
+  /// never drawn**. The headless specimen shows exactly that asymmetry: two
+  /// full-width neutral-400 lines at the top (shell at row 0, row at row 1) and
+  /// a single one at the bottom (shell at row 48, the row's clipped away).
+  static const double rowHeight = 2 * DabblerSizing.borderDefault +
+      2 * tabPaddingBlock +
+      DabblerSizing.iconMd;
 
   /// `lineHeight: "20px"` on the span that holds each glyph
   /// (`NavigationTabBar.jsx:64,95,126,157`).
   ///
-  /// The 24px glyph is larger than its own 20px line box and overhangs it by 2
-  /// each way, exactly as an inline replaced element does on the web. The box
-  /// is what the 12px padding is measured from, so it is the number that sets
-  /// the row's height — not the glyph.
+  /// **It does not set the row's height** — [rowHeight] does, from the glyph.
+  /// The 24px glyph overhangs this 20px line box by 2 each way, and because the
+  /// tab centres its content rather than laying it out on a baseline, the box
+  /// the 12px padding actually measures from is the glyph's 24. Kept as the
+  /// transcribed value of the declaration, not as a layout input.
   static const double glyphLineHeight = 20;
 
   /// `padding: "12px 0px 12px 0px"` on each tab (`NavigationTabBar.jsx:43`) —
@@ -153,22 +182,30 @@ class DabblerNavigationTabBar extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: barWidth),
       child: SizedBox(
         height: barHeight,
-        child: ClipRRect(
-          // `overflow: "hidden"` against `borderRadius: 16` — this is what
-          // takes the row's overflowing pixel off the block end.
-          borderRadius: DabblerRadius.cardAll,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: DabblerRadius.cardAll,
-              // The shell's own `1px solid var(--neutral-400)` (`:14-17`).
-              border: Border.all(
-                color: colors.borderDefault,
-                width: DabblerSizing.borderDefault,
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: DabblerRadius.cardAll,
+            // The shell's own `1px solid var(--neutral-400)` (`:14-17`),
+            // drawn inside [barHeight] and outside [barContentHeight] — the
+            // content-box the export is written against.
+            border: Border.all(
+              color: colors.borderDefault,
+              width: DabblerSizing.borderDefault,
             ),
-            // `flexDirection: "column", alignItems: "flex-start"` (`:19-20`)
-            // with a `flexShrink: 0` row — so the row keeps its natural height
-            // and is clipped from the block end, not squeezed.
+          ),
+          // `overflow: "hidden"` (`:12`). The clip sits **inside** the border
+          // rather than around it, because CSS clips an overflowing child to
+          // the padding box — the shell's own outline is never painted over by
+          // what it clips. Clipping the whole border box instead would lose the
+          // bottom rule, which is the one full-width line the specimen draws
+          // down there.
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(
+                DabblerRadius.card - DabblerSizing.borderDefault)),
+            // `flexDirection: "column"` with a `flexShrink: 0` row (`:19,36`):
+            // the row keeps its natural [rowHeight] of 50 in a 47 content box
+            // and is clipped from the block end, not squeezed. That clip is
+            // what removes the row's own bottom border — see [rowHeight].
             child: Align(
               alignment: AlignmentDirectional.topStart,
               child: OverflowBox(
@@ -184,8 +221,8 @@ class DabblerNavigationTabBar extends StatelessWidget {
     );
   }
 
-  /// One tab: the glyph in its 20px line box, with 12 of block padding either
-  /// side and nothing on the inline axis.
+  /// One tab: the 24px glyph with 12 of block padding either side and nothing
+  /// on the inline axis — 48 tall, which is what makes the row [rowHeight].
   Widget _tab(
     DabblerColors colors,
     DabblerNavigationItem item,
@@ -195,13 +232,12 @@ class DabblerNavigationTabBar extends StatelessWidget {
       padding: const EdgeInsetsDirectional.symmetric(
         vertical: tabPaddingBlock,
       ),
+      // `alignItems: "center"` on a flex column (`:44`) — the tab takes its
+      // content's height, and the content is the glyph's own 24. The 20px
+      // [glyphLineHeight] the span declares is overhung and does not measure.
       child: SizedBox(
-        height: glyphLineHeight,
-        // The 24 glyph overhangs its 20 line box by 2 each way, as the inline
-        // element does on the web. [OverflowBox] lets it, so the row measures
-        // 20 here and the drawn mark is still 24.
-        child: OverflowBox(
-          maxHeight: DabblerSizing.iconMd,
+        height: DabblerSizing.iconMd,
+        child: Center(
           child: DabblerIcon(
             item.icon,
             size: DabblerSizing.iconMd,
