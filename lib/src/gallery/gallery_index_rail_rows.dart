@@ -292,8 +292,13 @@ class _NavRow extends StatelessWidget {
 /// One documentation page in the content pane.
 ///
 /// The render itself is [DabblerDocPageView], which already existed and is not
-/// restyled here (`D-041(c)4`); this is the loading seam around it, which is
-/// the shell half `KAN-327` asks for.
+/// restyled here (`D-041(c)4`); this is the loading seam around it, and it is
+/// the WHOLE of what `KAN-327` asks for, not half of it. The separate
+/// `GalleryDocPage` screen that ticket first produced was deleted once this
+/// landed: it was never referenced, and pushing it would have put a second
+/// doc-page renderer in one gallery — `D-053(b)`'s defect shape one level up
+/// — over a rail the reader had just used, which `D-045` rules out by
+/// construction.
 class _DocPane extends StatefulWidget {
   const _DocPane({
     super.key,

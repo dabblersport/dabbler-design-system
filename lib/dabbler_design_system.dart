@@ -97,7 +97,6 @@ export 'src/gallery/docs/doc_specimen_resolver.dart';
 export 'src/gallery/docs/doc_view.dart';
 export 'src/gallery/docs/doc_vocabulary.dart';
 export 'src/gallery/gallery_app.dart';
-export 'src/gallery/gallery_doc_page.dart';
 export 'src/gallery/gallery_entry.dart';
 export 'src/gallery/gallery_index.dart';
 export 'src/gallery/gallery_page.dart';
