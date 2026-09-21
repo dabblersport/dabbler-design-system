@@ -92,7 +92,7 @@ class DabblerTooltip extends StatefulWidget {
   /// 450ms.
   static const Duration defaultTouchDelay = Duration(milliseconds: 450);
 
-  /// `maxWidth: 220` (`Tooltip.jsx:72`). Not on any ramp; transcribed.
+  /// `maxWidth: 220` (`Tooltip.jsx:70`). Not on any ramp; transcribed.
   static const double maxWidth = 220;
 
   /// `calc(100% + var(--space-2))` — the gap between control and panel

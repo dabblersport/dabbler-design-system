@@ -1,12 +1,13 @@
-/// Gallery entries for [DabblerNavigationTopBar] and
+/// Gallery entries for [DabblerNavigationTopBar], [DabblerNavigationTabBar] and
 /// [DabblerNavigationBottomBar].
 ///
 /// Laid out to mirror `components/navigation/navigation.card.html`, which
-/// stacks the top bar, then the bottom bar closed, then the bottom bar with
-/// its create menu open, then the bottom bar in RTL — each of the bottom bars
-/// in a 384-wide column, which is the width the specimen exports at and the
-/// width the split bar is designed against. At full gallery width the pill and
-/// the action fly apart and the bar stops reading as one object.
+/// stacks the top bar, then the four-tab bar, then the bottom bar closed, then
+/// the bottom bar with its create menu open, then the bottom bar in RTL — each
+/// of the last four in a 384-wide column, which is the width the specimen
+/// exports at and the width the split bar is designed against. At full gallery
+/// width the pill and the action fly apart and the bar stops reading as one
+/// object.
 library;
 
 import 'package:flutter/widgets.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/widgets.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import 'bottom_bar.dart';
+import 'tab_bar.dart';
 import 'top_bar.dart';
 
 /// The specimen's export width (`navigation.card.html` — `width: 384`).
@@ -30,6 +32,16 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
         'specimen exports it. Safe-area padding is off here so the bar reads '
         'at gallery scale.',
     builder: _topBar,
+  ),
+  GalleryEntry(
+    id: 'tab-bar',
+    page: 'components/tab-bar',
+    group: GalleryPurpose.navigation,
+    title: 'Navigation — tab bar',
+    description: 'The flat four-tab strip the specimen draws between the top '
+        'bar and the split bottom bar: icon-only, equal widths, brand-tinted '
+        'bold glyph on the active tab.',
+    builder: _tabBar,
   ),
   GalleryEntry(
     id: 'bottom-bar',
@@ -80,6 +92,35 @@ Widget _topBar(BuildContext context) => const GalleryStack(
           ),
         ),
         GallerySpecimen(label: 'wordmark alone', child: DabblerWordmark()),
+      ],
+    );
+
+Widget _tabBar(BuildContext context) => const GalleryStack(
+      children: <Widget>[
+        GallerySpecimen(
+          label: 'as the specimen draws it — first tab active',
+          child: SizedBox(
+            width: _phoneWidth,
+            child: DabblerNavigationTabBar(),
+          ),
+        ),
+        GallerySpecimen(
+          label: 'a later tab active',
+          child: SizedBox(
+            width: _phoneWidth,
+            child: DabblerNavigationTabBar(active: 'messages'),
+          ),
+        ),
+        GallerySpecimen(
+          label: 'RTL — the tabs mirror',
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: SizedBox(
+              width: _phoneWidth,
+              child: DabblerNavigationTabBar(active: 'explore'),
+            ),
+          ),
+        ),
       ],
     );
 

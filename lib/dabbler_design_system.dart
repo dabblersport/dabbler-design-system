@@ -121,6 +121,7 @@ export 'src/layout/section_gallery.dart';
 export 'src/layout/tabs.dart';
 export 'src/layout/tabs_gallery.dart';
 export 'src/navigation/bottom_bar.dart';
+export 'src/navigation/tab_bar.dart';
 export 'src/navigation/top_bar.dart';
 export 'src/navigation/navigation_gallery.dart';
 export 'src/overlays/dialog.dart';
