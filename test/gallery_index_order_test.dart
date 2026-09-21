@@ -1,18 +1,24 @@
-/// KAN-328 AC3 — the index's band order comes from `_order.md`.
+/// KAN-328 AC3 / D-047(d) — the index never degrades on a bad `_order.md`.
 ///
-/// `GalleryIndex._bands()` used to sequence its nine bands by
-/// `GalleryPurpose.values`, a hand-authored enum. That is the "second,
-/// divergent copy" AC3 exists to prevent: the enum and the authored file agree
-/// today and nothing kept them agreeing tomorrow.
+/// **KAN-342 disposed of the rest of this file under `T-087`.** What remains is
+/// the three degradation cases `T-087`(h) named as the open edge — invisible in
+/// normal operation, visible only if you corrupt the file by hand, and
+/// explicitly **not** covered by the gate that replaced the fourth:
 ///
-/// `cxo` ruled `D-049` — option (a), **order only**: the index takes its group
-/// sequence from `_order.md` by an independent, narrower read, which is not a
-/// call into the navigation's own derivation and so does not reopen the
-/// `D-047`(e) merge that was withdrawn.
+/// - *"a file that disagrees with the enum wins"* became
+///   `tool/check_order_bands.dart`, `T-087`(h)'s own recommendation: the
+///   invariant underneath it — `_order.md`'s group sequence and
+///   `GalleryPurpose`'s labels must not diverge — is population drift and is
+///   gate-shaped, and the gate makes the stub-bundle test redundant.
+/// - *"the real corpus file orders the bands"*, *"Foundations stays first"* and
+///   *"GalleryPurpose keeps its ruled membership"* were the forbidden shape by
+///   `T-087`(e)'s own naming — visible on one screen, or restating an enum —
+///   and are deleted.
 ///
-/// Because the enum order and the file order match in the real corpus, only a
-/// **disagreeing** file can tell the two mechanisms apart — which is what the
-/// stub bundle here is for.
+/// `D-047(d)` ruled the index IS the below-1000 navigation and nothing replaces
+/// it: the nav may show "unavailable" on a bad file, the index may not. Each
+/// case below pins one way the file can be bad and asserts all nine bands are
+/// still there.
 library;
 
 import 'package:dabbler_design_system/dabbler_design_system.dart';
@@ -58,18 +64,6 @@ final List<GalleryEntry> _nine = <GalleryEntry>[
   _entry(GalleryPurpose.selectionAndInput, 'text-field'),
 ];
 
-/// An `_order.md` whose nine groups run in REVERSE of the enum's order.
-String _reversedOrderMd() {
-  final List<GalleryPurpose> reversed =
-      GalleryPurpose.values.reversed.toList();
-  final StringBuffer b = StringBuffer('# Reading order\n\nLead.\n\n## Components\n\n');
-  for (int i = 0; i < reversed.length; i++) {
-    b.writeln('### ${i + 1} · ${reversed[i].label} — a tagline\n');
-    b.writeln('- [A page](components/a.md) — one line.\n');
-  }
-  return b.toString();
-}
-
 const String _orderPath = 'assets/documentation/_order.md';
 
 Future<List<String>> _renderedBands(
@@ -96,42 +90,6 @@ Future<List<String>> _renderedBands(
 }
 
 void main() {
-  group('AC3 — the order is sourced from _order.md', () {
-    testWidgets('a file that disagrees with the enum wins', (
-      WidgetTester tester,
-    ) async {
-      final List<String> bands = await _renderedBands(
-        tester,
-        files: <String, String>{_orderPath: _reversedOrderMd()},
-      );
-      expect(
-        bands,
-        GalleryPurpose.values.reversed
-            .map((GalleryPurpose p) => p.label)
-            .toList(),
-        reason: 'the authored file is the spine; the enum order is not',
-      );
-      expect(bands, isNot(GalleryPurpose.values.map((GalleryPurpose p) => p.label).toList()),
-          reason: 'if this matched, the enum would still be deciding');
-    });
-
-    testWidgets('the real corpus file orders the bands', (
-      WidgetTester tester,
-    ) async {
-      final String real = await rootBundle.loadString(_orderPath);
-      final List<String> bands = await _renderedBands(
-        tester,
-        files: <String, String>{_orderPath: real},
-      );
-      // The real file and the enum agree, which is the point: this pins that
-      // they still do, and the test above proves which one is load-bearing.
-      expect(
-        bands,
-        GalleryPurpose.values.map((GalleryPurpose p) => p.label).toList(),
-      );
-    });
-  });
-
   group('D-047(d) — the index never degrades', () {
     testWidgets('an unreadable _order.md falls back to the enum, all nine '
         'bands present', (WidgetTester tester) async {
@@ -160,8 +118,8 @@ void main() {
     ) async {
       // A file naming only two groups must not drop the other seven.
       const String partial = '# Reading order\n\nLead.\n\n## Components\n\n'
-          '### 1 · Structure — a tagline\n\n- [A](components/a.md) — x.\n\n'
-          '### 2 · Actions — a tagline\n\n- [B](components/b.md) — y.\n';
+          '### 1 \u00b7 Structure — a tagline\n\n- [A](components/a.md) — x.\n\n'
+          '### 2 \u00b7 Actions — a tagline\n\n- [B](components/b.md) — y.\n';
       final List<String> bands = await _renderedBands(
         tester,
         files: const <String, String>{_orderPath: partial},
@@ -170,62 +128,6 @@ void main() {
       expect(bands[1], 'Actions');
       expect(bands.length, GalleryPurpose.values.length,
           reason: 'unnamed groups are appended, never dropped');
-    });
-  });
-
-  group('non-changes D-049 names explicitly', () {
-    test('GalleryPurpose keeps its ruled membership', () {
-      expect(GalleryPurpose.values.length, 9);
-      expect(
-        GalleryPurpose.values.map((GalleryPurpose p) => p.label).toList(),
-        <String>[
-          'Navigation',
-          'Content containers',
-          'Identity and status',
-          'Selection and input',
-          'Date and time',
-          'Actions',
-          'Presentation',
-          'Status and feedback',
-          'Structure',
-        ],
-      );
-    });
-
-    testWidgets('Foundations stays first, and stays hardcoded (D-033(a))', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(MaterialApp(
-        theme: galleryTheme(DabblerTheme.main, Brightness.light),
-        home: Scaffold(
-          body: GalleryIndex(
-            entries: <GalleryEntry>[
-              ..._nine,
-              GalleryEntry(
-                id: 'colour',
-                title: 'Colour',
-                page: 'foundations/colour.md',
-                group: null,
-                builder: (BuildContext context) => const SizedBox.shrink(),
-              ),
-            ],
-            onOpen: (GalleryEntry _) {},
-            loader: DabblerDocLoader(
-              bundle: _MapBundle(<String, String>{
-                _orderPath: _reversedOrderMd(),
-              }),
-            ),
-          ),
-        ),
-      ));
-      await tester.pumpAndSettle();
-      final List<String> bands = tester
-          .widgetList<GallerySectionLabel>(find.byType(GallerySectionLabel))
-          .map((GallerySectionLabel l) => l.text.split(' (').first)
-          .toList();
-      expect(bands.first, 'Foundations',
-          reason: 'section order is D-033(a), transcribed per D-043, and is '
-              'not what moved to the file');
     });
   });
 }
