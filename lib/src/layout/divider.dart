@@ -173,7 +173,7 @@ class DabblerDivider extends StatelessWidget {
             ),
           );
         }
-        // Divider.jsx:43-44 — height 1, full width, `margin-inline: inset`.
+        // Divider.jsx:39-40 — height 1, full width, `margin-inline: inset`.
         return ExcludeSemantics(
           child: Padding(
             padding: EdgeInsetsDirectional.symmetric(horizontal: inset),

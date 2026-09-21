@@ -356,7 +356,7 @@ class DabblerCalendar extends StatelessWidget {
   /// `Confirm` — `Calendar.jsx:70`.
   static const String defaultConfirmLabel = 'Confirm';
 
-  /// `Cancel` — `Calendar.jsx:75`.
+  /// `Cancel` — `Calendar.jsx:67`.
   static const String defaultCancelLabel = 'Cancel';
 
   /// The previous-month control's accessible name. Not in the source, which

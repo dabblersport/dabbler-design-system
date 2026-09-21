@@ -1149,7 +1149,7 @@ class DabblerMenuItem extends StatelessWidget {
   /// the Flutter equivalent is an alpha on the tone itself.
   static const double tileTintOpacity = 0.12;
 
-  /// `opacity: 0.45` on a disabled row (`Menu.jsx:236`).
+  /// `opacity: 0.45` on a disabled row (`Menu.jsx:210`).
   static const double disabledOpacity = 0.45;
 
   /// The row's text.
@@ -1237,7 +1237,7 @@ class DabblerMenuItem extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            // `.t-subheadline`, `text-align: start` (`Menu.jsx:247`).
+            // `.t-subheadline`, `text-align: start` (`Menu.jsx:211`, `:217`).
             style: DabblerType.subheadline
                 .resolveForDirection(direction)
                 .copyWith(color: foreground),
@@ -1265,7 +1265,7 @@ class DabblerMenuItem extends StatelessWidget {
       ),
       padding: EdgeInsetsDirectional.symmetric(
         // Tightened to `--space-2` when a tile is present so the row height is
-        // unchanged (`Menu.jsx:232`).
+        // unchanged (`Menu.jsx:206`).
         horizontal: tinted ? DabblerSpacing.space2 : DabblerSpacing.space3,
       ),
       decoration: BoxDecoration(
@@ -1346,7 +1346,7 @@ class DabblerMenuItem extends StatelessWidget {
   }
 }
 
-/// The hairline between groups — `MenuSeparator` in `Menu.jsx:262`.
+/// The hairline between groups — `MenuSeparator` in `Menu.jsx:224`.
 ///
 /// `height: 1`, `--faint` (whose semantic role is
 /// [DabblerColors.bgTertiary], the same token DS-701's Sheet footer draws
