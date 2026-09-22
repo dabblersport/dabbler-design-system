@@ -33,7 +33,7 @@ enum DabblerAvatarBadgeTone {
   primary,
   /// `var(--color-accent)` — resolves to [DabblerColors.accent].
   accent,
-  /// `var(--accent-indigo)`, **approximated**. See [DabblerAvatar.badgeTone].
+  /// `var(--accent-indigo)` — resolves to [DabblerPalette.accentIndigo].
   indigo,
 }
 

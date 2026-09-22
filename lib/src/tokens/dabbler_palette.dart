@@ -182,6 +182,15 @@ abstract final class DabblerPalette {
 
   // --- Standalone accent ---
 
+  /// The only indigo in the system. Read it directly — never approximate it
+  /// through [socialInfo] (`#6366F1`), which is a different token with a
+  /// different job: white on `--social-info` measures 4.47:1 and fails AA,
+  /// white on `--accent-indigo` measures 5.61:1 and passes. `DabblerFab`'s
+  /// `indigo` tone and `DabblerAvatar`'s `indigo` badge did approximate it
+  /// that way until D-004; the components still unbuilt that will want an
+  /// indigo — `Button`'s accent tone, `Badge.info`, `CardTicket.indigo` —
+  /// must name this constant on the day they are written.
+  ///
   /// `--accent-indigo` — `#5C50E6`.
   static const Color accentIndigo = Color(0xFF5C50E6);
 

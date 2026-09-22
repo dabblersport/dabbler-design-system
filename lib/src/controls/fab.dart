@@ -191,8 +191,7 @@ class DabblerFab extends StatelessWidget {
   /// The fill for [tone], resolved against the enclosing theme.
   static Color backgroundOf(DabblerFabTone tone, DabblerColors colors) =>
       switch (tone) {
-        // `--accent-indigo`. See [_indigo] for why this is not an exact
-        // transcription.
+        // `--accent-indigo`, transcribed exactly.
         DabblerFabTone.indigo => _indigo,
         DabblerFabTone.primary => colors.brandPrimary,
         DabblerFabTone.accent => colors.accent,
