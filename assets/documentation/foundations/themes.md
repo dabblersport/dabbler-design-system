@@ -45,6 +45,9 @@ across all seven themes and three brand roles never repeating. Neither entry fol
 own theme switcher — each cell installs its own resolved pair independently, which is the whole
 point of the page.
 
+@specimen themes/palettes
+@specimen themes/paper
+
 ## Using it
 
 **Never assume a component needs theme-specific styling for anything except brand-tinted fill,

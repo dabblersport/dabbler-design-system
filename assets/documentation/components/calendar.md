@@ -53,6 +53,8 @@ source's own list.
 
 A month grid with selection — see `calendar_gallery.dart`'s *Calendar* section.
 
+@specimen calendar
+
 ## Using it
 
 **Never fork Calendar for a field-specific variant.** `DateField`, `PickerField` and any future date

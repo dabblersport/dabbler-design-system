@@ -42,6 +42,8 @@ future amendment is one edit, not three.
 
 All three densities — see `cards_gallery.dart`'s *Card — event* section.
 
+@specimen card-event/densities
+
 ## Using it
 
 **Don't treat this component's numbers as transcribed from a design drawing — they're ruled,

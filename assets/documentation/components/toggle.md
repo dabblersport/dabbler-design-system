@@ -25,6 +25,8 @@ one size.
 
 Off, on, disabled-off and disabled-on — see `forms_gallery.dart`'s *Selection* section.
 
+@specimen checkbox/selection-controls
+
 ## Using it
 
 **Use Toggle only where the change takes effect immediately, with nothing to submit.** If the

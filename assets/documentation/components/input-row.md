@@ -53,6 +53,8 @@ primitives every other tappable surface in this system does instead.
 A title-only row, a row with a subtitle, a row with a trailing chevron, a row with a trailing
 toggle, and a disabled row — see `forms_gallery.dart`'s *InputRow* section.
 
+@specimen input-row
+
 ## Using it
 
 **Do not compose `FieldShell` under an InputRow.** It was tried and does not fit: the two disagree

@@ -38,6 +38,8 @@ to catch in review than a wrong one.
 The full 40-name vocabulary at both weights, plus the fallback and placeholder states — see
 `foundations_gallery.dart`'s *Icon* section.
 
+@specimen icons/vocabulary
+
 ## Using it
 
 **Request an icon by its kebab-case design-source name, not by an `Iconsax` constant.** The name is

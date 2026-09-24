@@ -34,6 +34,10 @@ table — the design source itself only tabulates duration and easing as two num
 this specimen is where the actual difference between 80ms and 200ms becomes visible rather than
 read.
 
+@specimen motion/durations
+@specimen motion/press-scale
+@specimen motion/reduced
+
 ## Using it
 
 **Never invent a second easing curve.** One curve covers every eased transition in this system —

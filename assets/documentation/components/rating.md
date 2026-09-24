@@ -44,6 +44,8 @@ exact fraction, so any value works, not only halves.
 Whole and fractional values, both sizes, read-only and interactive — see `rating_gallery.dart`'s
 *Rating* section.
 
+@specimen rating
+
 ## Using it
 
 **Don't be surprised the empty star renders a colder, darker grey than the design file's own

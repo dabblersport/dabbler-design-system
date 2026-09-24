@@ -26,6 +26,8 @@ continues from where the user was.
 
 Single-value, multi-value, searchable and disabled — see `forms_gallery.dart`'s *Select* section.
 
+@specimen select
+
 ## Using it
 
 **Compose `TextField` and `Menu` for any picker that isn't exactly this one — never fork either.**

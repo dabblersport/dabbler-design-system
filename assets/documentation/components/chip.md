@@ -30,6 +30,8 @@ tapped.
 
 Selected, unselected, and a leading-icon variant — see `chip_gallery.dart`'s *Chip* section.
 
+@specimen chip
+
 ## Using it
 
 **Never hardcode white for a selected chip's label.** Use the shared on-brand ink role instead. In

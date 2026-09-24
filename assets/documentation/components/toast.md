@@ -29,6 +29,8 @@ showing pushes the oldest one out rather than growing the stack.
 
 Every tone, triggered — see `toast_gallery.dart`'s *Toast* section.
 
+@specimen toast/tones
+
 ## Using it
 
 **Removal is immediate, with no exit animation — don't build one around it.** A toast's dismissal

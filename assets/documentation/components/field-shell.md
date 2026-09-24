@@ -38,6 +38,8 @@ input.
 The rest / filled / helper / error / disabled state matrix, shown directly over the raw shell — see
 `forms_gallery.dart`'s *Fields* section.
 
+@specimen field-shell
+
 ## Using it
 
 **Never place a bare `DabblerFieldShell` in a screen.** It holds no state of its own — every field

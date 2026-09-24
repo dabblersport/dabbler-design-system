@@ -30,6 +30,8 @@ the card shell, which is the whole of its visual vocabulary on purpose.
 
 Both sizes — see `cards_gallery.dart`'s *EmptyState* section.
 
+@specimen empty-state
+
 ## Using it
 
 **This is the only empty state in the system — never build a screen-specific one.** A screen that

@@ -38,6 +38,8 @@ what a caller puts in any of them.
 
 All five variants — see `cards_gallery.dart`'s *Card — variants* section.
 
+@specimen card/variants
+
 ## Using it
 
 **Supply content, never chrome.** Fill, border colour and width, corner radius, inner padding and

@@ -33,6 +33,8 @@ symbols has its own trap, covered in *Using it*.
 Alongside CardHouse and CardTicket — see `cards_gallery.dart`'s *Card — house, pricing, ticket*
 section.
 
+@specimen card-house/composed
+
 ## Using it
 
 **`selected: true` is what paints the filled-tick, bordered shell — read the symbol names

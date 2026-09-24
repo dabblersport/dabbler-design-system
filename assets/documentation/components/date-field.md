@@ -35,6 +35,8 @@ field-specific variant.
 
 Closed, alongside `TimeField` and `PickerField` — see `forms_gallery.dart`'s *Pickers* section.
 
+@specimen picker-field/pickers
+
 ## Using it
 
 **Do not fork `Calendar` for a field-specific variant.** DateField's whole design depends on the

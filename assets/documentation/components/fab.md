@@ -25,6 +25,8 @@ why, and do not read that exception as license to add a shadow anywhere else.
 
 All four tones — see `fab_gallery.dart`'s *FAB — tones* section.
 
+@specimen fab/tones
+
 ## Using it
 
 **Reserve Fab for the one primary action a screen wants reachable from anywhere on it.** It floats

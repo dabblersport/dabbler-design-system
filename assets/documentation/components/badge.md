@@ -30,6 +30,8 @@ one that actually means something.
 
 Every decorative tone and every semantic status — see `badge_gallery.dart`'s *Badge* section.
 
+@specimen badge/tones
+
 ## Using it
 
 **Never read `tone="error"` as meaning something went wrong, or any other tone name as its literal

@@ -29,6 +29,8 @@ rather than overlaying it, so the row grows upward from the action's own baselin
 Destinations with an active state and the create menu open — see `navigation_gallery.dart`'s
 *Navigation — bottom bar* section.
 
+@specimen bottom-bar
+
 ## Using it
 
 **Drive `active` and `menuOpen` together or not at all — don't control one and leave the other

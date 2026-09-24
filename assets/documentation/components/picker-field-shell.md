@@ -32,6 +32,8 @@ pretending to be a field.
 Closed date and time fields, each carrying this shell — see `forms_gallery.dart`'s *Pickers*
 section.
 
+@specimen picker-field/pickers
+
 ## Using it
 
 **Never treat opening the picker as the only way to set a value.** Typing has to stay possible —

@@ -29,6 +29,8 @@ Arabic — the product's time format is `H:MM AM` in both scripts, not a value t
 
 Closed, alongside `DateField` and `PickerField` — see `forms_gallery.dart`'s *Pickers* section.
 
+@specimen picker-field/pickers
+
 ## Using it
 
 **Never localise the meridiem.** `AM`/`PM` are constants this system draws literally, not a locale

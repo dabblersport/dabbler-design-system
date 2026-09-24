@@ -52,6 +52,8 @@ its component twice, LTR and RTL side by side, under its own explicit direction 
 gallery's header switcher — the subject is the difference between the two renders, which a switcher
 that replaces one state with the other can't show adjacently.
 
+@specimen bidirectionality
+
 ## Using it
 
 **Never assume a component needs a direction prop to behave correctly.** Nothing in this package

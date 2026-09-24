@@ -64,6 +64,9 @@ Read the matrix for tones and states rather than for a full size grid: `small` i
 columns and `rest` is `medium`, while `full` is shown on a couple of tones in its own group, not
 once per tone.
 
+@specimen button/tones
+@specimen button/sizes
+
 ## Using it
 
 **Reach for a tone by what it should paint, not by habit from another system's names.** This

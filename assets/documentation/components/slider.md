@@ -26,6 +26,8 @@ floor with the rest of the form controls.
 A single-value distance slider, a two-thumb price range with marks, and a disabled state — see
 `forms_gallery.dart`'s *Slider and Stepper* section.
 
+@specimen slider/value-controls
+
 ## Using it
 
 **Give `marks` in value space, not pixel space.** Tick positions are values along the axis

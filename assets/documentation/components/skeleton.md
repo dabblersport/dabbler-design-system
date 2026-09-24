@@ -28,6 +28,8 @@ the block that's already there rather than introducing a second colour moving ac
 
 All four variants — see `skeleton_gallery.dart`'s *Skeleton* section.
 
+@specimen skeleton
+
 ## Using it
 
 **Never add a shimmer or travelling highlight to a skeleton.** It's excluded at the product level,

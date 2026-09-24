@@ -26,6 +26,8 @@ API through which any of those could be introduced simply doesn't exist here.
 
 All five fill steps — see `surface_gallery.dart`'s *Surface* section.
 
+@specimen surface/variants
+
 ## Using it
 
 **Reach for `DabblerSurface` under any new component that needs an opaque, flat container — never

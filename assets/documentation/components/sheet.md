@@ -28,6 +28,8 @@ scrim is what separates it from the page beneath.
 
 Multiple detents with a footer, opened from a trigger — see `sheet_gallery.dart`'s *Sheet* section.
 
+@specimen sheet/detents
+
 ## Using it
 
 **Reserve `inline` presentation for documentation cards and embedded previews — never for a live

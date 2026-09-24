@@ -26,6 +26,8 @@ why the two behave differently under the same setting.
 
 Every size and tone — see `spinner_gallery.dart`'s *Spinner* section.
 
+@specimen spinner
+
 ## Using it
 
 **Never build a second loading indicator.** This is the one indeterminate loader for the whole

@@ -47,6 +47,8 @@ whether a password is currently revealed.
 All five variants, each closed and — for `select` — open — see `forms_gallery.dart`'s *TextField*
 section.
 
+@specimen text-field/variants
+
 ## Using it
 
 **Reach for the variant, not a manually composed field.** `search` supplies its own leading glyph,

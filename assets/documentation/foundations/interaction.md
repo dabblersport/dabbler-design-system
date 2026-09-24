@@ -28,6 +28,8 @@ them — see *Using it*.
 
 The focus ring, press scale and scrim, each shown on and off — see `interaction_gallery.dart`.
 
+@specimen interaction
+
 ## Using it
 
 **Never build a component-specific focus ring, press effect or overlay wash.** These three

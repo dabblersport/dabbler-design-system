@@ -28,6 +28,8 @@ which is exactly why it can never be the only place information lives.
 
 Every placement — see `tooltip_gallery.dart`'s *Tooltip* section.
 
+@specimen tooltip
+
 ## Using it
 
 **Never make a tooltip the only place a user can learn something they need.** It's unavailable to

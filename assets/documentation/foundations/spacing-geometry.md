@@ -45,6 +45,11 @@ sections. The radius entry draws a nested figure specifically to make the 16-ver
 distinction visible: a card at 16 with a tile inside it at 12, side by side with what it looks like
 when both share one corner — which is the actual bug the dedicated card step exists to prevent.
 
+@specimen spacing-geometry/spacing
+@specimen spacing-geometry/radius
+@specimen spacing-geometry/sizing
+@specimen spacing-geometry/elevation
+
 ## Using it
 
 **Never use the 12px radius step for a card's own corner.** It's the corner of a tile *nested

@@ -28,6 +28,8 @@ on selection, and everything about the row — target size, gap, RTL — matches
 Three mutually exclusive options with one selected, plus a disabled unselected and a disabled
 selected option — see `forms_gallery.dart`'s *Selection* section.
 
+@specimen checkbox/selection-controls
+
 ## Using it
 
 **Do not build a `RadioGroup` component.** Mutual exclusivity is state the caller already owns —

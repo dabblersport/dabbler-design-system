@@ -39,6 +39,8 @@ direction-specific code.
 Unchecked, checked, disabled unchecked, and disabled checked, each with the label "Recurring" —
 see `forms_gallery.dart`'s *Checkbox* section.
 
+@specimen checkbox/selection-controls
+
 ## Using it
 
 **Use Checkbox only where selections are independent.** Each box answers one yes/no question on

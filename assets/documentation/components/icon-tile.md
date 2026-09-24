@@ -29,6 +29,8 @@ and even those three are tokens, not literals.
 
 Every tone — see `icon_tile_gallery.dart`'s *IconTile* section.
 
+@specimen icon-tile
+
 ## Using it
 
 **Reach for the brand tone by default; the three decorative tones (`amber`, `info`, `accent`) are

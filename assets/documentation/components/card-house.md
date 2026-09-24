@@ -28,6 +28,8 @@ into the same row as the title.
 Alongside CardPricing and CardTicket — see `cards_gallery.dart`'s *Card — house, pricing, ticket*
 section.
 
+@specimen card-house/composed
+
 ## Using it
 
 **Put the row (icon well, name, cadence) in `child` and the join action in `footer` — never

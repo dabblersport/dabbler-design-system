@@ -27,6 +27,8 @@ banner interrupts a screen reader or merely announces itself follows directly fr
 
 Every tone — see `banner_gallery.dart`'s *Banner* section.
 
+@specimen banner/tones
+
 ## Using it
 
 **Reach for `neutral` only when the message genuinely carries no status.** It isn't a fifth status

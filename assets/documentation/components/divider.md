@@ -24,6 +24,8 @@ hard-codes the line rather than offering a range.
 
 Horizontal, labelled, and vertical — see `divider_gallery.dart`'s *Divider* section.
 
+@specimen divider
+
 ## Using it
 
 **Don't reach for a Divider between cards in a feed, under a Section heading, or directly above a

@@ -32,6 +32,8 @@ arrow-key navigation this widget drives — with the value semantics completely 
 
 Hour, minute and period columns — see `calendar_gallery.dart`'s *TimePicker* section.
 
+@specimen time-picker
+
 ## Using it
 
 **Never rebuild the design source's drag-ruler interaction on top of this component.** It was

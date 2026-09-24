@@ -30,6 +30,8 @@ own gutter both belong to whatever places the Section, not to the Section itself
 Title with a trailing action, and title with a subtitle — see `section_gallery.dart`'s *Section*
 section.
 
+@specimen section
+
 ## Using it
 
 **Pass the trailing action as a `Button` at the `text` tone once that tone exists — not as a

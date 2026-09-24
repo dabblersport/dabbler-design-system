@@ -49,6 +49,8 @@ gets.
 
 Both sizes, opened from a trigger — see `dialog_gallery.dart`'s *Dialog* section.
 
+@specimen dialog/sizes
+
 ## Using it
 
 **Never build a separate modal wrapper, scrim or focus trap for a screen's own confirmation

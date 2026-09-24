@@ -28,6 +28,8 @@ that forces the solid role everywhere else.
 Every tone, both sizes, and the indeterminate form — see `progress_bar_gallery.dart`'s *ProgressBar*
 section.
 
+@specimen progress-bar
+
 ## Using it
 
 **Pass `value` as a 0–1 fraction, never a 0–100 number.** The component clamps into that range but

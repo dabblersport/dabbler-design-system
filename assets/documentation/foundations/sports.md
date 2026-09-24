@@ -37,6 +37,9 @@ screen today.
 All thirteen sports at both icon weights, and every sport with shipped background artwork in its
 `main` variant — see `foundations_gallery.dart`'s *SportIcon* and *SportBackground* sections.
 
+@specimen sports/icon
+@specimen sports/background
+
 ## Using it
 
 **Never let a sport icon be the only thing on screen that says which sport it is.** No commissioned

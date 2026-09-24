@@ -32,6 +32,8 @@ into them directly, which is what those two slots have always been designed to a
 
 Both variants — see `tabs_gallery.dart`'s *Tabs* section.
 
+@specimen tabs/variants
+
 ## Using it
 
 **Let the underline alone carry the active signal — never brand-colour the label as well, and

@@ -26,6 +26,8 @@ itself (`child`) is supplied by the caller, most often a `Calendar` or a `TimePi
 
 Closed, alongside `DateField` and `TimeField` — see `forms_gallery.dart`'s *Pickers* section.
 
+@specimen picker-field/pickers
+
 ## Using it
 
 **Give it a picker as `child`; don't leave it empty expecting a default.** PickerField supplies the

@@ -21,6 +21,7 @@ library;
 
 import 'dart:io';
 
+import 'package:dabbler_design_system/main.dart' show galleryEntries;
 import 'package:dabbler_design_system/src/gallery/docs/doc_page.dart';
 import 'package:dabbler_design_system/src/gallery/docs/doc_specimen_resolver.dart';
 import 'package:dabbler_design_system/src/gallery/docs/doc_vocabulary.dart';
@@ -128,8 +129,9 @@ List<String> corpusViolations(
     }
   }
 
-  // Zero `@specimen` lines exist in the corpus today; that is KAN-325 AC4 not
-  // having landed, and nothing to resolve is not a failure.
+  // With no resolver supplied nothing resolves, so a fixture that wants its
+  // `@specimen` lines to pass must supply one; the corpus test supplies the
+  // real registry.
   final List<String> unresolved =
       (resolver ?? DabblerDocSpecimenResolver(const <GalleryEntry>[]))
           .unresolvedIds(page);
@@ -138,6 +140,11 @@ List<String> corpusViolations(
   }
   return found;
 }
+
+/// The real registry — what the gallery app resolves `@specimen` lines
+/// through, so the gate and the screen agree on what exists.
+final DabblerDocSpecimenResolver _registry =
+    DabblerDocSpecimenResolver(galleryEntries);
 
 void main() {
   group('KAN-324 — the corpus conforms (AC5)', () {
@@ -150,12 +157,43 @@ void main() {
 
       final Map<String, List<String>> failures = <String, List<String>>{};
       for (final File f in files) {
-        final List<String> v = corpusViolations(f.path, f.readAsStringSync());
+        final List<String> v = corpusViolations(f.path, f.readAsStringSync(),
+            resolver: _registry);
         if (v.isNotEmpty) failures[f.path] = v;
       }
       expect(failures, isEmpty,
           reason: 'The corpus was re-baselined clean; a red result here is a '
               'real regression:\n${failures.entries.map((MapEntry<String, List<String>> e) => '  ${e.key}\n${e.value.map((String s) => '    - $s').join('\n')}').join('\n')}');
+    });
+
+    test('every component and foundations page maps its live specimen, and '
+        'every gallery entry is mapped from some page', () {
+      final Set<String> referenced = <String>{};
+      final List<String> unmapped = <String>[];
+      for (final File f in corpusFiles()) {
+        final DabblerDocPageKind kind =
+            DabblerDocVocabulary.kindForAssetPath(f.path);
+        final List<String> ids =
+            DabblerDocSplitter.split(f.path, f.readAsStringSync()).specimenIds;
+        referenced.addAll(ids);
+        if ((kind == DabblerDocPageKind.component ||
+                kind == DabblerDocPageKind.foundations) &&
+            ids.isEmpty) {
+          unmapped.add(f.path);
+        }
+      }
+      expect(unmapped, isEmpty,
+          reason: 'these pages carry no `@specimen` line under `## Specimen`, '
+              'so the component is not shown inside its documentation');
+      expect(
+        <String>[
+          for (final GalleryEntry e in galleryEntries)
+            if (!referenced.contains(e.id)) e.id,
+        ],
+        isEmpty,
+        reason: 'these gallery entries are referenced by no documentation '
+            'page — name each one in its page\'s `## Specimen` section',
+      );
     });
 
     test('the three vocabularies come from KAN-323, not from here', () {

@@ -39,6 +39,8 @@ machinery around it — which is exactly what `Select` does, at `listbox` role i
 
 Every placement, plus the list shown on its own — see `menu_gallery.dart`'s *Menu* section.
 
+@specimen menu/placements
+
 ## Using it
 
 **Compose `DabblerMenuList` directly only when you're building your own popover surface — reach for

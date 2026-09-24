@@ -64,6 +64,11 @@ the fourteen it's showing — switch theme or brightness in the gallery header a
 The brand primitives are the one deliberate exception: they're the literal-hex layer and don't
 resolve, which is itself part of what the specimen shows.
 
+@specimen colour/brand
+@specimen colour/surfaces
+@specimen colour/status
+@specimen colour/contrast
+
 ## Using it
 
 **Never draw body text, or a placeholder in a field that is still live, in `textTertiary`.** It

@@ -59,6 +59,8 @@ and `Avatar` directly, the same way `ConversationHeader` already does.
 Default with trailing actions and the account avatar — see `navigation_gallery.dart`'s *Navigation
 — top bar* section.
 
+@specimen top-bar
+
 ## Using it
 
 **Never add a title, back action, alignment or surface variant to this component.** The design

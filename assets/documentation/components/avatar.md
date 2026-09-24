@@ -32,6 +32,8 @@ fixed overlap with an optional `+N` overflow chip.
 
 Every size, every badge tone, and a group — see `avatar_gallery.dart`'s *Avatar* section.
 
+@specimen avatar
+
 ## Using it
 
 **Pass a stable seed — a name, handle or user id — never assume the portrait can be styled to match

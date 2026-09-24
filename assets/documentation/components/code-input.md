@@ -34,6 +34,8 @@ composes no field shell.
 Four boxes filled, six boxes partially filled, a masked four-digit PIN, an error state, and a
 disabled state — see `forms_gallery.dart`'s *CodeInput* section.
 
+@specimen picker-field/pickers
+
 ## Using it
 
 **Never wrap CodeInput in `FieldShell`.** Every other field in this system draws from the shared

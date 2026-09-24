@@ -27,6 +27,8 @@ child's own intrinsic size, so content of any length animates correctly with not
 Both variants, with `DabblerCollapse` shown underneath them — see `accordion_gallery.dart`'s
 *Accordion* section.
 
+@specimen accordion
+
 ## Using it
 
 **Compose `DabblerCollapse` for any other expand/collapse animation in the system — never hand-roll

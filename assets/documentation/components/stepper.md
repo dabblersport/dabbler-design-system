@@ -26,6 +26,8 @@ gap breaking the row's symmetry.
 Both sizes, a bound stepper at its minimum and maximum, an error state, and a disabled state — see
 `forms_gallery.dart`'s *Slider and Stepper* section.
 
+@specimen slider/value-controls
+
 ## Using it
 
 **Let typed entry, not just the buttons, be a real path to a value.** The numeral is a genuine text

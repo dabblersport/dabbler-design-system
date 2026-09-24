@@ -40,6 +40,10 @@ Three entries — see `dabbler_type_gallery.dart`'s *Type* section: the four fac
 themselves, the complete ramp in Latin and Arabic side by side, and weights including the values
 drawn outside the ramp entirely.
 
+@specimen type/faces
+@specimen type/ramp
+@specimen type/weights
+
 ## Using it
 
 **No new ramp constant may be added to this class right now — there is a standing freeze.** The

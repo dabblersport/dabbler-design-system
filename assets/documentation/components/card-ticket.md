@@ -27,6 +27,8 @@ uses, kept distinct because the product says "upcoming," not "progress."
 Alongside CardHouse and CardPricing — see `cards_gallery.dart`'s *Card — house, pricing, ticket*
 section.
 
+@specimen card-house/composed
+
 ## Using it
 
 **Never compose `Badge` for the status pill.** It was tried and reversed: `Badge`'s 11px bold with
