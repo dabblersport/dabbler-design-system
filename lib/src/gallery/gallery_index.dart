@@ -57,6 +57,7 @@ library;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
+import '../controls/button.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -79,7 +80,6 @@ class GalleryIndex extends StatefulWidget {
   const GalleryIndex({
     super.key,
     required this.entries,
-    required this.onOpen,
     this.loader = const DabblerDocLoader(),
   });
 
@@ -92,9 +92,6 @@ class GalleryIndex extends StatefulWidget {
 
   /// Every registered entry, in registration order.
   final List<GalleryEntry> entries;
-
-  /// Opens one entry's own page.
-  final void Function(GalleryEntry entry) onOpen;
 
   @override
   State<GalleryIndex> createState() => _GalleryIndexState();
@@ -211,11 +208,7 @@ class _GalleryIndexState extends State<GalleryIndex> {
     return FutureBuilder<List<String>?>(
       future: _authoredGroupOrder,
       builder: (BuildContext context, AsyncSnapshot<List<String>?> snapshot) =>
-          _IndexLayout(
-        bands: _bands(snapshot.data),
-        entries: entries,
-        onOpen: widget.onOpen,
-      ),
+          _IndexLayout(bands: _bands(snapshot.data), entries: entries),
     );
   }
 }

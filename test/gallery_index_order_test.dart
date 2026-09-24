@@ -75,7 +75,6 @@ Future<List<String>> _renderedBands(
     home: Scaffold(
       body: GalleryIndex(
         entries: _nine,
-        onOpen: (GalleryEntry _) {},
         loader: DabblerDocLoader(bundle: _MapBundle(files)),
       ),
     ),

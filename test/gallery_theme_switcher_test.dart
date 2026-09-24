@@ -62,8 +62,33 @@ Future<void> _openEntry(WidgetTester tester, String component) async {
   await tester.tap(tile);
   // Not pumpAndSettle, for the reason `test/gallery_test.dart` gives: several
   // specimens are deliberately perpetual — a loading button, the spinner, the
-  // shimmering skeleton — and settling would never return. Two pumps past the
-  // route's 160ms fade is enough to build, lay out and paint the entry.
+  // shimmering skeleton — and settling would never return. The page loads
+  // from the bundle a frame after the tap (KAN-354), hence the third pump.
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 300));
+  await tester.pump(const Duration(milliseconds: 300));
+}
+
+/// Pushes the development harness `GalleryEntryScreen` for the first entry of
+/// [component], over the catalogue.
+///
+/// Since KAN-354 a tile opens the entry's documentation page, and no page in
+/// the corpus embeds an `@specimen` yet — so the doc page draws no component
+/// whose paint could be read. The harness still renders the specimen alone,
+/// and pushing it here keeps AC8 a PAINT assertion under the real app's
+/// [GalleryThemeScope]; the push is the test's, not the gallery's.
+Future<void> _openSpecimen(WidgetTester tester, String component) async {
+  final GalleryEntry entry = galleryEntries.firstWhere(
+    (GalleryEntry e) => e.title.split(' — ').first == component,
+  );
+  Navigator.of(tester.element(find.byType(GalleryHomeScreen))).push(
+    PageRouteBuilder<void>(
+      transitionDuration: Duration.zero,
+      pageBuilder: (BuildContext context, Animation<double> a,
+              Animation<double> b) =>
+          GalleryEntryScreen(entry: entry),
+    ),
+  );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 300));
 }
@@ -98,7 +123,7 @@ void main() {
 
     await tester.tap(find.byType(GalleryIndexTile).first);
     await tester.pumpAndSettle();
-    expect(find.byType(GalleryEntryScreen), findsOneWidget);
+    expect(find.byType(DabblerDocPageView), findsOneWidget);
     expect(
       find.byType(GalleryThemeSwitcher),
       findsOneWidget,
@@ -110,7 +135,7 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
     await tester.pumpAndSettle();
-    await _openEntry(tester, 'Button');
+    await _openSpecimen(tester, 'Button');
 
     Color brandOf(DabblerTheme theme) => DabblerColors.resolve(
           theme: theme,
@@ -203,18 +228,17 @@ void main() {
     );
 
     await _openEntry(tester, 'Button');
+    expect(find.byType(DabblerDocPageView), findsOneWidget);
     expect(
-      _paintedFills(tester),
-      contains(expected.brandPrimary),
-      reason: 'the pushed route paints under the chosen appearance',
+      _colorsAt(tester, find.byType(DabblerDocPageView)).brandPrimary,
+      expected.brandPrimary,
+      reason: 'the documentation page resolves the chosen appearance',
     );
     expect(find.widgetWithText(DabblerButton, 'Social'), findsOneWidget);
     expect(find.widgetWithText(DabblerButton, 'Dark'), findsOneWidget);
 
-    // Not `tester.pageBack()`: that helper hunts for a Material or Cupertino
-    // back button, and the chrome rebuild replaced the `AppBar` with the
-    // design's own page header, whose back affordance is a [DabblerButton].
-    // Tapping the real control is also the truer assertion.
+    // The doc page's own Back control — below the rail breakpoint (the 800px
+    // test surface) it is the way back to the catalogue (KAN-354).
     await tester.tap(find.widgetWithText(DabblerButton, 'Back'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
@@ -227,6 +251,11 @@ void main() {
     // …and going in a second time still paints it, which is the half a
     // surviving *state variable* would pass without the paint following.
     await _openEntry(tester, 'Button');
+    expect(
+      _colorsAt(tester, find.byType(DabblerDocPageView)).brandPrimary,
+      expected.brandPrimary,
+    );
+    await _openSpecimen(tester, 'Button');
     expect(_paintedFills(tester), contains(expected.brandPrimary));
     expect(
       _paintedFills(tester),

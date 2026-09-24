@@ -13,10 +13,17 @@
 /// lives in a [GalleryPageHeader] and the catalogue is a band of
 /// [GalleryIndexTile]s. What is being asserted is unchanged: it boots, it
 /// titles itself, it shows what is registered, and a tile opens its entry.
+///
+/// Updated by KAN-354: a tile no longer pushes `GalleryEntryScreen`; it opens
+/// the entry's canonical documentation page ([DabblerDocPageView]) in place,
+/// identically above and below the 1000px rail breakpoint, and the reader can
+/// get back to the catalogue from there.
 library;
 
 import 'package:dabbler_design_system/dabbler_design_system.dart';
 import 'package:dabbler_design_system/main.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -71,14 +78,50 @@ void main() {
     );
   });
 
-  testWidgets('tapping a tile opens that entry', (WidgetTester tester) async {
-    await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
-    await tester.pumpAndSettle();
+  // 800 is the default test surface; 1400 puts the rail beside the pane.
+  for (final double width in <double>[800, 1400]) {
+    testWidgets('a tile opens its documentation page at ${width}px', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      // rootBundle caches each asset's load future, and one created in an
+      // earlier test's fake-async zone never completes in this one.
+      addTearDown(rootBundle.clear);
 
-    await tester.tap(find.byType(GalleryIndexTile).first);
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
+      await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(GalleryEntryScreen), findsOneWidget);
-  });
+      final GalleryEntry entry =
+          tester.widget<GalleryIndexTile>(find.byType(GalleryIndexTile).first)
+              .entry;
+      await tester.tap(find.byType(GalleryIndexTile).first);
+      // The page loads from the bundle a frame after the tap.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.byType(GalleryEntryScreen), findsNothing);
+      expect(find.byType(DabblerDocPageView), findsOneWidget);
+      expect(
+        find.byKey(ValueKey<String>('${entry.page}.md')),
+        findsWidgets,
+        reason: 'the tile must open the page its entry names',
+      );
+      expect(find.byType(GalleryIndexTile), findsNothing);
+
+      // The way back: the rail's catalogue row above the breakpoint, the
+      // page's own Back control below it.
+      if (width < 1000) {
+        await tester.tap(find.widgetWithText(DabblerButton, 'Back'));
+      } else {
+        await tester.tap(find.text('All specimens').first);
+      }
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(DabblerDocPageView), findsNothing);
+      expect(find.byType(GalleryIndexTile), findsWidgets);
+    });
+  }
 }

@@ -17,6 +17,14 @@ part of 'gallery_index.dart';
 /// ([GalleryIndex._bands]), so a slide-over would put a second copy of it over
 /// a screen already showing it.
 ///
+/// ## A tile opens its documentation page, on every viewport
+///
+/// A catalogue tile swaps the pane to its entry's [GalleryEntry.page] — the
+/// same [_DocPane] the rail opens, never a pushed specimen-only screen
+/// (`KAN-354`). Below the breakpoint the catalogue and the page take turns in
+/// one scroll view, with a Back control over the page: the sidebar is not the
+/// documentation, so reaching a page cannot depend on the rail being drawn.
+///
 /// ## Why the pane swaps and nothing is pushed
 ///
 /// Every destination — the catalogue, a section landing, a group landing, a
@@ -27,19 +35,13 @@ part of 'gallery_index.dart';
 /// swaps the pane and leaves the rail standing, with that group's row now
 /// expanded and selected.
 class _IndexLayout extends StatefulWidget {
-  const _IndexLayout({
-    required this.bands,
-    required this.entries,
-    required this.onOpen,
-  });
+  const _IndexLayout({required this.bands, required this.entries});
 
   final List<(String, List<GalleryEntry>)> bands;
 
   /// Every registered entry — what a doc page's `@specimen` lines resolve
   /// through.
   final List<GalleryEntry> entries;
-
-  final void Function(GalleryEntry entry) onOpen;
 
   @override
   State<_IndexLayout> createState() => _IndexLayoutState();
@@ -122,15 +124,40 @@ class _IndexLayoutState extends State<_IndexLayout> {
     _go(_PagePane(entry), expand: ancestors);
   }
 
+  /// Opens [entry]'s documentation page — its `_order.md` link where the
+  /// file lists it, so the rail expands to it, and the page path alone where
+  /// it does not (or before the file has been read).
+  void _openEntry(_DocOrder? order, GalleryEntry entry) {
+    final String page = '${entry.page}.md';
+    if (order != null) {
+      for (final _DocOrderSection section in order.sections) {
+        for (final _DocOrderGroup group in section.groups) {
+          for (final _DocOrderEntry e in group.entries) {
+            if (e.page == page) return _openPage(order, e);
+          }
+        }
+      }
+    }
+    _go(
+      _PagePane(
+        _DocOrderEntry(
+          title: entry.title.split(' — ').first,
+          page: page,
+          description: entry.description,
+        ),
+      ),
+    );
+  }
+
   /// The catalogue: the index exactly as it is without a rail.
-  Widget _catalogue() {
+  Widget _catalogue(_DocOrder? order) {
     return GallerySections(
       children: <Widget>[
         const GalleryUsage(
           '**The Dabbler design system.** Every specimen below renders under '
           'the theme and brightness chosen above — seven section themes across '
-          'two brightnesses, fourteen palettes in all. Open a tile to see that '
-          'component on its own page.',
+          'two brightnesses, fourteen palettes in all. Open a tile to read that '
+          "component's documentation page.",
         ),
         for (final (String name, List<GalleryEntry> band) in widget.bands)
           GalleryGroup(
@@ -139,7 +166,7 @@ class _IndexLayoutState extends State<_IndexLayout> {
               for (final GalleryEntry entry in band)
                 GalleryIndexTile(
                   entry: entry,
-                  onTap: () => widget.onOpen(entry),
+                  onTap: () => _openEntry(order, entry),
                 ),
             ],
           ),
@@ -150,7 +177,7 @@ class _IndexLayoutState extends State<_IndexLayout> {
   /// The content pane for the current [_target].
   Widget _pane(_DocOrder? order) {
     final Widget body = switch (_target) {
-      _CataloguePane() => _catalogue(),
+      _CataloguePane() => _catalogue(order),
       _SectionPane(:final _DocOrderSection section) => _SectionLanding(
         section: section,
         onOpenGroup: (_DocOrderGroup group) => _go(_GroupPane(section, group)),
@@ -179,33 +206,47 @@ class _IndexLayoutState extends State<_IndexLayout> {
       ),
     };
 
+    // Keyed on the target so a new page opens at its top rather than at the
+    // catalogue's scroll offset.
     return SingleChildScrollView(
+      key: ValueKey<String>(_target.key),
       child: Align(alignment: AlignmentDirectional.topStart, child: body),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        // GalleryPaper's padding is already outside this widget, so it is
-        // added back rather than the constant being adjusted: the threshold
-        // is a viewport figure.
-        final double viewport =
-            constraints.maxWidth + GalleryPaper.bodyPadding.horizontal;
-        if (viewport < _sideNavBreakpoint) {
-          return SingleChildScrollView(
-            child: Align(
-              alignment: AlignmentDirectional.topStart,
-              child: _catalogue(),
-            ),
-          );
-        }
+    return FutureBuilder<_DocOrder>(
+      future: _order,
+      builder: (BuildContext context, AsyncSnapshot<_DocOrder> snapshot) {
+        final _DocOrder? order = snapshot.data;
+        return LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            // GalleryPaper's padding is already outside this widget, so it is
+            // added back rather than the constant being adjusted: the
+            // threshold is a viewport figure.
+            final double viewport =
+                constraints.maxWidth + GalleryPaper.bodyPadding.horizontal;
+            if (viewport < _sideNavBreakpoint) {
+              if (_target is _CataloguePane) return _pane(order);
+              // No rail to go back through, so the page carries the way
+              // back to the catalogue itself.
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  DabblerButton(
+                    label: 'Back',
+                    tone: DabblerButtonTone.outlined,
+                    size: DabblerButtonSize.small,
+                    semanticLabel: 'Back to the catalogue',
+                    onPressed: () => _go(const _CataloguePane()),
+                  ),
+                  const SizedBox(height: DabblerSpacing.space4),
+                  Expanded(child: _pane(order)),
+                ],
+              );
+            }
 
-        return FutureBuilder<_DocOrder>(
-          future: _order,
-          builder: (BuildContext context, AsyncSnapshot<_DocOrder> snapshot) {
-            final _DocOrder? order = snapshot.data;
             return Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[

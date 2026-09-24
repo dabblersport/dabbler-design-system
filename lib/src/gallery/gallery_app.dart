@@ -132,38 +132,21 @@ class GalleryHomeScreen extends StatelessWidget {
       // and a rail inside this page's scroll view would scroll away with the
       // content and stop being a rail.
       scrollable: false,
-      child: GalleryIndex(
-        entries: entries,
-        onOpen: (GalleryEntry entry) => Navigator.of(context).push(
-          galleryEntryRoute(entry),
-        ),
-      ),
+      // A tile opens its entry's documentation page inside the index, on
+      // every viewport (KAN-354) — nothing is pushed from here.
+      child: GalleryIndex(entries: entries),
     );
   }
-}
-
-/// The route an entry opens in.
-///
-/// A [PageRouteBuilder] with a plain fade rather than [MaterialPageRoute]:
-/// routing is the mechanism the gallery wants, but `MaterialPageRoute` also
-/// brings `ThemeData.pageTransitionsTheme`, which is a Material appearance
-/// reaching a pixel.
-Route<void> galleryEntryRoute(GalleryEntry entry) {
-  return PageRouteBuilder<void>(
-    transitionDuration: const Duration(milliseconds: 160),
-    reverseTransitionDuration: const Duration(milliseconds: 120),
-    pageBuilder: (BuildContext context, Animation<double> a,
-            Animation<double> b) =>
-        GalleryEntryScreen(entry: entry),
-    transitionsBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondary, Widget child) =>
-        FadeTransition(opacity: animation, child: child),
-  );
 }
 
 /// One entry's own page, composed the way the design composes a `.card.html`:
 /// the page's name and subtitle over a hairline, then the specimen under its
 /// band label with air around it.
+///
+/// **Not reachable from ordinary navigation** (`KAN-354`): a catalogue tile,
+/// the rail and every doc link open the entry's documentation page instead.
+/// It stays as a development harness — `test/gallery_test.dart` pumps it
+/// directly to render every specimen in isolation.
 class GalleryEntryScreen extends StatelessWidget {
   /// Creates the screen for [entry].
   const GalleryEntryScreen({super.key, required this.entry});
