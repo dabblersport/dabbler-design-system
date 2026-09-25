@@ -127,18 +127,11 @@ class DabblerSection extends StatelessWidget {
                   ? const SizedBox.shrink()
                   : Text(
                       title,
-                      // `fontSize: 20, lineHeight: '25px', fontWeight: 300`
-                      // (`Section.jsx:19-20`) — `.t-title-3` at
-                      // `--weight-light`, NOT at its own regular default. The
-                      // previous cut left the weight alone, which draws the
-                      // section heading a full step heavier than the specimen
-                      // and is the single most visible thing about a Section.
+                      // `.t-title-3` at its own weight 400 — never Light. See
+                      // the D-013 note in the class dartdoc above.
                       style: DabblerType.title3
                           .resolveForDirection(direction)
-                          .copyWith(
-                            color: colors.textPrimary,
-                            fontWeight: DabblerType.light,
-                          ),
+                          .copyWith(color: colors.textPrimary),
                     ),
             ),
             if (action != null) ...<Widget>[
