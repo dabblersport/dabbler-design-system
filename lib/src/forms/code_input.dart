@@ -385,15 +385,12 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
     }
 
     if (typed.length > 1) {
-      // Paste or multi-character autofill: spread across the boxes from here,
-      // then land after the last digit written.
-      for (int k = 0; k < typed.length; k++) {
-        if (index + k < widget.length) {
-          next[index + k] = typed[k];
-        }
-      }
-      _emit(next);
-      _focusBox(index + typed.length);
+      // Paste or multi-character autofill (`CodeInput.jsx:63-69`): the source
+      // spreads the pasted digits from box 0 whichever box took the paste,
+      // truncated to `length`, then focuses `min(pasted.length, length - 1)`.
+      final int n = typed.length < widget.length ? typed.length : widget.length;
+      _emit(typed.substring(0, n).split(''));
+      _focusBox(typed.length < widget.length - 1 ? typed.length : widget.length - 1);
       return;
     }
 

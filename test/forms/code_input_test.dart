@@ -262,7 +262,7 @@ void main() {
       }
     });
 
-    testWidgets('a paste from the middle fills forward and stops at the end', (
+    testWidgets('a paste from the middle fills from box 0, truncated to length', (
       WidgetTester tester,
     ) async {
       final List<String> changes = <String>[];
@@ -273,7 +273,32 @@ void main() {
       );
       await tester.enterText(_field(1), '12345');
       await tester.pumpAndSettle();
-      expect(changes.last, '9123');
+      // `CodeInput.jsx:67`: `pasted.slice(0, length)`, from box 0.
+      expect(changes.last, '1234');
+      expect(tester.widget<EditableText>(_field(3)).focusNode.hasFocus, isTrue);
+    });
+
+    testWidgets('KAN-365: a paste into box 3 of 6 fills from box 0', (
+      WidgetTester tester,
+    ) async {
+      final List<String> changes = <String>[];
+      await tester.pumpWidget(
+        _host(DabblerCodeInput(onChanged: changes.add)),
+      );
+      await tester.tap(_field(3));
+      await tester.pump();
+      await tester.enterText(_field(3), '4815');
+      await tester.pumpAndSettle();
+
+      expect(changes.last, '4815');
+      for (int i = 0; i < 6; i++) {
+        expect(
+          tester.widget<EditableText>(_field(i)).controller.text,
+          i < 4 ? '4815'[i] : '',
+        );
+      }
+      // `CodeInput.jsx:69`: focusBox(min(pasted.length, length - 1)).
+      expect(tester.widget<EditableText>(_field(4)).focusNode.hasFocus, isTrue);
     });
 
     testWidgets('a full code fires onCompleted after onChanged', (
