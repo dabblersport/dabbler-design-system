@@ -420,6 +420,7 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
       radius: radius,
       onTap: widget.onPressed,
       semanticsLabel: widget.label,
+      expanded: widget.open,
       children: <Widget>[
         if (widget.prefixIcon != null)
           _iconSlot(widget.prefixIcon!, colors.brandPrimary),

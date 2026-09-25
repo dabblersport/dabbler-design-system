@@ -111,6 +111,7 @@ class DabblerFieldShell extends StatelessWidget {
     this.innerPadding = defaultInnerPadding,
     this.onTap,
     this.semanticsLabel,
+    this.expanded,
   });
 
   /// `padding: '9px 12px'` (`TextField.jsx:58`) — `--space-3` block,
@@ -178,6 +179,11 @@ class DabblerFieldShell extends StatelessWidget {
 
   /// The accessible name for the box when [onTap] is set. Defaults to [label].
   final String? semanticsLabel;
+
+  /// The expanded state announced on the box when [onTap] is set — the port
+  /// of `aria-expanded` on a popup trigger. Null (the default) asserts no
+  /// expanded state, which is right for every field that opens nothing.
+  final bool? expanded;
 
   /// The disabled fill.
   ///
@@ -285,6 +291,7 @@ class DabblerFieldShell extends StatelessWidget {
         button: true,
         enabled: !disabled,
         label: semanticsLabel ?? label,
+        expanded: expanded,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: disabled ? null : onTap,

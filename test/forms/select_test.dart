@@ -419,6 +419,19 @@ void main() {
       expect(node.flagsCollection.isButton, isTrue);
       expect(find.text('padel'), findsOneWidget);
 
+      // `aria-expanded` on the trigger tracks the menu (KAN-366).
+      bool? expanded() => tester
+          .getSemantics(find.byType(DabblerFieldShell))
+          .flagsCollection
+          .isExpanded
+          .toBoolOrNull();
+      expect(expanded(), isFalse);
+      await _open(tester);
+      expect(expanded(), isTrue);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(expanded(), isFalse);
+
       handle.dispose();
     });
 
