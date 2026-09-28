@@ -72,9 +72,12 @@ enum DabblerStepperSize {
 ///
 /// ## Keyboard
 ///
-/// Both buttons are tab stops, activated with Space or Enter, each drawing the
-/// shared [DabblerFocusRing]; a button at a bound is genuinely disabled and is
+/// Both buttons are tab stops, activated with Space or Enter, each drawing its
+/// own [DabblerFocusRing]; a button at a bound is genuinely disabled and is
 /// skipped by the tab order, as the source's real `disabled` attribute is.
+/// Focus on **any** of the three controls — decrement, numeral, increment —
+/// also activates the shell's shared focused border, which is the design's
+/// *"shared focus ring on whichever control has focus"*.
 /// **Arrow Up and Arrow Down step the value** while the numeral has focus,
 /// which is the keyboard affordance a number control is expected to have;
 /// Arrow Left and Arrow Right are left to the caret, because the numeral is a
@@ -181,7 +184,15 @@ class _DabblerStepperState extends State<DabblerStepper> {
   late final TextEditingController _controller =
       TextEditingController(text: '${widget.value}');
   late final FocusNode _fieldNode = FocusNode()..addListener(_handleFocus);
-  bool _focused = false;
+
+  // One shared ring for three controls (`value-controls.card.html:133,138`):
+  // the shell's focused border is the union of the numeral's focus and each
+  // button's, so it activates from whichever control has focus and clears
+  // only when none does.
+  bool _fieldFocused = false;
+  bool _decreaseFocused = false;
+  bool _increaseFocused = false;
+  bool get _focused => _fieldFocused || _decreaseFocused || _increaseFocused;
 
   @override
   void didUpdateWidget(DabblerStepper oldWidget) {
@@ -208,8 +219,8 @@ class _DabblerStepperState extends State<DabblerStepper> {
   }
 
   void _handleFocus() {
-    if (_focused != _fieldNode.hasFocus) {
-      setState(() => _focused = _fieldNode.hasFocus);
+    if (_fieldFocused != _fieldNode.hasFocus) {
+      setState(() => _fieldFocused = _fieldNode.hasFocus);
     }
     if (!_fieldNode.hasFocus) {
       // `if (digits === '') { set(min); }` resolved on the way out, so the box
@@ -266,6 +277,11 @@ class _DabblerStepperState extends State<DabblerStepper> {
                 enabled: _enabled && !_atMin,
                 colors: colors,
                 onPressed: () => _set(widget.value - widget.step),
+                onFocusChange: (bool focused) {
+                  if (_decreaseFocused != focused) {
+                    setState(() => _decreaseFocused = focused);
+                  }
+                },
               ),
               Expanded(child: _numeral(colors, direction, box)),
               _StepperButton(
@@ -275,6 +291,11 @@ class _DabblerStepperState extends State<DabblerStepper> {
                 enabled: _enabled && !_atMax,
                 colors: colors,
                 onPressed: () => _set(widget.value + widget.step),
+                onFocusChange: (bool focused) {
+                  if (_increaseFocused != focused) {
+                    setState(() => _increaseFocused = focused);
+                  }
+                },
               ),
             ],
           ),
@@ -375,6 +396,7 @@ class _StepperButton extends StatefulWidget {
     required this.enabled,
     required this.colors,
     required this.onPressed,
+    required this.onFocusChange,
   });
 
   final String icon;
@@ -383,6 +405,10 @@ class _StepperButton extends StatefulWidget {
   final bool enabled;
   final DabblerColors colors;
   final VoidCallback onPressed;
+
+  /// Reports this button's focus to the stepper, which folds it into the
+  /// shell's shared focused border.
+  final ValueChanged<bool> onFocusChange;
 
   @override
   State<_StepperButton> createState() => _StepperButtonState();
@@ -402,6 +428,7 @@ class _StepperButtonState extends State<_StepperButton> {
       child: ExcludeSemantics(
         child: FocusableActionDetector(
           enabled: widget.enabled,
+          onFocusChange: widget.onFocusChange,
           onShowFocusHighlight: (bool visible) {
             if (_ringVisible != visible) {
               setState(() => _ringVisible = visible);

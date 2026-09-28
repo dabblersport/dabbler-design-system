@@ -200,6 +200,143 @@ void main() {
     });
   });
 
+  group('Stepper shares one focus ring across its three controls', () {
+    DabblerSurface shellBox(WidgetTester tester) =>
+        tester.widget<DabblerSurface>(
+          find
+              .descendant(
+                of: find.byType(DabblerFieldShell),
+                matching: find.byType(DabblerSurface),
+              )
+              .first,
+        );
+
+    void expectShellFocused(WidgetTester tester, bool focused, String why) {
+      final DabblerSurface box = shellBox(tester);
+      expect(
+        box.borderColor,
+        DabblerFieldShell.borderColorFor(
+          testColors(),
+          disabled: false,
+          hasError: false,
+          focused: focused,
+        ),
+        reason: why,
+      );
+      expect(
+        box.borderWidth,
+        DabblerFieldShell.borderWidthFor(
+          disabled: false,
+          hasError: false,
+          focused: focused,
+        ),
+        reason: why,
+      );
+    }
+
+    bool numeralFocused(WidgetTester tester) => tester
+        .widget<TextField>(find.byType(TextField))
+        .focusNode!
+        .hasFocus;
+
+    testWidgets('decrement, numeral and increment each activate the shell '
+        'border, and it clears when focus leaves all three', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(DabblerStepper(value: 10, min: 4, max: 22, onChanged: (_) {})),
+      );
+      expectShellFocused(tester, false, 'nothing focused yet');
+      expect(testColors().focusRing, isNotNull);
+
+      // Tab 1 → decrement (AC1).
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(numeralFocused(tester), isFalse);
+      expectShellFocused(tester, true, 'focus on the decrement button');
+      expect(shellBox(tester).borderColor, testColors().focusRing);
+
+      // Tab 2 → numeral (AC3, unchanged behaviour).
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(numeralFocused(tester), isTrue);
+      expectShellFocused(tester, true, 'focus on the numeral');
+
+      // Tab 3 → increment (AC2).
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(numeralFocused(tester), isFalse);
+      expectShellFocused(tester, true, 'focus on the increment button');
+
+      // Focus leaves all three (AC4).
+      FocusManager.instance.primaryFocus!.unfocus();
+      await tester.pump();
+      expectShellFocused(tester, false, 'focus left all three controls');
+    });
+
+    testWidgets('the numeral alone still drives the shell border', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(DabblerStepper(value: 10, min: 4, max: 22, onChanged: (_) {})),
+      );
+      await tester.tap(find.byType(TextField));
+      await tester.pump();
+      expectShellFocused(tester, true, 'numeral focused');
+
+      FocusManager.instance.primaryFocus!.unfocus();
+      await tester.pump();
+      expectShellFocused(tester, false, 'numeral blurred');
+    });
+
+    testWidgets('a focused button that reaches its bound does not leave the '
+        'shell stuck focused', (WidgetTester tester) async {
+      int value = 5;
+      await tester.pumpWidget(
+        host(
+          StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) =>
+                DabblerStepper(
+              value: value,
+              min: 4,
+              max: 22,
+              onChanged: (int v) => setState(() => value = v),
+            ),
+          ),
+        ),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expectShellFocused(tester, true, 'decrement focused');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(value, 4);
+      expectShellFocused(
+        tester,
+        false,
+        'the decrement button is now disabled and has let go of focus',
+      );
+    });
+
+    testWidgets('a button at its bound is still skipped by the tab order', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(DabblerStepper(value: 4, min: 4, max: 22, onChanged: (_) {})),
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(
+        numeralFocused(tester),
+        isTrue,
+        reason: 'the disabled decrement button is not a tab stop',
+      );
+      expectShellFocused(tester, true, 'numeral focused');
+    });
+  });
+
   group('Stepper is RTL-correct', () {
     testWidgets('minus and plus swap sides, and the numeral does not reorder', (
       WidgetTester tester,
