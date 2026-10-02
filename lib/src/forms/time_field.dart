@@ -7,7 +7,7 @@ import 'picker_field.dart';
 
 /// The time half of the formatting layer (AC1) and of the numerals rule (AC2).
 ///
-/// Transcribed from `components/forms/TimeField.jsx:14-27`,
+/// Transcribed from `components/forms/TimeField.jsx:12-23`,
 /// `TimeField.prompt.md` and `components/forms/fields.card.html:136`.
 ///
 /// ## Western Arabic numerals, regardless of locale (AC2)
@@ -23,14 +23,14 @@ import 'picker_field.dart';
 ///
 /// ## The meridiem is not localised either
 ///
-/// `TimeField.jsx:14` formats the period as the literal `AM` / `PM` the value
+/// `TimeField.jsx:12` formats the period as the literal `AM` / `PM` the value
 /// already carries, and `fields.card.html:137` calls `H:MM AM` *"the product's
 /// own format"*. [amLabel] and [pmLabel] are therefore constants, not a
 /// locale lookup — a design-system decision transcribed, not an oversight.
 abstract final class DabblerTimeFormat {
   const DabblerTimeFormat._();
 
-  /// The placeholder — `TimeField.jsx:35`.
+  /// The placeholder — `TimeField.jsx:34`.
   static const String placeholder = 'H:MM AM';
 
   /// The before-noon marker.
@@ -41,7 +41,7 @@ abstract final class DabblerTimeFormat {
 
   /// `H:MM AM` in Western Arabic numerals, or `''` for null.
   ///
-  /// `TimeField.jsx:14` — `${hour}:${pad(minute)} ${period}`. The hour is
+  /// `TimeField.jsx:12` — `${hour}:${pad(minute)} ${period}`. The hour is
   /// 12-hour and **not** zero-padded; the minute always is. Midnight and noon
   /// are `12`, which is what the source's `hour` already is — it never holds
   /// a `0`, because [parse] and its `TimePicker` both work in 1–12.
@@ -58,7 +58,7 @@ abstract final class DabblerTimeFormat {
 
   /// `6pm`, `6:00 PM`, `18:30`, `6.30 pm` — or null.
   ///
-  /// `TimeField.jsx:16-26`, transcribed including its 24-hour fold: when no
+  /// `TimeField.jsx:14-22`, transcribed including its 24-hour fold: when no
   /// `am`/`pm` is typed, an hour of 12 or more is `PM` and anything above 12
   /// has 12 subtracted, so `18:30` is `6:30 PM` and `09:15` is `9:15 AM`.
   ///
@@ -161,7 +161,7 @@ class DabblerTimeField extends StatefulWidget {
     this.focusNode,
   });
 
-  /// `icon="clock"` — `TimeField.jsx:72`.
+  /// `icon="clock"` — `TimeField.jsx:67`.
   static const String iconName = 'clock';
 
   /// The chosen time, or null while unset (the source's `''`).
@@ -214,7 +214,7 @@ class _DabblerTimeFieldState extends State<DabblerTimeField> {
   @override
   void didUpdateWidget(DabblerTimeField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // `useEffect(() => setText(value), [value])` — `TimeField.jsx:39`.
+    // `useEffect(() => setText(value), [value])` — `TimeField.jsx:40`.
     final String display = widget.displayText;
     if (display != oldWidget.displayText && display != _controller.text) {
       _controller.text = display;

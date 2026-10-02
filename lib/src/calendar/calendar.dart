@@ -26,7 +26,7 @@ class DabblerCalendarCell {
 
   /// Whether [date] falls outside the displayed month — the source's `out`.
   ///
-  /// `Calendar.jsx:55` — an outside cell is muted and **not selectable**
+  /// `Calendar.jsx:51-57` — an outside cell is muted and **not selectable**
   /// (`onClick={() => !c.out && …}`, `cursor: 'default'`).
   final bool outside;
 
@@ -51,7 +51,7 @@ class DabblerCalendarCell {
 ///
 /// ## The week start is a locale fact, not a direction fact (AC3)
 ///
-/// `Calendar.jsx:5` fixes `DOW = ['MO' … 'SU']` and `:18` fixes
+/// `Calendar.jsx:4` fixes `DOW = ['MO' … 'SU']` and `:18` fixes
 /// `lead = (first.getDay() + 6) % 7`, i.e. Monday-first, unconditionally. AC3
 /// requires the week to start on *the correct day*, which for the Arabic
 /// locales Dabbler ships to is Saturday, not Monday — and which is a property
@@ -853,7 +853,7 @@ class DabblerCalendar extends StatelessWidget {
     );
 
     if (!selectable) {
-      // `cursor: 'default'` and a guarded handler (`Calendar.jsx:53`): an
+      // `cursor: 'default'` and a guarded handler (`Calendar.jsx:57`): an
       // outside or out-of-bounds cell is inert, and is hidden from assistive
       // technology as a control rather than announced as a dead one.
       return KeyedSubtree(
@@ -887,7 +887,7 @@ class DabblerCalendar extends StatelessWidget {
     // narrow or the label is a long Arabic one.
     return Wrap(
       textDirection: direction,
-      // `gap: 9` (`Calendar.jsx:68`) — `--space-3`, on both axes.
+      // `gap: 9` (`Calendar.jsx:64`) — `--space-3`, on both axes.
       spacing: DabblerSpacing.space3,
       runSpacing: DabblerSpacing.space3,
       crossAxisAlignment: WrapCrossAlignment.center,

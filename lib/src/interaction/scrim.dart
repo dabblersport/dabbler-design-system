@@ -24,7 +24,7 @@ import '../tokens/dabbler_motion.dart';
 /// `dbl-fade` keyframe, `animation: dbl-fade var(--motion-base) var(--ease-out)`
 /// (`components/foundations/overlay.jsx:32`), and the same motion
 /// `Dialog.prompt.md:70` gives the panel. Under reduced motion the source sets
-/// `.dbl-fade{animation:none}` (`overlay.jsx:43`), so the scrim here appears
+/// `.dbl-fade{animation:none}` (`overlay.jsx:39`), so the scrim here appears
 /// and disappears instantly.
 ///
 /// ## It assumes no overlay

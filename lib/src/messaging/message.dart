@@ -10,89 +10,8 @@ import 'messaging_auto_direction.dart';
 import 'messaging_foundations.dart';
 import 'messaging_parts.dart';
 
-/// Ownership of a [DabblerMessage]. Outgoing fills with brand and aligns to the
-/// inline end.
-enum DabblerMessageDirection {
-  /// From someone else.
-  incoming,
-
-  /// From the viewer.
-  outgoing,
-}
-
-/// The conversation context. `group` adds the avatar gutter and sender name.
-enum DabblerMessageContext {
-  /// One other person.
-  direct,
-
-  /// Several people.
-  group,
-}
-
-/// Position within a same-sender run. Set by `DabblerMessageThread`.
-enum DabblerGroupPosition {
-  /// Alone.
-  single,
-
-  /// The run's first.
-  first,
-
-  /// Inside a run.
-  middle,
-
-  /// The run's last.
-  last,
-}
-
-/// A message's interaction state.
-enum DabblerMessageState {
-  /// Normal.
-  normal,
-
-  /// Draws the brand outline.
-  selected,
-
-  /// Disables interaction.
-  readOnly,
-}
-
-/// The quoted message of a reply.
-@immutable
-class DabblerReplySpec {
-  /// A reply spec.
-  const DabblerReplySpec({
-    this.sender = '',
-    this.content,
-    this.attachmentLabel,
-  });
-
-  /// Who wrote the quoted message.
-  final String sender;
-
-  /// The quoted text.
-  final String? content;
-
-  /// Set instead of [content] when the quoted message was an attachment.
-  final String? attachmentLabel;
-}
-
-/// What a message carries besides text.
-@immutable
-class DabblerMessageAttachment {
-  /// An image, supplied by the caller and drawn 232x156 with a 12px corner.
-  const DabblerMessageAttachment.image({required this.child}) : isImage = true;
-
-  /// A shared game, venue or player.
-  const DabblerMessageAttachment.object(DabblerSharedObjectCard card)
-    : child = card,
-      isImage = false;
-
-  /// The attachment's widget.
-  final Widget child;
-
-  /// Whether this is an image.
-  final bool isImage;
-}
+part 'message_models.dart';
+part 'message_bubble_body.dart';
 
 /// Message — the canonical message.
 ///
@@ -315,57 +234,7 @@ class DabblerMessage extends StatelessWidget {
     final bool interactive = onPress != null && !readOnly;
     final Color ink = out ? colors.onBrand : colors.textPrimary;
 
-    // The source bubble is a flex column with the default `align-items:
-    // stretch`, so the reply reference spans the bubble's full width.
-    final Widget bubbleBody = IntrinsicWidth(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          if (reply != null)
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: (attachment != null || (content?.isNotEmpty ?? false))
-                    ? DabblerMessagingSpacing.replyGap
-                    : 0,
-              ),
-              child: DabblerMessageReplyReference(
-                sender: reply!.sender,
-                content: reply!.content,
-                attachmentLabel: reply!.attachmentLabel,
-                variant: out
-                    ? DabblerReplyVariant.onBrand
-                    : DabblerReplyVariant.message,
-              ),
-            ),
-          if (attachment != null)
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: (content?.isNotEmpty ?? false)
-                    ? DabblerMessagingSpacing.replyGap
-                    : 0,
-              ),
-              child: attachment!.isImage
-                  ? ClipRRect(
-                      borderRadius: DabblerRadius.lgAll,
-                      child: SizedBox(
-                        width: imageSize.width,
-                        height: imageSize.height,
-                        child: attachment!.child,
-                      ),
-                    )
-                  : SizedBox(width: objectWidth, child: attachment!.child),
-            ),
-          if (content != null && content!.isNotEmpty)
-            DabblerAutoDirectionText(
-              content!,
-              style: DabblerType.subheadline
-                  .resolveForDirection(dir)
-                  .copyWith(color: ink),
-            ),
-        ],
-      ),
-    );
+    final Widget bubbleBody = _bubbleBody(dir, ink, out);
 
     Widget bubble = DecoratedBox(
       decoration: BoxDecoration(

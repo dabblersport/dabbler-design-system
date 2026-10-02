@@ -43,7 +43,7 @@ import '../tokens/dabbler_motion.dart';
 /// The scale still happens — it is the press *affordance*, and removing it
 /// would leave the control with no feedback at all — but the transition is
 /// instant. The source removes animation, not state
-/// (`components/foundations/overlay.jsx:34-45`).
+/// (`components/foundations/overlay.jsx:34-41`).
 ///
 /// ## Disabled
 ///

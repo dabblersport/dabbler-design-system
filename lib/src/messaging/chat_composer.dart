@@ -14,72 +14,9 @@ import '../tokens/dabbler_type.dart';
 import 'messaging_foundations.dart';
 import 'messaging_parts.dart';
 
-/// The state of a [DabblerChatComposer] — `state` in the source.
-enum DabblerChatComposerState {
-  /// `'default'` — the source's string; `default` is a Dart keyword.
-  normal,
-
-  /// A message is in flight: a spinner replaces the send glyph and the input
-  /// and every target are inert.
-  sending,
-
-  /// Sunken field and every target inert.
-  disabled,
-}
-
-/// The quoted message shown above the field — `replyTo` in the source.
-@immutable
-class DabblerComposerReply {
-  /// A reply target. Set [content] for a text message, [attachmentLabel] for an
-  /// attachment.
-  const DabblerComposerReply({
-    required this.sender,
-    this.content,
-    this.attachmentLabel,
-    this.onCancel,
-    this.cancelLabel = 'Cancel reply',
-  });
-
-  /// Who wrote the quoted message.
-  final String sender;
-
-  /// The quoted text (`content ?? text` in the source).
-  final String? content;
-
-  /// Set instead of [content] when the quoted message was an attachment.
-  final String? attachmentLabel;
-
-  /// Shows the cancel button when set.
-  final VoidCallback? onCancel;
-
-  /// The cancel button's accessible name.
-  final String cancelLabel;
-}
-
-/// A reason the conversation cannot be posted to — `notice` in the source. It
-/// replaces the input entirely.
-@immutable
-class DabblerComposerNotice {
-  /// A notice.
-  const DabblerComposerNotice({
-    required this.text,
-    this.icon = 'info-circle',
-    this.actionLabel,
-    this.onAction,
-  });
-
-  /// The explanation.
-  final String text;
-
-  /// The Iconsax glyph — `info-circle` by default (`notice.icon || 'info-circle'`).
-  final String icon;
-
-  /// Shows an outlined small action button when set.
-  final String? actionLabel;
-
-  /// Called by the action.
-  final VoidCallback? onAction;
-}
+part 'chat_composer_models.dart';
+part 'chat_composer_targets.dart';
+part 'chat_composer_notice.dart';
 
 /// ChatComposer — the persistent input surface for composing and sending a
 /// message inside a conversation.
@@ -288,58 +225,6 @@ class _DabblerChatComposerState extends State<DabblerChatComposer> {
             for (int i = 0; i < children.length; i++) ...<Widget>[
               if (i > 0) const SizedBox(height: DabblerSpacing.space3),
               children[i],
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotice(
-    BuildContext context,
-    DabblerColors colors,
-    DabblerComposerNotice notice,
-  ) {
-    final TextDirection dir = Directionality.of(context);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surfaceSunken,
-        borderRadius: DabblerRadius.mdAll,
-        border: Border.all(
-          color: colors.bgTertiary,
-          width: DabblerSizing.borderDefault,
-        ),
-      ),
-      child: Padding(
-        // 9 vertical / 12 horizontal, inside the 1px border.
-        padding: const EdgeInsets.symmetric(
-          vertical: DabblerSpacing.space3,
-          horizontal: DabblerSpacing.space4,
-        ),
-        child: Row(
-          children: <Widget>[
-            DabblerIcon(
-              notice.icon,
-              size: DabblerSizing.iconSm,
-              color: colors.textSecondary,
-            ),
-            const SizedBox(width: DabblerSpacing.space3),
-            Expanded(
-              child: Text(
-                notice.text,
-                style: DabblerType.caption1
-                    .resolveForDirection(dir)
-                    .copyWith(color: colors.textSecondary),
-              ),
-            ),
-            if (notice.actionLabel != null) ...<Widget>[
-              const SizedBox(width: DabblerSpacing.space3),
-              DabblerButton(
-                label: notice.actionLabel!,
-                tone: DabblerButtonTone.outlined,
-                size: DabblerButtonSize.small,
-                onPressed: notice.onAction,
-              ),
             ],
           ],
         ),
@@ -571,63 +456,6 @@ class _DabblerChatComposerState extends State<DabblerChatComposer> {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// The focus ring around the field, shown while the input holds focus.
-class _FieldRing extends StatelessWidget {
-  const _FieldRing({required this.visible, required this.child});
-
-  final bool visible;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => DabblerFocusRing.visible(
-    visible: visible,
-    borderRadius: DabblerRadius.xxlAll,
-    child: child,
-  );
-}
-
-/// A button target: press scale, focus ring and keyboard activation when live;
-/// a disabled, named button in the semantics tree when [onTap] is null (the
-/// source's `<button disabled aria-label>`).
-class _Target extends StatelessWidget {
-  const _Target({
-    required this.label,
-    required this.onTap,
-    required this.child,
-    required this.ringRadius,
-    this.scale = true,
-  });
-
-  final String label;
-  final VoidCallback? onTap;
-  final Widget child;
-  final BorderRadius ringRadius;
-  final bool scale;
-
-  @override
-  Widget build(BuildContext context) {
-    if (onTap == null) {
-      return Semantics(
-        button: true,
-        enabled: false,
-        label: label,
-        excludeSemantics: true,
-        child: child,
-      );
-    }
-    return Semantics(
-      enabled: true,
-      child: DabblerMessagingTap(
-        onTap: onTap,
-        label: label,
-        ringRadius: ringRadius,
-        scale: scale,
-        child: child,
-      ),
     );
   }
 }

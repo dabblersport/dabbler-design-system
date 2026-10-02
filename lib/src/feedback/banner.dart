@@ -125,7 +125,7 @@ class DabblerBanner extends StatelessWidget {
     this.dismissSemanticLabel = defaultDismissSemanticLabel,
   });
 
-  /// The tone. Default `info`, as in `Banner.jsx:17`.
+  /// The tone. Default `info`, as in `Banner.jsx:15`.
   final DabblerBannerTone tone;
 
   /// The headline line. Rendered in [DabblerType.headline].
@@ -225,7 +225,7 @@ class DabblerBanner extends StatelessWidget {
     }
     if (message != null) {
       if (column.isNotEmpty) {
-        // `gap: var(--space-1)` on the content column, Banner.jsx:38.
+        // `gap: var(--space-1)` on the content column, Banner.jsx:40.
         column.add(const SizedBox(height: DabblerSpacing.space1));
       }
       column.add(
@@ -239,7 +239,7 @@ class DabblerBanner extends StatelessWidget {
     }
     if (action != null) {
       if (column.isNotEmpty) {
-        // `marginBlockStart: var(--space-2)` on the action, Banner.jsx:45.
+        // `marginBlockStart: var(--space-2)` on the action, Banner.jsx:46.
         column.add(const SizedBox(height: DabblerSpacing.space2));
       }
       column.add(

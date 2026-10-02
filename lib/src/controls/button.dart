@@ -18,7 +18,7 @@ import '../tokens/dabbler_type.dart';
 /// row.
 ///
 /// **Tone names describe the PAINT, not a semantic.** The source is explicit
-/// about this (`Button.jsx:12`), and it is why the kit's original names were
+/// about this (`Button.jsx:13-15`), and it is why the kit's original names were
 /// replaced: `outline` was a filled indigo pill, `ghost` a filled neutral pill
 /// and `dark` the only actually outlined tone.
 ///
@@ -155,7 +155,7 @@ enum DabblerButtonSize {
 /// [DabblerButtonSize.full] is 52 tall, which clears the floor on its own.
 /// `medium` and `small` take a [DabblerSizing.touchTargetMin] (45) **minimum on
 /// the painted box**, which is where the source puts it (`minHeight:
-/// 'var(--touch-target-min)'`, `Button.jsx:76`) — so the pill itself grows,
+/// 'var(--touch-target-min)'`, `Button.jsx:77`) — so the pill itself grows,
 /// rather than sitting inside a larger invisible hit area as [DabblerChip]'s
 /// does. A matching `minWidth` is applied as well; the source sets no
 /// `min-width`, but KAN-243 AC5 asks for ≥44 in **both** axes and a narrow
@@ -245,7 +245,7 @@ class DabblerButton extends StatefulWidget {
 
   /// Whether the button is loading: inert and out of the tab order like
   /// [disabled], but **not** dimmed — `opacity: disabled ? 0.45 : 1`
-  /// (`Button.jsx:88`) keys off `disabled` alone. The leading slot renders a
+  /// (`Button.jsx:94`) keys off `disabled` alone. The leading slot renders a
   /// [DabblerSpinner] instead of [icon].
   final bool loading;
 
@@ -269,7 +269,7 @@ class DabblerButton extends StatefulWidget {
   static const double fullRadius = DabblerSpacing.space7;
 
   /// The gap between the leading slot and the label — `gap: icon || loading ?
-  /// 8 : 0` (`Button.jsx:85`), which `buttons.card.html` restates as *"Icon gap
+  /// 8 : 0` (`Button.jsx:90`), which `buttons.card.html` restates as *"Icon gap
   /// is 8px when an `icon` or a loading spinner is present."*
   ///
   /// **8 is off the base-3 grid** and is not [DabblerSpacing.iconGap] (6). The
@@ -289,7 +289,7 @@ class DabblerButton extends StatefulWidget {
   /// is the button's whole content rather than a label's companion.
   static const double iconOnlyGlyphSize = 20;
 
-  /// The opacity of a [disabled] button — `opacity: 0.45` (`Button.jsx:88`).
+  /// The opacity of a [disabled] button — `opacity: 0.45` (`Button.jsx:94`).
   static const double disabledOpacity = 0.45;
 
   /// How far a pressed background moves toward black.
@@ -302,7 +302,7 @@ class DabblerButton extends StatefulWidget {
 
   /// The fill for [DabblerButtonTone.accent] — `--accent-indigo`, `#5C50E6`.
   ///
-  /// `Button.jsx:30` paints this tone `var(--accent-indigo)`. It is
+  /// `Button.jsx:29` paints this tone `var(--accent-indigo)`. It is
   /// [DabblerPalette.accentIndigo], the same role [DabblerFab]'s `default` tone
   /// and [DabblerAvatar]'s `indigo` badge use. White on it measures 5.61:1;
   /// the former `--social-info` (`#6366F1`) stand-in measured 4.47:1 and failed
@@ -389,7 +389,7 @@ class DabblerButton extends StatefulWidget {
     DabblerButtonSize.small => 12,
   };
 
-  /// `line-height: 1.4` (`Button.jsx:83`) — a multiplier, which is already what
+  /// `line-height: 1.4` (`Button.jsx:86`) — a multiplier, which is already what
   /// [TextStyle.height] is, so it is used directly.
   static const double lineHeightFactor = 1.4;
 
@@ -451,7 +451,7 @@ class _DabblerButtonState extends State<DabblerButton> {
   bool _pressed = false;
   bool _focused = false;
 
-  /// `const inert = disabled || loading` (`Button.jsx:64`).
+  /// `const inert = disabled || loading` (`Button.jsx:63`).
   bool get _inert => widget.disabled || widget.loading;
 
   void _setPressed(bool value) {
@@ -519,7 +519,7 @@ class _DabblerButtonState extends State<DabblerButton> {
               size: widget.size,
               tone: widget.tone,
             ),
-            // `whiteSpace: 'nowrap'` (`Button.jsx:86`).
+            // `whiteSpace: 'nowrap'` (`Button.jsx:91`).
             maxLines: 1,
             softWrap: false,
             textAlign: TextAlign.center,

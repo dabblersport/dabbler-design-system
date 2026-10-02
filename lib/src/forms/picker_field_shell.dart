@@ -108,7 +108,7 @@ class DabblerPickerFieldShell extends StatefulWidget {
   final TextEditingController controller;
 
   /// The trailing button's Iconsax glyph: `calendar` or `clock`
-  /// (`DateField.jsx:120`, `TimeField.jsx:72`).
+  /// (`DateField.jsx:120`, `TimeField.jsx:67`).
   final String iconName;
 
   /// The label above the box.

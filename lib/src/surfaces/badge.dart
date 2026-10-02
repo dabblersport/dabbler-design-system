@@ -79,7 +79,7 @@ enum DabblerBadgeTone {
 ///   **strong** ink, and a 1px hairline of that strong colour at 20%.
 ///
 /// When both are passed, [status] wins and [tone] is ignored entirely. That is
-/// `Badge.jsx:34` (`const semantic = status ? … : null`) and it is asserted
+/// `Badge.jsx:31` (`const semantic = status ? … : null`) and it is asserted
 /// directly in `test/surfaces/badge_test.dart`.
 ///
 /// ## [status] is a [DabblerStatusColor], never a [Color]
@@ -170,7 +170,7 @@ class DabblerBadge extends StatelessWidget {
   /// reason as [verticalPadding].
   static const double horizontalPadding = 10;
 
-  /// The gap between [icon] and [label] — `4` (`Badge.jsx:37`,
+  /// The gap between [icon] and [label] — `4` (`Badge.jsx:38`,
   /// `gap: icon ? 4 : 0`). Not [DabblerSpacing.iconGap] (`6`), which would
   /// widen the pill past the Figma symbol.
   static const double iconGap = 4;
@@ -184,7 +184,7 @@ class DabblerBadge extends StatelessWidget {
   ///
   /// [DabblerType.caption2] is the ramp's only 11px step and supplies the size
   /// and the face; the source sets `fontWeight: 700` and `lineHeight: 1.5`
-  /// (`Badge.jsx:43`), where the ramp step is weight 400 at 13px leading. Both
+  /// (`Badge.jsx:42`), where the ramp step is weight 400 at 13px leading. Both
   /// deltas are the source's, so they are applied on top of the step rather
   /// than a new step being invented.
   static TextStyle textStyleFor(TextDirection direction) => DabblerType.caption2

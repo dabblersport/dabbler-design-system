@@ -89,7 +89,7 @@ enum DabblerMenuRole {
 ///
 /// A separator is an entry too, exactly as in the source, where `separator:
 /// true` replaces the item rather than being a different array
-/// (`Menu.jsx:135`). That keeps one ordered list, so an item inserted before a
+/// (`Menu.jsx:121-135`). That keeps one ordered list, so an item inserted before a
 /// separator does not have to be moved between two collections.
 @immutable
 class DabblerMenuEntry {
@@ -147,7 +147,7 @@ class DabblerMenuEntry {
   final Widget? trailing;
 
   /// Called with this entry when the row is chosen. The source passes the item
-  /// back to its own handler (`Menu.jsx:88`).
+  /// back to its own handler (`Menu.jsx:77`).
   final ValueChanged<DabblerMenuEntry>? onSelect;
 
   /// Whether this entry draws a [DabblerMenuSeparator] instead of a row.
@@ -244,7 +244,7 @@ class DabblerMenuPosition {
 /// direction — so it is tested near all four edges directly, without a
 /// pointer. It flips to the block start when the popover would overflow the
 /// bottom, and to the other inline edge when it would overflow the inline one
-/// (`Menu.jsx:52-60`), then clamps into the viewport as a last resort.
+/// (`Menu.jsx:50-58`), then clamps into the viewport as a last resort.
 ///
 /// ## Keyboard
 ///
@@ -279,28 +279,28 @@ class DabblerMenu extends StatefulWidget {
   /// sheet (`Menu.jsx:39`). 480 is the first width that stays a popover.
   static const double sheetBreakpoint = 480;
 
-  /// `min-width: 200` (`Menu.jsx:120`). Not a spacing step; the source's own
+  /// `min-width: 200` (`Menu.jsx:109`). Not a spacing step; the source's own
   /// popover range.
   static const double minPopoverWidth = 200;
 
-  /// `max-width: 320` (`Menu.jsx:120`).
+  /// `max-width: 320` (`Menu.jsx:109`).
   static const double maxPopoverWidth = 320;
 
-  /// `max-height: 45dvh` (`Menu.jsx:121`), as a fraction of the viewport.
+  /// `max-height: 45dvh` (`Menu.jsx:110`), as a fraction of the viewport.
   static const double maxHeightFraction = 0.45;
 
   /// `calc(100% + var(--space-2))` — the gap between trigger and popover
-  /// (`Menu.jsx:118`).
+  /// (`Menu.jsx:106`).
   static const double anchorGap = DabblerSpacing.space2;
 
   /// The viewport margin the source keeps on the inline axis — `vw - 8`
-  /// (`Menu.jsx:59`). A literal in the source rather than a spacing token, and
+  /// (`Menu.jsx:57`). A literal in the source rather than a spacing token, and
   /// transcribed as one here; it is applied on all four edges so the clamp is
   /// symmetric.
   static const double viewportMargin = 8;
 
   /// The sheet detent the source opens at — `detents={[0.45]}`
-  /// (`Menu.jsx:174`).
+  /// (`Menu.jsx:154`).
   static const List<double> sheetDetents = <double>[0.45];
 
   /// The element that opens the menu. It is wrapped, never rebuilt: the
@@ -363,7 +363,7 @@ class DabblerMenu extends StatefulWidget {
   final DabblerMenuPlacement placement;
 
   /// Controlled open state. Null leaves the menu uncontrolled, which is the
-  /// source's default (`Menu.jsx:29-33`).
+  /// source's default (`Menu.jsx:29-31`).
   final bool? open;
 
   /// Reports every open and close, controlled or not.
@@ -602,7 +602,7 @@ class _DabblerMenuState extends State<DabblerMenu> {
       header: widget.header,
       onSelected: _onSelected,
       // The popover is its own surface; inside the sheet the panel already is
-      // one, so the list draws no second card (`Menu.jsx:113`, where the sheet
+      // one, so the list draws no second card (`Menu.jsx:104`, where the sheet
       // branch keeps only the flex column).
       decorated: !inSheet,
     );
@@ -638,7 +638,7 @@ class _DabblerMenuState extends State<DabblerMenu> {
         // KAN-286 — a [Listener], NOT a [GestureDetector].
         //
         // The source wraps the trigger in `<span onClick={() => setOpen(!open)}>`
-        // (`Menu.jsx:146`) and relies on DOM bubbling: a click on an inner
+        // (`Menu.jsx:147`) and relies on DOM bubbling: a click on an inner
         // `<button>` fires the button's own handler AND reaches this span. The
         // uncontrolled default therefore works with a gesture-handling trigger
         // in the web source, which is what this port has to reproduce.
@@ -790,7 +790,7 @@ class _DabblerMenuLayout extends SingleChildLayoutDelegate {
 ///   focus follows the active row so pointer and keyboard agree.
 /// * **Type-ahead.** Typing letters jumps to the first activatable row whose
 ///   label starts with the buffer; the buffer resets after
-///   [typeAheadTimeout] (`Menu.jsx:99`).
+///   [typeAheadTimeout] (`Menu.jsx:89`).
 /// * **Enter / Space** select the active row.
 /// * Disabled rows stay visible and are skipped by both
 ///   (`Menu.prompt.md` — *Accessibility*).
@@ -818,7 +818,7 @@ class DabblerMenuList extends StatefulWidget {
     this.controller,
   });
 
-  /// `700ms` — the type-ahead buffer's reset window (`Menu.jsx:99`).
+  /// `700ms` — the type-ahead buffer's reset window (`Menu.jsx:89`).
   static const Duration typeAheadTimeout = Duration(milliseconds: 700);
 
   /// The rows, in order.
@@ -831,7 +831,7 @@ class DabblerMenuList extends StatefulWidget {
   final DabblerMenuRole role;
 
   /// A node above the rows, inside the same scroll area as the source's
-  /// (`Menu.jsx:134`).
+  /// (`Menu.jsx:120`).
   final Widget? header;
 
   /// Called with the chosen entry. [DabblerMenu] adds closing to this.
@@ -842,7 +842,7 @@ class DabblerMenuList extends StatefulWidget {
   final bool decorated;
 
   /// Whether the list takes focus when it appears, so the arrow keys work
-  /// without a click first (`Menu.jsx:163`).
+  /// without a click first (`Menu.jsx:140-143`).
   final bool autofocus;
 
   /// The scroll controller for the rows, so the composer can drive the scroll
@@ -932,7 +932,7 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
   }
 
   /// `(at + dir + list.length) % list.length`, cycling over activatable rows
-  /// only (`Menu.jsx:78-84`).
+  /// only (`Menu.jsx:65-73`).
   void _move(int direction) {
     final List<int> list = _activatable;
     if (list.isEmpty) {
@@ -979,7 +979,7 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
       return KeyEventResult.ignored;
     }
     // A listbox is driven by its composer (`Select` owns its own field
-    // keyboard); only a menu handles keys itself (`Menu.jsx:110`).
+    // keyboard); only a menu handles keys itself (`Menu.jsx:103`).
     if (widget.role != DabblerMenuRole.menu || widget.items.isEmpty) {
       return KeyEventResult.ignored;
     }
@@ -1064,7 +1064,7 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
     }
 
     Widget scroller = SingleChildScrollView(
-      // `overflow-y: auto` (`Menu.jsx:121`); the column is short, so it only
+      // `overflow-y: auto` (`Menu.jsx:110`); the column is short, so it only
       // scrolls once the 45dvh cap bites.
       //
       // Null when the caller supplies none, which leaves the view free to
@@ -1077,7 +1077,7 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
       scroller = DecoratedBox(
         decoration: BoxDecoration(
           // `--surface-card`, `1px solid --outline-card`, `--radius-lg`
-          // (`Menu.jsx:123-125`). No shadow.
+          // (`Menu.jsx:112-114`). No shadow.
           color: colors.surfaceCard,
           border: Border.all(
             color: colors.borderDefault,
@@ -1086,7 +1086,7 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
           borderRadius: DabblerRadius.lgAll,
         ),
         child: Padding(
-          // `padding: var(--space-2)` (`Menu.jsx:126`).
+          // `padding: var(--space-2)` (`Menu.jsx:115`).
           padding: const EdgeInsets.all(DabblerSpacing.space2),
           child: scroller,
         ),
@@ -1104,7 +1104,7 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
   String _keyOf(int index) => widget.items[index].id ?? 'item-$index';
 }
 
-/// One row — `MenuItem` in `Menu.jsx:195`.
+/// One row — `MenuItem` in `Menu.jsx:172`.
 ///
 /// Public because the source exports it, and because a composer that builds
 /// its own rows (a `Select` option with a custom trailing node) needs the same
@@ -1140,11 +1140,11 @@ class DabblerMenuItem extends StatelessWidget {
   /// row's own [AnimatedContainer] fill.
   static const Key tileKey = ValueKey<String>('DabblerMenuItem.tile');
 
-  /// The tinted tile's side — `width: 30, height: 30` (`Menu.jsx:214`), which
+  /// The tinted tile's side — `width: 30, height: 30` (`Menu.jsx:194`), which
   /// is [DabblerSizing.iconLg].
   static const double tileSide = DabblerSizing.iconLg;
 
-  /// `12%` — the tone's share of the tile fill (`Menu.jsx:216`). The source
+  /// `12%` — the tone's share of the tile fill (`Menu.jsx:196`). The source
   /// mixes with `transparent`, not white, so it composites over any surface;
   /// the Flutter equivalent is an alpha on the tone itself.
   static const double tileTintOpacity = 0.12;
@@ -1195,7 +1195,7 @@ class DabblerMenuItem extends StatelessWidget {
 
   /// The colour a [DabblerMenuIconTone] resolves to, against [colors].
   ///
-  /// `ICON_TONES` (`Menu.jsx:190-197`) verbatim: brand is
+  /// `ICON_TONES` (`Menu.jsx:163-170`) verbatim: brand is
   /// `--color-brand-primary`, the four status tones are the bare
   /// `--color-status-<tone>` — [DabblerStatusColor.base], the indicator role —
   /// and `neutral` is `--color-text-secondary`.
@@ -1230,7 +1230,7 @@ class DabblerMenuItem extends StatelessWidget {
 
     final Widget row = Row(
       mainAxisSize: MainAxisSize.min,
-      // `gap: var(--space-3)` (`Menu.jsx:229`).
+      // `gap: var(--space-3)` (`Menu.jsx:204`).
       spacing: DabblerSpacing.space3,
       children: <Widget>[
         if (icon != null) _leading(colors, foreground),
