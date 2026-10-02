@@ -376,6 +376,34 @@ void main() {
     expect(retries, 1);
   });
 
+  testWidgets('Retry under RTL: 45 target, 3px after the glyph, mirrored', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        DabblerMessage(
+          direction: DabblerMessageDirection.outgoing,
+          content: 'x',
+          timestamp: '17:00',
+          deliveryState: DabblerDeliveryState.failed,
+          onRetry: () {},
+          retryLabel: 'Again',
+        ),
+        dir: TextDirection.rtl,
+      ),
+    );
+    expect(
+      tester.getSize(find.byKey(DabblerMessage.retryKey)).height,
+      greaterThanOrEqualTo(45),
+    );
+    // In RTL Retry sits to the LEFT of the glyph, 3px away.
+    expect(
+      tester.getRect(find.byType(DabblerIcon)).left -
+          tester.getRect(find.text('Again')).right,
+      3,
+    );
+  });
+
   testWidgets('selected outline is 2px brand, outside, no layout change', (
     WidgetTester tester,
   ) async {

@@ -36,6 +36,20 @@ const Set<String> literalAllowlist = <String>{
   'lib/src/tokens/dabbler_dark_provisional.dart',
 };
 
+/// Live tokens the package deliberately does NOT mirror. Each entry is a
+/// named, documented exception so this live-parity test cannot silently
+/// "fix" the override back to the live value.
+///
+/// `tag-pending-ink`: live `#B4530E` measures 4.40:1 on `--tag-pending-surface`
+/// `#FDEDE3` (fails AA 4.5:1, "a real defect"); the package ships `#A34A08`
+/// at 5.20:1. Authority: `Dabbler/dabbler-docs/DECISIONS.md:11914-11919`,
+/// ruling cdispatch-d92eff45 (reaffirmed cdispatch-5e71152a). See
+/// `test/tokens/tag_pending_ink_override_test.dart`.
+const Map<String, ({String live, String package})> liveParityExceptions =
+    <String, ({String live, String package})>{
+  'tag-pending-ink': (live: 'B4530E', package: 'A34A08'),
+};
+
 final RegExp _hexLiteral = RegExp(r'Color\(0x[0-9A-Fa-f]{6,8}\)');
 
 /// Every `--name:#RRGGBB` declared in the `:root` block of `colors.css`.
@@ -76,6 +90,24 @@ void main() {
       // Each token's doc comment records its CSS name; the constant below it
       // must carry that token's exact hex.
       for (final MapEntry<String, String> entry in tokens.entries) {
+        final ({String live, String package})? exception =
+            liveParityExceptions[entry.key];
+        if (exception != null) {
+          // The live value is still the one the exception was granted
+          // against; if live changes, the exception must be re-judged.
+          expect(entry.value, exception.live,
+              reason: 'live --${entry.key} changed; re-judge the override');
+          expect(
+            RegExp('/// `--${RegExp.escape(entry.key)}` — `#${exception.package}`'
+                    r'\.[^\n]*\n(?:  ///[^\n]*\n)*'
+                    r'  static const Color \w+ = '
+                    'Color\\(0xFF${exception.package}\\);')
+                .hasMatch(source),
+            isTrue,
+            reason: 'override for --${entry.key} must be #${exception.package}',
+          );
+          continue;
+        }
         final RegExp decl = RegExp(
           '/// `--${RegExp.escape(entry.key)}` — `#${entry.value}`\\.\\n'
           r'  static const Color \w+ = '

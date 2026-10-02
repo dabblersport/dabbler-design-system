@@ -95,10 +95,9 @@ import 'card.dart';
 /// | `padding: "16px"` | [DabblerCard.defaultPadding] (16) | live `Card.jsx` `padding = 16` |
 /// | `width: 186, height: 123` | neither is fixed | Figma frame measurements; see [width] |
 /// | line 2 box `height: 24`, line 4 box `height: 25` | [priceSlotHeight], [billingSlotHeight]; no gap ([slotGap] 0) | the source stacks fixed-height line boxes |
-/// | trial pill fill `--purple-700` | [DabblerColors.brandPrimaryHover] (the theme's 700 step; main `#5A1FA1` vs live `rgb(90,30,168)`) | no exact palette constant; theme-following |
+/// | trial pill fill `--purple-700` | [DabblerColors.brandPrimaryHover] | **nearest theme token approximation, not source-exact** (live purple-700 `rgb(90,30,168)` = `#5A1EA8`; main `brandPrimaryHover` = `#5A1FA1`; other categories differ) |
 /// | trial pill `left: 14`, `top: -10` | [trialInset] 14, [trialTop] -10 | transcribed at the live value |
 /// | trial pill `top: -10` | a half-height translation | see [trialLabel] |
-/// | trial pill fill `--purple-700` | [DabblerBadgeTone.defaultTone] (`--color-brand-primary`, purple-600) | see below |
 /// | the tick's inline `<path>` | [DabblerIcon] `check` | this package carries no raw Figma paths — DS-300 is the icon layer |
 ///
 /// ### The vertical rhythm
@@ -113,12 +112,11 @@ import 'card.dart';
 ///
 /// ### The trial pill's fill
 ///
-/// The source fills it `--purple-700`, one ramp step darker than the brand.
-/// [DabblerBadge] is the system's pill and its brand tone is
-/// `--color-brand-primary` (purple-600); it exposes no fill override, by
-/// design. A one-off hue is not worth bypassing the badge layer for, so the
-/// badge is used as it stands and the one-step difference is recorded here
-/// rather than a private pill being drawn beside it.
+/// Live fills it `--purple-700` (`#5A1EA8`). The pill is a [DabblerBadge]
+/// with `fill:` [DabblerColors.brandPrimaryHover] — the **nearest theme token
+/// approximation, not source-exact**: main resolves `#5A1FA1`, and the other
+/// categories resolve their own 700 step, so it is not purple there. It does
+/// not match live.
 ///
 /// ## Accessibility
 ///

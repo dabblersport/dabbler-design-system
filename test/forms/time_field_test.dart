@@ -395,26 +395,147 @@ void main() {
       );
     });
 
-    testWidgets('an out-of-bounds time reverts on the typed path too', (
+    testWidgets('an out-of-bounds time clamps to the nearer bound', (
       WidgetTester tester,
     ) async {
-      TimeOfDay? committed;
+      // Ruling cdispatch-5e71152a item 3: bounds retained on the typed path;
+      // out-of-range must clamp or show an error, never be silently dropped.
+      final List<TimeOfDay?> committed = <TimeOfDay?>[];
       await tester.pumpWidget(
         _host(
           DabblerTimeField(
             value: const TimeOfDay(hour: 10, minute: 0),
             minimum: const TimeOfDay(hour: 9, minute: 0),
             maximum: const TimeOfDay(hour: 17, minute: 30),
-            onChanged: (TimeOfDay? v) => committed = v,
+            onChanged: committed.add,
           ),
         ),
       );
-      for (final String raw in <String>['8:59 AM', '5:31 PM']) {
+      for (final (String raw, TimeOfDay want, String shown)
+          in <(String, TimeOfDay, String)>[
+        ('8:59 AM', const TimeOfDay(hour: 9, minute: 0), '9:00 AM'), // 12h
+        ('5:31 PM', const TimeOfDay(hour: 17, minute: 30), '5:30 PM'), // 12h
+        ('07:15', const TimeOfDay(hour: 9, minute: 0), '9:00 AM'), // 24h
+        ('23:00', const TimeOfDay(hour: 17, minute: 30), '5:30 PM'), // 24h
+      ]) {
+        committed.clear();
         await tester.enterText(find.byType(EditableText), raw);
         await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pump();
-        expect(committed, isNull, reason: raw);
+        expect(committed, <TimeOfDay?>[want], reason: raw);
+        expect(
+          tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+          shown,
+          reason: raw,
+        );
+        expect(find.text(DabblerTimeField.defaultInvalidText), findsNothing);
       }
+    });
+
+    testWidgets('impossible 12h and 24h input shows an error, not a drop', (
+      WidgetTester tester,
+    ) async {
+      final List<TimeOfDay?> committed = <TimeOfDay?>[];
+      await tester.pumpWidget(
+        _host(
+          DabblerTimeField(
+            value: const TimeOfDay(hour: 18, minute: 0),
+            onChanged: committed.add,
+          ),
+        ),
+      );
+      for (final String raw in <String>[
+        '25:61', // 24h, both fields out of range
+        '24:00', // 24h — the source fold would read this as noon
+        '18:60', // 24h, minute out of range
+        '13:00 PM', // 12h, hour out of range
+        '0:30 am', // 12h, hour 0
+        '12:75 pm', // 12h, minute out of range
+      ]) {
+        await tester.enterText(find.byType(EditableText), raw);
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await tester.pump();
+        expect(committed, isEmpty, reason: raw);
+        expect(
+          tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+          '6:00 PM',
+          reason: '$raw reverts to the current value',
+        );
+        expect(
+          find.text(DabblerTimeField.defaultInvalidText),
+          findsOneWidget,
+          reason: '$raw is reported, not silently dropped',
+        );
+      }
+      // The next good commit clears the error.
+      await tester.enterText(find.byType(EditableText), '19:00');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(committed, <TimeOfDay?>[const TimeOfDay(hour: 19, minute: 0)]);
+      expect(find.text(DabblerTimeField.defaultInvalidText), findsNothing);
+    });
+
+    testWidgets('caller errorText wins over the invalid message', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerTimeField(
+            errorText: 'Pick a kick-off',
+            invalidText: 'وقت غير صالح',
+          ),
+        ),
+      );
+      await tester.enterText(find.byType(EditableText), '25:61');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(find.text('Pick a kick-off'), findsOneWidget);
+      expect(find.text('وقت غير صالح'), findsNothing);
+    });
+
+    test('parse: 24h 23:59 is valid, 24:00 is not', () {
+      expect(
+        DabblerTimeFormat.parse('23:59'),
+        const TimeOfDay(hour: 23, minute: 59),
+      );
+      expect(DabblerTimeFormat.parse('24:00'), isNull);
+      expect(DabblerTimeFormat.parse('12:00 am'), const TimeOfDay(hour: 0, minute: 0));
+    });
+
+    testWidgets('public API: existing caller parameters still compile', (
+      WidgetTester tester,
+    ) async {
+      // `lib/src/forms/forms_gallery.dart:644-647` and every pre-existing
+      // constructor parameter; `invalidText` is additive with a default.
+      final FocusNode node = FocusNode();
+      addTearDown(node.dispose);
+      await tester.pumpWidget(
+        _host(
+          Column(
+            children: <Widget>[
+              const DabblerTimeField(
+                label: 'Kick-off',
+                value: TimeOfDay(hour: 18, minute: 0),
+              ),
+              DabblerTimeField(
+                value: null,
+                onChanged: (TimeOfDay? _) {},
+                minimum: const TimeOfDay(hour: 6, minute: 0),
+                maximum: const TimeOfDay(hour: 23, minute: 0),
+                label: 'l',
+                helperText: 'h',
+                errorText: null,
+                enabled: true,
+                placeholder: 'p',
+                open: false,
+                onOpenPicker: () {},
+                focusNode: node,
+              ),
+            ],
+          ),
+        ),
+      );
+      expect(find.byType(DabblerTimeField), findsNWidgets(2));
     });
 
     testWidgets('emptying the field commits null', (WidgetTester tester) async {

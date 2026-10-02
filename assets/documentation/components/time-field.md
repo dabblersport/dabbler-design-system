@@ -46,6 +46,11 @@ folded to `12:30 AM`.** That's a transcribed edge from the source rather than a 
 extend — the paired `TimePicker` has no distinct "12 AM" column either, so the field doesn't invent
 one on the typed path.
 
+**Out-of-range typing is never silently dropped.** A readable time outside the minimum and maximum
+clamps to the nearer bound and commits. Text that cannot be a time, such as `25:61`, `24:00` or
+`13:00 PM`, reverts to the current value and shows an error line (English by default, caller
+overridable); a caller's own error text wins over it.
+
 ## Axes
 
 ### State

@@ -459,21 +459,55 @@ void main() {
     });
 
     testWidgets(
-      'the press tint of Card.jsx is not ported — the fill is stable',
+      'press tints the fill 94% toward black (Card.jsx) and releases back',
       (WidgetTester tester) async {
+        // Live `components/cards/Card.jsx`: pressed background
+        // `color-mix(in srgb, <bg> 94%, black)`, `transition: background
+        // 80ms ease`. Ruling cdispatch-5e71152a item 3.
         await tester.pumpWidget(
           _host(DabblerCard(onTap: () {}, child: const Text('b'))),
         );
 
         final Color before = _decoration(tester).color!;
+        expect(before, DabblerCard.fillOf(_colors(), DabblerCardVariant.standard));
         final TestGesture gesture = await tester.startGesture(
           tester.getCenter(find.text('b')),
         );
-        await tester.pump(const Duration(milliseconds: 200));
-        expect(_decoration(tester).color, before);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+        final Color pressed = _decoration(tester).color!;
+        expect(pressed, DabblerCard.pressedFillOf(before));
+        expect(pressed, isNot(before));
+        expect(pressed.r, closeTo(before.r * 0.94, 1e-6));
+        expect(pressed.g, closeTo(before.g * 0.94, 1e-6));
+        expect(pressed.b, closeTo(before.b * 0.94, 1e-6));
+        // The system press scale still applies on top.
+        expect(find.byType(DabblerPressScale), findsOneWidget);
+
         await gesture.up();
         await tester.pumpAndSettle();
+        expect(_decoration(tester).color, before);
       },
     );
+
+    testWidgets('an inert card never tints', (WidgetTester tester) async {
+      await tester.pumpWidget(_host(const DabblerCard(child: Text('b'))));
+      final Color before = _decoration(tester).color!;
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.text('b')),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(_decoration(tester).color, before);
+      await gesture.up();
+    });
+
+    test('defaultPadding/livePadding is 16; cardPadding stays 18 on purpose', () {
+      // Live `Card.jsx` `padding = 16`; `--card-padding` (18) is still used
+      // by `lib/src/cards/card_ticket.dart:240` (bodyPadding top).
+      expect(DabblerCard.livePadding, 16);
+      expect(DabblerCard.defaultPadding, const EdgeInsets.all(16));
+      expect(DabblerSpacing.cardPadding, 18);
+      expect(DabblerCard.livePadding, isNot(DabblerSpacing.cardPadding));
+    });
   });
 }

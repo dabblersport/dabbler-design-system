@@ -298,6 +298,13 @@ void main() {
         // right constraint — do not snap this back to `iconMd`.
         expect(size, const Size(28, 28));
         expect(DabblerCardPricing.indicatorSide, 28);
+        // Live digest: 24x24 disc + `border: 2px solid`, not border-box:
+        // 24 + 2 + 2 = 28 outer.
+        expect(DabblerCardPricing.indicatorBorderWidth, 2);
+        expect(
+          DabblerSizing.iconMd + 2 * DabblerCardPricing.indicatorBorderWidth,
+          DabblerCardPricing.indicatorSide,
+        );
       }
     });
   });
@@ -415,6 +422,37 @@ void main() {
       expect((box.decoration as BoxDecoration).color, c.brandPrimaryHover);
     });
 
+    testWidgets('trial fill is the brandPrimaryHover mapping per category — '
+        'nearest theme token approximation, not source-exact', (
+      WidgetTester tester,
+    ) async {
+      // Live purple-700 is rgb(90,30,168) = #5A1EA8; the port maps it to the
+      // theme's brandPrimaryHover (main #5A1FA1). Not a live match.
+      final List<Color> fills = <Color>[];
+      for (final DabblerTheme theme in <DabblerTheme>[
+        DabblerTheme.main,
+        DabblerTheme.sport,
+      ]) {
+        await tester.pumpWidget(_host(_yearly, theme: theme));
+        await tester.pumpAndSettle(); // MaterialApp animates theme changes.
+        final Color fill = (tester
+                .widget<DecoratedBox>(find
+                    .descendant(
+                      of: find.byType(DabblerBadge),
+                      matching: find.byType(DecoratedBox),
+                    )
+                    .first)
+                .decoration as BoxDecoration)
+            .color!;
+        expect(fill, _colors(theme: theme).brandPrimaryHover, reason: '$theme');
+        fills.add(fill);
+      }
+      expect(fills.first, const Color(0xFF5A1FA1));
+      expect(fills.first, isNot(const Color(0xFF5A1EA8)),
+          reason: 'approximation, not the live value');
+      expect(fills.last, isNot(fills.first));
+    });
+
     testWidgets('straddles the card\'s top edge', (WidgetTester tester) async {
       await tester.pumpWidget(_host(_yearly));
 
@@ -439,6 +477,25 @@ void main() {
         card.right - pill.right,
         closeTo(DabblerCardPricing.trialInset, 0.5),
       );
+    });
+
+    testWidgets('RTL: the indicator trails on the left, plan on the right', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(_yearly, direction: TextDirection.rtl));
+      final Rect indicator = tester.getRect(
+        find
+            .descendant(
+              of: find.byType(DabblerCardPricing),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      final Rect plan = tester.getRect(find.text(_yearly.plan));
+      expect(indicator.center.dx, lessThan(plan.center.dx));
+      final Rect card = tester.getRect(find.byType(DabblerCard));
+      expect(card.right - plan.right, closeTo(16, 0.6),
+          reason: 'Card.jsx padding 16 from the leading (right) edge');
     });
 
     testWidgets('is inset from the left under LTR', (

@@ -77,6 +77,11 @@ abstract final class DabblerTimeFormat {
     final int minute = m.group(2) == null ? 0 : int.parse(m.group(2)!);
     String? period = m.group(3)?.toUpperCase();
     if (period == null) {
+      // A 24-hour hour above 23 is out of range. The source's fold would turn
+      // `24:00` into `12:00 PM` (noon) silently; it is rejected instead.
+      if (hour > 23) {
+        return null;
+      }
       period = hour >= 12 ? pmLabel : amLabel;
       if (hour > 12) {
         hour -= 12;
@@ -159,7 +164,11 @@ class DabblerTimeField extends StatefulWidget {
     this.open = false,
     this.onOpenPicker,
     this.focusNode,
+    this.invalidText = defaultInvalidText,
   });
+
+  /// The default [invalidText]. English; callers override it.
+  static const String defaultInvalidText = 'Enter a valid time, e.g. 6:30 PM';
 
   /// `icon="clock"` — `TimeField.jsx:67`.
   static const String iconName = 'clock';
@@ -200,6 +209,11 @@ class DabblerTimeField extends StatefulWidget {
   /// An external focus node.
   final FocusNode? focusNode;
 
+  /// Shown as the error line when typed text cannot be read as a time
+  /// (`25:61`, `13:00 PM`, `half six`). [errorText] wins when both are set.
+  /// Cleared by the next successful commit.
+  final String invalidText;
+
   /// The value as the field displays it.
   String get displayText => DabblerTimeFormat.format(value);
 
@@ -215,6 +229,9 @@ class _DabblerTimeFieldState extends State<DabblerTimeField> {
   void didUpdateWidget(DabblerTimeField oldWidget) {
     super.didUpdateWidget(oldWidget);
     // `useEffect(() => setText(value), [value])` — `TimeField.jsx:40`.
+    if (widget.value != oldWidget.value) {
+      _reported = null;
+    }
     final String display = widget.displayText;
     if (display != oldWidget.displayText && display != _controller.text) {
       _controller.text = display;
@@ -227,43 +244,80 @@ class _DabblerTimeFieldState extends State<DabblerTimeField> {
     super.dispose();
   }
 
+  /// Set when typed text could not be read; drives the error line.
+  String? _invalid;
+
+  void _setInvalid(String? value) {
+    if (_invalid != value) setState(() => _invalid = value);
+  }
+
   /// `commitText` — `TimeField.jsx:43-49`.
   ///
   /// **Documented deviation:** the source parses but does **not** bounds-check
   /// the typed path — `inBounds` is wired only to the `TimePicker`'s
-  /// `onChange` (`TimeField.jsx:78`), so typing a time outside `min`/`max`
-  /// commits while picking the same time does not. `TimeField.prompt.md` gives
-  /// no rule either way, but `DateField.prompt.md`, the sibling this pair is
-  /// specified against, states *"`min`/`max` are enforced on both paths"* —
-  /// so the check is applied here too, and an out-of-bounds time reverts
-  /// exactly as an unparseable one does.
+  /// `onChange` (`TimeField.jsx:78`). `DateField.prompt.md`, the sibling this
+  /// pair is specified against, states *"`min`/`max` are enforced on both
+  /// paths"*, so bounds are enforced here too (retained provisionally, ruling
+  /// cdispatch-5e71152a item 3), and nothing is silently dropped:
+  ///
+  /// * a readable time outside [DabblerTimeField.minimum] /
+  ///   [DabblerTimeField.maximum] is **clamped** to the nearer bound and
+  ///   committed;
+  /// * unreadable or impossible text (`25:61`, `13:00 PM`, `24:00`) reverts
+  ///   to the current value **and shows** [DabblerTimeField.invalidText].
   void _commit(String raw) {
+    // The blur after Enter re-commits the text this method just restored;
+    // unchanged text commits nothing and keeps any error showing.
+    if (raw.trim().isNotEmpty && raw.trim() == widget.displayText) {
+      return;
+    }
     if (raw.trim().isEmpty) {
+      _setInvalid(null);
       if (widget.value != null) {
         widget.onChanged?.call(null);
       }
       return;
     }
-    final TimeOfDay? next = DabblerTimeFormat.parse(raw);
-    if (next != null &&
-        DabblerTimeFormat.inBounds(
-          next,
-          min: widget.minimum,
-          max: widget.maximum,
-        )) {
-      // Enter commits, and the blur that follows commits the same text again;
-      // an unchanged value is dropped so one edit is one callback. See
-      // [DabblerDateField]'s `_report`.
-      if (next != widget.value) {
-        widget.onChanged?.call(next);
-      }
-    } else {
+    final TimeOfDay? parsed = DabblerTimeFormat.parse(raw);
+    if (parsed == null) {
       final String display = widget.displayText;
       if (_controller.text != display) {
         _controller.text = display;
       }
+      _setInvalid(widget.invalidText);
+      return;
+    }
+    _setInvalid(null);
+    TimeOfDay next = parsed;
+    final TimeOfDay? min = widget.minimum;
+    final TimeOfDay? max = widget.maximum;
+    if (min != null &&
+        DabblerTimeFormat.minutesOfDay(next) <
+            DabblerTimeFormat.minutesOfDay(min)) {
+      next = min;
+    } else if (max != null &&
+        DabblerTimeFormat.minutesOfDay(next) >
+            DabblerTimeFormat.minutesOfDay(max)) {
+      next = max;
+    }
+    // Show the committed (possibly clamped) value at once; the parent's
+    // rebuild agrees with it.
+    final String shown = DabblerTimeFormat.format(next);
+    if (_controller.text != shown) {
+      _controller.text = shown;
+    }
+    // Enter commits, and the blur that follows commits the same text again;
+    // an unchanged value is dropped so one edit is one callback. See
+    // [DabblerDateField]'s `_report`.
+    if (next != widget.value && next != _reported) {
+      _reported = next;
+      widget.onChanged?.call(next);
     }
   }
+
+  /// The last value reported and not yet echoed back through
+  /// [DabblerTimeField.value]; stops a clamped Enter + blur reporting twice.
+  TimeOfDay? _reported;
 
   @override
   Widget build(BuildContext context) {
@@ -273,7 +327,7 @@ class _DabblerTimeFieldState extends State<DabblerTimeField> {
       label: widget.label,
       placeholder: widget.placeholder ?? DabblerTimeFormat.placeholder,
       helperText: widget.helperText,
-      errorText: widget.errorText,
+      errorText: widget.errorText ?? _invalid,
       enabled: widget.enabled,
       open: widget.open,
       onOpenPressed: widget.onOpenPicker,

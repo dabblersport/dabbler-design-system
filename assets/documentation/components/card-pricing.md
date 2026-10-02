@@ -52,9 +52,10 @@ button would ask the user to make the same choice twice for a mutually exclusive
 the tile is its own control with no button label anywhere on it, assistive technology needs to hear
 it as one selectable option in a group — the visual disc alone doesn't convey that on its own.
 
-**Leave the trial pill on `Badge`'s own brand tone; don't give it a private fill.** A one-step
-colour drift in the design file was corrected there rather than answered with a fill override or a
-separate literal pill — this component's trial pill stays an ordinary `Badge`.
+**Leave the trial pill as an ordinary `Badge` filled with the theme's brand-hover step.** Live
+fills it purple-700 (#5A1EA8). The brand-hover token is the nearest theme token approximation, not
+source-exact: the main category resolves #5A1FA1 and the other categories differ, so it does not
+match live.
 
 ## Axes
 
@@ -72,7 +73,7 @@ Present or absent.
 ## Tokens used
 
 Shell: `pricingUnselected` or `pricingSelected` variant of `Card` — see that page. Indicator:
-brand fill when selected, a plain ring when not. Trial pill: `Badge` at its brand tone, unmodified.
+brand fill when selected, a plain ring when not. Trial pill: `Badge` with the brand-hover fill (nearest theme token approximation, not source-exact).
 
 ## Change log
 

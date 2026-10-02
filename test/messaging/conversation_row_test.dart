@@ -253,6 +253,44 @@ void main() {
       );
     });
 
+    testWidgets('unread pill geometry: minWidth 24, paddingInline 6, centred',
+        (WidgetTester tester) async {
+      // Live `components/messaging/ConversationRow.jsx:65-66`: Badge style
+      // `minWidth: 24, justifyContent: 'center', paddingInline: var(--space-2)`.
+      await tester.pumpWidget(
+        _host(
+          const DabblerConversationRow(
+            title: 'Layla',
+            preview: 'hi',
+            timestamp: '17:02',
+            unread: 3,
+          ),
+        ),
+      );
+      final DabblerBadge badge = tester.widget(find.byType(DabblerBadge));
+      expect(badge.minWidth, 24);
+      expect(badge.paddingInline, 6);
+      final Rect box = tester.getRect(find.byType(DabblerBadge));
+      final Rect label = tester.getRect(find.text('3'));
+      expect(box.width, 24, reason: 'a one-digit count sits on the 24 floor');
+      expect(label.center.dx, closeTo(box.center.dx, 0.6));
+
+      await tester.pumpWidget(
+        _host(
+          const DabblerConversationRow(
+            title: 'Layla',
+            preview: 'hi',
+            timestamp: '17:02',
+            unread: 120,
+          ),
+        ),
+      );
+      final Rect wide = tester.getRect(find.byType(DabblerBadge));
+      final Rect wideLabel = tester.getRect(find.text('99+'));
+      expect(wideLabel.left - wide.left, closeTo(6, 0.6));
+      expect(wide.right - wideLabel.right, closeTo(6, 0.6));
+    });
+
     testWidgets('read: title 600, timestamp 400 secondary, no badge', (
       WidgetTester tester,
     ) async {
