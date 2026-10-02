@@ -25,7 +25,7 @@ enum DabblerFieldAlign {
 ///
 /// Transcribed from `components/forms/TextField.jsx:5-81` (the `FieldShell`
 /// function and its `RADIUS` table), `components/forms/TextField.d.ts:41-54` (unverified: file not mirrored)
-/// (`FieldShellProps`) and the specimen `components/forms/fields.card.html:68`,
+/// (`FieldShellProps`) and the specimen `components/forms/fields.card.html:68` (unverified: file not mirrored),
 /// which states the rule this file exists to enforce: *"**Every field in the
 /// system paints from it**, which is why no picker can drift into a visual fork
 /// of the input."*
@@ -94,7 +94,7 @@ enum DabblerFieldAlign {
 /// never be used as a text colour — therefore costs this file nothing: the
 /// forms source never puts helper text on either. The one `var(--muted)` in
 /// the whole forms area is a specimen's inline `AED` suffix label
-/// (`fields.card.html:56`), which is demo content and not part of the shell.
+/// (`fields.card.html:56` (unverified: file not mirrored)), which is demo content and not part of the shell.
 class DabblerFieldShell extends StatelessWidget {
   /// Creates the chrome around [children].
   const DabblerFieldShell({
@@ -160,7 +160,7 @@ class DabblerFieldShell extends StatelessWidget {
   final bool focusRingVisible;
 
   /// The box's corner radius. `--radius-xxl` (24) for every field shell;
-  /// `--radius-xl` (18) for multiline. `fields.card.html:169` lists the 24
+  /// `--radius-xl` (18) for multiline. `fields.card.html:169` (unverified: file not mirrored) lists the 24
   /// as shared by *"TextField, Select, PickerField, DateField, TimeField,
   /// Stepper"*.
   final double radius;

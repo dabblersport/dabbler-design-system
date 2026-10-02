@@ -4,7 +4,7 @@ import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// The specimen's card width — `calendar.card.html:20` gives the Calendar a
+/// The specimen's card width — `calendar.card.html:20` (unverified: file not mirrored) gives the Calendar a
 /// `320` box.
 const double specimenWidth = 320;
 

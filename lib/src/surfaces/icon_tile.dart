@@ -30,7 +30,7 @@ import 'surface.dart';
 /// next to the one [DabblerSurface.brandTintFill] already owns, and would let a
 /// caller paint a tile in a colour the token layer never declared. The
 /// specimen's one non-default use — `color="var(--color-accent)"` on
-/// `components/surfaces/surfaces.card.html:28` — is [accent] here. If a tone
+/// `components/surfaces/surfaces.card.html:28` (unverified: file not mirrored) — is [accent] here. If a tone
 /// the source paints turns out to be missing from the token layer, that is a
 /// DS-102 gap to report, not a colour to invent.
 enum DabblerIconTileTone {
@@ -267,7 +267,8 @@ class _DabblerIconTileState extends State<DabblerIconTile> {
     // `border = color-mix(<color> 28%, white)`, with `color` defaulting to
     // `--color-brand-primary`. The brand tone is therefore a tint of the brand
     // exactly like a caller colour (it was DS-500's `brandTint` step — 8% fill
-    // and the bare card outline — until compared against the live source).
+    // and the bare card outline — until compared against the hand-transcribed mirror of live, no byte or
+    // pixel check).
     final Color? surfaceTint =
         tint ??
         (widget.tone == DabblerIconTileTone.brand ? colors.brandPrimary : null);

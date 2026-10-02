@@ -44,7 +44,7 @@ class DabblerSelectOption<T> {
 ///
 /// Transcribed from `components/forms/Select.jsx:1-96`, `Select.d.ts`,
 /// `Select.prompt.md` and the specimens `components/forms/fields.card.html`
-/// (lines 104-113) and `forms.card.html:38-42`.
+/// (lines 104-113) and `forms.card.html:38-42` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerSelect<String>(
@@ -84,7 +84,7 @@ class DabblerSelectOption<T> {
 /// DS-700 offers both, and the choice is deliberate. `Select.jsx:63-95` wraps
 /// the whole field in `<Menu fullWidth open closeOnSelect header trigger …>`
 /// and passes **no `role`**, so the list is the default `role="menu"`, which
-/// `fields.card.html:113` states outright: *"the list is `role="menu"` with
+/// `fields.card.html:113` (unverified: file not mirrored) states outright: *"the list is `role="menu"` with
 /// `role="menuitem"` options carrying `aria-checked` when selected"*.
 /// [DabblerMenuList] alone would mean owning the popover, its anchoring, its
 /// dismissal and the sheet breakpoint — a second popover, which

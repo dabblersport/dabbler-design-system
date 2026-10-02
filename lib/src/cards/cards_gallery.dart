@@ -102,7 +102,7 @@ const List<GalleryEntry> cardsGalleryEntries = <GalleryEntry>[
   ),
 ];
 
-/// The shell row of `components/cards/cards.card.html:48-52`.
+/// The shell row of `components/cards/cards.card.html:48-52` (unverified: file not mirrored).
 ///
 /// `width: 150` and a body reading the variant's own name are the drawn
 /// specimen's, not this gallery's invention: the five shells are compared to

@@ -46,7 +46,7 @@ class DabblerDateSpan {
 /// ## Western Arabic numerals, regardless of locale (AC2)
 ///
 /// `DateField.prompt.md` → *"The date string itself keeps `DD/MM/YYYY` order
-/// with Western Arabic numerals in both scripts"*, and `fields.card.html:183`
+/// with Western Arabic numerals in both scripts"*, and `fields.card.html:183` (unverified: file not mirrored)
 /// → *"Numerals are Western Arabic (0–9) in both scripts throughout"*. That is
 /// DS-103a's rule as [DabblerType.toWesternDigits] states it, and it is
 /// enforced on **both** directions of the layer, not just one:
@@ -185,7 +185,7 @@ abstract final class DabblerDateFormat {
 /// DateField — a date, or a date range, typed or picked.
 ///
 /// Transcribed from `components/forms/DateField.jsx`, `DateField.d.ts`,
-/// `DateField.prompt.md` and `components/forms/fields.card.html:128-137`.
+/// `DateField.prompt.md` and `components/forms/fields.card.html:128-137` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerDateField(

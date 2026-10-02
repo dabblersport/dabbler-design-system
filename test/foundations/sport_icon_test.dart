@@ -10,7 +10,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 ///
 /// Asserted against the design source's own `FALLBACKS` table
 /// (`components/foundations/SportIcon.jsx`) and the fallback table in
-/// `components/foundations/icons-system.card.html:151-153`, not against the
+/// `components/foundations/icons-system.card.html:151-153` (unverified: file not mirrored), not against the
 /// implementation.
 void main() {
   setUp(() {

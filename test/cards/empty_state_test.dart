@@ -36,7 +36,7 @@ Widget _host(
   );
 }
 
-/// The specimen at `components/cards/cards.card.html:100`, and the first
+/// The specimen at `components/cards/cards.card.html:100` (unverified: file not mirrored), and the first
 /// example of `EmptyState.prompt.md`.
 const DabblerEmptyState _inline = DabblerEmptyState(
   icon: 'game',

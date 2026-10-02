@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The three tabs of the design source's own example
-/// (`components/controls/buttons.card.html:143-147`).
+/// (`components/controls/buttons.card.html:143-147` (unverified: file not mirrored)).
 const List<DabblerTabItem> _items = <DabblerTabItem>[
   DabblerTabItem(id: 'overview', label: 'overview'),
   DabblerTabItem(id: 'players', label: 'players'),

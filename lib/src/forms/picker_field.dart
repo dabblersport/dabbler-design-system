@@ -31,7 +31,7 @@ part 'picker_field_shell.dart';
 ///
 /// Transcribed from `components/forms/PickerField.jsx:1-93`,
 /// `PickerField.d.ts`, `PickerField.prompt.md` and the specimen
-/// `components/forms/fields.card.html:115-123`.
+/// `components/forms/fields.card.html:115-123` (unverified: file not mirrored).
 ///
 /// The shell above is the box and the typed input — the half `DateField` and
 /// `TimeField` use, because each of those owns its own picker surface. This

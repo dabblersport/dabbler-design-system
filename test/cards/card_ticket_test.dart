@@ -37,7 +37,7 @@ Widget _host(
   );
 }
 
-/// The specimen at `components/cards/cards.card.html:63`.
+/// The specimen at `components/cards/cards.card.html:63` (unverified: file not mirrored).
 DabblerCardTicket _specimen({
   DabblerTicketHeader header = DabblerTicketHeader.indigo,
   DabblerTicketStatusTone tone = DabblerTicketStatusTone.progress,

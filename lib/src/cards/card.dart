@@ -126,9 +126,9 @@ enum DabblerCardVariant {
 ///
 /// `Card.jsx` declares `padding = 16` and says *"Figma wins on every value"*;
 /// every Figma export it merges writes `padding: "16px"`. [defaultPadding] is
-/// therefore 16, as in the live project 4286affa-bf50-4ff6-9576-917f76a93ca1.
-/// (It was `--card-padding` — 18 — until this was compared against the live
-/// source; that alias still exists for surfaces that name it.)
+/// therefore 16, as in the mirror of live project 4286affa-bf50-4ff6-9576-917f76a93ca1.
+/// (It was `--card-padding` — 18 — until this was compared against the
+/// hand-transcribed mirror of live (no byte or pixel check); that alias still exists for surfaces that name it.)
 ///
 /// **The two values differ on purpose.** `--card-padding` ([DabblerSpacing.cardPadding],
 /// 18, `tokens/spacing.css`) is the semantic alias on the base-3 grid for

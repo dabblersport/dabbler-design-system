@@ -12,7 +12,7 @@ import '../tokens/dabbler_type.dart';
 ///
 /// Transcribed from `components/controls/Chip.jsx`, `Chip.d.ts`,
 /// `Chip.prompt.md` and the specimen
-/// `components/surfaces/identity-status.card.html:52-66`, which is the Chip's
+/// `components/surfaces/identity-status.card.html:52-66` (unverified: file not mirrored), which is the Chip's
 /// canonical reference page (*"Chips · Badges · Avatars · Ratings ·
 /// Reactions"*) — **not** `controls.card.html` or `button-states.card.html`,
 /// neither of which mentions Chip at all. See the class note *"What the source

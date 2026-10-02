@@ -12,7 +12,7 @@ import '../tokens/dabbler_type.dart';
 ///
 /// Transcribed from `components/layout/InputRow.jsx:1-63`,
 /// `InputRow.d.ts:1-26` (unverified: file not mirrored), `InputRow.prompt.md` and the specimen
-/// `components/layout/layout.card.html:22-29`.
+/// `components/layout/layout.card.html:22-29` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerInputRow(
@@ -310,8 +310,9 @@ class DabblerInputRow extends StatelessWidget {
 /// Chevron — the kit's trailing disclosure glyph.
 ///
 /// `components/layout/InputRow.jsx:53-63`: `arrow-right` at 18, in
-/// `var(--subtle)`, *"exported alongside for the trailing disclosure glyph"*
-/// (`InputRow.prompt.md:9` (unverified: file not mirrored)).
+/// `var(--subtle)`. The phrase *"exported alongside for the trailing
+/// disclosure glyph"* is quoted from `InputRow.prompt.md:9` (unverified: file
+/// not mirrored), not from `InputRow.jsx`.
 ///
 /// ## It mirrors by name, not by transform
 ///

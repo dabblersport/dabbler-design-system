@@ -88,7 +88,7 @@ void main() {
       WidgetTester tester,
     ) async {
       // The specimen fills the slot with a SportIcon as well as an Icon
-      // (`components/surfaces/surfaces.card.html:29`), so the slot must take
+      // (`components/surfaces/surfaces.card.html:29` (unverified: file not mirrored)), so the slot must take
       // any widget, not only a name.
       const Widget slot = SizedBox.shrink(key: ValueKey<String>('slot'));
       await tester.pumpWidget(_host(const DabblerIconTile(slot)));

@@ -153,7 +153,7 @@ abstract final class DabblerCardEventGeometry {
 /// *"contacts" / "see which friends are already here"*, Medium is
 /// *"microphone" / "enable mic so you can speak in rooms"*, Small is
 /// *"notifications" / "get notified when friends go live"*. The specimen
-/// (`components/cards/cards.card.html:57-58`) only renders the three at
+/// (`components/cards/cards.card.html:57-58` (unverified: file not mirrored)) only renders the three at
 /// `width: 400` and shows nothing further.
 ///
 /// There is no cover image, no sport mark and no date/time anywhere in those
