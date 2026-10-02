@@ -55,7 +55,7 @@ Fills and ink: page, card and sunken surfaces, the card outline, the faint hairl
 
 ## Change log
 
-- Added from the live design project, design system 1.2.0 (`ChatComposer.jsx`). Deliberate deviations are listed in the class documentation: disabled glyphs and placeholder follow the text roles ruled in D-003(a) and D-025.
+- Added from the live design project, design system 1.2.0 (`ChatComposer.jsx`). Deliberate deviations are listed in the class documentation: disabled glyphs and placeholder follow the text roles ruled in D-003(a) and D-025. The field's focus ring follows `ChatComposer.prompt.md`, which says the field takes the shared focus ring; the JSX itself sets `outline: none` on the input and attaches no focus class, so prompt and source disagree and the prompt was followed.
 
 ## Source
 
