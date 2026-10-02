@@ -34,14 +34,14 @@ Every tone — see `icon_tile_gallery.dart`'s *IconTile* section.
 ## Using it
 
 **Reach for the brand tone by default; the three decorative tones (`amber`, `info`, `accent`) are
-for the specific roles the token layer names, not a free colour choice.** There is no arbitrary-colour
-option — a tone the design draws that isn't one of these four is a gap to report against the token
-layer, not a colour to invent on the spot.
+for the specific roles the token layer names, not a free colour choice.** When the design really
+does draw a different tint (`IconTile.d.ts`'s `color` prop), `DabblerIconTile.tinted` takes a colour
+from `DabblerColors` — never a raw `Color(0x…)`, which the palette gate refuses — and derives the
+fill at 10% and the stroke at 28% over the card, with the glyph in the same colour.
 
-**Don't pass a 10%/28% custom tint expecting it to match the design source exactly.** The brand
-tone resolves through the same shared token the rest of the system's brand tint uses, which is the
-later, authoritative version of the same intent — matching it exactly rather than re-deriving the
-original mix percentages is the point.
+**The brand tone does not use that 10%/28% mix.** It resolves through the shared brand-tint surface
+token (the later, authoritative statement of the same intent), so a `tinted` tile in the brand colour
+and the brand-tone tile are close but not identical by design.
 
 **Only the three decorative tones carry no hairline; the brand tone does.** If a tile looks like
 it's missing its border, check which tone it's on before assuming a defect — flat decorative fills
@@ -51,7 +51,7 @@ and the bordered brand tint are two different visual treatments by design, not a
 
 ### Tone
 `brand` (the default — brand tint with the card hairline), `amber`, `info`, `accent` (decorative
-tile roles, flat fill, no hairline).
+tile roles, flat fill, no hairline), or a free colour through `DabblerIconTile.tinted`.
 
 ### Interactivity
 Tappable (gets the shared press scale and focus ring) or inert.
