@@ -103,6 +103,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardPoll](components/card-poll.md) — a poll result with bars and a vote count.
 - [CardRoom](components/card-room.md) — a room with its participant avatars.
 - [CardActiveRoom](components/card-active-room.md) — a live room with its speaker and join action.
+- [ConversationContext](components/conversation-context.md) — the activity header pinned above a game conversation.
 - [MiniPlayer](components/mini-player.md) — the collapsed room player.
 - [SpeakerGrid](components/speaker-grid.md) — the room's speakers in three columns.
 
