@@ -67,8 +67,7 @@ class DabblerSportArtwork {
   final String? package;
 
   /// The image provider for this reference.
-  ImageProvider<Object> get image =>
-      AssetImage(assetPath, package: package);
+  ImageProvider<Object> get image => AssetImage(assetPath, package: package);
 
   @override
   bool operator ==(Object other) =>
@@ -80,7 +79,8 @@ class DabblerSportArtwork {
   int get hashCode => Object.hash(assetPath, package);
 
   @override
-  String toString() => 'DabblerSportArtwork.asset($assetPath'
+  String toString() =>
+      'DabblerSportArtwork.asset($assetPath'
       '${package == null ? '' : ', package: $package'})';
 }
 
@@ -182,37 +182,56 @@ abstract final class DabblerSportBackgroundRegistry {
   /// (`sport-backgrounds.card.html:31-41`).
   static const Map<DabblerSport, DabblerSportArtwork> defaultMainArtwork =
       <DabblerSport, DabblerSportArtwork>{
-    DabblerSport.football:
-        DabblerSportArtwork.asset('$assetDirectory/football-main-background.png'),
-    DabblerSport.padel:
-        DabblerSportArtwork.asset('$assetDirectory/padel-main-background.png'),
-    DabblerSport.tennis:
-        DabblerSportArtwork.asset('$assetDirectory/tennis-main-background.png'),
-    DabblerSport.basketball: DabblerSportArtwork.asset(
-        '$assetDirectory/basketball-main-background.png'),
-    DabblerSport.volleyball: DabblerSportArtwork.asset(
-        '$assetDirectory/volleyball-main-background.png'),
-    DabblerSport.cricket:
-        DabblerSportArtwork.asset('$assetDirectory/cricket-main-background.png'),
-    DabblerSport.running:
-        DabblerSportArtwork.asset('$assetDirectory/running-main-background.png'),
-    DabblerSport.swimming: DabblerSportArtwork.asset(
-        '$assetDirectory/swimming-main-background.png'),
-    DabblerSport.cycling:
-        DabblerSportArtwork.asset('$assetDirectory/cycling-main-background.png'),
-    DabblerSport.badminton: DabblerSportArtwork.asset(
-        '$assetDirectory/badminton-main-background.png'),
-    DabblerSport.gym:
-        DabblerSportArtwork.asset('$assetDirectory/gym-main-background.png'),
-  };
+        DabblerSport.football: DabblerSportArtwork.asset(
+          '$assetDirectory/football-main-background.png',
+        ),
+        DabblerSport.padel: DabblerSportArtwork.asset(
+          '$assetDirectory/padel-main-background.png',
+        ),
+        DabblerSport.tennis: DabblerSportArtwork.asset(
+          '$assetDirectory/tennis-main-background.png',
+        ),
+        DabblerSport.basketball: DabblerSportArtwork.asset(
+          '$assetDirectory/basketball-main-background.png',
+        ),
+        DabblerSport.volleyball: DabblerSportArtwork.asset(
+          '$assetDirectory/volleyball-main-background.png',
+        ),
+        DabblerSport.cricket: DabblerSportArtwork.asset(
+          '$assetDirectory/cricket-main-background.png',
+        ),
+        DabblerSport.running: DabblerSportArtwork.asset(
+          '$assetDirectory/running-main-background.png',
+        ),
+        DabblerSport.swimming: DabblerSportArtwork.asset(
+          '$assetDirectory/swimming-main-background.png',
+        ),
+        DabblerSport.cycling: DabblerSportArtwork.asset(
+          '$assetDirectory/cycling-main-background.png',
+        ),
+        DabblerSport.badminton: DabblerSportArtwork.asset(
+          '$assetDirectory/badminton-main-background.png',
+        ),
+        DabblerSport.gym: DabblerSportArtwork.asset(
+          '$assetDirectory/gym-main-background.png',
+        ),
+      };
 
-  static final Map<DabblerSport, Map<DabblerSportBackgroundVariant,
-      DabblerSportArtwork>> _registry = _seed();
+  static final Map<
+    DabblerSport,
+    Map<DabblerSportBackgroundVariant, DabblerSportArtwork>
+  >
+  _registry = _seed();
 
-  static Map<DabblerSport,
-      Map<DabblerSportBackgroundVariant, DabblerSportArtwork>> _seed() {
-    return <DabblerSport,
-        Map<DabblerSportBackgroundVariant, DabblerSportArtwork>>{
+  static Map<
+    DabblerSport,
+    Map<DabblerSportBackgroundVariant, DabblerSportArtwork>
+  >
+  _seed() {
+    return <
+      DabblerSport,
+      Map<DabblerSportBackgroundVariant, DabblerSportArtwork>
+    >{
       for (final MapEntry<DabblerSport, DabblerSportArtwork> entry
           in defaultMainArtwork.entries)
         entry.key: <DabblerSportBackgroundVariant, DabblerSportArtwork>{
@@ -237,13 +256,14 @@ abstract final class DabblerSportBackgroundRegistry {
   /// overwritten, so Batch 2 can register `matchDay` for every sport without
   /// disturbing `main`. A null or empty [set] is a no-op, as in the source.
   static void registerSportBackgrounds(
-    Map<DabblerSport,
-            Map<DabblerSportBackgroundVariant, DabblerSportArtwork>>?
-        set,
+    Map<DabblerSport, Map<DabblerSportBackgroundVariant, DabblerSportArtwork>>?
+    set,
   ) {
     if (set == null) return;
-    set.forEach((DabblerSport sport,
-        Map<DabblerSportBackgroundVariant, DabblerSportArtwork> variants) {
+    set.forEach((
+      DabblerSport sport,
+      Map<DabblerSportBackgroundVariant, DabblerSportArtwork> variants,
+    ) {
       (_registry[sport] ??=
               <DabblerSportBackgroundVariant, DabblerSportArtwork>{})
           .addAll(variants);
@@ -297,7 +317,20 @@ abstract final class DabblerSportBackgroundRegistry {
     DabblerSportBackgroundVariant variant = DabblerSportBackgroundVariant.main,
   }) {
     final DabblerSport? sport = DabblerSport.fromKey(key);
-    if (sport == null) return null;
+    if (sport == null) {
+      // Live `SportBackground.jsx`: an unknown sport has no registry entry, so
+      // it warns once as `warnMissing(sport, variant)` and renders null.
+      final String warnKey = '$key:${variant.key}';
+      if (_warned.add(warnKey)) {
+        warn(
+          '[Dabbler DS] SportBackground: no "${variant.key}" artwork '
+          'registered for "$key" yet. Register it with '
+          'DabblerSportBackgroundRegistry.registerSportBackgrounds(). Does not '
+          'fall back to another variant.',
+        );
+      }
+      return null;
+    }
     return resolve(sport, variant: variant);
   }
 }
@@ -396,7 +429,8 @@ class DabblerSportBackground extends StatelessWidget {
     Alignment alignment = Alignment.center,
     String? semanticLabel,
   }) {
-    final DabblerSportArtwork? resolved = artwork ??
+    final DabblerSportArtwork? resolved =
+        artwork ??
         DabblerSportBackgroundRegistry.resolve(sport, variant: variant);
     if (resolved == null) return null;
     return DabblerSportBackground(
@@ -412,7 +446,8 @@ class DabblerSportBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DabblerSportArtwork? resolved = artwork ??
+    final DabblerSportArtwork? resolved =
+        artwork ??
         DabblerSportBackgroundRegistry.resolve(sport, variant: variant);
 
     // An unpopulated sport/variant is a normal case: nothing is drawn, nothing

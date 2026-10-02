@@ -19,8 +19,7 @@ import 'package:flutter_test/flutter_test.dart';
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// The minimum a tile needs: a [ThemeData] carrying [DabblerColors], and a
 /// direction. 186 is the source's own frame width, so the tile is measured at
@@ -94,10 +93,7 @@ void main() {
 
     test('card_pricing_selected.dart re-exports the one widget', () {
       // Importing either Surfaces path yields the same type.
-      expect(
-        selected_path.DabblerCardPricing,
-        same(DabblerCardPricing),
-      );
+      expect(selected_path.DabblerCardPricing, same(DabblerCardPricing));
     });
 
     test('the whole chrome difference is one expression', () {
@@ -115,8 +111,9 @@ void main() {
       );
     });
 
-    testWidgets('both states draw the same tree, differing only in chrome',
-        (WidgetTester tester) async {
+    testWidgets('both states draw the same tree, differing only in chrome', (
+      WidgetTester tester,
+    ) async {
       for (final bool selected in <bool>[false, true]) {
         await tester.pumpWidget(
           _host(
@@ -150,8 +147,9 @@ void main() {
   });
 
   group('the shell comes from DabblerCard, not from this file', () {
-    testWidgets('selected is the white shell with a 2px brand border',
-        (WidgetTester tester) async {
+    testWidgets('selected is the white shell with a 2px brand border', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly));
       final DabblerColors colors = _colors();
 
@@ -161,22 +159,17 @@ void main() {
       expect(card.variant, DabblerCardVariant.pricingSelected);
       // `backgroundColor: var(--neutral-white)`, `2px solid var(--purple-600)`
       // — CardPricingDefault.jsx.
-      expect(
-        DabblerCard.fillOf(colors, card.variant),
-        colors.surfaceCard,
-      );
-      expect(
-        DabblerCard.borderOf(colors, card.variant),
-        colors.brandPrimary,
-      );
+      expect(DabblerCard.fillOf(colors, card.variant), colors.surfaceCard);
+      expect(DabblerCard.borderOf(colors, card.variant), colors.brandPrimary);
       expect(
         DabblerCard.borderWidthOf(card.variant),
         DabblerSizing.borderDefault * 2,
       );
     });
 
-    testWidgets('unselected is the sunken shell with a 2px outline border',
-        (WidgetTester tester) async {
+    testWidgets('unselected is the sunken shell with a 2px outline border', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_monthly));
       final DabblerColors colors = _colors();
 
@@ -186,22 +179,17 @@ void main() {
       expect(card.variant, DabblerCardVariant.pricingUnselected);
       // `backgroundColor: var(--neutral-200)`, `2px solid var(--neutral-400)`
       // — CardPricingSelected.jsx.
-      expect(
-        DabblerCard.fillOf(colors, card.variant),
-        colors.surfaceSunken,
-      );
-      expect(
-        DabblerCard.borderOf(colors, card.variant),
-        colors.borderDefault,
-      );
+      expect(DabblerCard.fillOf(colors, card.variant), colors.surfaceSunken);
+      expect(DabblerCard.borderOf(colors, card.variant), colors.borderDefault);
       expect(
         DabblerCard.borderWidthOf(card.variant),
         DabblerSizing.borderDefault * 2,
       );
     });
 
-    testWidgets('the tile adds no chrome of its own',
-        (WidgetTester tester) async {
+    testWidgets('the tile adds no chrome of its own', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly));
       // The only decorated box this file draws is the indicator. Everything
       // else — fill, border, radius — belongs to DabblerCard.
@@ -221,8 +209,9 @@ void main() {
   });
 
   group('the indicator', () {
-    testWidgets('selected — a brand-filled disc carrying a tick',
-        (WidgetTester tester) async {
+    testWidgets('selected — a brand-filled disc carrying a tick', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly));
       final DabblerColors colors = _colors();
       final BoxDecoration decoration = _indicatorDecoration(tester);
@@ -248,20 +237,22 @@ void main() {
       expect(find.byType(DabblerIcon), findsNothing);
 
       final Size tick = tester.getSize(
-        find.descendant(
-          of: find.byType(DabblerCardPricing),
-          matching: find.byType(CustomPaint),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(DabblerCardPricing),
+              matching: find.byType(CustomPaint),
+            )
+            .first,
       );
       expect(
         tick,
-        const Size(DabblerCardPricing.tickWidth,
-            DabblerCardPricing.tickHeight),
+        const Size(DabblerCardPricing.tickWidth, DabblerCardPricing.tickHeight),
       );
     });
 
-    testWidgets('unselected — an empty --outline-strong ring',
-        (WidgetTester tester) async {
+    testWidgets('unselected — an empty --outline-strong ring', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_monthly));
       final DabblerColors colors = _colors();
       final BoxDecoration decoration = _indicatorDecoration(tester);
@@ -277,8 +268,9 @@ void main() {
       expect(find.byType(DabblerIcon), findsNothing);
     });
 
-    testWidgets('is the drawn 28x28 in both states, off the icon grid',
-        (WidgetTester tester) async {
+    testWidgets('is the drawn 28x28 in both states, off the icon grid', (
+      WidgetTester tester,
+    ) async {
       for (final bool selected in <bool>[true, false]) {
         await tester.pumpWidget(
           _host(
@@ -311,8 +303,9 @@ void main() {
   });
 
   group('content and type', () {
-    testWidgets('the four text slots carry the source\'s values',
-        (WidgetTester tester) async {
+    testWidgets('the four text slots carry the source\'s values', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_monthly));
       // CardPricingSelected.d.ts's four defaults, minus the priceNote it does
       // not have.
@@ -322,8 +315,9 @@ void main() {
       expect(find.text('7d free trial'), findsOneWidget);
     });
 
-    testWidgets('the optional lines drop out cleanly',
-        (WidgetTester tester) async {
+    testWidgets('the optional lines drop out cleanly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerCardPricing(plan: 'free', price: r'$0')),
       );
@@ -342,26 +336,26 @@ void main() {
 
     test('the styles are ramp steps, not invented sizes', () {
       // --font-size-body-lg 15 @700 → .t-subheadline at bold.
-      final TextStyle plan =
-          DabblerCardPricing.planStyleFor(TextDirection.ltr);
+      final TextStyle plan = DabblerCardPricing.planStyleFor(TextDirection.ltr);
       expect(plan.fontSize, DabblerType.subheadline.fontSize);
       expect(plan.fontWeight, DabblerType.bold);
 
       // --font-size-body-sm 13 @400 → .t-footnote, unmodified.
-      final TextStyle price =
-          DabblerCardPricing.priceStyleFor(TextDirection.ltr);
+      final TextStyle price = DabblerCardPricing.priceStyleFor(
+        TextDirection.ltr,
+      );
       expect(price.fontSize, DabblerType.footnote.fontSize);
       expect(price.fontWeight, DabblerType.regular);
 
       // --font-size-overline 11 @400 → .t-caption-2, unmodified.
-      final TextStyle note =
-          DabblerCardPricing.noteStyleFor(TextDirection.ltr);
+      final TextStyle note = DabblerCardPricing.noteStyleFor(TextDirection.ltr);
       expect(note.fontSize, DabblerType.caption2.fontSize);
       expect(note.fontWeight, DabblerType.regular);
     });
 
-    testWidgets('text takes its colour from the tokens',
-        (WidgetTester tester) async {
+    testWidgets('text takes its colour from the tokens', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly));
       final DabblerColors colors = _colors();
 
@@ -385,14 +379,17 @@ void main() {
       );
     });
 
-    test('the slot gap is a base-3 step', () {
-      expect(DabblerCardPricing.slotGap, DabblerSpacing.stackTight);
-      expect(DabblerSpacing.scale, contains(DabblerCardPricing.slotGap));
-    });
-
-    test('the trial pill inset is a base-3 step', () {
-      expect(DabblerCardPricing.trialInset, DabblerSpacing.space5);
-      expect(DabblerSpacing.scale, contains(DabblerCardPricing.trialInset));
+    test('line boxes and pill offsets equal the live export', () {
+      // Live `components/cards/CardPricingDefault.jsx` (Figma node 8:39,
+      // digest): line 2 box height 24, line 4 box height 25, badge left 14 /
+      // top -10, card padding 16, radius 16.
+      expect(DabblerCardPricing.slotGap, 0);
+      expect(DabblerCardPricing.priceSlotHeight, 24);
+      expect(DabblerCardPricing.billingSlotHeight, 25);
+      expect(DabblerCardPricing.trialInset, 14);
+      expect(DabblerCardPricing.trialTop, -10);
+      expect(DabblerCard.defaultPadding, const EdgeInsets.all(16));
+      expect(DabblerCard.defaultRadius, 16);
     });
   });
 
@@ -403,15 +400,14 @@ void main() {
       final Rect card = tester.getRect(find.byType(DabblerCard));
       final Rect pill = tester.getRect(find.byType(DabblerBadge));
 
-      // Centred on the edge: half above, half below. `top: -10` in the Figma
-      // dump, expressed without depending on the badge's measured height.
-      expect(pill.top, lessThan(card.top));
+      // `top: -10` in the Figma dump (CardPricingDefault.jsx digest).
+      expect(card.top - pill.top, closeTo(10, 0.5));
       expect(pill.bottom, greaterThan(card.top));
-      expect(pill.center.dy, closeTo(card.top, 0.5));
     });
 
-    testWidgets('is inset from the LEADING edge under RTL',
-        (WidgetTester tester) async {
+    testWidgets('is inset from the LEADING edge under RTL', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly, direction: TextDirection.rtl));
 
       final Rect card = tester.getRect(find.byType(DabblerCard));
@@ -424,8 +420,9 @@ void main() {
       );
     });
 
-    testWidgets('is inset from the left under LTR',
-        (WidgetTester tester) async {
+    testWidgets('is inset from the left under LTR', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly));
 
       final Rect card = tester.getRect(find.byType(DabblerCard));
@@ -439,8 +436,9 @@ void main() {
   });
 
   group('interaction', () {
-    testWidgets('a tappable tile fires, and composes the system primitives',
-        (WidgetTester tester) async {
+    testWidgets('a tappable tile fires, and composes the system primitives', (
+      WidgetTester tester,
+    ) async {
       int taps = 0;
       await tester.pumpWidget(
         _host(
@@ -463,15 +461,17 @@ void main() {
       expect(taps, 1);
     });
 
-    testWidgets('an inert tile has no focus ring and no press scale',
-        (WidgetTester tester) async {
+    testWidgets('an inert tile has no focus ring and no press scale', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly));
       expect(find.byType(DabblerFocusRing), findsNothing);
       expect(find.byType(DabblerPressScale), findsNothing);
     });
 
-    testWidgets('enabled: false withholds the handler and the affordances',
-        (WidgetTester tester) async {
+    testWidgets('enabled: false withholds the handler and the affordances', (
+      WidgetTester tester,
+    ) async {
       int taps = 0;
       await tester.pumpWidget(
         _host(
@@ -493,7 +493,9 @@ void main() {
   });
 
   group('accessibility', () {
-    testWidgets('the tile reports its selected state', (WidgetTester tester) async {
+    testWidgets('the tile reports its selected state', (
+      WidgetTester tester,
+    ) async {
       for (final bool selected in <bool>[true, false]) {
         await tester.pumpWidget(
           _host(
@@ -520,16 +522,14 @@ void main() {
       }
     });
 
-    testWidgets('an unlabelled tile still reads its own content',
-        (WidgetTester tester) async {
+    testWidgets('an unlabelled tile still reads its own content', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly));
       final SemanticsNode node = tester.getSemantics(
         find.byType(DabblerCardPricing),
       );
-      expect(
-        node.label,
-        contains('yearly'),
-      );
+      expect(node.label, contains('yearly'));
       expect(node.label, contains(r'$59.99/yr'));
       expect(node.label, contains('billed annually'));
       expect(node.label, contains('7d free trial'));
@@ -551,8 +551,9 @@ void main() {
       expect(node.label, 'Yearly plan, best value');
     });
 
-    testWidgets('the whole tile is the target, and it clears 44×44',
-        (WidgetTester tester) async {
+    testWidgets('the whole tile is the target, and it clears 44×44', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           DabblerCardPricing(
@@ -573,8 +574,9 @@ void main() {
       expect(size.height, greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
     });
 
-    testWidgets('meets the framework\'s own tap-target guideline',
-        (WidgetTester tester) async {
+    testWidgets('meets the framework\'s own tap-target guideline', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
         _host(
@@ -593,8 +595,9 @@ void main() {
   });
 
   group('themes', () {
-    testWidgets('the indicator follows the active theme\'s brand',
-        (WidgetTester tester) async {
+    testWidgets('the indicator follows the active theme\'s brand', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in <DabblerTheme>[
         DabblerTheme.main,
         DabblerTheme.sport,
@@ -624,8 +627,9 @@ void main() {
       }
     });
 
-    testWidgets('it builds in dark without a hardcoded colour',
-        (WidgetTester tester) async {
+    testWidgets('it builds in dark without a hardcoded colour', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_yearly, brightness: Brightness.dark));
       expect(tester.takeException(), isNull);
       expect(

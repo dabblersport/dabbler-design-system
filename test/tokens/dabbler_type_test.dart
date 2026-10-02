@@ -21,6 +21,12 @@ File? _findTypographyCss() {
     if (dir.parent.path == dir.path) break;
     dir = dir.parent;
   }
+  // Fallback: the package-pinned fixture, a transcription of the live Claude
+  // Design project 4286affa-bf50-4ff6-9576-917f76a93ca1 file `tokens/typography.css`
+  // (read via DesignSync get_file on 2026-10-02, transcribed to a local mirror
+  // by the coordinator). See `test/fixtures/live/README.md`.
+  final File pinned = File('test/fixtures/live/tokens/typography.css');
+  if (pinned.existsSync()) return pinned;
   return null;
 }
 
@@ -60,10 +66,14 @@ Map<String, _CssRule> _parseRules(String css) {
   };
 }
 
-/// Every `[dir="rtl"] .t-<name> { line-height:<n>px; }` override.
+/// Every `[dir="rtl"] .t-<name> … { …line-height:<n>px… }` override.
+///
+/// The live `typography.css` groups the three RTL selectors per rule
+/// (`[dir="rtl"] .t-x, [lang="ar"] .t-x, [lang^="ar-"] .t-x { font-size:…;
+/// line-height:…; }`), so the selector tail is skipped up to the `{`.
 Map<String, double> _parseRtlLeading(String css) => <String, double>{
   for (final RegExpMatch m in RegExp(
-    r'\[dir="rtl"\]\s*\.t-([a-z0-9-]+)\s*\{\s*line-height:\s*([0-9.]+)px',
+    r'\[dir="rtl"\]\s*\.t-([a-z0-9-]+)[^{]*\{[^}]*?line-height:\s*([0-9.]+)px',
   ).allMatches(css))
     m.group(1)!: double.parse(m.group(2)!),
 };
@@ -89,7 +99,13 @@ void main() {
     if (source == null) return;
     final String css = source.readAsStringSync();
     rules = _parseRules(css);
-    rtlLeading = _parseRtlLeading(css);
+    // The live file restates `line-height` in every RTL rule; only the ones
+    // that differ from the Latin leading are *additional* Arabic leading.
+    final Map<String, double> allRtl = _parseRtlLeading(css);
+    rtlLeading = <String, double>{
+      for (final MapEntry<String, double> e in allRtl.entries)
+        if (e.value != rules[e.key]!.lineHeight) e.key: e.value,
+    };
     expect(rules, isNotEmpty);
   });
 
@@ -212,9 +228,11 @@ void main() {
         DabblerType.body.resolve(DabblerTypeScript.latin).height,
         21 / 16,
       );
+      // Live `typography.css` RTL `.t-body`: `font-size:15.1px;
+      // line-height:24px` — the multiple is taken over the Arabic size.
       expect(
         DabblerType.body.resolve(DabblerTypeScript.arabic).height,
-        24 / 16,
+        24 / 15.1,
       );
       expect(
         DabblerType.body.resolveForDirection(TextDirection.rtl).height,

@@ -21,6 +21,12 @@ File? _findColorsCss() {
     if (dir.parent.path == dir.path) break;
     dir = dir.parent;
   }
+  // Fallback: the package-pinned fixture, a transcription of the live Claude
+  // Design project 4286affa-bf50-4ff6-9576-917f76a93ca1 file `tokens/colors.css`
+  // (read via DesignSync get_file on 2026-10-02, transcribed to a local mirror
+  // by the coordinator). See `test/fixtures/live/README.md`.
+  final File pinned = File('test/fixtures/live/tokens/colors.css');
+  if (pinned.existsSync()) return pinned;
   return null;
 }
 
@@ -82,7 +88,13 @@ void main() {
         );
       }
 
-      expect(_hexLiteral.allMatches(source).length, tokens.length);
+      // One literal is NOT in `tokens/colors.css`: `--accent-indigo` (#5C50E6),
+      // which the live project declares only under `tokens/figma/fig-tokens.css`
+      // and which `Avatar.jsx` / `Badge.jsx` / `Button.jsx` consume. Named here
+      // so the count stays an exact statement rather than a tolerance.
+      expect(tokens.containsKey('accent-indigo'), isFalse);
+      expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
+      expect(_hexLiteral.allMatches(source).length, tokens.length + 1);
     });
 
     test('covers all seven theme palettes and their p/s ramps', () {

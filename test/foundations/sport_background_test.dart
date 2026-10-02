@@ -119,6 +119,17 @@ void main() {
       }
     });
 
+    test('an unknown sport key warns once and returns null, as live does', () {
+      // Live `SportBackground.jsx` `warnMissing(sport, variant)` fires for an
+      // unregistered sport string too, then renders null.
+      final List<String> messages = <String>[];
+      DabblerSportBackgroundRegistry.warn = messages.add;
+      expect(DabblerSportBackgroundRegistry.resolveKey('quidditch'), isNull);
+      expect(DabblerSportBackgroundRegistry.resolveKey('quidditch'), isNull);
+      expect(messages, hasLength(1));
+      expect(messages.single, contains('quidditch'));
+    });
+
     test('an unknown sport key returns null rather than throwing', () {
       expect(DabblerSportBackgroundRegistry.resolveKey('quidditch'), isNull);
       expect(() => DabblerSportBackgroundRegistry.resolveKey(''),

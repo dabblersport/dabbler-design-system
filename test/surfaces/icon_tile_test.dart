@@ -258,16 +258,26 @@ void main() {
   });
 
   group('AC1 — the tint comes from the token layer', () {
-    testWidgets('the brand tone leaves DS-500\'s brandTint step untouched', (
+    testWidgets('the brand tone is color-mix(brand 10% / 28%, white) as live', (
       WidgetTester tester,
     ) async {
+      // Live `components/surfaces/IconTile.jsx`: fill `color-mix(in srgb,
+      // <color> 10%, white)`, border `color-mix(in srgb, <color> 28%, white)`,
+      // radius `--radius-lg`, size 45, `color` default `--color-brand-primary`.
       await tester.pumpWidget(_host(const DabblerIconTile.named('game')));
       final DabblerSurface box = _box(tester);
-      expect(box.variant, DabblerSurfaceVariant.brandTint);
-      // Null overrides: the step resolves through Surface itself.
-      expect(box.fill, isNull);
-      expect(box.borderColor, isNull);
-      expect(box.borderWidth, isNull);
+      final DabblerColors colors = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      Color mix(double a) => Color.alphaBlend(
+        colors.brandPrimary.withValues(alpha: a),
+        const Color(0xFFFFFFFF),
+      );
+      expect(box.fill, mix(0.10));
+      expect(box.borderColor, mix(0.28));
+      expect(box.radius, DabblerRadius.lg);
+      expect(tester.getSize(find.byType(DabblerSurface)), const Size(45, 45));
     });
 
     testWidgets('the brand glyph is painted in the brand, per tone', (

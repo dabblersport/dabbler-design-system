@@ -13,16 +13,21 @@ import '../tokens/dabbler_type.dart';
 enum DabblerAvatarSize {
   /// 28px.
   xs(28),
+
   /// 36px. The size [DabblerAvatarGroup] stacks.
   sm(36),
+
   /// 48px. The default.
   md(48),
+
   /// 64px.
   lg(64),
+
   /// 80px.
   xl(80);
 
   const DabblerAvatarSize(this.diameter);
+
   /// The circle's width and height in logical pixels.
   final double diameter;
 }
@@ -31,8 +36,10 @@ enum DabblerAvatarSize {
 enum DabblerAvatarBadgeTone {
   /// `var(--color-brand-primary)` — resolves to [DabblerColors.brandPrimary].
   primary,
+
   /// `var(--color-accent)` — resolves to [DabblerColors.accent].
   accent,
+
   /// `var(--accent-indigo)` — resolves to [DabblerPalette.accentIndigo].
   indigo,
 }
@@ -47,6 +54,7 @@ abstract final class DabblerAvatarSeed {
 
   /// The default seed, from `Avatar.jsx`: `seed ?? initials ?? 'dabbler'`.
   static const String fallback = 'dabbler';
+
   /// The 32-bit FNV-1a hash of [seed]. Stable across runs and platforms.
   static int hash(String seed) {
     int h = 0x811C9DC5;
@@ -74,8 +82,11 @@ abstract class DabblerAvatarPortraitBuilder {
   /// [DabblerAvatar] clips it to a circle and hides it from semantics, so an
   /// implementation need do neither — and may never render a character of
   /// [seed].
-  Widget build(BuildContext context,
-      {required String seed, required double diameter});
+  Widget build(
+    BuildContext context, {
+    required String seed,
+    required double diameter,
+  });
 }
 
 /// The deterministic **fallback** portrait, drawn when Multiavatar cannot render
@@ -99,26 +110,38 @@ class DabblerPlaceholderPortrait extends DabblerAvatarPortraitBuilder {
   /// source says the same from the other side — *"there is no `palette` prop;
   /// the library owns the avatar's colour"*.
   static const List<Color> parts = <Color>[
-    DabblerPalette.mainP600, DabblerPalette.mainS600,
-    DabblerPalette.socialP600, DabblerPalette.socialS600,
-    DabblerPalette.sportP600, DabblerPalette.sportS600,
-    DabblerPalette.activeP600, DabblerPalette.activeS600,
-    DabblerPalette.brightP600, DabblerPalette.brightS600,
+    DabblerPalette.mainP600,
+    DabblerPalette.mainS600,
+    DabblerPalette.socialP600,
+    DabblerPalette.socialS600,
+    DabblerPalette.sportP600,
+    DabblerPalette.sportS600,
+    DabblerPalette.activeP600,
+    DabblerPalette.activeS600,
+    DabblerPalette.brightP600,
+    DabblerPalette.brightS600,
   ];
 
   @override
-  Widget build(BuildContext context,
-      {required String seed, required double diameter}) {
+  Widget build(
+    BuildContext context, {
+    required String seed,
+    required double diameter,
+  }) {
     final int h = DabblerAvatarSeed.hash(seed);
     final int ground = h % parts.length;
     // Each part is offset off the one before it, so no two adjacent parts land
     // on the same colour and paint a featureless disc.
-    final int head = (ground + 1 + (h >> 8) % (parts.length - 1)) % parts.length;
+    final int head =
+        (ground + 1 + (h >> 8) % (parts.length - 1)) % parts.length;
     final int body = (head + 1 + (h >> 16) % (parts.length - 1)) % parts.length;
     return CustomPaint(
       size: Size.square(diameter),
       painter: _PlaceholderPortraitPainter(
-          ground: parts[ground], head: parts[head], body: parts[body]),
+        ground: parts[ground],
+        head: parts[head],
+        body: parts[body],
+      ),
     );
   }
 }
@@ -127,7 +150,9 @@ class DabblerPlaceholderPortrait extends DabblerAvatarPortraitBuilder {
 /// every size renders the same portrait at a different scale.
 class _PlaceholderPortraitPainter extends CustomPainter {
   const _PlaceholderPortraitPainter({
-    required this.ground, required this.head, required this.body,
+    required this.ground,
+    required this.head,
+    required this.body,
   });
 
   final Color ground;
@@ -142,8 +167,10 @@ class _PlaceholderPortraitPainter extends CustomPainter {
 
     // Shoulders: a pill rising from the lower edge.
     canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(d * 0.14, d * 0.66, d * 0.72, d * 0.52),
-          Radius.circular(d * 0.36)),
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(d * 0.14, d * 0.66, d * 0.72, d * 0.52),
+        Radius.circular(d * 0.36),
+      ),
       paint..color = body,
     );
 
@@ -180,14 +207,21 @@ class DabblerRandomAvatarPortrait extends DabblerAvatarPortraitBuilder {
   final DabblerAvatarPortraitBuilder fallback;
 
   @override
-  Widget build(BuildContext context,
-      {required String seed, required double diameter}) {
+  Widget build(
+    BuildContext context, {
+    required String seed,
+    required double diameter,
+  }) {
     if (seed.isNotEmpty) {
       try {
         // `excludeFromSemantics` because the portrait is decorative;
         // [DabblerAvatar] excludes it again from the outside.
-        return RandomAvatar(seed,
-            width: diameter, height: diameter, excludeFromSemantics: true);
+        return RandomAvatar(
+          seed,
+          width: diameter,
+          height: diameter,
+          excludeFromSemantics: true,
+        );
       } on Object {
         // Any failure degrades to the deterministic fallback — never to an
         // error widget, and never to initials.
@@ -230,8 +264,13 @@ class DabblerRandomAvatarPortrait extends DabblerAvatarPortraitBuilder {
 class DabblerAvatar extends StatelessWidget {
   /// An avatar for [seed] at [size].
   const DabblerAvatar({
-    super.key, this.seed, this.size = DabblerAvatarSize.md, this.badge,
-    this.badgeTone = DabblerAvatarBadgeTone.primary, this.ringColor,
+    super.key,
+    this.seed,
+    this.size = DabblerAvatarSize.md,
+    this.badge,
+    this.badgeTone = DabblerAvatarBadgeTone.primary,
+    this.ringColor,
+    this.badgeSize = badgeDiameter,
   });
 
   /// The stable identifying string — a name, handle or user id. **Never
@@ -256,11 +295,16 @@ class DabblerAvatar extends StatelessWidget {
   /// by something that is not a shadow.
   final Color? ringColor;
 
+  /// The corner badge's diameter. Defaults to [badgeDiameter] (24, `Avatar.jsx`);
+  /// `NavigationTopBar` draws a 16px one (Figma-export digest: `16x16`).
+  final double badgeSize;
+
   /// The 2px of `Avatar.jsx`'s group ring and badge border.
   static const double _ringWidth = 2;
 
   /// `width: 24, height: 24` in `Avatar.jsx` — [DabblerSizing.iconMd].
   static const double badgeDiameter = DabblerSizing.iconMd;
+
   /// How far the badge overhangs the circle: `right: -2, bottom: -2`.
   static const double _badgeOverhang = -2;
 
@@ -293,8 +337,11 @@ class DabblerAvatar extends StatelessWidget {
         color: colors.bgTertiary,
         child: SizedBox.square(
           dimension: d,
-          child: portrait.build(context,
-              seed: seed ?? DabblerAvatarSeed.fallback, diameter: d),
+          child: portrait.build(
+            context,
+            seed: seed ?? DabblerAvatarSeed.fallback,
+            diameter: d,
+          ),
         ),
       ),
     );
@@ -302,13 +349,24 @@ class DabblerAvatar extends StatelessWidget {
     circle = ExcludeSemantics(child: circle);
 
     if (ring != null) {
-      circle = DecoratedBox(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: ring, width: _ringWidth),
-        ),
-        position: DecorationPosition.foreground,
-        child: circle,
+      // `boxShadow: '0 0 0 2px var(--surface-page)'` (`Avatar.jsx`, group): a
+      // spread OUTSIDE the 36px box. Painted as a page-coloured disc
+      // [_ringWidth] larger on every side, behind the portrait, so the
+      // portrait keeps its full diameter.
+      circle = Stack(
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          Positioned(
+            left: -_ringWidth,
+            top: -_ringWidth,
+            right: -_ringWidth,
+            bottom: -_ringWidth,
+            child: DecoratedBox(
+              decoration: BoxDecoration(shape: BoxShape.circle, color: ring),
+            ),
+          ),
+          Positioned.fill(child: circle),
+        ],
       );
     }
 
@@ -321,10 +379,14 @@ class DabblerAvatar extends StatelessWidget {
         children: <Widget>[
           circle,
           PositionedDirectional(
-            end: _badgeOverhang, bottom: _badgeOverhang,
+            end: _badgeOverhang,
+            bottom: _badgeOverhang,
             child: _Badge(
               fill: badgeFill(colors, badgeTone),
-              ink: colors.surfaceCard, border: colors.bgPrimary, child: badge!,
+              ink: colors.surfaceCard,
+              border: colors.bgPrimary,
+              side: badgeSize,
+              child: badge!,
             ),
           ),
         ],
@@ -336,35 +398,39 @@ class DabblerAvatar extends StatelessWidget {
 /// The 24px corner badge: a circular fill with a 2px paper border.
 class _Badge extends StatelessWidget {
   const _Badge({
-    required this.fill, required this.ink, required this.border,
+    required this.fill,
+    required this.ink,
+    required this.border,
     required this.child,
+    required this.side,
   });
 
+  final double side;
   final Color fill;
   final Color ink;
   final Color border;
   final Widget child;
   @override
   Widget build(BuildContext context) => Container(
-        width: DabblerAvatar.badgeDiameter,
-        height: DabblerAvatar.badgeDiameter,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: fill,
-          shape: BoxShape.circle,
-          border: Border.all(color: border, width: DabblerAvatar._ringWidth),
-        ),
-        // `color: var(--surface-card)`, `font-size: 11`, `font-weight: 700`.
-        child: IconTheme.merge(
-          data: IconThemeData(color: ink, size: 10),
-          child: DefaultTextStyle.merge(
-            style: DabblerType.caption2
-                .resolveForDirection(Directionality.of(context))
-                .copyWith(color: ink, fontWeight: DabblerType.bold),
-            child: child,
-          ),
-        ),
-      );
+    width: DabblerAvatar.badgeDiameter,
+    height: DabblerAvatar.badgeDiameter,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: fill,
+      shape: BoxShape.circle,
+      border: Border.all(color: border, width: DabblerAvatar._ringWidth),
+    ),
+    // `color: var(--surface-card)`, `font-size: 11`, `font-weight: 700`.
+    child: IconTheme.merge(
+      data: IconThemeData(color: ink, size: 10),
+      child: DefaultTextStyle.merge(
+        style: DabblerType.caption2
+            .resolveForDirection(Directionality.of(context))
+            .copyWith(color: ink, fontWeight: DabblerType.bold),
+        child: child,
+      ),
+    ),
+  );
 }
 
 /// AvatarGroup — an overlapping row of [DabblerAvatarSize.sm] avatars with an
@@ -385,9 +451,9 @@ class _Badge extends StatelessWidget {
 ///
 /// The source's ring is a `box-shadow` **spread**, outside the 36px box, so its
 /// −10px margin measures between the circles themselves. This system paints no
-/// shadows, so the ring is a 2px border *inside* the circle: every box stays
-/// exactly 36px and the overlap exactly −10, keeping the centres 26px apart as
-/// in the source, at the cost of 2px of portrait on each side.
+/// shadows, so the ring is a page-coloured disc 2px larger on every side,
+/// painted behind each portrait: every box stays exactly 36px with a full 36px
+/// portrait, centres 26px apart, as in the source.
 ///
 /// Laid out with [Stack] and [PositionedDirectional] rather than negative
 /// margins, so it mirrors under RTL — in Arabic the stack runs from the right
@@ -395,7 +461,9 @@ class _Badge extends StatelessWidget {
 class DabblerAvatarGroup extends StatelessWidget {
   /// A group of [people], with an optional `+`[overflow] chip.
   const DabblerAvatarGroup({
-    super.key, this.people = const <String>[], this.overflow = 0,
+    super.key,
+    this.people = const <String>[],
+    this.overflow = 0,
   }) : assert(overflow >= 0, 'an overflow count cannot be negative');
 
   /// The seeds to render, in order. Each is a stable identifying string, and
@@ -407,6 +475,7 @@ class DabblerAvatarGroup extends StatelessWidget {
 
   /// `size="sm"` — the group's circles are 36px.
   static const DabblerAvatarSize avatarSize = DabblerAvatarSize.sm;
+
   /// `marginLeft: -10` — how far each item sits under the one before it.
   static const double overlap = 10;
 
@@ -422,12 +491,17 @@ class DabblerAvatarGroup extends StatelessWidget {
     final int n = people.length;
     final List<Widget> items = <Widget>[];
     for (int i = 0; i < n; i++) {
-      items.add(PositionedDirectional(
-        start: i * _step,
-        // `ringColor` is `--surface-page`, the 2px separating ring.
-        child: DabblerAvatar(
-            seed: people[i], size: avatarSize, ringColor: colors.bgPrimary),
-      ));
+      items.add(
+        PositionedDirectional(
+          start: i * _step,
+          // `ringColor` is `--surface-page`, the 2px separating ring.
+          child: DabblerAvatar(
+            seed: people[i],
+            size: avatarSize,
+            ringColor: colors.bgPrimary,
+          ),
+        ),
+      );
     }
 
     double width = n == 0 ? 0 : d + (n - 1) * _step;
@@ -439,11 +513,13 @@ class DabblerAvatarGroup extends StatelessWidget {
       // whatever followed it in a row. Measured rather than assumed — see
       // [_OverflowChip.widthFor].
       final double chipWidth = _OverflowChip.widthFor(context, overflow);
-      items.add(PositionedDirectional(
-        start: n * _step,
-        width: chipWidth,
-        child: _OverflowChip(count: overflow, colors: colors, height: d),
-      ));
+      items.add(
+        PositionedDirectional(
+          start: n * _step,
+          width: chipWidth,
+          child: _OverflowChip(count: overflow, colors: colors, height: d),
+        ),
+      );
       width = n * _step + chipWidth;
     }
     if (items.isEmpty) return const SizedBox.shrink();
@@ -454,8 +530,9 @@ class DabblerAvatarGroup extends StatelessWidget {
       width: width,
       height: d,
       child: Stack(
-          clipBehavior: Clip.none,
-          children: items.reversed.toList(growable: false)),
+        clipBehavior: Clip.none,
+        children: items.reversed.toList(growable: false),
+      ),
     );
   }
 }
@@ -463,7 +540,9 @@ class DabblerAvatarGroup extends StatelessWidget {
 /// The trailing `+N` chip: `--faint` on `--muted`, pill radius, 36px tall.
 class _OverflowChip extends StatelessWidget {
   const _OverflowChip({
-    required this.count, required this.colors, required this.height,
+    required this.count,
+    required this.colors,
+    required this.height,
   });
 
   final int count;
@@ -493,10 +572,23 @@ class _OverflowChip extends StatelessWidget {
     )..layout();
     final double width = painter.width + 2 * DabblerAvatarGroup._chipPadding;
     painter.dispose();
-    return width < DabblerAvatarGroup._chipMinWidth
+    final double visible = width < DabblerAvatarGroup._chipMinWidth
         ? DabblerAvatarGroup._chipMinWidth
         : width;
+    return visible + tuck;
   }
+
+  /// How much of the chip's leading edge sits under the last avatar and its
+  /// ring: the 10px overlap plus the 2px ring.
+  ///
+  /// Live `AvatarGroup` tucks the chip under the last avatar by the same
+  /// `marginLeft: -10`, but pads its text only `0 8px`, so the first glyph of a
+  /// short count (`+5`) lands under that avatar's ring and is hidden. The chip
+  /// here keeps the live overlap and the live `minWidth: 28` / `0 8px` for the
+  /// *visible* part, and grows by [tuck] so the label starts clear of the
+  /// avatar. Deviation from live, made so `+N` is legible.
+  static const double tuck =
+      DabblerAvatarGroup.overlap + DabblerAvatar._ringWidth;
 
   /// The label's style — `--muted` ink at the 11px bold caption step.
   static TextStyle textStyleFor(BuildContext context, DabblerColors colors) =>
@@ -505,25 +597,46 @@ class _OverflowChip extends StatelessWidget {
           .copyWith(color: colors.textSecondary, fontWeight: DabblerType.bold);
 
   @override
-  Widget build(BuildContext context) => Container(
-        height: height,
-        constraints:
-            const BoxConstraints(minWidth: DabblerAvatarGroup._chipMinWidth),
-        padding: const EdgeInsets.symmetric(
-            horizontal: DabblerAvatarGroup._chipPadding),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colors.bgTertiary,
-          borderRadius: DabblerRadius.pillAll,
-          border: Border.all(
-              color: colors.bgPrimary, width: DabblerAvatar._ringWidth),
+  Widget build(BuildContext context) => Stack(
+    clipBehavior: Clip.none,
+    children: <Widget>[
+      // `boxShadow: '0 0 0 2px var(--surface-page)'` — outside the box.
+      Positioned(
+        left: -DabblerAvatar._ringWidth,
+        top: -DabblerAvatar._ringWidth,
+        right: -DabblerAvatar._ringWidth,
+        bottom: -DabblerAvatar._ringWidth,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.bgPrimary,
+            borderRadius: DabblerRadius.pillAll,
+          ),
         ),
-        child: Text(
-          labelFor(count),
-          maxLines: 1,
-          softWrap: false,
-          overflow: TextOverflow.clip,
-          style: textStyleFor(context, colors),
-        ),
-      );
+      ),
+      _body(context),
+    ],
+  );
+
+  Widget _body(BuildContext context) => Container(
+    height: height,
+    constraints: const BoxConstraints(
+      minWidth: DabblerAvatarGroup._chipMinWidth + tuck,
+    ),
+    padding: const EdgeInsetsDirectional.only(
+      start: DabblerAvatarGroup._chipPadding + tuck,
+      end: DabblerAvatarGroup._chipPadding,
+    ),
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: colors.bgTertiary,
+      borderRadius: DabblerRadius.pillAll,
+    ),
+    child: Text(
+      labelFor(count),
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.clip,
+      style: textStyleFor(context, colors),
+    ),
+  );
 }

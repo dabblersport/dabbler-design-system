@@ -453,7 +453,9 @@ void main() {
         matching: find.byType(Container),
       ).first);
       final BoxDecoration decoration = bar.decoration! as BoxDecoration;
-      expect(decoration.borderRadius, DabblerRadius.lgAll);
+      // Live NavigationTopBar.jsx digest: root `borderRadius: 16`.
+      expect(decoration.borderRadius, DabblerRadius.cardAll);
+      expect(DabblerRadius.card, 16);
       expect(
         (decoration.border! as Border).top.color,
         _colors().borderDefault,

@@ -39,8 +39,10 @@ Widget _host(
   Brightness brightness = Brightness.light,
   TextDirection textDirection = TextDirection.ltr,
 }) {
-  final DabblerColors colors =
-      DabblerColors.resolve(theme: theme, brightness: brightness);
+  final DabblerColors colors = DabblerColors.resolve(
+    theme: theme,
+    brightness: brightness,
+  );
   return MediaQuery(
     data: const MediaQueryData(),
     child: Directionality(
@@ -60,24 +62,25 @@ Widget _host(
 
 /// The button's one painted box.
 DabblerSurface _surface(WidgetTester tester) => tester.widget<DabblerSurface>(
-      find.descendant(
-        of: find.byType(DabblerButton),
-        matching: find.byType(DabblerSurface),
-      ),
-    );
+  find.descendant(
+    of: find.byType(DabblerButton),
+    matching: find.byType(DabblerSurface),
+  ),
+);
 
 TextStyle _labelStyle(WidgetTester tester) => tester
-    .widget<Text>(find.descendant(
-      of: find.byType(DabblerButton),
-      matching: find.byType(Text),
-    ))
+    .widget<Text>(
+      find.descendant(
+        of: find.byType(DabblerButton),
+        matching: find.byType(Text),
+      ),
+    )
     .style!;
 
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 void main() {
   group('AC1 — the tone enum', () {
@@ -108,10 +111,16 @@ void main() {
       final String source = _code();
       // The enum value `outlined` legitimately contains `outline`, so the scan
       // is for the bare identifiers.
-      expect(RegExp(r'\boutline\b').hasMatch(source), isFalse,
-          reason: 'legacy tone name `outline` must not be ported');
-      expect(RegExp(r'\bghost\b').hasMatch(source), isFalse,
-          reason: 'legacy tone name `ghost` must not be ported');
+      expect(
+        RegExp(r'\boutline\b').hasMatch(source),
+        isFalse,
+        reason: 'legacy tone name `outline` must not be ported',
+      );
+      expect(
+        RegExp(r'\bghost\b').hasMatch(source),
+        isFalse,
+        reason: 'legacy tone name `ghost` must not be ported',
+      );
       expect(source.contains('TONE_ALIASES'), isFalse);
       expect(source.contains('@Deprecated'), isFalse);
     });
@@ -134,10 +143,14 @@ void main() {
         return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
       }
 
-      expect(ratio(DabblerPalette.paper, DabblerButton.accentFill),
-          greaterThanOrEqualTo(4.5));
-      expect(ratio(DabblerPalette.paper, DabblerPalette.socialInfo),
-          lessThan(4.5));
+      expect(
+        ratio(DabblerPalette.paper, DabblerButton.accentFill),
+        greaterThanOrEqualTo(4.5),
+      );
+      expect(
+        ratio(DabblerPalette.paper, DabblerPalette.socialInfo),
+        lessThan(4.5),
+      );
     });
 
     testWidgets('paints each tone from the source TONES map', (
@@ -146,17 +159,20 @@ void main() {
       final DabblerColors c = _colors();
       final Map<DabblerButtonTone, (Color, Color)> expected =
           <DabblerButtonTone, (Color, Color)>{
-        DabblerButtonTone.primary: (c.brandPrimary, c.onBrand),
-        DabblerButtonTone.secondary: (c.accent, c.onAccent),
-        DabblerButtonTone.accent: (DabblerButton.accentFill, c.surfaceCard),
-        DabblerButtonTone.neutral: (c.surfaceSunken, c.textPrimary),
-        DabblerButtonTone.filled: (c.textPrimary, c.surfaceCard),
-        DabblerButtonTone.outlined: (Colors.transparent, c.textPrimary),
-        DabblerButtonTone.text: (Colors.transparent, c.textPrimary),
-        DabblerButtonTone.destructive: (c.error.solid, DabblerPalette.paper),
-        DabblerButtonTone.iconLabel: (c.surfaceSunken, c.textPrimary),
-        DabblerButtonTone.icon: (c.textPrimary, c.surfaceCard),
-      };
+            DabblerButtonTone.primary: (c.brandPrimary, c.onBrand),
+            DabblerButtonTone.secondary: (c.accent, c.onAccent),
+            DabblerButtonTone.accent: (DabblerButton.accentFill, c.surfaceCard),
+            DabblerButtonTone.neutral: (c.surfaceSunken, c.textPrimary),
+            DabblerButtonTone.filled: (c.textPrimary, c.surfaceCard),
+            DabblerButtonTone.outlined: (Colors.transparent, c.textPrimary),
+            DabblerButtonTone.text: (Colors.transparent, c.textPrimary),
+            DabblerButtonTone.destructive: (
+              c.error.solid,
+              DabblerPalette.paper,
+            ),
+            DabblerButtonTone.iconLabel: (c.surfaceSunken, c.textPrimary),
+            DabblerButtonTone.icon: (c.textPrimary, c.surfaceCard),
+          };
 
       for (final DabblerButtonTone tone in DabblerButtonTone.values) {
         await tester.pumpWidget(
@@ -168,7 +184,9 @@ void main() {
       }
     });
 
-    testWidgets('only `outlined` draws a hairline', (WidgetTester tester) async {
+    testWidgets('only `outlined` draws a hairline', (
+      WidgetTester tester,
+    ) async {
       final DabblerColors c = _colors();
       for (final DabblerButtonTone tone in DabblerButtonTone.values) {
         await tester.pumpWidget(
@@ -204,12 +222,21 @@ void main() {
             ),
           );
           final DabblerColors c = _colors(theme: theme, brightness: brightness);
-          expect(_surface(tester).fill, Colors.transparent,
-              reason: '${theme.name}/${brightness.name} fill');
-          expect(_surface(tester).borderColor, Colors.transparent,
-              reason: '${theme.name}/${brightness.name} border');
-          expect(_labelStyle(tester).color, c.textPrimary,
-              reason: '${theme.name}/${brightness.name} label');
+          expect(
+            _surface(tester).fill,
+            Colors.transparent,
+            reason: '${theme.name}/${brightness.name} fill',
+          );
+          expect(
+            _surface(tester).borderColor,
+            Colors.transparent,
+            reason: '${theme.name}/${brightness.name} border',
+          );
+          expect(
+            _labelStyle(tester).color,
+            c.textPrimary,
+            reason: '${theme.name}/${brightness.name} label',
+          );
         }
       }
     });
@@ -217,16 +244,24 @@ void main() {
     test('KAN-279 — `text` carries D-023(c) on the tone, not in a comment', () {
       // AC2: the affordance constraint has to be in the API surface a caller
       // reads, so it is asserted against the dartdoc rather than trusted.
-      final String doc = File('lib/src/controls/button.dart').readAsStringSync();
-      final int start = doc.indexOf('/// Transparent fill, `--ink` label, **no** hairline');
+      final String doc = File(
+        'lib/src/controls/button.dart',
+      ).readAsStringSync();
+      final int start = doc.indexOf(
+        '/// Transparent fill, `--ink` label, **no** hairline',
+      );
       final int end = doc.indexOf('  text,', start);
       expect(start, greaterThan(-1), reason: 'the `text` dartdoc is gone');
       expect(end, greaterThan(start));
       final String block = doc.substring(start, end);
       expect(block.contains('D-023(c)'), isTrue);
       expect(block.contains('Never the only action in a group'), isTrue);
-      expect(block.contains('Never the primary action, and never the destructive one'),
-          isTrue);
+      expect(
+        block.contains(
+          'Never the primary action, and never the destructive one',
+        ),
+        isTrue,
+      );
     });
 
     testWidgets('re-tints with the section theme', (WidgetTester tester) async {
@@ -357,8 +392,7 @@ void main() {
           matching: find.byType(Row),
         ),
       );
-      final SizedBox gap =
-          row.children.whereType<SizedBox>().single;
+      final SizedBox gap = row.children.whereType<SizedBox>().single;
       expect(gap.width, DabblerButton.iconGap);
       expect(gap.width, 8);
 
@@ -443,15 +477,18 @@ void main() {
       final DabblerColors c = _colors();
       expect(_surface(tester).fill, c.brandPrimary);
 
-      final TestGesture gesture =
-          await tester.startGesture(tester.getCenter(find.byType(DabblerButton)));
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.byType(DabblerButton)),
+      );
       await tester.pump();
       expect(
         _surface(tester).fill,
         Color.lerp(c.brandPrimary, Colors.black, DabblerButton.pressDarken),
       );
       expect(
-        tester.widget<DabblerPressScale>(find.byType(DabblerPressScale)).pressed,
+        tester
+            .widget<DabblerPressScale>(find.byType(DabblerPressScale))
+            .pressed,
         isTrue,
       );
       await gesture.up();
@@ -463,10 +500,11 @@ void main() {
       // The merge is the point of DS-400: 10 tones × 3 sizes are modifiers on
       // DabblerButton and nothing else is exported from the file.
       final String source = _code();
-      final Iterable<String> publicClasses = RegExp(r'^class (\w+)', multiLine: true)
-          .allMatches(source)
-          .map((RegExpMatch m) => m.group(1)!)
-          .where((String name) => !name.startsWith('_'));
+      final Iterable<String> publicClasses =
+          RegExp(r'^class (\w+)', multiLine: true)
+              .allMatches(source)
+              .map((RegExpMatch m) => m.group(1)!)
+              .where((String name) => !name.startsWith('_'));
       expect(publicClasses, <String>['DabblerButton']);
     });
   });
@@ -476,12 +514,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(
-          DabblerButton(label: 'joining', loading: true, onPressed: () {}),
-        ),
+        _host(DabblerButton(label: 'joining', loading: true, onPressed: () {})),
       );
-      final DabblerSpinner spinner =
-          tester.widget<DabblerSpinner>(find.byType(DabblerSpinner));
+      final DabblerSpinner spinner = tester.widget<DabblerSpinner>(
+        find.byType(DabblerSpinner),
+      );
       expect(spinner.size, DabblerSpinnerSize.sm);
       expect(spinner.tone, DabblerSpinnerTone.inherit);
       expect(spinner.size.diameter, DabblerSizing.iconSm);
@@ -493,7 +530,11 @@ void main() {
       int taps = 0;
       await tester.pumpWidget(
         _host(
-          DabblerButton(label: 'joining', loading: true, onPressed: () => taps++),
+          DabblerButton(
+            label: 'joining',
+            loading: true,
+            onPressed: () => taps++,
+          ),
         ),
       );
       await tester.tap(find.byType(DabblerButton));
@@ -607,8 +648,9 @@ void main() {
       await tester.pumpWidget(
         _host(DabblerButton(label: 'join', onPressed: () => taps++)),
       );
-      Focus.maybeOf(tester.element(find.byType(GestureDetector)))!
-          .requestFocus();
+      Focus.maybeOf(
+        tester.element(find.byType(GestureDetector)),
+      )!.requestFocus();
       await tester.pumpAndSettle();
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
@@ -646,16 +688,11 @@ void main() {
           ),
         ),
       );
-      expect(
-        tester.getSemantics(find.byType(DabblerButton)).label,
-        'More',
-      );
+      expect(tester.getSemantics(find.byType(DabblerButton)).label, 'More');
 
       // Disabled: no tap action, and not enabled.
       await tester.pumpWidget(
-        _host(
-          DabblerButton(label: 'join', disabled: true, onPressed: () {}),
-        ),
+        _host(DabblerButton(label: 'join', disabled: true, onPressed: () {})),
       );
       expect(
         tester.getSemantics(find.byType(DabblerButton)),
@@ -703,16 +740,21 @@ void main() {
         'ringWidth',
         'ringOffset',
       ]) {
-        expect(source.contains(forbidden), isFalse,
-            reason: 'DS-200 value `$forbidden` restated in button.dart');
+        expect(
+          source.contains(forbidden),
+          isFalse,
+          reason: 'DS-200 value `$forbidden` restated in button.dart',
+        );
       }
     });
 
     test('names no colour literal and no left/right', () {
       final String source = _code();
       expect(RegExp(r'Color\(0x').hasMatch(source), isFalse);
-      expect(RegExp(r'\bColors\.(?!transparent|black\b)').hasMatch(source),
-          isFalse);
+      expect(
+        RegExp(r'\bColors\.(?!transparent|black\b)').hasMatch(source),
+        isFalse,
+      );
       expect(RegExp(r'EdgeInsets\.only').hasMatch(source), isFalse);
       expect(RegExp(r'\bleft:|\bright:').hasMatch(source), isFalse);
     });
@@ -728,9 +770,13 @@ void main() {
       );
       final double icon = tester.getCenter(find.byType(DabblerIcon)).dx;
       final double label = tester.getCenter(find.byType(Text)).dx;
-      expect(icon, greaterThan(label),
-          reason: 'the leading slot is at the inline start, which is the right '
-              'under RTL');
+      expect(
+        icon,
+        greaterThan(label),
+        reason:
+            'the leading slot is at the inline start, which is the right '
+            'under RTL',
+      );
     });
 
     testWidgets('the label takes the Arabic face under RTL', (
@@ -797,9 +843,40 @@ void main() {
       expect(
         drawn,
         DabblerButtonTone.values.toSet(),
-        reason: 'a tone with no specimen is a tone a reader cannot check '
+        reason:
+            'a tone with no specimen is a tone a reader cannot check '
             'the implementation against',
       );
     });
+  });
+
+  testWidgets('a button shrink-wraps its label inside a Wrap (fit-content)', (
+    WidgetTester tester,
+  ) async {
+    // Live `Button.jsx`: `width: fullWidth ? '100%' : (s.width || 'fit-content')`.
+    // A bare Center in the surface used to stretch it to the whole line.
+    await tester.pumpWidget(
+      _host(
+        const SizedBox(
+          width: 400,
+          child: Wrap(
+            spacing: 9,
+            children: <Widget>[
+              DabblerButton(label: 'Confirm', onPressed: null),
+              DabblerButton(label: 'Cancel', onPressed: null),
+            ],
+          ),
+        ),
+      ),
+    );
+    final List<Rect> rects = tester
+        .widgetList<DabblerButton>(find.byType(DabblerButton))
+        .map((DabblerButton b) => tester.getRect(find.byWidget(b)))
+        .toList();
+    expect(rects[0].width, lessThan(200));
+    expect(rects[1].width, lessThan(200));
+    // Both fit on one line: 9px apart.
+    expect(rects[1].top, rects[0].top);
+    expect(rects[1].left - rects[0].right, 9);
   });
 }

@@ -19,14 +19,12 @@ Direction: NO section. TimePicker's own "RTL" note states explicitly
 # TimePicker
 ### `DabblerTimePicker`
 
-TimePicker is the hour, minute and meridiem picker that pairs with `Calendar` — two scrollable
-columns and a segmented AM/PM control, not the drag rulers the design source draws.
+TimePicker is the hour, minute and meridiem picker that pairs with `Calendar` — two horizontal
+drag rulers under a fixed centre window and a segmented AM/PM control, as the live design draws it.
 
-The value set, the default, the nearest-step fold and the Confirm/Cancel footer are all
-transcribed exactly. What isn't ported is the drag ruler: the design's own column is a
-pointer-driven strip with no keyboard path and no discrete target at all, so there's nothing to
-measure a touch target against. Each column is a real listbox instead — accessible rows with
-arrow-key navigation this widget drives — with the value semantics completely unchanged.
+The value set, the default, the nearest-step fold, the ruler geometry and the Confirm/Cancel footer
+are compared value-by-value against the live `TimePicker.jsx`. The ruler's source is pointer-only,
+so each ruler also takes arrow-key navigation, an adjustable accessibility role and tap-to-pick.
 
 ## Specimen
 
@@ -36,12 +34,10 @@ Hour, minute and period columns — see `calendar_gallery.dart`'s *TimePicker* s
 
 ## Using it
 
-**Never rebuild the design source's drag-ruler interaction on top of this component.** It was
-deliberately replaced, not merely reskinned — the ruler has no keyboard path and no measurable
-touch target, and reintroducing drag-only selection would reopen exactly the accessibility gap this
-component exists to close.
+**Keep the keyboard and tap paths when you restyle the rulers.** The live ruler has neither; they
+were added so the drag-only drawing stays reachable without a pointer.
 
-**Let Up/Down skip disabled values rather than landing on them.** A value outside `minimum`/
+**Let the arrow keys skip disabled values rather than landing on them.** A value outside `minimum`/
 `maximum` is skipped during arrow-key navigation, never selected and then rejected — build any
 custom navigation the same way if you extend this component.
 
@@ -65,9 +61,8 @@ selectable and then rejected.
 
 ## Tokens used
 
-Row label: `textPrimary` on the card surface. Selected row: `onBrand` on `brandPrimary`. Meridiem
-segment: `textPrimary` for the unselected state (a corrected deviation from a design value that
-failed contrast on this card).
+Numerals: `textPrimary` fading to 20% by distance, the centred numeral and the window in
+`brandPrimary`. Meridiem segment: `textSecondary` for the unselected state (the live `--muted`).
 
 ## Change log
 
@@ -75,9 +70,9 @@ failed contrast on this card).
   `Button` at `medium`, and rules the `text` tone this widget's action row uses. Shipped by
   KAN-279 (`a90a784`), which also deleted the `DabblerCalendarTextAction` stand-in. Pinned in
   `test/calendar/time_picker_test.dart`.
-- D-030 (cxo) — confirms no drawn ruler is required, because
-  the design bundle itself doesn't draw one — the listbox replacement above is not a deviation from
-  a requirement, it's the correct reading of what was actually specified.
+- Compared against live `TimePicker.jsx` (2026-10-02): the listbox columns that D-030 had read as
+  the correct specification were replaced by the live drag rulers (height 64, pitch 46, window,
+  pin, ticks, numeral opacity), keeping keyboard, semantics and tap. D-030 needs a `cxo` re-read.
 
 ## Source
 

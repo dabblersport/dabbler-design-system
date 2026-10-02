@@ -295,17 +295,15 @@ abstract final class DabblerCalendarMonth {
 /// |---|---|---|---|
 /// | Day in month | `--ink` | [DabblerColors.textPrimary] | 18.1:1 |
 /// | Selected day | `--color-on-brand` on `--color-brand-primary` | same | 8.6:1 (main) |
-/// | Weekday label | `--muted` | [DabblerColors.textPrimary] | **deviation**; see below |
+/// | Weekday label | `--muted` | [DabblerColors.textSecondary] | D-003(a): `--muted` text is `textSecondary`, which resolves to `--ink-soft` |
 /// | Outside day | `--subtle` | [DabblerColors.textSecondary] | **deviation**; 10.37:1 |
 ///
 /// **Weekday label.** `Calendar.jsx:50` sets the column labels in `--muted`
-/// (`#8C8C8C`), which measures **3.36:1** on `#FFFFFF` — below the 4.5:1 that
-/// WCAG 1.4.3 requires of text at 11px/600 (not large text, which starts at
-/// 18.66px bold). The labels are informative, not decorative, so no exemption
-/// applies and AC4 is explicit that contrast is *"verified before shipping,
-/// not deferred"*. They are set in [DabblerColors.textPrimary] instead. The
-/// token-level finding — `--muted` cannot carry AA body text on a card — is
-/// reported rather than patched here.
+/// (`#8C8C8C`) and so does this: `--muted` text is [DabblerColors.textSecondary]
+/// under D-003(a), which resolves to `--ink-soft` and clears 4.5:1 on the card
+/// where the raw `--muted` measures **3.36:1**. (This used to be set in
+/// [DabblerColors.textPrimary], a deviation from the live colour that D-003(a)
+/// made unnecessary.)
 ///
 /// **Outside day.** `Calendar.jsx:58` sets these in `--subtle`, which
 /// `DECISIONS.md` D-003 forbids as a text colour outright. They are set in
@@ -315,8 +313,10 @@ abstract final class DabblerCalendarMonth {
 /// longer needed: no text in this widget, interactive or not, is below 4.5:1.
 ///
 /// **Touch targets.** Every date cell is a target. Each is at least
-/// [DabblerSizing.touchTargetMin] (45) **tall** — `Calendar.jsx:55` says `39`,
-/// and the 45 is a **documented deviation** taken for AC4. Cell *width* is the
+/// [DabblerSizing.touchTargetMin] (45) **tall** — `Calendar.jsx:55` says `39`.
+/// The selection pill is *painted* at the live 39 ([cellPillHeight]) and the
+/// remaining 6px is hit area and row pitch only; the 45 pitch is the
+/// **documented deviation** taken for AC4. Cell *width* is the
 /// column width and is therefore set by the card, not by this file: seven
 /// columns, six [DabblerSpacing.space1] gutters and two
 /// [DabblerSpacing.space5] insets, i.e. `(cardWidth - 48) / 7`. That clears
@@ -373,6 +373,20 @@ class DabblerCalendar extends StatelessWidget {
   /// The chips' visual height, inside a [DabblerSizing.touchTargetMin] target
   /// (`Calendar.jsx:29`).
   static const double chipHeight = 30;
+
+  /// `gap: 4` between a chip's label and its caret (`Calendar.jsx:29`).
+  static const double chipGap = 4;
+
+  /// `<Icon name="arrow-down-1" size={14} />` — the caret in a month/year chip
+  /// (`Calendar.jsx:33`).
+  static const double chipCaretSize = 14;
+
+  /// `padding: '2px 0'` on a weekday column label (`Calendar.jsx:50`).
+  static const double weekdayLabelPadding = 2;
+
+  /// `height: 39` on a date cell (`Calendar.jsx:55`) — the *painted* height of
+  /// the selection pill. The hit target is [DabblerSizing.touchTargetMin].
+  static const double cellPillHeight = 39;
 
   /// `fontSize: 14` on a month/year chip (`Calendar.jsx:31`). Off the type
   /// ramp; transcribed.
@@ -685,9 +699,8 @@ class DabblerCalendar extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        // `gap: 4` — the nearest token is `--space-1` (3), which is what is
-        // used; 4 is not a step of the base-3 grid DS-104 defines.
-        spacing: DabblerSpacing.space1,
+        // `gap: 4` (`Calendar.jsx:29`), transcribed at its live value.
+        spacing: chipGap,
         children: <Widget>[
           Flexible(
             child: Text(
@@ -709,9 +722,8 @@ class DabblerCalendar extends StatelessWidget {
           ),
           DabblerIcon(
             'arrow-down-1',
-            // `size={14}` — the documented small step is 18; 14 is not one of
-            // DS-104's three icon sizes.
-            size: DabblerSizing.iconSm,
+            // `size={14}` (`Calendar.jsx:33`), transcribed at its live value.
+            size: chipCaretSize,
             color: colors.textPrimary,
           ),
         ],
@@ -764,18 +776,24 @@ class DabblerCalendar extends StatelessWidget {
               Expanded(
                 child: Semantics(
                   key: DabblerCalendar.weekdayKey(weekday),
-                  child: Text(
-                    labels[weekday] ?? '',
-                    textAlign: TextAlign.center,
-                    // `fontSize: 11, fontWeight: 600` (`Calendar.jsx:50`) —
-                    // `.t-caption-2` at semibold. The colour deviates; see
-                    // *Contrast and touch targets*.
-                    style: DabblerType.caption2
-                        .resolveForDirection(direction)
-                        .copyWith(
-                          color: colors.textPrimary,
-                          fontWeight: DabblerType.semibold,
-                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: weekdayLabelPadding,
+                    ),
+                    child: Text(
+                      labels[weekday] ?? '',
+                      textAlign: TextAlign.center,
+                      // `fontSize: 11, fontWeight: 600, color: var(--muted)`
+                      // (`Calendar.jsx:50`) — `.t-caption-2` at semibold, with
+                      // `--muted` text taken as [DabblerColors.textSecondary]
+                      // (D-003(a)).
+                      style: DabblerType.caption2
+                          .resolveForDirection(direction)
+                          .copyWith(
+                            color: colors.textSecondary,
+                            fontWeight: DabblerType.semibold,
+                          ),
+                    ),
                   ),
                 ),
               ),
@@ -807,9 +825,9 @@ class DabblerCalendar extends StatelessWidget {
         ? colors.textSecondary
         : colors.textPrimary;
 
-    final Widget square = Container(
-      // `height: 39` in the source; 45 here for AC4 — see the class doc.
-      height: DabblerSizing.touchTargetMin,
+    final Widget pill = Container(
+      // `height: 39` (`Calendar.jsx:55`) — the painted pill.
+      height: cellPillHeight,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: on ? colors.brandPrimary : null,
@@ -826,6 +844,12 @@ class DabblerCalendar extends StatelessWidget {
               fontWeight: on ? DabblerType.bold : DabblerType.medium,
             ),
       ),
+    );
+    // The row pitch stays [DabblerSizing.touchTargetMin] (AC4) while the pill
+    // is drawn at the live 39: the 3px each side is hit area, not paint.
+    final Widget square = SizedBox(
+      height: DabblerSizing.touchTargetMin,
+      child: Center(child: pill),
     );
 
     if (!selectable) {
