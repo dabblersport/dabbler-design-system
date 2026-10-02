@@ -16,6 +16,7 @@ import '../foundations/icon.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import 'messaging_auto_direction.dart';
 import 'messaging_foundations.dart';
 
 export 'messaging_shared_object_card.dart';
@@ -134,8 +135,9 @@ class DabblerMessageReplyReference extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
+                  DabblerAutoDirectionText(
                     sender,
+                    fill: true,
                     style: _t(
                       context,
                       DabblerType.caption2,
@@ -166,8 +168,9 @@ class DabblerMessageReplyReference extends StatelessWidget {
                       style: bodyStyle,
                     )
                   else
-                    Text(
+                    DabblerAutoDirectionText(
                       content ?? '',
+                      fill: true,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: bodyStyle,

@@ -148,6 +148,7 @@ export 'src/messaging/message_thread.dart';
 export 'src/messaging/message_thread_gallery.dart';
 export 'src/messaging/messaging_atoms.dart';
 export 'src/messaging/messaging_atoms_gallery.dart';
+export 'src/messaging/messaging_auto_direction.dart';
 export 'src/messaging/messaging_foundations.dart';
 export 'src/messaging/messaging_parts.dart';
 export 'src/messaging/messaging_parts_gallery.dart';

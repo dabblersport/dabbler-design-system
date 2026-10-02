@@ -6,6 +6,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
+import 'messaging_auto_direction.dart';
 import 'messaging_foundations.dart';
 import 'messaging_parts.dart';
 
@@ -356,7 +357,7 @@ class DabblerMessage extends StatelessWidget {
                   : SizedBox(width: objectWidth, child: attachment!.child),
             ),
           if (content != null && content!.isNotEmpty)
-            Text(
+            DabblerAutoDirectionText(
               content!,
               style: DabblerType.subheadline
                   .resolveForDirection(dir)

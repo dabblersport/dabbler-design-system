@@ -237,7 +237,7 @@ void main() {
                 ),
               ],
               chips: <String>[ar ? 'داخلي' : 'Indoor'],
-              footnote: ar ? '٨ من ١٠' : '8 of 10',
+              footnote: ar ? '8 من 10' : '8 of 10',
               cta: ar ? 'عرض' : 'View',
               onPress: () {},
             ),

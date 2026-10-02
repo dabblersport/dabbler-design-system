@@ -500,7 +500,7 @@ void main() {
                     groupPosition: p,
                     sender: ar ? 'ليلى' : 'Layla',
                     content: ar
-                        ? 'ملعب ٣ الليلة ${p.name}'
+                        ? 'ملعب 3 الليلة${p.name}'
                         : 'Pitch 3 ${p.name}',
                     timestamp: '17:10',
                   ),

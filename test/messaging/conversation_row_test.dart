@@ -133,7 +133,7 @@ void main() {
           const DabblerConversationRow(
             title: 'ليلى',
             preview: 'مرحبا',
-            timestamp: '١٧:٠٢',
+            timestamp: '17:02',
           ),
           direction: TextDirection.rtl,
         ),
@@ -145,7 +145,7 @@ void main() {
       expect(row.right - avatar.right, 18);
       expect(avatar.top - row.top, 12);
       expect(avatar.left - tester.getRect(find.text('ليلى')).right, 12);
-      expect(tester.getRect(find.text('١٧:٠٢')).left - row.left, 18);
+      expect(tester.getRect(find.text('17:02')).left - row.left, 18);
     });
 
     testWidgets(
@@ -156,14 +156,14 @@ void main() {
             const DabblerConversationRow(
               title: 'ليلى',
               preview: 'مرحبا',
-              timestamp: '١٧:٠٢',
+              timestamp: '17:02',
               kindLabel: 'مباراة',
             ),
             direction: TextDirection.rtl,
           ),
         );
         expect(_text(tester, 'ليلى').style!.fontSize, closeTo(14.1, 1e-9));
-        expect(_text(tester, '١٧:٠٢').style!.fontSize, closeTo(11.1, 1e-9));
+        expect(_text(tester, '17:02').style!.fontSize, closeTo(11.1, 1e-9));
         expect(_text(tester, 'مباراة').style!.fontSize, closeTo(10.1, 1e-9));
         final RichText preview = tester.widget<RichText>(
           find.byWidgetPredicate(
@@ -587,7 +587,7 @@ void main() {
           DabblerConversationRow(
             title: 'ليلى حداد',
             preview: 'أراك في الملعب!',
-            timestamp: '١٧:٠٢',
+            timestamp: '17:02',
             unread: 2,
             online: true,
           ),
@@ -607,7 +607,7 @@ void main() {
             sender: 'عمر',
             typing: true,
             typingLabel: 'عمر يكتب',
-            timestamp: '١٧:٠٢',
+            timestamp: '17:02',
             state: DabblerConversationState(
               label: 'مؤكد',
               status: DabblerStatusTone.success,
