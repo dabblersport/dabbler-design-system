@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart' show DayPeriod, TimeOfDay;
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyEvent, KeyRepeatEvent, LogicalKeyboardKey;
@@ -7,7 +9,7 @@ import '../controls/button.dart';
 import '../forms/time_field.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
-import '../overlays/menu.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -84,9 +86,10 @@ abstract final class DabblerTimeValues {
 /// TimePicker — the hour, minute and meridiem picker that pairs with
 /// [DabblerCalendar].
 ///
-/// Transcribed from `components/calendar/TimePicker.jsx`, `TimePicker.d.ts`,
-/// `TimePicker.prompt.md` and the specimen
-/// `components/calendar/calendar.card.html`.
+/// Transcribed from `components/calendar/TimePicker.jsx` in the live Claude
+/// Design project 4286affa-bf50-4ff6-9576-917f76a93ca1 (Dabbler Design System),
+/// read via DesignSync get_file on 2026-10-02 and transcribed to a local mirror
+/// by the coordinator.
 ///
 /// ```dart
 /// DabblerTimePicker(
@@ -97,88 +100,47 @@ abstract final class DabblerTimeValues {
 /// )
 /// ```
 ///
-/// ## What is transcribed, and the one thing that is not
+/// ## Source to Dart
 ///
-/// Kept exactly: the card shell (`--surface-card`, an 18px corner, 15px
-/// padding — `TimePicker.jsx:98`); the centred header showing the value and
-/// the AM/PM segmented pill (`:99-114`); the value set — twelve hours and
-/// twelve five-minute steps (`:80-81`); the default of `7:00 AM` (`:88`); the
-/// nearest-step fold (`:93`); and the Confirm / Cancel footer (`:116-124`).
+/// | Live (`TimePicker.jsx`) | Dart |
+/// |---|---|
+/// | card `--surface-card`, radius 18, padding 15, gap 10 (`:98`) | [cardRadius], [DabblerSpacing.space5], [cardGap] |
+/// | header `20 / 700` sans, gap 10 (`:99-101`) | [headerFontSize], [headerGap] |
+/// | meridiem pill, `1px --outline-card`, `4px 10px`, `12 / 700`, inactive `--muted` (`:104-112`) | [DabblerColors.textSecondary] for `--muted` (D-003(a)) |
+/// | `Ruler` height 64, pitch 46 (`:5`, `:56`) | [rulerHeight], [rulerPitch] |
+/// | tick strip bottom 6, height 14, `1.5px` ticks every `pitch / 4` (`:58-63`) | [tickBottom], [tickHeight], [tickWidth] |
+/// | numerals display face, 24 selected / 18 other, opacity `max(.2, 1 - dist * .3)` (`:66-70`) | [selectedFontSize], [otherFontSize], [minOpacity], [opacityStep] |
+/// | centre window: top/bottom 4, width `pitch + 14`, radius 12, `2px` brand, shadow `0 2px 8px rgba(0,0,0,.05)` (`:73-76`) | [windowInset], [windowExtra], [windowRadius], [windowBorder] |
+/// | pin: bottom 8, `2 x 16`, radius 1 (`:77-79`) | [pinBottom], [pinWidth], [pinHeight] |
+/// | track glide `200ms cubic-bezier(.2,.8,.2,1)` (`:14`) | [glide], [glideCurve] |
+/// | drag end: `shift = round(-dx / pitch)`, wraps modulo n (`:25-27`) | same |
+/// | hours `1..12`, minutes `i * 5` (`:80-81`), default `7 AM` (`:88`) | [DabblerTimeValues] |
 ///
-/// **Replaced: the two horizontal drag rulers.** `TimePicker.jsx:3-77` renders
-/// each column as a `Ruler` — a 64px-tall strip of numbers dragged left and
-/// right under a fixed centre window, driven entirely by `pointerdown` /
-/// `pointermove` / `pointerup`. It is not ported, for two reasons that are
-/// both this ticket's acceptance criteria:
+/// ## Additions beyond the source (accessibility)
 ///
-/// * **AC4.** The ruler has no keyboard path at all and no discrete target:
-///   a value is reached only by a pointer drag of `pitch` pixels, and the
-///   non-centre numbers are drawn at `opacity: Math.max(0.2, …)`, which is a
-///   contrast the token layer cannot state a ratio for. There is nothing to
-///   measure a 44×44 target against because there are no targets.
-/// * **AC2**, which names the composition to build instead: DS-700's
-///   [DabblerMenuList] at [DabblerMenuRole.listbox]. DS-700 widened that
-///   surface for exactly this component and says so — `DabblerSelect`'s own
-///   note records that the listbox form *"is still right for `TimePicker`,
-///   which genuinely owns its own container"*. Each column is therefore a real
-///   list of [DabblerMenuItem] rows: 45px targets, a visible selected state,
-///   [SemanticsRole.listItem] children, and arrow-key navigation this widget
-///   drives (see *Keyboard*).
+/// The source ruler is pointer-only. Kept on top of the faithful drawing:
 ///
-/// The *value semantics* are unchanged — same twelve hours, same twelve
-/// minutes, same meridiem control, same default, same nearest-step fold. What
-/// changed is how a finger or a keyboard reaches them.
+/// * **Keyboard.** Each ruler is one focus stop: Left/Down step to the previous
+///   enabled value, Right/Up to the next, Home/End jump to the first/last
+///   enabled value. Every move commits through [onChanged] at once, as the
+///   source does on pointer-up.
+/// * **Semantics.** A ruler is an adjustable node with increase/decrease
+///   actions and its two-digit value.
+/// * **Tap.** A tap picks the numeral under the finger, so a discrete target
+///   exists. The source's tap changes nothing.
 ///
-/// ## The seam to DS-602
+/// Values disabled by [minimum]/[maximum] are never committed (the source's
+/// `TimeField` `inBounds` guard, applied here where the value is chosen) and
+/// are skipped by the keys.
 ///
-/// The header renders through [DabblerTimeFormat.format], so the picker prints
-/// the field's own `H:MM AM` rather than a second format, and the value type is
-/// [TimeOfDay] — what `DabblerTimeField` already speaks, so the two need no
-/// adapter. A time field attaches this the same way a date field attaches
-/// [DabblerCalendar]: `onOpenPicker` raises the surface, `open` comes back so
-/// the field holds its border, and a picked time reports through the field's
-/// `onChanged`. Bounds on the picked path are this widget's
-/// ([minimum]/[maximum]) and are checked with [DabblerTimeFormat.inBounds] —
-/// DS-602's own predicate, not a second one.
+/// ## Remaining documented deviations
 ///
-/// ## Keyboard
-///
-/// [DabblerMenuList] at [DabblerMenuRole.listbox] *"is driven by its
-/// composer"* and deliberately handles no keys, so each column here is one
-/// focus stop — a native `<select>`, not a roving list — and this widget owns
-/// the keys:
-///
-/// * **Up / Down** move the selection to the previous or next **enabled**
-///   value, without wrapping. A value disabled by [minimum]/[maximum] is
-///   skipped, not landed on.
-/// * **Home / End** jump to the first and last enabled value.
-/// * Every move commits through [onChanged] immediately, which is what the
-///   source does too (`TimePicker.jsx:92` — `set()` fires on each change and
-///   there is no staged value).
-///
-/// ## RTL (AC3)
-///
-/// The two columns and the AM/PM pill are [Row]s, so [TextDirection.rtl]
-/// mirrors their order for free: the hour column sits on the right, which is
-/// where a right-to-left reader starts. Nothing in this file reverses a list,
-/// and nothing is keyed off direction. Every number is rendered through
-/// [DabblerTimeFormat.format] or [DabblerType.toWesternDigits], so the digits
-/// are Western Arabic in both scripts (DS-103a) — and the meridiem stays the
-/// literal `AM`/`PM`, which `TimeField.prompt.md` calls *"the product's own
-/// format"* in both scripts and [DabblerTimeFormat] already carries as
-/// constants.
-///
-/// ## Touch targets and contrast (AC4)
-///
-/// Every value row is a [DabblerMenuItem], whose minimum height is
-/// [DabblerSizing.touchTargetMin] (45). The meridiem segments are the source's
-/// `4px 10px` visual inside a 45px target. Row labels are
-/// [DabblerColors.textPrimary] on [DabblerColors.surfaceCard] (18.1:1); the
-/// selected row is [DabblerColors.onBrand] on [DabblerColors.brandPrimary]
-/// (8.6:1 on `main`). `TimePicker.jsx:112` sets the *unselected* meridiem
-/// segment in `--muted`, which measures 3.36:1 and is a **documented
-/// deviation** for the same reason [DabblerCalendar]'s weekday labels are:
-/// it is set in [DabblerColors.textPrimary] here.
+/// * The meridiem segments keep a [DabblerSizing.touchTargetMin] (45) minimum
+///   height; the live `4px 10px` pill paints 24 tall.
+/// * Confirm / Cancel are [DabblerButton]s (D-023), not the live 40px spans.
+/// * The ruler is drawn in a left-to-right frame in both directions: it is a
+///   scale (numbers ascend to the right), exactly as the physical CSS is. The
+///   numerals use the Arabic size (Latin less 0.9px) under RTL.
 class DabblerTimePicker extends StatefulWidget {
   /// Creates a time picker.
   const DabblerTimePicker({
@@ -196,18 +158,76 @@ class DabblerTimePicker extends StatefulWidget {
     this.hourColumnLabel = defaultHourColumnLabel,
     this.minuteColumnLabel = defaultMinuteColumnLabel,
     this.periodLabel = defaultPeriodLabel,
-    this.visibleRows = defaultVisibleRows,
-  }) : assert(minuteStep > 0 && minuteStep <= 60, 'minuteStep must be 1..60'),
-       assert(visibleRows > 0, 'visibleRows must be positive');
+  }) : assert(minuteStep > 0 && minuteStep <= 60, 'minuteStep must be 1..60');
 
-  /// `border-radius: 18` on the card (`TimePicker.jsx:98`) — the same shell as
-  /// [DabblerCalendar], and the same constant.
+  /// `border-radius: 18` (`TimePicker.jsx:98`).
   static const double cardRadius = DabblerCalendar.cardRadius;
 
-  /// How many rows a column shows before it scrolls. Not a source value — the
-  /// ruler showed a fixed 64px strip and had no row concept. Three keeps the
-  /// picker roughly the ruler's height while leaving the selection centred.
-  static const int defaultVisibleRows = 3;
+  /// `gap: 10` between the card's rows (`TimePicker.jsx:98`).
+  static const double cardGap = 10;
+
+  /// `gap: 10` between the value and the meridiem pill (`:99`).
+  static const double headerGap = 10;
+
+  /// `fontSize: 20` of the header value (`:101`).
+  static const double headerFontSize = 20;
+
+  /// `height: 64` of a ruler (`:56`).
+  static const double rulerHeight = 64;
+
+  /// `pitch = 46` — the width of one numeral cell (`:3`).
+  static const double rulerPitch = 46;
+
+  /// Tick strip `bottom: 6` (`:58`).
+  static const double tickBottom = 6;
+
+  /// Tick strip `height: 14` (`:58`).
+  static const double tickHeight = 14;
+
+  /// Tick width `1.5px` (`:62`).
+  static const double tickWidth = 1.5;
+
+  /// Numeral size when centred (`:66`).
+  static const double selectedFontSize = 24;
+
+  /// Numeral size when not centred (`:66`).
+  static const double otherFontSize = 18;
+
+  /// Opacity floor of a non-centre numeral (`:62`).
+  static const double minOpacity = 0.2;
+
+  /// Opacity lost per cell of distance (`:62`).
+  static const double opacityStep = 0.3;
+
+  /// Window `top: 4; bottom: 4` (`:73`).
+  static const double windowInset = 4;
+
+  /// Window width is `pitch + 14` (`:73`).
+  static const double windowExtra = 14;
+
+  /// Window `borderRadius: 12` (`:74`).
+  static const double windowRadius = 12;
+
+  /// Window `border: 2px solid brand` (`:74`).
+  static const double windowBorder = 2;
+
+  /// Window shadow alpha, `rgba(0,0,0,0.05)` (`:75`).
+  static const double windowShadowAlpha = 0.05;
+
+  /// Pin `bottom: 8` (`:77`).
+  static const double pinBottom = 8;
+
+  /// Pin `width: 2` (`:77`).
+  static const double pinWidth = 2;
+
+  /// Pin `height: 16` (`:77`).
+  static const double pinHeight = 16;
+
+  /// Track transition `200ms` (`:14`).
+  static const Duration glide = Duration(milliseconds: 200);
+
+  /// Track transition `cubic-bezier(.2,.8,.2,1)` (`:14`).
+  static const Cubic glideCurve = Cubic(0.2, 0.8, 0.2, 1);
 
   /// The hour column's accessible name.
   static const String defaultHourColumnLabel = 'Hour';
@@ -218,10 +238,10 @@ class DabblerTimePicker extends StatefulWidget {
   /// The meridiem control's accessible name.
   static const String defaultPeriodLabel = 'AM or PM';
 
-  /// The key of the hour column.
+  /// The key of the hour ruler.
   static const Key hourColumnKey = ValueKey<String>('DabblerTimePicker.hours');
 
-  /// The key of the minute column.
+  /// The key of the minute ruler.
   static const Key minuteColumnKey = ValueKey<String>(
     'DabblerTimePicker.minutes',
   );
@@ -241,35 +261,30 @@ class DabblerTimePicker extends StatefulWidget {
   /// The key of the cancel action.
   static const Key cancelKey = ValueKey<String>('DabblerTimePicker.cancel');
 
+  /// The key of the track inside the ruler keyed [columnKey].
+  static Key trackKey(Key columnKey) =>
+      ValueKey<String>('${(columnKey as ValueKey<String>).value}.track');
+
+  /// The key of the numeral cell at absolute index [absIdx] of [columnKey].
+  static Key cellKey(Key columnKey, int absIdx) =>
+      ValueKey<String>('${(columnKey as ValueKey<String>).value}.cell.$absIdx');
+
   /// The chosen time. Null shows [DabblerTimeValues.defaultValue].
-  ///
-  /// `TimePicker.d.ts:5-7` splits it into `hour`, `minute` and `period`. One
-  /// [TimeOfDay] replaces the three — **documented deviation**, for the reason
-  /// DS-602 gives for its own value type: it is what a Flutter time field
-  /// already speaks, so the seam needs no adapter, and three loose fields
-  /// admit combinations (`hour: 0`, `period: 'PM'`) that the type does not.
   final TimeOfDay? value;
 
   /// Called on every change — hour, minute or meridiem.
   final ValueChanged<TimeOfDay>? onChanged;
 
-  /// The minute column's step. 5 in the source.
+  /// The minute ruler's step. 5 in the source.
   final int minuteStep;
 
-  /// The earliest selectable time, inclusive. A value before it renders
-  /// disabled and is skipped by the arrow keys.
-  ///
-  /// Not in `TimePicker.jsx`, which has no bounds. `TimeField.jsx:52-58` has
-  /// them on the typed path and leaves the picked path to the picker's owner,
-  /// which is this widget. The predicate is
-  /// [DabblerTimeFormat.inBounds].
+  /// The earliest selectable time, inclusive.
   final TimeOfDay? minimum;
 
-  /// The latest selectable time, inclusive. See [minimum].
+  /// The latest selectable time, inclusive.
   final TimeOfDay? maximum;
 
-  /// Whether to draw the Confirm / Cancel row. `showActions` —
-  /// `TimePicker.d.ts:12`, default true.
+  /// Whether to draw the Confirm / Cancel row.
   final bool showActions;
 
   /// Fired by Confirm.
@@ -284,17 +299,14 @@ class DabblerTimePicker extends StatefulWidget {
   /// The Cancel label.
   final String cancelLabel;
 
-  /// The hour column's accessible name.
+  /// The hour ruler's accessible name.
   final String hourColumnLabel;
 
-  /// The minute column's accessible name.
+  /// The minute ruler's accessible name.
   final String minuteColumnLabel;
 
   /// The meridiem control's accessible name.
   final String periodLabel;
-
-  /// How many rows a column shows before it scrolls.
-  final int visibleRows;
 
   /// The value in force: [value], or [DabblerTimeValues.defaultValue].
   TimeOfDay get effectiveValue => value ?? DabblerTimeValues.defaultValue;
@@ -316,62 +328,42 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        // `background: var(--surface-card)`, `border-radius: 18`
-        // (`TimePicker.jsx:98`). Flat.
         color: colors.surfaceCard,
         borderRadius: const BorderRadius.all(
           Radius.circular(DabblerTimePicker.cardRadius),
         ),
       ),
       child: Padding(
-        // `padding: 15` — `--space-5`.
         padding: const EdgeInsets.all(DabblerSpacing.space5),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          // `gap: 10` (`TimePicker.jsx:98`). The nearest base-3 step is
-          // `--space-3` (9), which is what DS-104 says to round to.
-          spacing: DabblerSpacing.space3,
+          spacing: DabblerTimePicker.cardGap,
           children: <Widget>[
             _header(colors, direction, value),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: DabblerSpacing.space3,
-              children: <Widget>[
-                Expanded(
-                  child: _ValueColumn(
-                    key: DabblerTimePicker.hourColumnKey,
-                    label: widget.hourColumnLabel,
-                    values: DabblerTimeValues.hours,
-                    selected: DabblerTimeValues.hourOfPeriodOf(value),
-                    enabledOf: (int hour) => widget.isAllowed(
-                      DabblerTimeValues.withHourOfPeriod(value, hour),
-                    ),
-                    onSelected: (int hour) => _commit(
-                      DabblerTimeValues.withHourOfPeriod(value, hour),
-                    ),
-                    visibleRows: widget.visibleRows,
-                  ),
-                ),
-                Expanded(
-                  child: _ValueColumn(
-                    key: DabblerTimePicker.minuteColumnKey,
-                    label: widget.minuteColumnLabel,
-                    values: DabblerTimeValues.minutesFor(widget.minuteStep),
-                    selected: DabblerTimeValues.nearestMinute(
-                      value.minute,
-                      widget.minuteStep,
-                    ),
-                    enabledOf: (int minute) => widget.isAllowed(
-                      DabblerTimeValues.withMinute(value, minute),
-                    ),
-                    onSelected: (int minute) =>
-                        _commit(DabblerTimeValues.withMinute(value, minute)),
-                    visibleRows: widget.visibleRows,
-                    padded: true,
-                  ),
-                ),
-              ],
+            _TimeRuler(
+              key: DabblerTimePicker.hourColumnKey,
+              label: widget.hourColumnLabel,
+              values: DabblerTimeValues.hours,
+              selected: DabblerTimeValues.hourOfPeriodOf(value),
+              enabledOf: (int hour) => widget.isAllowed(
+                DabblerTimeValues.withHourOfPeriod(value, hour),
+              ),
+              onSelected: (int hour) =>
+                  _commit(DabblerTimeValues.withHourOfPeriod(value, hour)),
+            ),
+            _TimeRuler(
+              key: DabblerTimePicker.minuteColumnKey,
+              label: widget.minuteColumnLabel,
+              values: DabblerTimeValues.minutesFor(widget.minuteStep),
+              selected: DabblerTimeValues.nearestMinute(
+                value.minute,
+                widget.minuteStep,
+              ),
+              enabledOf: (int minute) =>
+                  widget.isAllowed(DabblerTimeValues.withMinute(value, minute)),
+              onSelected: (int minute) =>
+                  _commit(DabblerTimeValues.withMinute(value, minute)),
             ),
             if (widget.showActions) _actions(),
           ],
@@ -387,29 +379,28 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
     widget.onChanged?.call(next);
   }
 
-  /// `TimePicker.jsx:99-114` — the formatted value and the AM/PM pill,
-  /// centred.
   Widget _header(
     DabblerColors colors,
     TextDirection direction,
     TimeOfDay value,
   ) {
+    final bool rtl = direction == TextDirection.rtl;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      spacing: DabblerSpacing.space3,
+      spacing: DabblerTimePicker.headerGap,
       children: <Widget>[
         Text(
           DabblerTimeFormat.format(value),
           key: DabblerTimePicker.valueKey,
-          // `fontSize: 20, fontWeight: 700` (`TimePicker.jsx:101`). The sans
-          // ramp's nearest step is `.t-title-3` (20) — but title-3 is a
-          // *display*-role style, and a numeric readout set in Gloock/Wingx is
-          // not what the source asks for (`font-family: var(--font-sans)`).
-          // `.t-headline` (17, sans, semibold) is the nearest **sans** step,
-          // taken at bold.
+          // `H:MM AM` is the product's own format in both scripts; under an RTL
+          // paragraph the bidi algorithm would draw `PM 6:35`.
+          textDirection: TextDirection.ltr,
+          // `fontSize: 20, fontWeight: 700`, sans (`TimePicker.jsx:101`);
+          // Arabic size is Latin less 0.9.
           style: DabblerType.headline
               .resolveForDirection(direction)
               .copyWith(
+                fontSize: DabblerTimePicker.headerFontSize - (rtl ? 0.9 : 0),
                 color: colors.textPrimary,
                 fontWeight: DabblerType.bold,
               ),
@@ -419,7 +410,6 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
     );
   }
 
-  /// The two-segment meridiem control — `TimePicker.jsx:104-113`.
   Widget _periodPill(
     DabblerColors colors,
     TextDirection direction,
@@ -429,7 +419,6 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
       container: true,
       label: widget.periodLabel,
       child: ClipRRect(
-        // `border-radius: 999; overflow: hidden` (`TimePicker.jsx:104`).
         borderRadius: DabblerRadius.pillAll,
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -486,22 +475,21 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
           onTap: onPressed,
           child: DabblerPressScale.gesture(
             child: Container(
-              // `padding: '4px 10px'` (`TimePicker.jsx:107`) inside a 45px
-              // target — AC4, exactly as [DabblerCalendar]'s chips.
               constraints: const BoxConstraints(
                 minHeight: DabblerSizing.touchTargetMin,
                 minWidth: DabblerSizing.touchTargetMin,
               ),
+              // `padding: '4px 10px'` (`TimePicker.jsx:107`).
               padding: const EdgeInsetsDirectional.symmetric(horizontal: 10),
               alignment: Alignment.center,
               color: on ? colors.brandPrimary : null,
               child: Text(
                 label,
-                // `fontSize: 12, fontWeight: 700` — `.t-caption-1` at bold.
+                // `12 / 700`; inactive `--muted` (`:107-111`).
                 style: DabblerType.caption1
                     .resolveForDirection(direction)
                     .copyWith(
-                      color: on ? colors.onBrand : colors.textPrimary,
+                      color: on ? colors.onBrand : colors.textSecondary,
                       fontWeight: DabblerType.bold,
                     ),
               ),
@@ -512,11 +500,7 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
     );
   }
 
-  /// Confirm / Cancel — `TimePicker.jsx:116-124`, centred rather than
-  /// start-aligned, which is the one layout difference the source keeps
-  /// between the two components.
   Widget _actions() {
-    // A [Wrap] for the reason [DabblerCalendar]'s footer is one.
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: DabblerSpacing.space3,
@@ -541,22 +525,16 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
   }
 }
 
-/// One value column: a [DabblerMenuList] at [DabblerMenuRole.listbox], bounded
-/// to [visibleRows] rows, with its selection scrolled into view and the arrow
-/// keys driven from here.
-///
-/// See [DabblerTimePicker] → *Keyboard* for why the keys are this widget's and
-/// not the list's.
-class _ValueColumn extends StatefulWidget {
-  const _ValueColumn({
+/// The `Ruler` of `TimePicker.jsx:3-77`: a looping strip of numerals under a
+/// fixed centre window, dragged horizontally.
+class _TimeRuler extends StatefulWidget {
+  const _TimeRuler({
     super.key,
     required this.label,
     required this.values,
     required this.selected,
     required this.enabledOf,
     required this.onSelected,
-    required this.visibleRows,
-    this.padded = false,
   });
 
   final String label;
@@ -564,174 +542,353 @@ class _ValueColumn extends StatefulWidget {
   final int selected;
   final bool Function(int) enabledOf;
   final ValueChanged<int> onSelected;
-  final int visibleRows;
-
-  /// Whether to zero-pad the label to two digits.
-  ///
-  /// `TimePicker.jsx:68` pads **both** columns — `String(c.val).padStart(2)`.
-  /// The hour column is not padded here, so the column and
-  /// [DabblerTimeFormat.format] agree: that formatter prints `7:05 PM`, not
-  /// `07:05 PM` (`TimeField.jsx:14` — the hour is not padded), and a picker
-  /// showing `07` beside a field showing `7` is two formats for one value.
-  final bool padded;
-
-  /// The row height a [DabblerMenuItem] lays out at — its `minHeight`.
-  static const double rowExtent = DabblerSizing.touchTargetMin;
 
   @override
-  State<_ValueColumn> createState() => _ValueColumnState();
+  State<_TimeRuler> createState() => _TimeRulerState();
 }
 
-class _ValueColumnState extends State<_ValueColumn> {
-  final ScrollController _controller = ScrollController();
-  final FocusNode _node = FocusNode(debugLabel: 'DabblerTimePicker column');
+class _TimeRulerState extends State<_TimeRuler> {
+  final FocusNode _node = FocusNode(debugLabel: 'DabblerTimePicker ruler');
+  double _dragPx = 0;
+  bool _dragging = false;
   bool _focused = false;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _revealSelected());
-  }
-
-  @override
-  void didUpdateWidget(_ValueColumn oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.selected != oldWidget.selected) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _revealSelected());
-    }
-  }
+  int get _n => widget.values.length;
+  int get _idx => math.max(0, widget.values.indexOf(widget.selected));
 
   @override
   void dispose() {
-    _controller.dispose();
     _node.dispose();
     super.dispose();
   }
 
-  /// Puts the selected row in the middle of the window.
-  ///
-  /// Arithmetic rather than [Scrollable.ensureVisible] because the rows live
-  /// inside [DabblerMenuList] and this widget holds no handle on their
-  /// contexts. Every row is exactly [_ValueColumn.rowExtent] tall — a
-  /// [DabblerMenuItem]'s `minHeight`, asserted by this ticket's tests — so the
-  /// offset is an index times that, clamped to the real extent.
-  void _revealSelected() {
-    if (!_controller.hasClients) {
-      return;
+  void _pick(int index) {
+    final int wrapped = ((index % _n) + _n) % _n;
+    final int v = widget.values[wrapped];
+    if (widget.enabledOf(v)) {
+      widget.onSelected(v);
     }
-    final int index = widget.values.indexOf(widget.selected);
-    if (index < 0) {
-      return;
-    }
-    final double centred =
-        (index - (widget.visibleRows - 1) / 2) * _ValueColumn.rowExtent;
-    _controller.jumpTo(centred.clamp(0, _controller.position.maxScrollExtent));
   }
 
-  /// The indices of the values a key may land on.
   List<int> get _enabled => <int>[
-    for (int i = 0; i < widget.values.length; i++)
+    for (int i = 0; i < _n; i++)
       if (widget.enabledOf(widget.values[i])) i,
   ];
 
-  KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
+  void _step(int direction) {
+    final List<int> enabled = _enabled;
+    if (enabled.isEmpty) {
+      return;
+    }
+    final int? next = direction > 0
+        ? enabled.where((int i) => i > _idx).firstOrNull
+        : enabled.where((int i) => i < _idx).lastOrNull;
+    if (next != null) {
+      widget.onSelected(widget.values[next]);
+    }
+  }
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
-    final List<int> enabled = _enabled;
-    if (enabled.isEmpty) {
+    final LogicalKeyboardKey key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowRight ||
+        key == LogicalKeyboardKey.arrowUp) {
+      _step(1);
+    } else if (key == LogicalKeyboardKey.arrowLeft ||
+        key == LogicalKeyboardKey.arrowDown) {
+      _step(-1);
+    } else if (key == LogicalKeyboardKey.home) {
+      final List<int> e = _enabled;
+      if (e.isNotEmpty) {
+        widget.onSelected(widget.values[e.first]);
+      }
+    } else if (key == LogicalKeyboardKey.end) {
+      final List<int> e = _enabled;
+      if (e.isNotEmpty) {
+        widget.onSelected(widget.values[e.last]);
+      }
+    } else {
       return KeyEventResult.ignored;
     }
-    final LogicalKeyboardKey key = event.logicalKey;
-    final int current = widget.values.indexOf(widget.selected);
-    if (key == LogicalKeyboardKey.arrowDown) {
-      final int? next = enabled.where((int i) => i > current).firstOrNull;
-      if (next != null) {
-        widget.onSelected(widget.values[next]);
-      }
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.arrowUp) {
-      final int? prev = enabled.where((int i) => i < current).lastOrNull;
-      if (prev != null) {
-        widget.onSelected(widget.values[prev]);
-      }
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.home) {
-      widget.onSelected(widget.values[enabled.first]);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.end) {
-      widget.onSelected(widget.values[enabled.last]);
-      return KeyEventResult.handled;
-    }
-    return KeyEventResult.ignored;
+    return KeyEventResult.handled;
   }
 
-  String _labelOf(int value) {
-    final String digits = widget.padded
-        ? value.toString().padLeft(2, '0')
-        : value.toString();
-    return DabblerType.toWesternDigits(digits);
+  void _dragEnd() {
+    final int shift = (-_dragPx / DabblerTimePicker.rulerPitch).round();
+    setState(() {
+      _dragPx = 0;
+      _dragging = false;
+    });
+    _pick(_idx + shift);
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<DabblerMenuEntry> entries = <DabblerMenuEntry>[
-      for (final int value in widget.values)
-        DabblerMenuEntry(
-          id: '$value',
-          label: _labelOf(value),
-          selected: value == widget.selected,
-          disabled: !widget.enabledOf(value),
-        ),
-    ];
+    final DabblerColors colors = DabblerColors.of(context);
+    final TextDirection direction = Directionality.of(context);
+    final bool rtl = direction == TextDirection.rtl;
+    const double pitch = DabblerTimePicker.rulerPitch;
+    final int n = _n;
+    final int trackLen = n * 3;
+    final int centerAbs = n + _idx;
+    final double translate = -(centerAbs * pitch + pitch / 2) + _dragPx;
+    final Duration duration = (_dragging || DabblerMotion.reduceMotion(context))
+        ? Duration.zero
+        : DabblerTimePicker.glide;
+    final String valueText = DabblerType.toWesternDigits(
+      widget.selected.toString().padLeft(2, '0'),
+    );
 
-    // The ring is driven by this widget's own [Focus] rather than by a
-    // self-driven [DabblerFocusRing]: the column is one focus stop, and it has
-    // to be *this* node that receives the key events, so the ring cannot be
-    // the thing that owns focus.
-    return Listener(
-      // Pointer-down focus: a pointer user who taps into a column can then
-      // arrow through it, which is what a native `<select>` does and what
-      // makes the keyboard path reachable without a Tab-from-the-top.
-      onPointerDown: (PointerDownEvent _) => _node.requestFocus(),
+    final TextStyle base = DabblerType.title3.resolveForDirection(direction);
+
+    Widget ruler = LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints box) {
+        final double w = box.maxWidth;
+        return SizedBox(
+          height: DabblerTimePicker.rulerHeight,
+          width: w,
+          child: ClipRect(
+            child: Directionality(
+              // A scale: ascends to the right in both directions.
+              textDirection: TextDirection.ltr,
+              child: Stack(
+                children: <Widget>[
+                  // The window's outer shadow, painted first. CSS clips an outer
+                  // `box-shadow` to outside the border box, so the box under the
+                  // numerals is an opaque card-coloured fill that the shadow
+                  // cannot show through, and the ticks and numerals draw above.
+                  Positioned(
+                    left: (w - (pitch + DabblerTimePicker.windowExtra)) / 2,
+                    top: DabblerTimePicker.windowInset,
+                    bottom: DabblerTimePicker.windowInset,
+                    width: pitch + DabblerTimePicker.windowExtra,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colors.surfaceCard,
+                        borderRadius: BorderRadius.circular(
+                          DabblerTimePicker.windowRadius,
+                        ),
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            // `0 2px 8px rgba(0,0,0,0.05)` — ink at 5%.
+                            color: colors.textPrimary.withValues(
+                              alpha: DabblerTimePicker.windowShadowAlpha,
+                            ),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: w / 2,
+                    bottom: DabblerTimePicker.tickBottom,
+                    height: DabblerTimePicker.tickHeight,
+                    width: trackLen * pitch,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(end: translate),
+                      duration: duration,
+                      curve: DabblerTimePicker.glideCurve,
+                      builder: (BuildContext c, double t, Widget? _) =>
+                          Transform.translate(
+                            offset: Offset(t, 0),
+                            child: CustomPaint(
+                              painter: _TickPainter(
+                                color: colors.borderDefault,
+                                period: pitch / 4,
+                              ),
+                            ),
+                          ),
+                    ),
+                  ),
+                  Positioned(
+                    left: w / 2,
+                    top: 0,
+                    height: DabblerTimePicker.rulerHeight,
+                    width: trackLen * pitch,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(end: translate),
+                      duration: duration,
+                      curve: DabblerTimePicker.glideCurve,
+                      builder: (BuildContext c, double t, Widget? _) =>
+                          Transform.translate(
+                            key: DabblerTimePicker.trackKey(widget.key!),
+                            offset: Offset(t, 0),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: <Widget>[
+                                for (int i = 0; i < trackLen; i++)
+                                  _cell(
+                                    colors,
+                                    base,
+                                    rtl,
+                                    i,
+                                    (i - centerAbs).abs(),
+                                    pitch,
+                                  ),
+                              ],
+                            ),
+                          ),
+                    ),
+                  ),
+                  Positioned(
+                    left: (w - (pitch + DabblerTimePicker.windowExtra)) / 2,
+                    top: DabblerTimePicker.windowInset,
+                    bottom: DabblerTimePicker.windowInset,
+                    width: pitch + DabblerTimePicker.windowExtra,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            DabblerTimePicker.windowRadius,
+                          ),
+                          border: Border.all(
+                            color: colors.brandPrimary,
+                            width: DabblerTimePicker.windowBorder,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: (w - DabblerTimePicker.pinWidth) / 2,
+                    bottom: DabblerTimePicker.pinBottom,
+                    width: DabblerTimePicker.pinWidth,
+                    height: DabblerTimePicker.pinHeight,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colors.brandPrimary,
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    ruler = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragStart: (DragStartDetails d) {
+        _node.requestFocus();
+        setState(() => _dragging = true);
+      },
+      onHorizontalDragUpdate: (DragUpdateDetails d) =>
+          setState(() => _dragPx += d.delta.dx),
+      onHorizontalDragEnd: (DragEndDetails d) => _dragEnd(),
+      onHorizontalDragCancel: () => setState(() {
+        _dragPx = 0;
+        _dragging = false;
+      }),
+      onTapUp: (TapUpDetails d) {
+        _node.requestFocus();
+        final RenderBox box = context.findRenderObject()! as RenderBox;
+        final double dx = d.localPosition.dx - box.size.width / 2;
+        _pick(_idx + (dx / pitch).round());
+      },
+      child: ruler,
+    );
+
+    return Semantics(
+      container: true,
+      label: widget.label,
+      value: valueText,
+      increasedValue: valueText,
+      decreasedValue: valueText,
+      onIncrease: () => _step(1),
+      onDecrease: () => _step(-1),
       child: Focus(
         focusNode: _node,
-        onKeyEvent: _handleKey,
-        onFocusChange: (bool focused) => setState(() => _focused = focused),
-        child: DabblerFocusRing.visible(
-          visible: _focused,
-          borderRadius: DabblerRadius.lgAll,
-          child: SizedBox(
-            height: _ValueColumn.rowExtent * widget.visibleRows,
-            // [DabblerMenuList.controller] hands this controller straight to
-            // the list's internal `SingleChildScrollView`, which is what lets
-            // [_revealSelected] move it. This used to go through a
-            // [PrimaryScrollController] wrapper with
-            // `automaticallyInheritForPlatforms: TargetPlatform.values` — the
-            // list had no controller parameter of its own, so the only route
-            // in was ambient inheritance. KAN-278 added the parameter and the
-            // wrapper came out with it: the composer now drives the list
-            // directly, which is the composition this widget was designed for.
-            child: DabblerMenuList(
-              items: entries,
-              controller: _controller,
-              label: widget.label,
-              role: DabblerMenuRole.listbox,
-              // The column draws no card of its own: it sits inside the
-              // picker's card, exactly as a list inside a Sheet does
-              // (`DabblerMenuList.decorated`). This also keeps every row at
-              // exactly `rowExtent`, which [_revealSelected] depends on.
-              decorated: false,
-              autofocus: false,
-              onSelected: (DabblerMenuEntry entry) =>
-                  widget.onSelected(int.parse(entry.id!)),
+        onKeyEvent: _onKey,
+        onFocusChange: (bool f) => setState(() => _focused = f),
+        child: MouseRegion(
+          cursor: _dragging
+              ? SystemMouseCursors.grabbing
+              : SystemMouseCursors.grab,
+          child: DabblerFocusRing.visible(
+            visible: _focused,
+            borderRadius: DabblerRadius.lgAll,
+            child: ExcludeSemantics(child: ruler),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _cell(
+    DabblerColors colors,
+    TextStyle base,
+    bool rtl,
+    int absIdx,
+    int dist,
+    double pitch,
+  ) {
+    final bool on = dist == 0;
+    final double opacity = on
+        ? 1
+        : math.max(
+            DabblerTimePicker.minOpacity,
+            1 - dist * DabblerTimePicker.opacityStep,
+          );
+    final double size =
+        (on
+            ? DabblerTimePicker.selectedFontSize
+            : DabblerTimePicker.otherFontSize) -
+        (rtl ? 0.9 : 0);
+    return Positioned(
+      left: absIdx * pitch,
+      width: pitch,
+      top: 0,
+      bottom: 0,
+      child: IgnorePointer(
+        child: Center(
+          child: Text(
+            DabblerType.toWesternDigits(
+              widget.values[absIdx % _n].toString().padLeft(2, '0'),
+            ),
+            key: DabblerTimePicker.cellKey(widget.key!, absIdx),
+            style: base.copyWith(
+              fontSize: size,
+              height: 1,
+              fontWeight: DabblerType.regular,
+              color: (on ? colors.brandPrimary : colors.textPrimary).withValues(
+                alpha: opacity,
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+/// `repeating-linear-gradient(to right, c 0 1.5px, transparent 1.5px period)`.
+class _TickPainter extends CustomPainter {
+  const _TickPainter({required this.color, required this.period});
+
+  final Color color;
+  final double period;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()..color = color;
+    for (double x = 0; x < size.width; x += period) {
+      canvas.drawRect(
+        Rect.fromLTWH(x, 0, DabblerTimePicker.tickWidth, size.height),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_TickPainter old) =>
+      old.color != color || old.period != period;
 }

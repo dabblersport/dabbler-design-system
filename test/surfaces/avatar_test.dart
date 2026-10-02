@@ -16,8 +16,10 @@ Widget _host(
   Brightness brightness = Brightness.light,
   TextDirection textDirection = TextDirection.ltr,
 }) {
-  final DabblerColors colors =
-      DabblerColors.resolve(theme: theme, brightness: brightness);
+  final DabblerColors colors = DabblerColors.resolve(
+    theme: theme,
+    brightness: brightness,
+  );
   return MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(extensions: <ThemeExtension<dynamic>>[colors]),
@@ -31,8 +33,7 @@ Widget _host(
 DabblerColors _colors([
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-]) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+]) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// `dabbler-code/pubspec.yaml`, if the app repo is checked out beside this
 /// package. Located by walking up, like the palette test's design source.
@@ -54,18 +55,24 @@ File? _findAppPubspec() {
 
 /// The rect of the 24px corner badge — the [Container] the badge child sits in,
 /// not the child itself, which is a 10px icon.
-Rect _badgeRect(WidgetTester tester) => tester.getRect(find
-    .ancestor(of: find.byIcon(Icons.star), matching: find.byType(Container))
-    .first);
+Rect _badgeRect(WidgetTester tester) => tester.getRect(
+  find
+      .ancestor(of: find.byIcon(Icons.star), matching: find.byType(Container))
+      .first,
+);
 
 /// The rect of each person's circle, in the order [DabblerAvatarGroup] was
 /// given them — the paint order is reversed, so tree order is not people order.
 List<Rect> _groupRects(WidgetTester tester, List<String> people) => <Rect>[
-      for (final String seed in people)
-        tester.getRect(find.byWidget(tester
+  for (final String seed in people)
+    tester.getRect(
+      find.byWidget(
+        tester
             .widgetList<DabblerAvatar>(find.byType(DabblerAvatar))
-            .firstWhere((DabblerAvatar a) => a.seed == seed))),
-    ];
+            .firstWhere((DabblerAvatar a) => a.seed == seed),
+      ),
+    ),
+];
 
 /// Every string rendered anywhere under [root] — [Text], [RichText],
 /// [Semantics] labels/values/hints, and [Tooltip] messages.
@@ -74,8 +81,9 @@ List<Rect> _groupRects(WidgetTester tester, List<String> people) => <Rect>[
 /// character could reach a user, not only in [Text].
 List<String> _renderedStrings(WidgetTester tester, Finder root) {
   final List<String> out = <String>[];
-  for (final Widget w
-      in tester.allWidgets.where((Widget w) => w is Text || w is RichText)) {
+  for (final Widget w in tester.allWidgets.where(
+    (Widget w) => w is Text || w is RichText,
+  )) {
     if (w is Text) {
       if (w.data != null) out.add(w.data!);
       final InlineSpan? span = w.textSpan;
@@ -84,7 +92,9 @@ List<String> _renderedStrings(WidgetTester tester, Finder root) {
       out.add(w.text.toPlainText());
     }
   }
-  for (final Semantics s in tester.widgetList<Semantics>(find.byType(Semantics))) {
+  for (final Semantics s in tester.widgetList<Semantics>(
+    find.byType(Semantics),
+  )) {
     final SemanticsProperties p = s.properties;
     for (final String? v in <String?>[p.label, p.value, p.hint, p.tooltip]) {
       if (v != null) out.add(v);
@@ -127,13 +137,18 @@ void main() {
       expect(
         DabblerAvatarSize.values.map((DabblerAvatarSize s) => s.diameter),
         <double>[28, 36, 48, 64, 80],
-        reason: "Avatar.jsx: SIZES = { xs: 28, sm: 36, md: 48, lg: 64, xl: 80 }",
+        reason:
+            "Avatar.jsx: SIZES = { xs: 28, sm: 36, md: 48, lg: 64, xl: 80 }",
       );
     });
 
-    testWidgets('each size lays out at its own diameter', (WidgetTester tester) async {
+    testWidgets('each size lays out at its own diameter', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerAvatarSize size in DabblerAvatarSize.values) {
-        await tester.pumpWidget(_host(DabblerAvatar(seed: 'Alen Rahman', size: size)));
+        await tester.pumpWidget(
+          _host(DabblerAvatar(seed: 'Alen Rahman', size: size)),
+        );
         expect(
           tester.getSize(find.byType(DabblerAvatar)),
           Size.square(size.diameter),
@@ -153,13 +168,18 @@ void main() {
       expect(find.byType(Stack), findsNothing);
     });
 
-    testWidgets('a badge renders at 24px, overhanging the circle',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatar(
-        seed: 'Alen Rahman',
-        size: DabblerAvatarSize.md,
-        badge: Icon(Icons.star),
-      )));
+    testWidgets('a badge renders at 24px, overhanging the circle', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatar(
+            seed: 'Alen Rahman',
+            size: DabblerAvatarSize.md,
+            badge: Icon(Icons.star),
+          ),
+        ),
+      );
       expect(find.byIcon(Icons.star), findsOneWidget);
       expect(DabblerAvatar.badgeDiameter, DabblerSizing.iconMd);
 
@@ -192,7 +212,10 @@ void main() {
       // declared in tokens/colors.css and transcribed to the palette.
       for (final DabblerTheme theme in DabblerTheme.values) {
         expect(
-          DabblerAvatar.badgeFill(_colors(theme), DabblerAvatarBadgeTone.indigo),
+          DabblerAvatar.badgeFill(
+            _colors(theme),
+            DabblerAvatarBadgeTone.indigo,
+          ),
           DabblerPalette.accentIndigo,
         );
       }
@@ -201,11 +224,15 @@ void main() {
 
     testWidgets('the badge paints its tone fill', (WidgetTester tester) async {
       for (final DabblerAvatarBadgeTone tone in DabblerAvatarBadgeTone.values) {
-        await tester.pumpWidget(_host(DabblerAvatar(
-          seed: 'Alen Rahman',
-          badge: const Icon(Icons.star),
-          badgeTone: tone,
-        )));
+        await tester.pumpWidget(
+          _host(
+            DabblerAvatar(
+              seed: 'Alen Rahman',
+              badge: const Icon(Icons.star),
+              badgeTone: tone,
+            ),
+          ),
+        );
         final BoxDecoration d = tester
             .widgetList<Container>(find.byType(Container))
             .map((Container c) => c.decoration)
@@ -226,14 +253,17 @@ void main() {
       'Bushra Riaz',
     ];
 
-    testWidgets('no character of the seed is rendered anywhere',
-        (WidgetTester tester) async {
+    testWidgets('no character of the seed is rendered anywhere', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       for (final String seed in seeds) {
         for (final DabblerAvatarSize size in DabblerAvatarSize.values) {
           await tester.pumpWidget(_host(DabblerAvatar(seed: seed, size: size)));
-          final List<String> rendered =
-              _renderedStrings(tester, find.byType(DabblerAvatar));
+          final List<String> rendered = _renderedStrings(
+            tester,
+            find.byType(DabblerAvatar),
+          );
           for (final String s in rendered) {
             for (final int unit in seed.toLowerCase().codeUnits) {
               final String ch = String.fromCharCode(unit);
@@ -250,31 +280,41 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('an avatar renders no Text and no RichText at all',
-        (WidgetTester tester) async {
+    testWidgets('an avatar renders no Text and no RichText at all', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerAvatar(seed: 'Alen Rahman')));
       expect(find.byType(Text), findsNothing);
       expect(find.byType(RichText), findsNothing);
     });
 
-    testWidgets('a badged avatar renders only the badge child\'s own content',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatar(
-        seed: 'Alen Rahman',
-        badge: Icon(Icons.star),
-      )));
+    testWidgets('a badged avatar renders only the badge child\'s own content', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatar(seed: 'Alen Rahman', badge: Icon(Icons.star)),
+        ),
+      );
       expect(find.byType(Text), findsNothing);
     });
 
-    testWidgets('a group renders only the +N count, never a seed',
-        (WidgetTester tester) async {
+    testWidgets('a group renders only the +N count, never a seed', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
-      await tester.pumpWidget(_host(const DabblerAvatarGroup(
-        people: <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez'],
-        overflow: 42,
-      )));
-      final List<String> rendered =
-          _renderedStrings(tester, find.byType(DabblerAvatarGroup));
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez'],
+            overflow: 42,
+          ),
+        ),
+      );
+      final List<String> rendered = _renderedStrings(
+        tester,
+        find.byType(DabblerAvatarGroup),
+      );
       expect(
         rendered.where((String s) => s.trim().isNotEmpty).toSet(),
         <String>{'+42'},
@@ -282,8 +322,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('the portrait is excluded from semantics',
-        (WidgetTester tester) async {
+    testWidgets('the portrait is excluded from semantics', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(_host(const DabblerAvatar(seed: 'Alen Rahman')));
       expect(
@@ -322,23 +363,27 @@ void main() {
         expect(mine!.group(1), '^0.0.8');
         return;
       }
-      final RegExpMatch? theirs =
-          constraint.firstMatch(app.readAsStringSync());
+      final RegExpMatch? theirs = constraint.firstMatch(app.readAsStringSync());
       expect(theirs, isNotNull, reason: '${app.path} must declare it too');
-      expect(mine!.group(1), theirs!.group(1),
-          reason: 'a one-sided bump re-faces every user on one platform');
+      expect(
+        mine!.group(1),
+        theirs!.group(1),
+        reason: 'a one-sided bump re-faces every user on one platform',
+      );
     });
 
-    testWidgets('a real portrait renders, and renders no text',
-        (WidgetTester tester) async {
+    testWidgets('a real portrait renders, and renders no text', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerAvatar(seed: 'Alen Rahman')));
       expect(tester.takeException(), isNull);
       expect(find.byType(Text), findsNothing);
       expect(find.byType(RichText), findsNothing);
     });
 
-    testWidgets('an empty seed falls back to the deterministic placeholder',
-        (WidgetTester tester) async {
+    testWidgets('an empty seed falls back to the deterministic placeholder', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerAvatar(seed: '')));
       expect(
         find.descendant(
@@ -350,14 +395,19 @@ void main() {
       );
     });
 
-    testWidgets('a throwing generator degrades to the fallback, never initials',
-        (WidgetTester tester) async {
-      DabblerAvatar.portrait =
-          const _ThrowingPortrait(fallback: DabblerPlaceholderPortrait());
-      await tester.pumpWidget(_host(const DabblerAvatar(seed: 'Alen Rahman')));
-      expect(tester.takeException(), isNull);
-      expect(find.byType(Text), findsNothing);
-    });
+    testWidgets(
+      'a throwing generator degrades to the fallback, never initials',
+      (WidgetTester tester) async {
+        DabblerAvatar.portrait = const _ThrowingPortrait(
+          fallback: DabblerPlaceholderPortrait(),
+        );
+        await tester.pumpWidget(
+          _host(const DabblerAvatar(seed: 'Alen Rahman')),
+        );
+        expect(tester.takeException(), isNull);
+        expect(find.byType(Text), findsNothing);
+      },
+    );
   });
 
   group('the fallback portrait is deterministic and behind a seam', () {
@@ -366,8 +416,10 @@ void main() {
     });
 
     test('the same seed always hashes identically', () {
-      expect(DabblerAvatarSeed.hash('Alen Rahman'),
-          DabblerAvatarSeed.hash('Alen Rahman'));
+      expect(
+        DabblerAvatarSeed.hash('Alen Rahman'),
+        DabblerAvatarSeed.hash('Alen Rahman'),
+      );
     });
 
     test('different seeds hash differently', () {
@@ -380,21 +432,23 @@ void main() {
         'user_8812',
         'dabbler',
       ];
-      final Set<int> hashes =
-          seeds.map(DabblerAvatarSeed.hash).toSet();
+      final Set<int> hashes = seeds.map(DabblerAvatarSeed.hash).toSet();
       expect(hashes, hasLength(seeds.length));
     });
 
-    testWidgets('the same seed paints the same placeholder parts',
-        (WidgetTester tester) async {
+    testWidgets('the same seed paints the same placeholder parts', (
+      WidgetTester tester,
+    ) async {
       Future<_PortraitParts> partsFor(String seed) async {
         await tester.pumpWidget(_host(DabblerAvatar(seed: seed)));
-        final CustomPaint paint = tester.widgetList<CustomPaint>(
-          find.descendant(
-            of: find.byType(DabblerAvatar),
-            matching: find.byType(CustomPaint),
-          ),
-        ).firstWhere((CustomPaint p) => p.painter != null);
+        final CustomPaint paint = tester
+            .widgetList<CustomPaint>(
+              find.descendant(
+                of: find.byType(DabblerAvatar),
+                matching: find.byType(CustomPaint),
+              ),
+            )
+            .firstWhere((CustomPaint p) => p.painter != null);
         return _PortraitParts(paint.painter!.toString(), paint.painter!);
       }
 
@@ -402,10 +456,16 @@ void main() {
       final _PortraitParts b = await partsFor('Bushra Riaz');
       final _PortraitParts a2 = await partsFor('Alen Rahman');
 
-      expect(a2.painter.shouldRepaint(a.painter), isFalse,
-          reason: 'the same seed must paint the same portrait');
-      expect(b.painter.shouldRepaint(a.painter), isTrue,
-          reason: 'different seeds must paint different portraits');
+      expect(
+        a2.painter.shouldRepaint(a.painter),
+        isFalse,
+        reason: 'the same seed must paint the same portrait',
+      );
+      expect(
+        b.painter.shouldRepaint(a.painter),
+        isTrue,
+        reason: 'different seeds must paint different portraits',
+      );
     });
 
     test('placeholder parts are palette colours, never literals', () {
@@ -417,16 +477,21 @@ void main() {
       );
     });
 
-    testWidgets('the generator is swappable without touching the shell',
-        (WidgetTester tester) async {
+    testWidgets('the generator is swappable without touching the shell', (
+      WidgetTester tester,
+    ) async {
       DabblerAvatar.portrait = const _StubPortrait();
       await tester.pumpWidget(_host(const DabblerAvatar(seed: 'Alen Rahman')));
-      expect(find.byKey(const ValueKey<String>('stub-portrait')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey<String>('stub-portrait')),
+        findsOneWidget,
+      );
       expect(find.byType(CustomPaint), findsNothing);
     });
 
-    testWidgets('a null seed falls back to the source default',
-        (WidgetTester tester) async {
+    testWidgets('a null seed falls back to the source default', (
+      WidgetTester tester,
+    ) async {
       DabblerAvatar.portrait = const _RecordingPortrait();
       await tester.pumpWidget(_host(const DabblerAvatar()));
       expect(_RecordingPortrait.lastSeed, DabblerAvatarSeed.fallback);
@@ -435,11 +500,18 @@ void main() {
 
   group('AvatarGroup — 36px circles, −10 overlap, +N chip, RTL', () {
     testWidgets('stacks sm avatars 26px apart', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatarGroup(
-        people: <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez'],
-      )));
-      final List<Rect> rects = _groupRects(
-          tester, const <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez']);
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez'],
+          ),
+        ),
+      );
+      final List<Rect> rects = _groupRects(tester, const <String>[
+        'Alen Rahman',
+        'Bushra Riaz',
+        'Carlos Alvarez',
+      ]);
       expect(rects, hasLength(3));
       for (final Rect r in rects) {
         expect(r.size, const Size.square(36), reason: 'group circles are sm');
@@ -449,36 +521,57 @@ void main() {
       expect(rects[2].left - rects[1].left, 26);
     });
 
-    testWidgets('the first person is painted on top', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatarGroup(
-        people: <String>['Alen Rahman', 'Bushra Riaz'],
-      )));
-      final Stack stack = tester.widget<Stack>(find.descendant(
-        of: find.byType(DabblerAvatarGroup),
-        matching: find.byType(Stack),
-      ));
+    testWidgets('the first person is painted on top', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz'],
+          ),
+        ),
+      );
+      final Stack stack = tester.widget<Stack>(
+        find
+            .descendant(
+              of: find.byType(DabblerAvatarGroup),
+              matching: find.byType(Stack),
+            )
+            .first,
+      );
       final DabblerAvatar last =
           (stack.children.last as PositionedDirectional).child as DabblerAvatar;
       expect(last.seed, 'Alen Rahman');
     });
 
-    testWidgets('each stacked avatar is ringed in the page background',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatarGroup(
-        people: <String>['Alen Rahman', 'Bushra Riaz'],
-      )));
-      for (final DabblerAvatar a
-          in tester.widgetList<DabblerAvatar>(find.byType(DabblerAvatar))) {
+    testWidgets('each stacked avatar is ringed in the page background', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz'],
+          ),
+        ),
+      );
+      for (final DabblerAvatar a in tester.widgetList<DabblerAvatar>(
+        find.byType(DabblerAvatar),
+      )) {
         expect(a.ringColor, _colors().bgPrimary);
       }
     });
 
-    testWidgets('the +N chip carries the faint fill and muted ink',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatarGroup(
-        people: <String>['Alen Rahman'],
-        overflow: 42,
-      )));
+    testWidgets('the +N chip carries the faint fill and muted ink', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman'],
+            overflow: 42,
+          ),
+        ),
+      );
       expect(find.text('+42'), findsOneWidget);
       final Text chip = tester.widget<Text>(find.text('+42'));
       expect(chip.style!.color, _colors().textSecondary);
@@ -494,9 +587,9 @@ void main() {
     });
 
     testWidgets('overflow 0 renders no chip', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatarGroup(
-        people: <String>['Alen Rahman'],
-      )));
+      await tester.pumpWidget(
+        _host(const DabblerAvatarGroup(people: <String>['Alen Rahman'])),
+      );
       expect(find.textContaining('+'), findsNothing);
     });
 
@@ -506,14 +599,19 @@ void main() {
     });
 
     testWidgets('the stack mirrors under RTL', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerAvatarGroup(
-          people: <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez'],
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez'],
+          ),
+          textDirection: TextDirection.rtl,
         ),
-        textDirection: TextDirection.rtl,
-      ));
-      final List<Rect> rects = _groupRects(
-          tester, const <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez']);
+      );
+      final List<Rect> rects = _groupRects(tester, const <String>[
+        'Alen Rahman',
+        'Bushra Riaz',
+        'Carlos Alvarez',
+      ]);
       // In RTL the first person starts at the right edge and later people run
       // leftwards, the mirror of the LTR case.
       expect(rects[1].left - rects[0].left, -26);
@@ -521,14 +619,19 @@ void main() {
     });
 
     testWidgets('the badge mirrors under RTL', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerAvatar(seed: 'Alen Rahman', badge: Icon(Icons.star)),
-        textDirection: TextDirection.rtl,
-      ));
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatar(seed: 'Alen Rahman', badge: Icon(Icons.star)),
+          textDirection: TextDirection.rtl,
+        ),
+      );
       final Rect avatar = tester.getRect(find.byType(DabblerAvatar));
       final Rect badge = _badgeRect(tester);
-      expect(badge.left, lessThan(avatar.left),
-          reason: 'end-aligned, so the badge sits on the left in Arabic');
+      expect(
+        badge.left,
+        lessThan(avatar.left),
+        reason: 'end-aligned, so the badge sits on the left in Arabic',
+      );
     });
 
     test('a negative overflow is rejected', () {
@@ -537,14 +640,18 @@ void main() {
   });
 
   group('the flat system holds', () {
-    testWidgets('an avatar paints no shadow and no gradient',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerAvatarGroup(
-        people: <String>['Alen Rahman', 'Bushra Riaz'],
-        overflow: 6,
-      )));
-      final Iterable<BoxDecoration> decorations = tester
-          .allWidgets
+    testWidgets('an avatar paints no shadow and no gradient', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz'],
+            overflow: 6,
+          ),
+        ),
+      );
+      final Iterable<BoxDecoration> decorations = tester.allWidgets
           .whereType<DecoratedBox>()
           .map((DecoratedBox b) => b.decoration)
           .whereType<BoxDecoration>();
@@ -554,17 +661,126 @@ void main() {
       }
     });
 
-    testWidgets('every brightness and theme resolves without a null colour',
-        (WidgetTester tester) async {
+    testWidgets('every brightness and theme resolves without a null colour', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in DabblerTheme.values) {
         for (final Brightness b in Brightness.values) {
-          await tester.pumpWidget(_host(
-            const DabblerAvatar(seed: 'Alen Rahman', badge: Icon(Icons.star)),
-            theme: theme,
-            brightness: b,
-          ));
+          await tester.pumpWidget(
+            _host(
+              const DabblerAvatar(seed: 'Alen Rahman', badge: Icon(Icons.star)),
+              theme: theme,
+              brightness: b,
+            ),
+          );
           expect(tester.takeException(), isNull);
         }
+      }
+    });
+  });
+
+  group('live Avatar.jsx pins', () {
+    test('sizes, badge, overlap and chip equal the live values', () {
+      // Live `components/surfaces/Avatar.jsx`: SIZES { xs: 28, sm: 36, md: 48,
+      // lg: 64, xl: 80 }; badge 24x24, `right: -2, bottom: -2`, `2px solid
+      // var(--surface-page)`, 11px/700; group `marginLeft: -10`; chip
+      // `minWidth: 28, height: 36, padding: '0 8px'`.
+      expect(
+        <double>[
+          for (final DabblerAvatarSize s in DabblerAvatarSize.values)
+            s.diameter,
+        ],
+        <double>[28, 36, 48, 64, 80],
+      );
+      expect(DabblerAvatar.badgeDiameter, 24);
+      expect(DabblerAvatarGroup.overlap, 10);
+      expect(DabblerAvatarGroup.avatarSize, DabblerAvatarSize.sm);
+    });
+
+    testWidgets('the group ring is OUTSIDE the 36px box (box-shadow spread)', (
+      WidgetTester tester,
+    ) async {
+      // Live `AvatarGroup`: `boxShadow: '0 0 0 2px var(--surface-page)'` on a
+      // 36px avatar: the portrait stays 36 and the ring adds 2px each side.
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz'],
+          ),
+        ),
+      );
+      final Finder first = find.byType(DabblerAvatar).first;
+      expect(tester.getSize(first), const Size(36, 36));
+      final Finder ring = find.descendant(
+        of: first,
+        matching: find.byWidgetPredicate(
+          (Widget w) =>
+              w is DecoratedBox &&
+              (w.decoration as BoxDecoration).shape == BoxShape.circle &&
+              (w.decoration as BoxDecoration).color == _colors().bgPrimary,
+        ),
+      );
+      expect(tester.getSize(ring), const Size(40, 40));
+      // Centres 26 apart (36 - 10).
+      final List<Rect> r = tester
+          .widgetList<DabblerAvatar>(find.byType(DabblerAvatar))
+          .map((DabblerAvatar a) => tester.getRect(find.byWidget(a)))
+          .toList();
+      expect((r[0].center.dx - r[1].center.dx).abs(), 26);
+    });
+
+    testWidgets('the +N chip is 36 tall, min 28 wide, ring outside', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman'],
+            overflow: 5,
+          ),
+        ),
+      );
+      final Finder chipText = find.text('+5');
+      final Finder chip = find.ancestor(
+        of: chipText,
+        matching: find.byType(Container),
+      );
+      final Rect box = tester.getRect(chip.first);
+      expect(box.height, 36);
+      // Visible part: live `minWidth: 28`; plus the 12px tucked under the last
+      // avatar and its ring.
+      expect(box.width, greaterThanOrEqualTo(28 + 12));
+      // The label starts clear of the last avatar and its 2px ring.
+      final Rect last = tester.getRect(find.byType(DabblerAvatar).last);
+      expect(
+        tester.getRect(chipText).left,
+        greaterThanOrEqualTo(last.right + 2),
+      );
+      final Text t = tester.widget<Text>(chipText);
+      expect(t.style!.fontSize, 11);
+      expect(t.style!.fontWeight, FontWeight.w700);
+      expect(t.style!.color, _colors().textSecondary);
+    });
+
+    testWidgets('a badge keeps its 24px size and overhangs 2 at the end', (
+      WidgetTester tester,
+    ) async {
+      for (final TextDirection d in TextDirection.values) {
+        await tester.pumpWidget(
+          _host(const DabblerAvatar(badge: Text('3')), textDirection: d),
+        );
+        final Rect av = tester.getRect(find.byType(DabblerAvatar));
+        final Rect badge = tester.getRect(
+          find
+              .ancestor(of: find.text('3'), matching: find.byType(Container))
+              .first,
+        );
+        expect(badge.size, const Size(24, 24));
+        expect(av.bottom - badge.bottom, -2);
+        final double overhang = d == TextDirection.ltr
+            ? badge.right - av.right
+            : av.left - badge.left;
+        expect(overhang, 2, reason: '$d');
       }
     });
   });
@@ -586,8 +802,11 @@ class _ThrowingPortrait extends DabblerAvatarPortraitBuilder {
   final DabblerAvatarPortraitBuilder fallback;
 
   @override
-  Widget build(BuildContext context,
-      {required String seed, required double diameter}) {
+  Widget build(
+    BuildContext context, {
+    required String seed,
+    required double diameter,
+  }) {
     try {
       throw StateError('generator unavailable');
     } on Object {
@@ -600,8 +819,11 @@ class _StubPortrait extends DabblerAvatarPortraitBuilder {
   const _StubPortrait();
 
   @override
-  Widget build(BuildContext context, {required String seed, required double diameter}) =>
-      const SizedBox.shrink(key: ValueKey<String>('stub-portrait'));
+  Widget build(
+    BuildContext context, {
+    required String seed,
+    required double diameter,
+  }) => const SizedBox.shrink(key: ValueKey<String>('stub-portrait'));
 }
 
 /// Records the seed it was handed, so the fallback can be asserted.
@@ -611,7 +833,11 @@ class _RecordingPortrait extends DabblerAvatarPortraitBuilder {
   static String? lastSeed;
 
   @override
-  Widget build(BuildContext context, {required String seed, required double diameter}) {
+  Widget build(
+    BuildContext context, {
+    required String seed,
+    required double diameter,
+  }) {
     lastSeed = seed;
     return const SizedBox.shrink();
   }

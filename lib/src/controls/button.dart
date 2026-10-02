@@ -210,8 +210,8 @@ class DabblerButton extends StatefulWidget {
     this.onPressed,
     this.disabled = false,
     this.loading = false,
-  })  : label = null,
-        fullWidth = false;
+  }) : label = null,
+       fullWidth = false;
 
   /// The button text. `children` in the source. Null only on
   /// [DabblerButton.icon].
@@ -311,20 +311,19 @@ class DabblerButton extends StatefulWidget {
   static const Color accentFill = DabblerPalette.accentIndigo;
 
   /// The fill for [tone], resolved against [colors].
-  static Color backgroundFor(DabblerColors colors, DabblerButtonTone tone) =>
-      switch (tone) {
-        DabblerButtonTone.primary => colors.brandPrimary,
-        DabblerButtonTone.secondary => colors.accent,
-        DabblerButtonTone.accent => accentFill,
-        DabblerButtonTone.neutral ||
-        DabblerButtonTone.iconLabel =>
-          colors.surfaceSunken,
-        DabblerButtonTone.filled || DabblerButtonTone.icon => colors.textPrimary,
-        DabblerButtonTone.outlined ||
-        DabblerButtonTone.text =>
-          Colors.transparent,
-        DabblerButtonTone.destructive => colors.error.solid,
-      };
+  static Color backgroundFor(
+    DabblerColors colors,
+    DabblerButtonTone tone,
+  ) => switch (tone) {
+    DabblerButtonTone.primary => colors.brandPrimary,
+    DabblerButtonTone.secondary => colors.accent,
+    DabblerButtonTone.accent => accentFill,
+    DabblerButtonTone.neutral ||
+    DabblerButtonTone.iconLabel => colors.surfaceSunken,
+    DabblerButtonTone.filled || DabblerButtonTone.icon => colors.textPrimary,
+    DabblerButtonTone.outlined || DabblerButtonTone.text => Colors.transparent,
+    DabblerButtonTone.destructive => colors.error.solid,
+  };
 
   /// The label and glyph colour for [tone], resolved against [colors].
   static Color foregroundFor(DabblerColors colors, DabblerButtonTone tone) =>
@@ -333,13 +332,11 @@ class DabblerButton extends StatefulWidget {
         DabblerButtonTone.secondary => colors.onAccent,
         DabblerButtonTone.accent ||
         DabblerButtonTone.filled ||
-        DabblerButtonTone.icon =>
-          colors.surfaceCard,
+        DabblerButtonTone.icon => colors.surfaceCard,
         DabblerButtonTone.neutral ||
         DabblerButtonTone.outlined ||
         DabblerButtonTone.text ||
-        DabblerButtonTone.iconLabel =>
-          colors.textPrimary,
+        DabblerButtonTone.iconLabel => colors.textPrimary,
         // `--paper`, a fixed white, and not `surfaceCard`: the measured 8.3:1
         // in `Button.prompt.md` is white on the error-solid step, and
         // `surfaceCard` is not white in dark mode.
@@ -375,18 +372,22 @@ class DabblerButton extends StatefulWidget {
   static EdgeInsetsDirectional paddingFor(DabblerButtonSize size) =>
       switch (size) {
         DabblerButtonSize.full => EdgeInsetsDirectional.zero,
-        DabblerButtonSize.medium =>
-          const EdgeInsetsDirectional.symmetric(vertical: 10, horizontal: 20),
-        DabblerButtonSize.small =>
-          const EdgeInsetsDirectional.symmetric(vertical: 8, horizontal: 16),
+        DabblerButtonSize.medium => const EdgeInsetsDirectional.symmetric(
+          vertical: 10,
+          horizontal: 20,
+        ),
+        DabblerButtonSize.small => const EdgeInsetsDirectional.symmetric(
+          vertical: 8,
+          horizontal: 16,
+        ),
       };
 
   /// The label size for [size] — 16 / 14 / 12, all at weight 600.
   static double fontSizeFor(DabblerButtonSize size) => switch (size) {
-        DabblerButtonSize.full => 16,
-        DabblerButtonSize.medium => 14,
-        DabblerButtonSize.small => 12,
-      };
+    DabblerButtonSize.full => 16,
+    DabblerButtonSize.medium => 14,
+    DabblerButtonSize.small => 12,
+  };
 
   /// `line-height: 1.4` (`Button.jsx:83`) — a multiplier, which is already what
   /// [TextStyle.height] is, so it is used directly.
@@ -432,7 +433,9 @@ class DabblerButton extends StatefulWidget {
     required DabblerButtonTone tone,
   }) {
     final double fontSize = fontSizeFor(size);
-    return labelStyle.resolveForDirection(direction).copyWith(
+    return labelStyle
+        .resolveForDirection(direction)
+        .copyWith(
           fontSize: fontSize,
           height: lineHeightFactor,
           fontWeight: DabblerType.semibold,
@@ -472,10 +475,8 @@ class _DabblerButtonState extends State<DabblerButton> {
     final TextDirection direction = Directionality.of(context);
     final bool isFull = widget.size == DabblerButtonSize.full;
 
-    final Color foreground =
-        DabblerButton.foregroundFor(colors, widget.tone);
-    final Color background =
-        DabblerButton.backgroundFor(colors, widget.tone);
+    final Color foreground = DabblerButton.foregroundFor(colors, widget.tone);
+    final Color background = DabblerButton.backgroundFor(colors, widget.tone);
     final double radius = DabblerButton.radiusFor(widget.size);
 
     // `color-mix(in srgb, <bg> 88%, black)` while pressed and interactive.
@@ -490,14 +491,14 @@ class _DabblerButtonState extends State<DabblerButton> {
             tone: DabblerSpinnerTone.inherit,
           )
         : (widget.icon != null
-            ? DabblerIcon(
-                widget.icon!,
-                size: iconOnly
-                    ? DabblerButton.iconOnlyGlyphSize
-                    : DabblerButton.leadingIconSize,
-                color: foreground,
-              )
-            : null);
+              ? DabblerIcon(
+                  widget.icon!,
+                  size: iconOnly
+                      ? DabblerButton.iconOnlyGlyphSize
+                      : DabblerButton.leadingIconSize,
+                  color: foreground,
+                )
+              : null);
 
     final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
@@ -531,7 +532,8 @@ class _DabblerButtonState extends State<DabblerButton> {
       fill: fill,
       // Transparent rather than absent on the borderless tones, so switching
       // tone never changes the box by the hairline's 1px.
-      borderColor: DabblerButton.borderColorFor(colors, widget.tone) ??
+      borderColor:
+          DabblerButton.borderColorFor(colors, widget.tone) ??
           Colors.transparent,
       radius: radius,
       padding: DabblerButton.paddingFor(widget.size),
@@ -539,12 +541,21 @@ class _DabblerButtonState extends State<DabblerButton> {
           ? (widget.fullWidth ? double.infinity : DabblerButton.fullWidthPx)
           : (widget.fullWidth ? double.infinity : null),
       height: isFull ? DabblerButton.fullHeight : null,
-      center: true,
+      // Not `center: true`: that wraps the content in a bare `Center`, which
+      // expands to the maximum width it is offered, so a button inside a
+      // `Wrap` or loose `Row` stretched to the full line. Live `Button.jsx`
+      // sizes `width: fullWidth ? '100%' : (s.width || 'fit-content')`, so a
+      // button without `fullWidth` / `size: full` shrink-wraps its label.
+      center: false,
       // `tone="inherit"` on the spinner reads this, and so does any glyph that
       // was not handed an explicit colour.
-      child: IconTheme.merge(
-        data: IconThemeData(color: foreground),
-        child: content,
+      child: Center(
+        widthFactor: (widget.fullWidth || isFull) ? null : 1,
+        heightFactor: isFull ? null : 1,
+        child: IconTheme.merge(
+          data: IconThemeData(color: foreground),
+          child: content,
+        ),
       ),
     );
 

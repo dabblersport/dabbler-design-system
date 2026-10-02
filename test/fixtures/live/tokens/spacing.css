@@ -1,0 +1,91 @@
+/* ============================================================================
+   Dabbler — Geometry · layering · motion · focus tokens · CSS
+   Base-3 grid. Mirrors dabbler_spacing.dart. Prefer 12/24/30/36/48 for
+   structural values — they are multiples of BOTH 3 and 4, so they line up with
+   24px icons and platform components.
+   Surfaces are FLAT (see tokens/glass.css): no blur, no gradient, no shadow.
+   --elevation-2 is the ONE legal shadow and only for Material dialogs.
+   ========================================================================== */
+
+:root {
+  /* Spacing scale (base 3) */
+  --space-1: 3px;  --space-2: 6px;  --space-3: 9px;  --space-4: 12px;
+  --space-5: 15px; --space-6: 18px; --space-7: 21px; --space-8: 24px;
+  --space-9: 30px; --space-10: 36px; --space-11: 48px;
+
+  /* Semantic spacing aliases */
+  --card-padding: var(--space-6);   /* 18 */
+  --screen-gutter: var(--space-8);  /* 24 */
+  --section-gap: var(--space-9);    /* 30 */
+  --stack-tight: var(--space-2);    /* 6 */
+  --stack-default: var(--space-4);  /* 12 */
+  --icon-gap: var(--space-2);       /* 6 */
+
+  /* Radius (base 3) */
+  --radius-sm: 6px;     /* chips, small inputs */
+  --radius-md: 9px;     /* buttons */
+  --radius-lg: 12px;    /* cards, icon tiles */
+  --radius-xl: 18px;    /* sheets, modals, cards (glass) */
+  --radius-xxl: 24px;   /* text fields, search */
+  --radius-pill: 999px; /* pills, avatars */
+
+  /* Sizing */
+  --touch-target-min: 45px; /* base-3, clears Apple's 44pt floor */
+  --border-hairline: 0.5px;
+  --border-default: 1px;
+  --icon-sm: 18px;
+  --icon-md: 24px; /* native icon grid */
+  --icon-lg: 30px;
+
+  /* Elevation (legacy Material floating shadow only) */
+  --elevation-0: none;
+  --elevation-1: none;
+  --elevation-2: 0 9px 24px rgba(23, 17, 35, 0.14), 0 3px 6px rgba(23, 17, 35, 0.08);
+
+  /* ---- Layering. THE z-index scale. No component may invent its own. ---- */
+  --z-base: 0;      /* @kind other */
+  --z-sticky: 100;  /* @kind other */
+  --z-nav: 200;     /* @kind other */
+  --z-sheet: 300;   /* @kind other */
+  --z-dialog: 400;  /* @kind other */
+  --z-menu: 500;    /* @kind other */
+  --z-toast: 600;   /* @kind other */
+  --z-tooltip: 700; /* @kind other */
+
+  /* ---- Motion. Short, ease-out, never bouncy.
+     fast = press / tint change · base = indicator slides, expand/collapse,
+     toast enter · slow = sheet + dialog enter. ---- */
+  --motion-fast: 80ms;   /* @kind other */
+  --motion-base: 120ms;  /* @kind other */
+  --motion-slow: 200ms;  /* @kind other */
+  --ease-out: cubic-bezier(.2, 0, .2, 1); /* @kind other */
+  --press-scale: .98;    /* @kind other */
+
+  /* ---- Focus. One ring for the whole system. ---- */
+  --focus-ring-width: 2px;  /* @kind spacing */
+  --focus-ring-offset: 2px; /* @kind spacing */
+}
+
+/* One focus implementation, shared. Uses `outline` (never box-shadow) so the
+   no-shadow rule holds in computed styles. */
+.dbl-focus:focus-visible,
+.dbl-focus:focus-visible:not(:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* One press implementation, shared: brand tint stays with the component, the
+   scale + timing come from tokens. */
+.dbl-press { transition: transform var(--motion-fast) var(--ease-out), background var(--motion-fast) var(--ease-out); }
+.dbl-press:active { transform: scale(var(--press-scale)); }
+
+/* Global reduced-motion law: no transforms, no slides, no spin. Components that
+   animate must degrade to an opacity change or to no animation at all. */
+@media (prefers-reduced-motion: reduce) {
+  .dbl-press { transition: none; }
+  .dbl-press:active { transform: none; }
+}
+
+[data-mode="dark"] {
+  --elevation-2: 0 9px 24px rgba(0, 0, 0, 0.28), 0 3px 6px rgba(0, 0, 0, 0.20);
+}

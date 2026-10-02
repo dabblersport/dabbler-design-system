@@ -21,6 +21,12 @@ File? _findSpacingCss() {
     if (dir.parent.path == dir.path) break;
     dir = dir.parent;
   }
+  // Fallback: the package-pinned fixture, a transcription of the live Claude
+  // Design project 4286affa-bf50-4ff6-9576-917f76a93ca1 file `tokens/spacing.css`
+  // (read via DesignSync get_file on 2026-10-02, transcribed to a local mirror
+  // by the coordinator). See `test/fixtures/live/README.md`.
+  final File pinned = File('test/fixtures/live/tokens/spacing.css');
+  if (pinned.existsSync()) return pinned;
   return null;
 }
 

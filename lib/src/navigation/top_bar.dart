@@ -132,15 +132,19 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// number that matters here rather than padding-plus-content.
   static const double barHeight = 62;
 
+  /// The avatar badge's diameter — `16x16` in the export (the plain Avatar's
+  /// own badge is 24).
+  static const double avatarBadgeSide = 16;
+
   /// `padding: '12px 16px'` (`NavigationTopBar.jsx:33`). 16 is off the base-3
   /// grid and is transcribed literally: the previous cut rounded it to
   /// `--space-5` (15), which pulls the wordmark a pixel in from where the
   /// specimen draws it. Recorded as a token conflict, not resolved to the ramp.
   static const EdgeInsetsDirectional barPadding =
       EdgeInsetsDirectional.symmetric(
-    vertical: DabblerSpacing.space4,
-    horizontal: barPaddingInline,
-  );
+        vertical: DabblerSpacing.space4,
+        horizontal: barPaddingInline,
+      );
 
   /// `gap: 12` between the trailing actions and the avatar
   /// (`NavigationTopBar.jsx:124`) — `--space-4`.
@@ -209,7 +213,8 @@ class DabblerNavigationTopBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Flexible(
-          child: leading ??
+          child:
+              leading ??
               DabblerWordmark(
                 // `color: 'var(--purple-600)'` on the export's root, which the
                 // paths inherit through `fill="currentColor"`.
@@ -248,7 +253,8 @@ class DabblerNavigationTopBar extends StatelessWidget {
         // `backgroundColor: 'var(--neutral-100)'`, which is `--surface-page`
         // (`tokens/colors.css:32`).
         color: colors.bgPrimary,
-        borderRadius: border ? DabblerRadius.lgAll : null,
+        // Root `borderRadius: 16` (NavigationTopBar.jsx digest).
+        borderRadius: border ? DabblerRadius.cardAll : null,
         border: border
             ? Border.all(
                 color: colors.borderDefault,
@@ -321,6 +327,8 @@ class DabblerNavigationTopBar extends StatelessWidget {
       seed: avatarSeed,
       size: DabblerAvatarSize.sm,
       badge: avatarBadge,
+      // Digest: badge `16x16`, `2px solid var(--neutral-100)`.
+      badgeSize: avatarBadgeSide,
     );
 
     final VoidCallback? onPressed = onAvatarPressed;
@@ -385,55 +393,235 @@ class DabblerWordmark extends StatelessWidget {
   static const List<List<double>> glyphs = <List<double>>[
     // d — left 0, top 0.211
     <double>[
-      0, 0.211,
-      0, 14.904, 0, 8.12, 3.543, 4.59, 10.529, 4.59, 10.529, 0,
-      14.234, 0, 14.234, 18.603, 3.684, 18.603, 3.684, 14.904, 0, 14.904,
+      0,
+      0.211,
+      0,
+      14.904,
+      0,
+      8.12,
+      3.543,
+      4.59,
+      10.529,
+      4.59,
+      10.529,
+      0,
+      14.234,
+      0,
+      14.234,
+      18.603,
+      3.684,
+      18.603,
+      3.684,
+      14.904,
+      0,
+      14.904,
       -1,
-      3.725, 14.906, 10.529, 14.906, 10.529, 8.287, 3.725, 8.287, 3.725, 14.906,
+      3.725,
+      14.906,
+      10.529,
+      14.906,
+      10.529,
+      8.287,
+      3.725,
+      8.287,
+      3.725,
+      14.906,
     ],
     // a — left 16.082, top 4.801
     <double>[
-      16.082, 4.801,
-      0.02, 14.012, 0, 14.012, 0, 5.146, 10.509, 5.146, 10.509, 3.696,
-      0, 3.696, 0, 0, 10.691, 0, 14.214, 3.529, 14.214, 14.012,
-      3.704, 14.012, 3.704, 10.314, 10.509, 10.316, 10.509, 8.383,
-      3.704, 8.383, 3.704, 10.314, 0.02, 10.314, 0.02, 14.012,
+      16.082,
+      4.801,
+      0.02,
+      14.012,
+      0,
+      14.012,
+      0,
+      5.146,
+      10.509,
+      5.146,
+      10.509,
+      3.696,
+      0,
+      3.696,
+      0,
+      0,
+      10.691,
+      0,
+      14.214,
+      3.529,
+      14.214,
+      14.012,
+      3.704,
+      14.012,
+      3.704,
+      10.314,
+      10.509,
+      10.316,
+      10.509,
+      8.383,
+      3.704,
+      8.383,
+      3.704,
+      10.314,
+      0.02,
+      10.314,
+      0.02,
+      14.012,
     ],
     // b — left 32.16, top 0.21
     <double>[
-      32.16, 0.21,
-      0, 18.603, 0, 0, 3.684, 0, 3.684, 4.59, 10.67, 4.59, 14.194, 8.12,
-      14.194, 18.603, 3.684, 18.603, 3.684, 14.904, 10.509, 14.906,
-      10.509, 8.287, 3.684, 8.287, 3.684, 14.904, 0, 14.904, 0, 18.603,
+      32.16,
+      0.21,
+      0,
+      18.603,
+      0,
+      0,
+      3.684,
+      0,
+      3.684,
+      4.59,
+      10.67,
+      4.59,
+      14.194,
+      8.12,
+      14.194,
+      18.603,
+      3.684,
+      18.603,
+      3.684,
+      14.904,
+      10.509,
+      14.906,
+      10.509,
+      8.287,
+      3.684,
+      8.287,
+      3.684,
+      14.904,
+      0,
+      14.904,
+      0,
+      18.603,
     ],
     // b — left 48.222, top 0.21 (the same glyph, moved)
     <double>[
-      48.222, 0.21,
-      0, 18.603, 0, 0, 3.684, 0, 3.684, 4.59, 10.67, 4.59, 14.194, 8.12,
-      14.194, 18.603, 3.684, 18.603, 3.684, 14.904, 10.509, 14.906,
-      10.509, 8.287, 3.684, 8.287, 3.684, 14.904, 0, 14.904, 0, 18.603,
+      48.222,
+      0.21,
+      0,
+      18.603,
+      0,
+      0,
+      3.684,
+      0,
+      3.684,
+      4.59,
+      10.67,
+      4.59,
+      14.194,
+      8.12,
+      14.194,
+      18.603,
+      3.684,
+      18.603,
+      3.684,
+      14.904,
+      10.509,
+      14.906,
+      10.509,
+      8.287,
+      3.684,
+      8.287,
+      3.684,
+      14.904,
+      0,
+      14.904,
+      0,
+      18.603,
     ],
     // l — left 64.276, top 0.186
     <double>[
-      64.276, 0.186,
-      0, 15.098, 0, 0, 3.725, 0, 3.725, 14.93, 6.543, 14.93,
-      6.543, 18.627, 3.523, 18.627, 0, 15.098,
+      64.276,
+      0.186,
+      0,
+      15.098,
+      0,
+      0,
+      3.725,
+      0,
+      3.725,
+      14.93,
+      6.543,
+      14.93,
+      6.543,
+      18.627,
+      3.523,
+      18.627,
+      0,
+      15.098,
     ],
     // e — left 72.676, top 4.801
     <double>[
-      72.676, 4.801,
-      0, 10.314, 0, 0, 10.67, 0, 14.214, 3.529, 14.214, 8.866,
-      3.704, 8.866, 3.704, 10.314, 0, 10.314,
+      72.676,
+      4.801,
+      0,
+      10.314,
+      0,
+      0,
+      10.67,
+      0,
+      14.214,
+      3.529,
+      14.214,
+      8.866,
+      3.704,
+      8.866,
+      3.704,
+      10.314,
+      0,
+      10.314,
       -1,
-      3.704, 10.314, 14.214, 10.316, 14.214, 14.012, 3.704, 14.012, 3.704, 10.314,
+      3.704,
+      10.314,
+      14.214,
+      10.316,
+      14.214,
+      14.012,
+      3.704,
+      14.012,
+      3.704,
+      10.314,
       -1,
-      3.704, 5.629, 10.51, 5.629, 10.51, 3.696, 3.704, 3.696, 3.704, 5.629,
+      3.704,
+      5.629,
+      10.51,
+      5.629,
+      10.51,
+      3.696,
+      3.704,
+      3.696,
+      3.704,
+      5.629,
     ],
     // r — left 88.745, top 4.801
     <double>[
-      88.745, 4.801,
-      0, 14.012, 0, 3.529, 3.523, 0, 11.255, 0, 11.255, 3.696,
-      3.684, 3.696, 3.684, 14.012, 0, 14.012,
+      88.745,
+      4.801,
+      0,
+      14.012,
+      0,
+      3.529,
+      3.523,
+      0,
+      11.255,
+      0,
+      11.255,
+      3.696,
+      3.684,
+      3.696,
+      3.684,
+      14.012,
+      0,
+      14.012,
     ],
   ];
 
@@ -469,7 +657,8 @@ class DabblerWordmark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size box = size ?? DabblerNavigationTopBar.wordmarkSize;
-    final Color tint = color ??
+    final Color tint =
+        color ??
         IconTheme.of(context).color ??
         DabblerColors.of(context).textPrimary;
     return ExcludeSemantics(

@@ -1,0 +1,99 @@
+/* ============================================================================
+   Dabbler — Typography · CSS
+   Apple HIG type ramp on TWO ROLES × TWO SCRIPTS — four faces in total:
+
+                  ENGLISH        ARABIC
+     Display/Title  Gloock       ↔ Wingx        (--font-display)
+     Everything else Glory    ↔   Meral Sans   (--font-sans)
+
+   The script pair swaps on [dir="rtl"] / [lang="ar"]; the ROLE never changes.
+
+   Gloock and Wingx each ship ONE weight (400), so every Title style is 400 in
+   both scripts — titles never run Light. Headline stays MEDIUM (500).
+
+   Coverage is strict and verified: Wingx has NO Latin glyphs and Gloock/Glory
+   have NO Arabic glyphs. Setting the wrong pair on a string falls through to a
+   system face and Arabic shaping breaks. Always go through --font-display /
+   --font-sans and let direction pick the face.
+
+   Tracking is near-zero on purpose. Arabic runs the SAME sizes as Latin at every
+   step — Wingx and Gloock read at matching optical weight, so there is no size
+   bump. Arabic takes extra LEADING on the text styles only (headline/body/
+   callout/subheadline); titles, footnote and captions share Latin's leading.
+   ========================================================================== */
+
+:root {
+  /* the four faces */
+  --font-display-en: 'Gloock', Georgia, 'Times New Roman', serif;
+  --font-display-ar: 'Wingx', Georgia, 'Times New Roman', serif;
+  --font-sans-en: 'Glory', system-ui, -apple-system, sans-serif;
+  --font-sans-ar: 'Meral Sans', system-ui, -apple-system, sans-serif;
+
+  /* the two ROLES — consume these; direction picks the script below */
+  --font-display: var(--font-display-en);  /* Display + Titles */
+  --font-sans: var(--font-sans-en);        /* everything else */
+
+  /* back-compat alias: the Arabic text face */
+  --font-arabic: var(--font-sans-ar);
+
+  /* sizes */
+  --type-large-title: 34px; --type-title-1: 28px; --type-title-2: 22px;
+  --type-title-3: 20px; --type-headline: 17px; --type-body: 16px;
+  --type-callout: 17px; --type-subheadline: 15px; --type-footnote: 13px;
+  --type-caption-1: 12px; --type-caption-2: 11px;
+
+  /* leading (Latin) */
+  --leading-large-title: 41px; --leading-title-1: 34px; --leading-title-2: 28px;
+  --leading-title-3: 25px; --leading-headline: 22px; --leading-body: 21px;
+  --leading-callout: 22px; --leading-subheadline: 20px; --leading-footnote: 18px;
+  --leading-caption-1: 16px; --leading-caption-2: 13px;
+
+  /* Numerals are ALWAYS Western Arabic (0-9), never Eastern Arabic-Indic. */
+  font-variant-numeric: lining-nums;
+
+  /* weights */
+  --weight-light: 300; --weight-regular: 400; --weight-medium: 500;
+  --weight-semibold: 600; --weight-bold: 700;
+}
+
+.t-large-title  { font-family:var(--font-display); font-size:34px; line-height:41px; font-weight:400; letter-spacing:0; }
+.t-title-1      { font-family:var(--font-display); font-size:28px; line-height:34px; font-weight:400; letter-spacing:0; }
+.t-title-2      { font-family:var(--font-display); font-size:22px; line-height:28px; font-weight:400; letter-spacing:0; }
+.t-title-3      { font-family:var(--font-display); font-size:20px; line-height:25px; font-weight:400; letter-spacing:0; }
+.t-headline     { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:600; letter-spacing:0; }
+.t-body         { font-family:var(--font-sans); font-size:16px; line-height:21px; font-weight:400; letter-spacing:0; }
+.t-callout      { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:500; letter-spacing:0; }
+.t-subheadline  { font-family:var(--font-sans); font-size:15px; line-height:20px; font-weight:400; letter-spacing:0; }
+.t-footnote     { font-family:var(--font-sans); font-size:13px; line-height:18px; font-weight:400; letter-spacing:0; }
+.t-caption-1    { font-family:var(--font-sans); font-size:12px; line-height:16px; font-weight:400; letter-spacing:0; }
+.t-caption-2    { font-family:var(--font-sans); font-size:11px; line-height:13px; font-weight:400; letter-spacing:0; }
+
+/* Button/label convenience = Headline weight at body size (Medium 500) */
+.t-label { font-family:var(--font-sans); font-size:17px; line-height:22px; font-weight:500; letter-spacing:0; }
+
+/* Arabic / RTL — size = Latin size − 0.9px at every step (Meral Sans / Wingx render optically larger and heavier than Glory / Gloock).
+   Four text styles also take extra leading (headline, body, callout, subheadline); all other leading is unchanged. */
+[dir="rtl"] .t-large-title, [lang="ar"] .t-large-title, [lang^="ar-"] .t-large-title { font-size:33.1px; line-height:41px; }
+[dir="rtl"] .t-title-1, [lang="ar"] .t-title-1, [lang^="ar-"] .t-title-1 { font-size:27.1px; line-height:34px; }
+[dir="rtl"] .t-title-2, [lang="ar"] .t-title-2, [lang^="ar-"] .t-title-2 { font-size:21.1px; line-height:28px; }
+[dir="rtl"] .t-title-3, [lang="ar"] .t-title-3, [lang^="ar-"] .t-title-3 { font-size:19.1px; line-height:25px; }
+[dir="rtl"] .t-headline, [lang="ar"] .t-headline, [lang^="ar-"] .t-headline { font-size:16.1px; line-height:25px; }
+[dir="rtl"] .t-body, [lang="ar"] .t-body, [lang^="ar-"] .t-body { font-size:15.1px; line-height:24px; }
+[dir="rtl"] .t-callout, [lang="ar"] .t-callout, [lang^="ar-"] .t-callout { font-size:16.1px; line-height:25px; }
+[dir="rtl"] .t-subheadline, [lang="ar"] .t-subheadline, [lang^="ar-"] .t-subheadline { font-size:14.1px; line-height:23px; }
+[dir="rtl"] .t-footnote, [lang="ar"] .t-footnote, [lang^="ar-"] .t-footnote { font-size:12.1px; line-height:18px; }
+[dir="rtl"] .t-caption-1, [lang="ar"] .t-caption-1, [lang^="ar-"] .t-caption-1 { font-size:11.1px; line-height:16px; }
+[dir="rtl"] .t-caption-2, [lang="ar"] .t-caption-2, [lang^="ar-"] .t-caption-2 { font-size:10.1px; line-height:13px; }
+[dir="rtl"] .t-label, [lang="ar"] .t-label, [lang^="ar-"] .t-label { font-size:16.1px; line-height:22px; }
+
+/* ---- Arabic / RTL: swap the SCRIPT, keep the ROLE ---- */
+[dir="rtl"], [lang="ar"], [lang^="ar-"] {
+  --font-display: var(--font-display-ar);  /* Gloock → Wingx */
+  --font-sans: var(--font-sans-ar);        /* Glory  → Meral Sans */
+  /* Numerals are ALWAYS Western Arabic (0–9) — never Eastern Arabic-Indic
+     (٠–٩) — in both scripts. Disabling the 'anum' feature stops Arabic-aware
+     faces from substituting Indic forms. */
+  font-feature-settings: "anum" 0;
+  font-variant-numeric: lining-nums;
+}
+/* Titles stay 400 in Arabic too — Wingx ships a single weight, same as Gloock. */

@@ -261,22 +261,24 @@ class _DabblerIconTileState extends State<DabblerIconTile> {
         ? DabblerIcon(widget.name!, weight: widget.weight)
         : widget.icon!;
 
+    // Live `IconTile.jsx`: `fill = color-mix(<color> 10%, white)`,
+    // `border = color-mix(<color> 28%, white)`, with `color` defaulting to
+    // `--color-brand-primary`. The brand tone is therefore a tint of the brand
+    // exactly like a caller colour (it was DS-500's `brandTint` step — 8% fill
+    // and the bare card outline — until compared against the live source).
+    final Color? surfaceTint =
+        tint ??
+        (widget.tone == DabblerIconTileTone.brand ? colors.brandPrimary : null);
     final Widget tile = DabblerSurface(
       variant: DabblerSurfaceVariant.brandTint,
       radius: DabblerRadius.lg,
-      // Null for the brand tone, which is what leaves DS-500's own step in
-      // place; a decorative tone overrides both and drops the hairline.
-      fill: tint != null
-          ? DabblerSurface.tintedFillOf(colors, tint)
-          : widget.tone == DabblerIconTileTone.brand
-              ? null
-              : DabblerIconTile.fillFor(colors, widget.tone),
-      borderColor: tint != null
-          ? DabblerSurface.tintedBorderOf(colors, tint)
+      fill: surfaceTint != null
+          ? DabblerSurface.tintedFillOf(colors, surfaceTint)
+          : DabblerIconTile.fillFor(colors, widget.tone),
+      borderColor: surfaceTint != null
+          ? DabblerSurface.tintedBorderOf(colors, surfaceTint)
           : null,
-      borderWidth: tint != null || widget.tone == DabblerIconTileTone.brand
-          ? null
-          : 0,
+      borderWidth: surfaceTint != null ? null : 0,
       width: side,
       height: side,
       center: true,

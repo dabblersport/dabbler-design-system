@@ -10,8 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// Wraps a badge in the minimum it needs: a [ThemeData] carrying the
 /// [DabblerColors] extension, and a direction.
@@ -44,31 +43,41 @@ TextStyle _labelStyleOf(WidgetTester tester) =>
 
 void main() {
   group('AC1 — tone is decorative, status is semantic, status wins', () {
-    testWidgets('status wins when tone and status are both set',
-        (WidgetTester tester) async {
+    testWidgets('status wins when tone and status are both set', (
+      WidgetTester tester,
+    ) async {
       final DabblerColors colors = _colors();
-      await tester.pumpWidget(_host(
-        DabblerBadge(
-          label: 'label',
-          // A decorative tone that would paint brand purple on card ink…
-          tone: DabblerBadgeTone.error,
-          // …and a semantic status that must override it completely.
-          status: colors.success,
+      await tester.pumpWidget(
+        _host(
+          DabblerBadge(
+            label: 'label',
+            // A decorative tone that would paint brand purple on card ink…
+            tone: DabblerBadgeTone.error,
+            // …and a semantic status that must override it completely.
+            status: colors.success,
+          ),
         ),
-      ));
+      );
 
       final BoxDecoration decoration = _decorationOf(tester);
-      expect(decoration.color, colors.success.surface,
-          reason: 'the fill must come from the status, not the tone');
-      expect(decoration.color, isNot(colors.brandPrimary),
-          reason: 'the decorative tone must not survive a set status');
+      expect(
+        decoration.color,
+        colors.success.surface,
+        reason: 'the fill must come from the status, not the tone',
+      );
+      expect(
+        decoration.color,
+        isNot(colors.brandPrimary),
+        reason: 'the decorative tone must not survive a set status',
+      );
       expect(_labelStyleOf(tester).color, colors.success.strong);
       // Decorative tones carry no border; a semantic badge always does.
       expect(decoration.border, isNotNull);
     });
 
-    testWidgets('every one of the eight tones paints its source pair',
-        (WidgetTester tester) async {
+    testWidgets('every one of the eight tones paints its source pair', (
+      WidgetTester tester,
+    ) async {
       final DabblerColors colors = _colors();
       expect(DabblerBadgeTone.values, hasLength(8));
 
@@ -76,47 +85,75 @@ void main() {
         await tester.pumpWidget(
           _host(DabblerBadge(label: 'label', tone: tone)),
         );
-        expect(_decorationOf(tester).color,
-            DabblerBadge.backgroundOf(tone, colors),
-            reason: '$tone fill');
-        expect(_labelStyleOf(tester).color,
-            DabblerBadge.foregroundOf(tone, colors),
-            reason: '$tone ink');
-        expect(_decorationOf(tester).border, isNull,
-            reason: '$tone is decorative and draws no hairline');
+        expect(
+          _decorationOf(tester).color,
+          DabblerBadge.backgroundOf(tone, colors),
+          reason: '$tone fill',
+        );
+        expect(
+          _labelStyleOf(tester).color,
+          DabblerBadge.foregroundOf(tone, colors),
+          reason: '$tone ink',
+        );
+        expect(
+          _decorationOf(tester).border,
+          isNull,
+          reason: '$tone is decorative and draws no hairline',
+        );
       }
     });
 
     test('the decorative names are the Figma kit\'s, not semantic ones', () {
       final DabblerColors colors = _colors();
       // `error` is PURPLE — the brand primary, shared with `default`.
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.error, colors),
-          colors.brandPrimary);
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.error, colors),
-          DabblerBadge.backgroundOf(DabblerBadgeTone.defaultTone, colors));
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.error, colors),
-          isNot(colors.error.base));
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.error, colors),
+        colors.brandPrimary,
+      );
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.error, colors),
+        DabblerBadge.backgroundOf(DabblerBadgeTone.defaultTone, colors),
+      );
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.error, colors),
+        isNot(colors.error.base),
+      );
       // `success` is BLACK — the ink ramp, not the success ramp.
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.success, colors),
-          colors.textPrimary);
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.success, colors),
-          isNot(colors.success.base));
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.success, colors),
+        colors.textPrimary,
+      );
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.success, colors),
+        isNot(colors.success.base),
+      );
       // `warning` is a NEUTRAL TINT — faint fill, muted ink.
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.warning, colors),
-          colors.bgTertiary);
-      expect(DabblerBadge.foregroundOf(DabblerBadgeTone.warning, colors),
-          colors.textSecondary);
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.warning, colors),
-          isNot(colors.warning.base));
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.warning, colors),
+        colors.bgTertiary,
+      );
+      expect(
+        DabblerBadge.foregroundOf(DabblerBadgeTone.warning, colors),
+        colors.textSecondary,
+      );
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.warning, colors),
+        isNot(colors.warning.base),
+      );
       // `pill` duplicates `primary`, `withIcon` duplicates `warning`.
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.pill, colors),
-          DabblerBadge.backgroundOf(DabblerBadgeTone.primary, colors));
-      expect(DabblerBadge.backgroundOf(DabblerBadgeTone.withIcon, colors),
-          DabblerBadge.backgroundOf(DabblerBadgeTone.warning, colors));
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.pill, colors),
+        DabblerBadge.backgroundOf(DabblerBadgeTone.primary, colors),
+      );
+      expect(
+        DabblerBadge.backgroundOf(DabblerBadgeTone.withIcon, colors),
+        DabblerBadge.backgroundOf(DabblerBadgeTone.warning, colors),
+      );
     });
 
-    testWidgets('all five status values paint surface + strong + hairline',
-        (WidgetTester tester) async {
+    testWidgets('all five status values paint surface + strong + hairline', (
+      WidgetTester tester,
+    ) async {
       final DabblerColors colors = _colors();
       final List<DabblerStatusColor> five = <DabblerStatusColor>[
         DabblerBadge.neutralStatusOf(colors),
@@ -132,10 +169,14 @@ void main() {
         final BoxDecoration decoration = _decorationOf(tester);
         expect(decoration.color, status.surface);
         expect(_labelStyleOf(tester).color, status.strong);
-        expect((decoration.border! as Border).top.color,
-            DabblerBadge.hairlineFor(status, colors));
-        expect((decoration.border! as Border).top.width,
-            DabblerSizing.borderDefault);
+        expect(
+          (decoration.border! as Border).top.color,
+          DabblerBadge.hairlineFor(status, colors),
+        );
+        expect(
+          (decoration.border! as Border).top.width,
+          DabblerSizing.borderDefault,
+        );
       }
     });
 
@@ -172,8 +213,10 @@ void main() {
       const DabblerBadge decorative = DabblerBadge(label: 'label');
       expect(decorative.status, isNull);
 
-      final DabblerBadge semantic =
-          DabblerBadge(label: 'label', status: colors.info);
+      final DabblerBadge semantic = DabblerBadge(
+        label: 'label',
+        status: colors.info,
+      );
       expect(semantic.status, isA<DabblerStatusColor>());
       // A Color cannot stand in for one: the runtime check mirrors the
       // compile-time guarantee, since `status: colors.info.base` — a Color —
@@ -197,8 +240,9 @@ void main() {
   });
 
   group('geometry, type and flatness', () {
-    testWidgets('pill radius, 4/10 padding, no shadow and no gradient',
-        (WidgetTester tester) async {
+    testWidgets('pill radius, 4/10 padding, no shadow and no gradient', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerBadge(label: 'label')));
       final BoxDecoration decoration = _decorationOf(tester);
       expect(decoration.borderRadius, DabblerRadius.pillAll);
@@ -206,10 +250,12 @@ void main() {
       expect(decoration.gradient, isNull);
 
       final Padding padding = tester.widget<Padding>(
-        find.descendant(
-          of: find.byType(DecoratedBox).first,
-          matching: find.byType(Padding),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(DecoratedBox).first,
+              matching: find.byType(Padding),
+            )
+            .first,
       );
       expect(
         padding.padding,
@@ -219,8 +265,9 @@ void main() {
       expect(DabblerBadge.horizontalPadding, 10);
     });
 
-    testWidgets('label is 11px bold at 1.5 leading',
-        (WidgetTester tester) async {
+    testWidgets('label is 11px bold at 1.5 leading', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerBadge(label: 'label')));
       final TextStyle style = _labelStyleOf(tester);
       expect(style.fontSize, 11);
@@ -229,17 +276,23 @@ void main() {
       expect(style.height, 1.5);
     });
 
-    testWidgets('the icon gap is 4 and appears only with an icon',
-        (WidgetTester tester) async {
+    testWidgets('the icon gap is 4 and appears only with an icon', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerBadge(label: 'label')));
       expect(find.byType(SizedBox), findsNothing);
 
-      await tester.pumpWidget(_host(
-        const DabblerBadge(
-          label: 'label',
-          icon: SizedBox.square(dimension: 12, key: ValueKey<String>('glyph')),
+      await tester.pumpWidget(
+        _host(
+          const DabblerBadge(
+            label: 'label',
+            icon: SizedBox.square(
+              dimension: 12,
+              key: ValueKey<String>('glyph'),
+            ),
+          ),
         ),
-      ));
+      );
       final SizedBox gap = tester.widget<SizedBox>(
         find.byWidgetPredicate(
           (Widget w) => w is SizedBox && w.width == DabblerBadge.iconGap,
@@ -248,10 +301,13 @@ void main() {
       expect(gap.width, 4);
     });
 
-    testWidgets('the glyph leads in LTR and trails in RTL',
-        (WidgetTester tester) async {
-      const Widget glyph =
-          SizedBox.square(dimension: 12, key: ValueKey<String>('glyph'));
+    testWidgets('the glyph leads in LTR and trails in RTL', (
+      WidgetTester tester,
+    ) async {
+      const Widget glyph = SizedBox.square(
+        dimension: 12,
+        key: ValueKey<String>('glyph'),
+      );
 
       await tester.pumpWidget(
         _host(const DabblerBadge(label: 'label', icon: glyph)),
@@ -261,31 +317,90 @@ void main() {
         lessThan(tester.getCenter(find.text('label')).dx),
       );
 
-      await tester.pumpWidget(_host(
-        const DabblerBadge(label: 'label', icon: glyph),
-        direction: TextDirection.rtl,
-      ));
+      await tester.pumpWidget(
+        _host(
+          const DabblerBadge(label: 'label', icon: glyph),
+          direction: TextDirection.rtl,
+        ),
+      );
       expect(
         tester.getCenter(find.byKey(const ValueKey<String>('glyph'))).dx,
         greaterThan(tester.getCenter(find.text('label')).dx),
       );
     });
 
-    testWidgets('resolves against the enclosing theme and brightness',
-        (WidgetTester tester) async {
+    testWidgets('resolves against the enclosing theme and brightness', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in DabblerTheme.values) {
         for (final Brightness brightness in Brightness.values) {
-          final DabblerColors colors =
-              _colors(theme: theme, brightness: brightness);
-          await tester.pumpWidget(_host(
-            DabblerBadge(label: 'label', status: colors.info),
+          final DabblerColors colors = _colors(
             theme: theme,
             brightness: brightness,
-          ));
-          expect(_decorationOf(tester).color, colors.info.surface,
-              reason: '$theme/$brightness');
+          );
+          await tester.pumpWidget(
+            _host(
+              DabblerBadge(label: 'label', status: colors.info),
+              theme: theme,
+              brightness: brightness,
+            ),
+          );
+          expect(
+            _decorationOf(tester).color,
+            colors.info.surface,
+            reason: '$theme/$brightness',
+          );
         }
       }
+    });
+  });
+
+  group('live Badge.jsx pins', () {
+    testWidgets('padding 4/10, pill, 11/700, line-height 1.5', (
+      WidgetTester tester,
+    ) async {
+      // Live `components/surfaces/Badge.jsx`: `padding: '4px 10px'`,
+      // `borderRadius: 9999`, `fontSize: 11, fontWeight: 700, lineHeight: 1.5`.
+      await tester.pumpWidget(_host(const DabblerBadge(label: 'new')));
+      final Rect box = tester.getRect(find.byType(DabblerBadge));
+      final Rect text = tester.getRect(find.text('new'));
+      expect(text.left - box.left, 10);
+      expect(box.right - text.right, 10);
+      expect(text.top - box.top, closeTo(4 + (11 * 1.5 - 11 * 1.5), 0.6));
+      final TextStyle style = tester.widget<Text>(find.text('new')).style!;
+      expect(style.fontSize, 11);
+      expect(style.fontWeight, FontWeight.w700);
+      expect(style.height, 1.5);
+    });
+
+    testWidgets('decorative info is --accent-indigo, not the info blue', (
+      WidgetTester tester,
+    ) async {
+      // Live `Badge.jsx:24` — `info: { bg: 'var(--accent-indigo)' }`.
+      await tester.pumpWidget(
+        _host(const DabblerBadge(label: 'x', tone: DabblerBadgeTone.info)),
+      );
+      expect(_decorationOf(tester).color, const Color(0xFF5C50E6));
+    });
+
+    testWidgets('paddingInline and minWidth override like live style', (
+      WidgetTester tester,
+    ) async {
+      // Live `ConversationRow` overrides the badge `paddingInline` to
+      // `--space-2` (6) and `minWidth` to 24.
+      await tester.pumpWidget(
+        _host(const DabblerBadge(label: '3', paddingInline: 6, minWidth: 24)),
+      );
+      final Rect box = tester.getRect(find.byType(DabblerBadge));
+      expect(box.width, greaterThanOrEqualTo(24));
+      final Rect text = tester.getRect(find.text('3'));
+      expect(text.center.dx, closeTo(box.center.dx, 0.6));
+      await tester.pumpWidget(
+        _host(const DabblerBadge(label: 'long label', paddingInline: 6)),
+      );
+      final Rect b2 = tester.getRect(find.byType(DabblerBadge));
+      final Rect t2 = tester.getRect(find.text('long label'));
+      expect(t2.left - b2.left, 6);
     });
   });
 }

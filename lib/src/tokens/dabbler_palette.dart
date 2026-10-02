@@ -293,8 +293,8 @@ abstract final class DabblerPalette {
   /// `--tag-pending-surface` — `#FDEDE3`.
   static const Color tagPendingSurface = Color(0xFFFDEDE3);
 
-  /// `--tag-pending-ink` — `#A34A08`.
-  static const Color tagPendingInk = Color(0xFFA34A08);
+  /// `--tag-pending-ink` — `#B4530E`.
+  static const Color tagPendingInk = Color(0xFFB4530E);
 
   /// `--tag-progress-surface` — `#DBEAFB`.
   static const Color tagProgressSurface = Color(0xFFDBEAFB);

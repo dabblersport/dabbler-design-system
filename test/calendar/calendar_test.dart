@@ -1,4 +1,5 @@
 import 'package:dabbler_design_system/src/calendar/calendar.dart';
+import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
@@ -672,20 +673,28 @@ void main() {
       }
     });
 
-    test('the weekday label deviates from --muted because --muted fails AA', () {
+    testWidgets('the weekday label is --muted taken as textSecondary (D-003a)', (
+      WidgetTester tester,
+    ) async {
+      // Live `Calendar.jsx:50` — `color: var(--muted)`; D-003(a) maps `--muted`
+      // text to textSecondary, which clears 4.5:1 where raw `--muted` does not.
+      await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
+      final Text label = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(DabblerCalendar.weekdayKey(DateTime.monday)),
+          matching: find.byType(Text),
+        ),
+      );
       final DabblerColors c = colorsFor();
-      // The finding this deviation is reported for: `Calendar.jsx:50` sets the
-      // column labels in `--muted`, which cannot carry AA body text on a card.
-      // Measured against the token itself: since D-003(a) (KAN-260)
-      // `textSecondary` no longer resolves to `--muted`, so reading the source
-      // token through that field would have stopped measuring the source.
+      expect(label.style!.color, c.textSecondary);
+      expect(label.style!.fontSize, 11);
+      expect(label.style!.fontWeight, FontWeight.w600);
       expect(
         contrastRatio(DabblerPalette.muted, c.surfaceCard),
         lessThan(4.5),
       );
-      // What is drawn instead.
       expect(
-        contrastRatio(c.textPrimary, c.surfaceCard),
+        contrastRatio(c.textSecondary, c.surfaceCard),
         greaterThanOrEqualTo(4.5),
       );
     });
@@ -807,6 +816,78 @@ void main() {
       await tester.tap(find.byKey(DabblerCalendar.cancelKey));
       expect(confirmed, 1);
       expect(cancelled, 1);
+    });
+  });
+
+  group('DabblerCalendar — live Calendar.jsx pins', () {
+    test('constants equal the live values', () {
+      // `Calendar.jsx`: card radius 18 (:38), chip height 30 and font 14 (:29,
+      // :31), chip gap 4 (:29), caret size 14 (:33), weekday padding `2px 0`
+      // (:50), cell height 39 (:55).
+      expect(DabblerCalendar.cardRadius, 18);
+      expect(DabblerCalendar.chipHeight, 30);
+      expect(DabblerCalendar.chipFontSize, 14);
+      expect(DabblerCalendar.chipGap, 4);
+      expect(DabblerCalendar.chipCaretSize, 14);
+      expect(DabblerCalendar.weekdayLabelPadding, 2);
+      expect(DabblerCalendar.cellPillHeight, 39);
+    });
+
+    testWidgets('chip caret is 14 and a selected pill paints 39 tall', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          DabblerCalendar(
+            month: specimenMonth,
+            selected: <DateTime>{DateTime(2078, 2, 14)},
+          ),
+        ),
+      );
+      final Rect caret = tester.getRect(
+        find.descendant(
+          of: find.byKey(DabblerCalendar.monthChipKey),
+          matching: find.byType(DabblerIcon),
+        ),
+      );
+      expect(caret.width, 14);
+      final Finder pill = find.descendant(
+        of: find.byKey(DabblerCalendar.dayKey(DateTime(2078, 2, 14))),
+        matching: find.byType(Container),
+      );
+      expect(tester.getRect(pill.first).height, 39);
+      expect(
+        tester
+            .getRect(find.byKey(DabblerCalendar.dayKey(DateTime(2078, 2, 14))))
+            .height,
+        DabblerSizing.touchTargetMin,
+      );
+    });
+
+    testWidgets('chip label to caret gap is 4 in LTR and RTL', (
+      WidgetTester tester,
+    ) async {
+      for (final TextDirection d in TextDirection.values) {
+        await tester.pumpWidget(
+          host(DabblerCalendar(month: specimenMonth), direction: d),
+        );
+        final Rect text = tester.getRect(
+          find.descendant(
+            of: find.byKey(DabblerCalendar.monthChipKey),
+            matching: find.byType(Text),
+          ),
+        );
+        final Rect caret = tester.getRect(
+          find.descendant(
+            of: find.byKey(DabblerCalendar.monthChipKey),
+            matching: find.byType(DabblerIcon),
+          ),
+        );
+        final double gap = d == TextDirection.ltr
+            ? caret.left - text.right
+            : text.left - caret.right;
+        expect(gap, closeTo(4, 0.01), reason: '$d');
+      }
     });
   });
 }

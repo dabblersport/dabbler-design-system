@@ -91,11 +91,11 @@ import 'card.dart';
 ///
 /// | Source literal | Taken here | Why |
 /// |---|---|---|
-/// | `borderRadius: 16` | [DabblerCard.defaultRadius] (12) | 16 is not a step of the base-3 ramp; `--radius-lg` is annotated *"cards"*. [DabblerCard]'s own ruling |
-/// | `padding: "16px"` | [DabblerCard.defaultPadding] (18) | `--card-padding` is `--space-6` |
+/// | `borderRadius: 16` | [DabblerCard.defaultRadius] (16) | D-018 |
+/// | `padding: "16px"` | [DabblerCard.defaultPadding] (16) | live `Card.jsx` `padding = 16` |
 /// | `width: 186, height: 123` | neither is fixed | Figma frame measurements; see [width] |
-/// | the wrappers' `4px` / `8px` vertical paddings | one [slotGap] of 6 | see below |
-/// | trial pill `left: 14` | [trialInset] — [DabblerSpacing.space5] (15) | 14 is not a base-3 step; 15 is `--space-5`, one pixel away |
+/// | line 2 box `height: 24`, line 4 box `height: 25` | [priceSlotHeight], [billingSlotHeight]; no gap ([slotGap] 0) | the source stacks fixed-height line boxes |
+/// | trial pill `left: 14`, `top: -10` | [trialInset] 14, [trialTop] -10 | transcribed at the live value |
 /// | trial pill `top: -10` | a half-height translation | see [trialLabel] |
 /// | trial pill fill `--purple-700` | [DabblerBadgeTone.defaultTone] (`--color-brand-primary`, purple-600) | see below |
 /// | the tick's inline `<path>` | [DabblerIcon] `check` | this package carries no raw Figma paths — DS-300 is the icon layer |
@@ -213,7 +213,14 @@ class DabblerCardPricing extends StatelessWidget {
 
   /// The gap between the card's slots — [DabblerSpacing.stackTight] (6). See
   /// the class doc's rhythm note.
-  static const double slotGap = DabblerSpacing.stackTight;
+  static const double slotGap = 0;
+
+  /// The price line's box — `height: 24` with `padding: 4px 0`
+  /// (`CardPricingDefault.jsx` line 2, Figma-export digest).
+  static const double priceSlotHeight = 24;
+
+  /// The billing line's box — `height: 25` with `padding: 8px 0` (line 4).
+  static const double billingSlotHeight = 25;
 
   /// The selection indicator's side — **28**, transcribed literally.
   ///
@@ -256,9 +263,11 @@ class DabblerCardPricing extends StatelessWidget {
   /// arcs show.
   static const double tickStrokeWidth = 1.8;
 
-  /// The trial pill's inset from the leading edge — [DabblerSpacing.space5]
-  /// (15), for the source's off-grid `left: 14`.
-  static const double trialInset = DabblerSpacing.space5;
+  /// The trial pill's inset from the leading edge — the source's `left: 14`.
+  static const double trialInset = 14;
+
+  /// The trial pill's `top: -10`.
+  static const double trialTop = -10;
 
   /// [plan]'s style: `.t-subheadline` at [DabblerType.bold].
   ///
@@ -356,23 +365,37 @@ class DabblerCardPricing extends StatelessWidget {
       ),
       footer: billingNote == null
           ? null
-          : Text(
-              billingNote!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: noteStyleFor(
-                direction,
-              ).copyWith(color: colors.textSecondary),
+          : SizedBox(
+              height: billingSlotHeight,
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  billingNote!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: noteStyleFor(
+                    direction,
+                  ).copyWith(color: colors.textSecondary),
+                ),
+              ),
             ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            price,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: priceStyleFor(direction).copyWith(color: colors.textPrimary),
+          SizedBox(
+            height: priceSlotHeight,
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                price,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: priceStyleFor(
+                  direction,
+                ).copyWith(color: colors.textPrimary),
+              ),
+            ),
           ),
           if (priceNote != null)
             Text(
@@ -457,12 +480,9 @@ class DabblerCardPricing extends StatelessWidget {
       children: <Widget>[
         card,
         PositionedDirectional(
-          top: 0,
+          top: trialTop,
           start: trialInset,
-          child: FractionalTranslation(
-            translation: const Offset(0, -0.5),
-            child: DabblerBadge(label: trialLabel!),
-          ),
+          child: DabblerBadge(label: trialLabel!),
         ),
       ],
     );

@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_neutral_status.dart';
+import '../tokens/dabbler_palette.dart';
 import '../tokens/dabbler_type.dart';
 
 /// The eight **decorative** badge tones.
@@ -124,6 +125,8 @@ class DabblerBadge extends StatelessWidget {
     this.tone = DabblerBadgeTone.defaultTone,
     this.status,
     this.icon,
+    this.paddingInline,
+    this.minWidth,
   });
 
   /// The pill's text.
@@ -139,6 +142,15 @@ class DabblerBadge extends StatelessWidget {
   /// Leading glyph. Adds a [iconGap] gap; sits on the leading side, so it moves
   /// to the right in RTL.
   final Widget? icon;
+
+  /// Overrides the inline padding ([horizontalPadding], 10). Live `Badge`
+  /// accepts `style` overrides; `ConversationRow` sets `paddingInline` to
+  /// `--space-2` (6) on its unread pill.
+  final double? paddingInline;
+
+  /// A minimum width. Live `ConversationRow` sets `minWidth: 24` on its unread
+  /// pill; the badge is `fit-content` otherwise.
+  final double? minWidth;
 
   /// Vertical padding — `4` (`Badge.jsx:39`, `padding: '4px 10px'`).
   ///
@@ -170,11 +182,9 @@ class DabblerBadge extends StatelessWidget {
   /// (`Badge.jsx:43`), where the ramp step is weight 400 at 13px leading. Both
   /// deltas are the source's, so they are applied on top of the step rather
   /// than a new step being invented.
-  static TextStyle textStyleFor(TextDirection direction) =>
-      DabblerType.caption2.resolveForDirection(direction).copyWith(
-            fontWeight: DabblerType.bold,
-            height: 1.5,
-          );
+  static TextStyle textStyleFor(TextDirection direction) => DabblerType.caption2
+      .resolveForDirection(direction)
+      .copyWith(fontWeight: DabblerType.bold, height: 1.5);
 
   /// The source's fifth `status` value, `neutral`, resolved against [colors].
   ///
@@ -197,8 +207,7 @@ class DabblerBadge extends StatelessWidget {
         // `--color-brand-primary`. `error` shares this row with `default` in
         // the source, which is why the decorative `error` is purple.
         DabblerBadgeTone.defaultTone ||
-        DabblerBadgeTone.error =>
-          colors.brandPrimary,
+        DabblerBadgeTone.error => colors.brandPrimary,
         // `--color-accent`.
         DabblerBadgeTone.primary || DabblerBadgeTone.pill => colors.accent,
         // `--accent-indigo`, approximated — see [decorativeIndigo].
@@ -208,8 +217,7 @@ class DabblerBadge extends StatelessWidget {
         DabblerBadgeTone.success => colors.textPrimary,
         // `--faint`, whose semantic role is `--color-bg-tertiary`.
         DabblerBadgeTone.warning ||
-        DabblerBadgeTone.withIcon =>
-          colors.bgTertiary,
+        DabblerBadgeTone.withIcon => colors.bgTertiary,
       };
 
   /// The ink for [tone], resolved against [colors].
@@ -217,30 +225,18 @@ class DabblerBadge extends StatelessWidget {
       switch (tone) {
         // `--muted`, whose semantic role is `--color-text-secondary`.
         DabblerBadgeTone.warning ||
-        DabblerBadgeTone.withIcon =>
-          colors.textSecondary,
+        DabblerBadgeTone.withIcon => colors.textSecondary,
         // Six of the eight tones name `--surface-card` as the foreground.
         _ => colors.surfaceCard,
       };
 
-  /// **Approximation, pending a token.** `Badge.jsx:24` paints the decorative
-  /// `info` tone with `--accent-indigo` (`rgb(92, 80, 230)`), a token declared
-  /// only in `tokens/figma/fig-tokens.css:5` and **not** in `tokens/colors.css`,
-  /// which is the stated source of the palette layer and is enforced by
-  /// `test/tokens/dabbler_palette_test.dart`.
-  ///
-  /// `DabblerColors.info.base` is what this tone paints today. **Corrected
-  /// 2026-09-17 against the rendered specimen:** this comment used to call that
-  /// value `#6366F1`, "the nearest indigo the palette actually declares". It is
-  /// neither. [DabblerPalette.info500] is **`#3B82F6`** — a blue, not an indigo
-  /// — so the gap is wider than it was written to be. Measured side by side,
-  /// the specimen paints `rgb(92, 80, 230)` and this paints `rgb(59, 130, 246)`:
-  /// visibly bluer, not a near-match. This is the
-  /// same hand-off `lib/src/controls/fab.dart` raised on KAN-222 for the FAB's
-  /// `indigo` tone: adopting `--accent-indigo` widens the palette's stated
-  /// source, which is a `cto`/`cxo` call rather than a developer's, and both
-  /// sites should move together when it is made.
-  static Color decorativeIndigo(DabblerColors colors) => colors.info.base;
+  /// `Badge.jsx:24` — the decorative `info` tone is `--accent-indigo`
+  /// (`rgb(92, 80, 230)`, [DabblerPalette.accentIndigo]). This used to paint
+  /// `DabblerColors.info.base` (`#3B82F6`, a blue); compared against the live
+  /// source it now takes the same indigo [DabblerAvatarBadgeTone.indigo] and the
+  /// button's accent tone use.
+  static Color decorativeIndigo(DabblerColors colors) =>
+      DabblerPalette.accentIndigo;
 
   /// The hairline a semantic badge draws for [status].
   ///
@@ -249,8 +245,8 @@ class DabblerBadge extends StatelessWidget {
   /// (`overlay.jsx:171`).
   static Color hairlineFor(DabblerStatusColor status, DabblerColors colors) =>
       status == neutralStatusOf(colors)
-          ? colors.borderDefault
-          : status.strong.withValues(alpha: hairlineOpacity);
+      ? colors.borderDefault
+      : status.strong.withValues(alpha: hairlineOpacity);
 
   @override
   Widget build(BuildContext context) {
@@ -258,12 +254,12 @@ class DabblerBadge extends StatelessWidget {
     final TextDirection direction = Directionality.of(context);
     final DabblerStatusColor? semantic = status;
 
-    final Color background =
-        semantic?.surface ?? backgroundOf(tone, colors);
+    final Color background = semantic?.surface ?? backgroundOf(tone, colors);
     final Color foreground = semantic?.strong ?? foregroundOf(tone, colors);
     // `Badge.jsx:41` — decorative tones draw no border at all.
-    final Color? hairline =
-        semantic == null ? null : hairlineFor(semantic, colors);
+    final Color? hairline = semantic == null
+        ? null
+        : hairlineFor(semantic, colors);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -271,41 +267,42 @@ class DabblerBadge extends StatelessWidget {
         borderRadius: DabblerRadius.pillAll,
         border: hairline == null
             ? null
-            : Border.all(
-                color: hairline,
-                width: DabblerSizing.borderDefault,
-              ),
+            : Border.all(color: hairline, width: DabblerSizing.borderDefault),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: verticalPadding,
-          horizontal: horizontalPadding,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            if (icon != null) ...<Widget>[
-              // `color: t.fg` sits on the badge in `Badge.jsx:40`, so the
-              // glyph inherits it as `currentColor` — the specimen's `pill`
-              // dot is literally `background: currentColor`, and neither
-              // icon-bearing badge passes a colour of its own. Without this
-              // the glyph fell back to `textPrimary` and read as a foreign
-              // ink on the six dark-filled tones.
-              IconTheme.merge(
-                data: IconThemeData(color: foreground),
-                child: icon!,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: minWidth ?? 0),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: verticalPadding,
+            horizontal: paddingInline ?? horizontalPadding,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              if (icon != null) ...<Widget>[
+                // `color: t.fg` sits on the badge in `Badge.jsx:40`, so the
+                // glyph inherits it as `currentColor` — the specimen's `pill`
+                // dot is literally `background: currentColor`, and neither
+                // icon-bearing badge passes a colour of its own. Without this
+                // the glyph fell back to `textPrimary` and read as a foreign
+                // ink on the six dark-filled tones.
+                IconTheme.merge(
+                  data: IconThemeData(color: foreground),
+                  child: icon!,
+                ),
+                const SizedBox(width: iconGap),
+              ],
+              Text(
+                label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.clip,
+                style: textStyleFor(direction).copyWith(color: foreground),
               ),
-              const SizedBox(width: iconGap),
             ],
-            Text(
-              label,
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.clip,
-              style: textStyleFor(direction).copyWith(color: foreground),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -120,12 +120,13 @@ enum DabblerCardVariant {
 /// [radius] — `CardTicket` draws at `24` ([DabblerRadius.xxl]) and is expected
 /// to.
 ///
-/// ## Padding: 18, not 16
+/// ## Padding: 16 (live `Card.jsx`)
 ///
-/// Same reasoning, same direction. The Figma dumps write `padding: "16px"`;
-/// `tokens/spacing.css:17` declares `--card-padding: var(--space-6)` — 18 — and
-/// this package's [DabblerSpacing.cardPadding] is that alias. The semantic
-/// token is what a card is specified in.
+/// `Card.jsx` declares `padding = 16` and says *"Figma wins on every value"*;
+/// every Figma export it merges writes `padding: "16px"`. [defaultPadding] is
+/// therefore 16, as in the live project 4286affa-bf50-4ff6-9576-917f76a93ca1.
+/// (It was `--card-padding` — 18 — until this was compared against the live
+/// source; that alias still exists for surfaces that name it.)
 class DabblerCard extends StatelessWidget {
   /// A card on the [variant] shell.
   const DabblerCard({
@@ -212,10 +213,14 @@ class DabblerCard extends StatelessWidget {
   /// that reading of `tokens/spacing.css:27` was wrong.
   static const double defaultRadius = DabblerRadius.card;
 
-  /// `--card-padding` → `--space-6` (18) — `tokens/spacing.css:17`.
-  static const EdgeInsets defaultPadding = EdgeInsets.all(
-    DabblerSpacing.cardPadding,
-  );
+  /// `padding = 16` — the live `Card.jsx` default (*"Radius 16, padding 16,
+  /// flat. Figma wins on every value."*). Not the `--card-padding` alias (18):
+  /// the live shell names 16 as its own value, and the Figma exports it merges
+  /// all write `padding: 16`.
+  static const double livePadding = 16;
+
+  /// [livePadding] on every side — see there.
+  static const EdgeInsets defaultPadding = EdgeInsets.all(livePadding);
 
   /// The [DabblerSurface] fill step each shell is built on.
   ///

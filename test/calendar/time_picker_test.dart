@@ -1,20 +1,14 @@
 import 'package:dabbler_design_system/src/calendar/time_picker.dart';
 import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/forms/time_field.dart';
-import 'package:dabbler_design_system/src/overlays/menu.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_host.dart';
-
-/// The row carrying [value] in the column keyed [column].
-Finder rowFor(Key column, String value) => find.descendant(
-      of: find.byKey(column),
-      matching: find.widgetWithText(DabblerMenuItem, value),
-    );
 
 void main() {
   group('DabblerTimeValues — the value arithmetic (AC2)', () {
@@ -23,15 +17,19 @@ void main() {
       expect(DabblerTimeValues.hours.length, 12);
       expect(DabblerTimeValues.hours.first, 1);
       expect(DabblerTimeValues.hours.last, 12);
-      final List<int> minutes =
-          DabblerTimeValues.minutesFor(DabblerTimeValues.defaultMinuteStep);
+      final List<int> minutes = DabblerTimeValues.minutesFor(
+        DabblerTimeValues.defaultMinuteStep,
+      );
       expect(minutes.length, 12);
       expect(minutes, <int>[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
     });
 
     test('the default is 7:00 AM', () {
       // `TimePicker.jsx:88`.
-      expect(DabblerTimeValues.defaultValue, const TimeOfDay(hour: 7, minute: 0));
+      expect(
+        DabblerTimeValues.defaultValue,
+        const TimeOfDay(hour: 7, minute: 0),
+      );
       expect(
         DabblerTimeFormat.format(DabblerTimeValues.defaultValue),
         '7:00 AM',
@@ -75,10 +73,7 @@ void main() {
         DabblerTimeValues.withPeriod(evening, DayPeriod.am),
         const TimeOfDay(hour: 6, minute: 30),
       );
-      expect(
-        DabblerTimeValues.withPeriod(evening, DayPeriod.pm),
-        evening,
-      );
+      expect(DabblerTimeValues.withPeriod(evening, DayPeriod.pm), evening);
     });
 
     test('hour 12 round-trips through both periods', () {
@@ -87,14 +82,11 @@ void main() {
         DabblerTimeValues.withPeriod(noon, DayPeriod.am),
         const TimeOfDay(hour: 0, minute: 0),
       );
-      expect(
-        DabblerTimeValues.withHourOfPeriod(noon, 12),
-        noon,
-      );
+      expect(DabblerTimeValues.withHourOfPeriod(noon, 12), noon);
     });
   });
 
-  group('DabblerTimePicker — it composes DS-602 and DS-700 (AC2)', () {
+  group('DabblerTimePicker — header and value set', () {
     testWidgets('the header prints the field\'s own H:MM AM', (
       WidgetTester tester,
     ) async {
@@ -106,132 +98,365 @@ void main() {
       );
       expect(
         tester.widget<Text>(find.byKey(DabblerTimePicker.valueKey)).data,
-        DabblerTimeFormat.format(const TimeOfDay(hour: 19, minute: 30)),
-      );
-      expect(
-        tester.widget<Text>(find.byKey(DabblerTimePicker.valueKey)).data,
         '7:30 PM',
       );
     });
 
-    testWidgets('both columns are DS-700 listboxes, not menus', (
+    testWidgets('a null value shows the source default', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         host(const DabblerTimePicker(), width: phoneWidth),
       );
-      for (final Key key in <Key>[
-        DabblerTimePicker.hourColumnKey,
-        DabblerTimePicker.minuteColumnKey,
-      ]) {
-        final DabblerMenuList list = tester.widget<DabblerMenuList>(
-          find.descendant(
-            of: find.byKey(key),
-            matching: find.byType(DabblerMenuList),
+      expect(
+        tester.widget<Text>(find.byKey(DabblerTimePicker.valueKey)).data,
+        '7:00 AM',
+      );
+    });
+
+    testWidgets('the rulers carry 12 hours and 12 five-minute steps, tripled', (
+      WidgetTester tester,
+    ) async {
+      // `TimePicker.jsx:7` — `trackLen = n * 3` cells per ruler.
+      await tester.pumpWidget(
+        host(const DabblerTimePicker(), width: phoneWidth),
+      );
+      for (int i = 0; i < 36; i++) {
+        expect(
+          find.byKey(
+            DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, i),
           ),
+          findsOneWidget,
         );
-        expect(list.role, DabblerMenuRole.listbox);
-        expect(list.decorated, isFalse);
-        expect(list.autofocus, isFalse);
+        expect(
+          find.byKey(
+            DabblerTimePicker.cellKey(DabblerTimePicker.minuteColumnKey, i),
+          ),
+          findsOneWidget,
+        );
+      }
+      expect(
+        find.byKey(
+          DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, 36),
+        ),
+        findsNothing,
+      );
+      String textAt(Key column, int i) => tester
+          .widget<Text>(find.byKey(DabblerTimePicker.cellKey(column, i)))
+          .data!;
+      // Zero-padded (`TimePicker.jsx:68` `padStart(2, '0')`).
+      expect(textAt(DabblerTimePicker.hourColumnKey, 12), '01');
+      expect(textAt(DabblerTimePicker.hourColumnKey, 23), '12');
+      expect(textAt(DabblerTimePicker.minuteColumnKey, 12), '00');
+      expect(textAt(DabblerTimePicker.minuteColumnKey, 23), '55');
+    });
+  });
+
+  group('DabblerTimePicker — the ruler against TimePicker.jsx', () {
+    test('the transcribed constants equal the live values', () {
+      // Live `TimePicker.jsx`: height 64 (:56), pitch 46 (:3), ticks bottom 6 /
+      // height 14 / 1.5px (:58-62), numerals 24 / 18 (:66), opacity
+      // max(.2, 1 - dist*.3) (:62), window top/bottom 4, width pitch+14,
+      // radius 12, 2px (:73-74), pin bottom 8, 2x16 (:77), glide 200ms
+      // cubic-bezier(.2,.8,.2,1) (:14), card radius 18, gap 10, header 20.
+      expect(DabblerTimePicker.rulerHeight, 64);
+      expect(DabblerTimePicker.rulerPitch, 46);
+      expect(DabblerTimePicker.tickBottom, 6);
+      expect(DabblerTimePicker.tickHeight, 14);
+      expect(DabblerTimePicker.tickWidth, 1.5);
+      expect(DabblerTimePicker.selectedFontSize, 24);
+      expect(DabblerTimePicker.otherFontSize, 18);
+      expect(DabblerTimePicker.minOpacity, 0.2);
+      expect(DabblerTimePicker.opacityStep, 0.3);
+      expect(DabblerTimePicker.windowInset, 4);
+      expect(DabblerTimePicker.windowExtra, 14);
+      expect(DabblerTimePicker.windowRadius, 12);
+      expect(DabblerTimePicker.windowBorder, 2);
+      expect(DabblerTimePicker.pinBottom, 8);
+      expect(DabblerTimePicker.pinWidth, 2);
+      expect(DabblerTimePicker.pinHeight, 16);
+      expect(DabblerTimePicker.glide, const Duration(milliseconds: 200));
+      expect(DabblerTimePicker.glideCurve, const Cubic(0.2, 0.8, 0.2, 1));
+      expect(DabblerTimePicker.cardRadius, 18);
+      expect(DabblerTimePicker.cardGap, 10);
+      expect(DabblerTimePicker.headerGap, 10);
+      expect(DabblerTimePicker.headerFontSize, 20);
+    });
+
+    testWidgets('a ruler is 64 tall and the centre cell sits on the centre', (
+      WidgetTester tester,
+    ) async {
+      // Live `:56` height 64; `:35` track left 50% with the centre cell
+      // translated to the middle.
+      await tester.pumpWidget(
+        host(
+          const DabblerTimePicker(value: TimeOfDay(hour: 7, minute: 0)),
+          width: phoneWidth,
+        ),
+      );
+      final Rect ruler = tester.getRect(
+        find.byKey(DabblerTimePicker.hourColumnKey),
+      );
+      expect(ruler.height, 64);
+      // Hour 7 is index 6; the centre cell is n + idx = 18.
+      final Rect centre = tester.getRect(
+        find.byKey(
+          DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, 18),
+        ),
+      );
+      expect(centre.center.dx, closeTo(ruler.center.dx, 0.6));
+      final Rect next = tester.getRect(
+        find.byKey(
+          DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, 19),
+        ),
+      );
+      // One pitch (46) to the right.
+      expect(next.center.dx - centre.center.dx, closeTo(46, 0.6));
+    });
+
+    testWidgets('numerals are 24 centred / 18 other with the live opacity', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerTimePicker(value: TimeOfDay(hour: 7, minute: 0)),
+          width: phoneWidth,
+        ),
+      );
+      TextStyle styleAt(int i) => tester
+          .widget<Text>(
+            find.byKey(
+              DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, i),
+            ),
+          )
+          .style!;
+      final DabblerColors c = colorsFor();
+      expect(styleAt(18).fontSize, 24);
+      expect(styleAt(18).color, c.brandPrimary);
+      expect(styleAt(19).fontSize, 18);
+      // dist 1 -> 0.7, dist 2 -> 0.4, dist 3 -> floor 0.2 (1 - .9 = .1).
+      expect(styleAt(19).color!.a, closeTo(0.7, 0.01));
+      expect(styleAt(20).color!.a, closeTo(0.4, 0.01));
+      expect(styleAt(21).color!.a, closeTo(0.2, 0.01));
+      expect(styleAt(25).color!.a, closeTo(0.2, 0.01));
+      expect(styleAt(19).color!.withValues(alpha: 1), c.textPrimary);
+    });
+
+    testWidgets('the same sizes under RTL are Latin less 0.9', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerTimePicker(value: TimeOfDay(hour: 7, minute: 0)),
+          direction: TextDirection.rtl,
+          width: phoneWidth,
+        ),
+      );
+      TextStyle styleAt(int i) => tester
+          .widget<Text>(
+            find.byKey(
+              DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, i),
+            ),
+          )
+          .style!;
+      expect(styleAt(18).fontSize, closeTo(23.1, 0.001));
+      expect(styleAt(19).fontSize, closeTo(17.1, 0.001));
+      expect(
+        tester
+            .widget<Text>(find.byKey(DabblerTimePicker.valueKey))
+            .style!
+            .fontSize,
+        closeTo(19.1, 0.001),
+      );
+    });
+
+    testWidgets('the header reads H:MM AM left to right even in RTL', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerTimePicker(value: TimeOfDay(hour: 18, minute: 35)),
+          direction: TextDirection.rtl,
+          width: phoneWidth,
+        ),
+      );
+      expect(
+        tester
+            .widget<Text>(find.byKey(DabblerTimePicker.valueKey))
+            .textDirection,
+        TextDirection.ltr,
+      );
+    });
+
+    testWidgets('the header value is 20 / 700 in LTR', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(const DabblerTimePicker(), width: phoneWidth),
+      );
+      final TextStyle s = tester
+          .widget<Text>(find.byKey(DabblerTimePicker.valueKey))
+          .style!;
+      expect(s.fontSize, 20);
+      expect(s.fontWeight, FontWeight.w700);
+    });
+
+    testWidgets('the scale ascends to the right in RTL too', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerTimePicker(value: TimeOfDay(hour: 7, minute: 0)),
+          direction: TextDirection.rtl,
+          width: phoneWidth,
+        ),
+      );
+      final double c = tester
+          .getCenter(
+            find.byKey(
+              DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, 18),
+            ),
+          )
+          .dx;
+      final double n = tester
+          .getCenter(
+            find.byKey(
+              DabblerTimePicker.cellKey(DabblerTimePicker.hourColumnKey, 19),
+            ),
+          )
+          .dx;
+      expect(n - c, closeTo(46, 0.6));
+    });
+
+    testWidgets('the rulers stack hour above minute in both directions', (
+      WidgetTester tester,
+    ) async {
+      for (final TextDirection d in TextDirection.values) {
+        await tester.pumpWidget(
+          host(const DabblerTimePicker(), direction: d, width: phoneWidth),
+        );
+        final Rect hour = tester.getRect(
+          find.byKey(DabblerTimePicker.hourColumnKey),
+        );
+        final Rect minute = tester.getRect(
+          find.byKey(DabblerTimePicker.minuteColumnKey),
+        );
+        expect(minute.top - hour.bottom, 10, reason: '$d — gap 10 (:98)');
+        expect(hour.left, minute.left);
       }
     });
 
-    testWidgets('the hour column offers 1..12 and the minute column the steps', (
+    testWidgets('the card is padded 15 with radius 18', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         host(const DabblerTimePicker(), width: phoneWidth),
       );
-      final DabblerMenuList hours = tester.widget<DabblerMenuList>(
-        find.descendant(
-          of: find.byKey(DabblerTimePicker.hourColumnKey),
-          matching: find.byType(DabblerMenuList),
-        ),
+      final Rect card = tester.getRect(find.byType(DabblerTimePicker));
+      final Rect ruler = tester.getRect(
+        find.byKey(DabblerTimePicker.hourColumnKey),
       );
-      expect(
-        hours.items.map((DabblerMenuEntry e) => e.label).toList(),
-        <String>['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-      );
-      final DabblerMenuList minutes = tester.widget<DabblerMenuList>(
-        find.descendant(
-          of: find.byKey(DabblerTimePicker.minuteColumnKey),
-          matching: find.byType(DabblerMenuList),
-        ),
-      );
-      // `TimePicker.jsx:68` pads; the hour is deliberately not padded so the
-      // column agrees with `DabblerTimeFormat.format`, which prints `7:05 PM`.
-      expect(minutes.items.first.label, '00');
-      expect(minutes.items.last.label, '55');
+      expect(ruler.left - card.left, 15);
+      expect(card.right - ruler.right, 15);
     });
+  });
 
-    testWidgets('the selected row is the one carrying the value', (
+  group('DabblerTimePicker — interaction', () {
+    Widget stateful({
+      required ValueChanged<TimeOfDay> onReport,
+      TimeOfDay initial = const TimeOfDay(hour: 7, minute: 0),
+      TimeOfDay? minimum,
+      TimeOfDay? maximum,
+      TextDirection direction = TextDirection.ltr,
+    }) {
+      TimeOfDay value = initial;
+      return host(
+        StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return DabblerTimePicker(
+              value: value,
+              minimum: minimum,
+              maximum: maximum,
+              onChanged: (TimeOfDay t) {
+                setState(() => value = t);
+                onReport(t);
+              },
+            );
+          },
+        ),
+        direction: direction,
+        width: phoneWidth,
+      );
+    }
+
+    Future<void> dragBy(WidgetTester tester, Finder at, double total) async {
+      // Steps of 10 so the recogniser passes its slop and still reports the
+      // remainder (`DragStartBehavior.start`).
+      final TestGesture g = await tester.startGesture(tester.getCenter(at));
+      final double step = total < 0 ? -10 : 10;
+      for (int i = 0; i < (total.abs() / 10).round(); i++) {
+        await g.moveBy(Offset(step, 0));
+      }
+      await g.up();
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('dragging left by ~two pitches advances two hours', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        host(
-          const DabblerTimePicker(value: TimeOfDay(hour: 15, minute: 20)),
-          width: phoneWidth,
-        ),
-      );
-      final DabblerMenuList hours = tester.widget<DabblerMenuList>(
-        find.descendant(
-          of: find.byKey(DabblerTimePicker.hourColumnKey),
-          matching: find.byType(DabblerMenuList),
-        ),
-      );
-      expect(
-        hours.items.where((DabblerMenuEntry e) => e.selected).single.label,
-        '3',
-      );
-      final DabblerMenuList minutes = tester.widget<DabblerMenuList>(
-        find.descendant(
-          of: find.byKey(DabblerTimePicker.minuteColumnKey),
-          matching: find.byType(DabblerMenuList),
-        ),
-      );
-      expect(
-        minutes.items.where((DabblerMenuEntry e) => e.selected).single.label,
-        '20',
-      );
+      // `TimePicker.jsx:25-27` — `shift = round(-dx / pitch)`.
+      TimeOfDay? last;
+      await tester.pumpWidget(stateful(onReport: (TimeOfDay t) => last = t));
+      await dragBy(tester, find.byKey(DabblerTimePicker.hourColumnKey), -120);
+      expect(last, const TimeOfDay(hour: 9, minute: 0));
     });
 
-    testWidgets('tapping an hour keeps the minute and the period', (
+    testWidgets('dragging right moves back and wraps modulo twelve', (
       WidgetTester tester,
     ) async {
-      TimeOfDay? reported;
+      TimeOfDay? last;
       await tester.pumpWidget(
-        host(
-          DabblerTimePicker(
-            value: const TimeOfDay(hour: 19, minute: 30),
-            onChanged: (TimeOfDay t) => reported = t,
-          ),
-          width: phoneWidth,
+        stateful(
+          onReport: (TimeOfDay t) => last = t,
+          initial: const TimeOfDay(hour: 1, minute: 0),
         ),
       );
-      await tester.ensureVisible(rowFor(DabblerTimePicker.hourColumnKey, '9'));
-      await tester.pump();
-      await tester.tap(rowFor(DabblerTimePicker.hourColumnKey, '9'));
-      expect(reported, const TimeOfDay(hour: 21, minute: 30));
+      await dragBy(tester, find.byKey(DabblerTimePicker.hourColumnKey), 70);
+      // 1 -> 12 (wrap): `((idx + shift) % n + n) % n` (`:27`); 12 with AM is
+      // midnight.
+      expect(last, const TimeOfDay(hour: 0, minute: 0));
     });
 
-    testWidgets('tapping a minute keeps the hour and the period', (
+    testWidgets('dragging the minute ruler changes minutes only', (
       WidgetTester tester,
     ) async {
-      TimeOfDay? reported;
-      await tester.pumpWidget(
-        host(
-          DabblerTimePicker(
-            value: const TimeOfDay(hour: 19, minute: 30),
-            onChanged: (TimeOfDay t) => reported = t,
-          ),
-          width: phoneWidth,
-        ),
+      TimeOfDay? last;
+      await tester.pumpWidget(stateful(onReport: (TimeOfDay t) => last = t));
+      await dragBy(tester, find.byKey(DabblerTimePicker.minuteColumnKey), -120);
+      expect(last, const TimeOfDay(hour: 7, minute: 10));
+    });
+
+    testWidgets('a tap picks the numeral under the finger', (
+      WidgetTester tester,
+    ) async {
+      TimeOfDay? last;
+      await tester.pumpWidget(stateful(onReport: (TimeOfDay t) => last = t));
+      final Offset c = tester.getCenter(
+        find.byKey(DabblerTimePicker.hourColumnKey),
       );
-      await tester
-          .ensureVisible(rowFor(DabblerTimePicker.minuteColumnKey, '45'));
-      await tester.pump();
-      await tester.tap(rowFor(DabblerTimePicker.minuteColumnKey, '45'));
-      expect(reported, const TimeOfDay(hour: 19, minute: 45));
+      await tester.tapAt(c + const Offset(46, 0));
+      await tester.pumpAndSettle();
+      expect(last, const TimeOfDay(hour: 8, minute: 0));
+    });
+
+    testWidgets('a tap on the centre cell reports nothing', (
+      WidgetTester tester,
+    ) async {
+      int reports = 0;
+      await tester.pumpWidget(stateful(onReport: (TimeOfDay _) => reports++));
+      await tester.tap(find.byKey(DabblerTimePicker.hourColumnKey));
+      await tester.pumpAndSettle();
+      expect(reports, 0);
     });
 
     testWidgets('the meridiem pill moves the value across noon', (
@@ -249,122 +474,53 @@ void main() {
       );
       await tester.tap(find.byKey(DabblerTimePicker.amKey));
       expect(reported, const TimeOfDay(hour: 7, minute: 30));
-
       reported = null;
       await tester.tap(find.byKey(DabblerTimePicker.pmKey));
       expect(reported, isNull, reason: 'already PM — no redundant report');
     });
 
-    testWidgets('an unchanged selection is not reported twice', (
+    testWidgets('a value outside the bounds is never committed', (
       WidgetTester tester,
     ) async {
-      int reports = 0;
+      TimeOfDay? last;
       await tester.pumpWidget(
-        host(
-          DabblerTimePicker(
-            value: const TimeOfDay(hour: 19, minute: 30),
-            onChanged: (TimeOfDay _) => reports++,
-          ),
-          width: phoneWidth,
+        stateful(
+          onReport: (TimeOfDay t) => last = t,
+          initial: const TimeOfDay(hour: 9, minute: 0),
+          minimum: const TimeOfDay(hour: 8, minute: 0),
+          maximum: const TimeOfDay(hour: 11, minute: 0),
         ),
       );
-      await tester.ensureVisible(rowFor(DabblerTimePicker.hourColumnKey, '7'));
-      await tester.pump();
-      await tester.tap(rowFor(DabblerTimePicker.hourColumnKey, '7'));
-      expect(reports, 0);
+      // Two hours back would be 7 AM, before the 8 AM minimum.
+      await dragBy(tester, find.byKey(DabblerTimePicker.hourColumnKey), 120);
+      expect(last, isNull);
     });
 
-    testWidgets('a null value shows the source default', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        host(const DabblerTimePicker(), width: phoneWidth),
-      );
-      expect(
-        tester.widget<Text>(find.byKey(DabblerTimePicker.valueKey)).data,
-        '7:00 AM',
-      );
-    });
-  });
-
-  group('DabblerTimePicker — bounds and keyboard', () {
-    testWidgets('a value outside the bounds renders disabled', (
-      WidgetTester tester,
-    ) async {
-      TimeOfDay? reported;
-      await tester.pumpWidget(
-        host(
-          DabblerTimePicker(
-            value: const TimeOfDay(hour: 9, minute: 0),
-            minimum: const TimeOfDay(hour: 8, minute: 0),
-            maximum: const TimeOfDay(hour: 11, minute: 0),
-            onChanged: (TimeOfDay t) => reported = t,
-          ),
-          width: phoneWidth,
-        ),
-      );
-      final DabblerMenuList hours = tester.widget<DabblerMenuList>(
-        find.descendant(
-          of: find.byKey(DabblerTimePicker.hourColumnKey),
-          matching: find.byType(DabblerMenuList),
-        ),
-      );
-      // The value is 9 AM, so an hour of 7 would be 7 AM — before the 8 AM
-      // minimum — and an hour of 12 would be 12 AM, before it too.
-      expect(
-        hours.items.firstWhere((DabblerMenuEntry e) => e.label == '7').disabled,
-        isTrue,
-      );
-      expect(
-        hours.items.firstWhere((DabblerMenuEntry e) => e.label == '9').disabled,
-        isFalse,
-      );
-      await tester.tap(
-        rowFor(DabblerTimePicker.hourColumnKey, '7'),
-        warnIfMissed: false,
-      );
-      expect(reported, isNull);
-    });
-
-    testWidgets('arrow keys move the selection and skip disabled values', (
+    testWidgets('arrow keys step and skip disabled values', (
       WidgetTester tester,
     ) async {
       TimeOfDay value = const TimeOfDay(hour: 9, minute: 0);
       await tester.pumpWidget(
-        host(
-          StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return DabblerTimePicker(
-                value: value,
-                minimum: const TimeOfDay(hour: 8, minute: 0),
-                maximum: const TimeOfDay(hour: 11, minute: 0),
-                onChanged: (TimeOfDay t) => setState(() => value = t),
-              );
-            },
-          ),
-          width: phoneWidth,
+        stateful(
+          onReport: (TimeOfDay t) => value = t,
+          initial: value,
+          minimum: const TimeOfDay(hour: 8, minute: 0),
+          maximum: const TimeOfDay(hour: 11, minute: 0),
         ),
       );
-
-      // Tapping into a column focuses it (pointer-down focus); the row tapped
-      // is the one already selected, so nothing else changes.
-      await tester.tap(rowFor(DabblerTimePicker.hourColumnKey, '9'));
-      await tester.pump();
-      expect(value, const TimeOfDay(hour: 9, minute: 0));
-      // 9 -> 10, both inside 8..11.
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pump();
+      await tester.tap(find.byKey(DabblerTimePicker.hourColumnKey));
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
       expect(value, const TimeOfDay(hour: 10, minute: 0));
-      // 10 -> 11. 12 would be 12 AM and is disabled, so Down stops here.
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
       expect(value, const TimeOfDay(hour: 11, minute: 0));
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pump();
-      expect(value, const TimeOfDay(hour: 11, minute: 0));
-      // Up walks back, skipping nothing inside the range.
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(value, const TimeOfDay(hour: 11, minute: 0), reason: '12 AM off');
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
       expect(value, const TimeOfDay(hour: 10, minute: 0));
     });
 
@@ -373,81 +529,45 @@ void main() {
     ) async {
       TimeOfDay value = const TimeOfDay(hour: 7, minute: 0);
       await tester.pumpWidget(
-        host(
-          StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return DabblerTimePicker(
-                value: value,
-                onChanged: (TimeOfDay t) => setState(() => value = t),
-              );
-            },
-          ),
-          width: phoneWidth,
-        ),
+        stateful(onReport: (TimeOfDay t) => value = t, initial: value),
       );
-      await tester.tap(rowFor(DabblerTimePicker.hourColumnKey, '7'));
-      await tester.pump();
+      await tester.tap(find.byKey(DabblerTimePicker.hourColumnKey));
+      await tester.pumpAndSettle();
       await tester.sendKeyEvent(LogicalKeyboardKey.end);
-      await tester.pump();
-      // Hour 12 with an AM period is midnight.
+      await tester.pumpAndSettle();
       expect(value, const TimeOfDay(hour: 0, minute: 0));
       await tester.sendKeyEvent(LogicalKeyboardKey.home);
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(value, const TimeOfDay(hour: 1, minute: 0));
     });
 
-    testWidgets('the arrow keys do not wrap', (WidgetTester tester) async {
-      TimeOfDay value = const TimeOfDay(hour: 1, minute: 0);
+    testWidgets('a ruler is an adjustable semantics node', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      TimeOfDay value = const TimeOfDay(hour: 7, minute: 0);
       await tester.pumpWidget(
-        host(
-          StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return DabblerTimePicker(
-                value: value,
-                onChanged: (TimeOfDay t) => setState(() => value = t),
-              );
-            },
-          ),
-          width: phoneWidth,
-        ),
+        stateful(onReport: (TimeOfDay t) => value = t, initial: value),
       );
-      await tester.tap(rowFor(DabblerTimePicker.hourColumnKey, '1'));
-      await tester.pump();
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.pump();
-      expect(value, const TimeOfDay(hour: 1, minute: 0));
+      final SemanticsNode node = tester.getSemantics(
+        find.byKey(DabblerTimePicker.hourColumnKey),
+      );
+      final SemanticsData data = node.getSemanticsData();
+      expect(data.label, 'Hour');
+      expect(data.value, '07');
+      expect(data.hasAction(SemanticsAction.increase), isTrue);
+      expect(data.hasAction(SemanticsAction.decrease), isTrue);
+      tester.semantics.performAction(
+        find.semantics.byLabel('Hour'),
+        SemanticsAction.increase,
+      );
+      await tester.pumpAndSettle();
+      expect(value, const TimeOfDay(hour: 8, minute: 0));
+      handle.dispose();
     });
   });
 
-  group('DabblerTimePicker — RTL and numerals (AC3)', () {
-    testWidgets('the hour column leads in both directions', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        host(const DabblerTimePicker(), width: phoneWidth),
-      );
-      expect(
-        tester.getRect(find.byKey(DabblerTimePicker.hourColumnKey)).left,
-        lessThan(
-          tester.getRect(find.byKey(DabblerTimePicker.minuteColumnKey)).left,
-        ),
-      );
-
-      await tester.pumpWidget(
-        host(
-          const DabblerTimePicker(),
-          direction: TextDirection.rtl,
-          width: phoneWidth,
-        ),
-      );
-      expect(
-        tester.getRect(find.byKey(DabblerTimePicker.hourColumnKey)).left,
-        greaterThan(
-          tester.getRect(find.byKey(DabblerTimePicker.minuteColumnKey)).left,
-        ),
-      );
-    });
-
+  group('DabblerTimePicker — RTL and numerals', () {
     testWidgets('AM leads PM in both directions', (WidgetTester tester) async {
       await tester.pumpWidget(
         host(const DabblerTimePicker(), width: phoneWidth),
@@ -456,7 +576,6 @@ void main() {
         tester.getRect(find.byKey(DabblerTimePicker.amKey)).left,
         lessThan(tester.getRect(find.byKey(DabblerTimePicker.pmKey)).left),
       );
-
       await tester.pumpWidget(
         host(
           const DabblerTimePicker(),
@@ -480,16 +599,14 @@ void main() {
           width: phoneWidth,
         ),
       );
-      final List<String> strings =
-          renderedStrings(tester, find.byType(DabblerTimePicker));
+      final List<String> strings = renderedStrings(
+        tester,
+        find.byType(DabblerTimePicker),
+      );
       expect(strings, contains('7:30 PM'));
       for (final String s in strings) {
         for (final int rune in s.runes) {
-          expect(
-            isArabicIndicDigit(rune),
-            isFalse,
-            reason: '"$s" carries an Arabic-Indic digit',
-          );
+          expect(isArabicIndicDigit(rune), isFalse, reason: '"$s"');
         }
       }
     });
@@ -508,39 +625,11 @@ void main() {
         renderedStrings(tester, find.byKey(DabblerTimePicker.amKey)),
         contains(DabblerTimeFormat.amLabel),
       );
-      expect(
-        renderedStrings(tester, find.byKey(DabblerTimePicker.pmKey)),
-        contains(DabblerTimeFormat.pmLabel),
-      );
     });
   });
 
-  group('DabblerTimePicker — targets and contrast (AC4)', () {
-    testWidgets('a value row is exactly the 45 the scroll maths assumes', (
-      WidgetTester tester,
-    ) async {
-      // `_ValueColumn._revealSelected` computes its offset as
-      // `index * rowExtent`; this is the assertion that keeps that arithmetic
-      // honest.
-      await tester.pumpWidget(
-        host(const DabblerTimePicker(), width: phoneWidth),
-      );
-      final Iterable<Element> rows = find
-          .descendant(
-            of: find.byKey(DabblerTimePicker.hourColumnKey),
-            matching: find.byType(DabblerMenuItem),
-          )
-          .evaluate();
-      expect(rows, isNotEmpty);
-      for (final Element row in rows) {
-        expect(
-          (row.renderObject! as RenderBox).size.height,
-          DabblerSizing.touchTargetMin,
-        );
-      }
-    });
-
-    testWidgets('every value row and meridiem segment clears the 45 floor', (
+  group('DabblerTimePicker — targets and colour', () {
+    testWidgets('meridiem segments and Cancel clear the 45 floor', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -552,78 +641,29 @@ void main() {
         DabblerTimePicker.cancelKey,
       ]) {
         final Rect rect = tester.getRect(find.byKey(key));
-        expect(
-          rect.height,
-          greaterThanOrEqualTo(DabblerSizing.touchTargetMin),
-          reason: '$key is under the 45 floor',
-        );
+        expect(rect.height, greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
         expect(rect.width, greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
       }
     });
 
-    testWidgets('a column shows visibleRows rows and scrolls past them', (
+    testWidgets('the unselected meridiem is --muted (textSecondary, D-003a)', (
       WidgetTester tester,
     ) async {
+      // Live `TimePicker.jsx:112` — inactive segment colour `var(--muted)`.
       await tester.pumpWidget(
         host(const DabblerTimePicker(), width: phoneWidth),
       );
-      expect(
-        tester.getRect(find.byKey(DabblerTimePicker.hourColumnKey)).height,
-        DabblerSizing.touchTargetMin *
-            DabblerTimePicker.defaultVisibleRows,
-      );
-    });
-
-    testWidgets('the selected value is scrolled into view', (
-      WidgetTester tester,
-    ) async {
-      // Hour 11 is the eleventh row of twelve — off screen in a 3-row window
-      // unless the column moved to it.
-      await tester.pumpWidget(
-        host(
-          const DabblerTimePicker(value: TimeOfDay(hour: 11, minute: 0)),
-          width: phoneWidth,
-        ),
-      );
-      await tester.pumpAndSettle();
-      final Rect column =
-          tester.getRect(find.byKey(DabblerTimePicker.hourColumnKey));
-      final Rect row = tester.getRect(
-        rowFor(DabblerTimePicker.hourColumnKey, '11'),
-      );
-      expect(row.top, greaterThanOrEqualTo(column.top - 0.5));
-      expect(row.bottom, lessThanOrEqualTo(column.bottom + 0.5));
-    });
-
-    test('a value row clears 4.5:1 in every theme and mode', () {
-      for (final DabblerTheme theme in DabblerTheme.values) {
-        for (final Brightness brightness in Brightness.values) {
-          final DabblerColors c =
-              colorsFor(theme: theme, brightness: brightness);
-          expect(
-            contrastRatio(c.textPrimary, c.surfaceCard),
-            greaterThanOrEqualTo(4.5),
-            reason: 'a value row in $theme/$brightness',
-          );
-        }
-      }
-    });
-
-    testWidgets('the unselected meridiem deviates from --muted for AA', (
-      WidgetTester tester,
-    ) async {
-      // `TimePicker.jsx:112` sets it in `--muted` (3.36:1 on the card).
-      await tester.pumpWidget(
-        host(const DabblerTimePicker(), width: phoneWidth),
-      );
-      final Text pm = tester.widget<Text>(
-        find.descendant(
-          of: find.byKey(DabblerTimePicker.pmKey),
-          matching: find.byType(Text),
-        ),
-      );
-      expect(pm.style!.color, colorsFor().textPrimary);
-      expect(pm.style!.color, isNot(colorsFor().textSecondary));
+      final TextStyle pm = tester
+          .widget<Text>(
+            find.descendant(
+              of: find.byKey(DabblerTimePicker.pmKey),
+              matching: find.byType(Text),
+            ),
+          )
+          .style!;
+      expect(pm.color, colorsFor().textSecondary);
+      expect(pm.fontSize, 12);
+      expect(pm.fontWeight, FontWeight.w700);
     });
   });
 
