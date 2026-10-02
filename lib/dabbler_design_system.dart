@@ -145,6 +145,7 @@ export 'src/messaging/conversation_row.dart';
 export 'src/messaging/conversation_row_gallery.dart';
 export 'src/messaging/message.dart';
 export 'src/messaging/message_thread.dart';
+export 'src/messaging/message_thread_gallery.dart';
 export 'src/messaging/messaging_atoms.dart';
 export 'src/messaging/messaging_atoms_gallery.dart';
 export 'src/messaging/messaging_foundations.dart';

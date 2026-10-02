@@ -5,7 +5,6 @@ import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
-import '../tokens/dabbler_palette.dart';
 
 /// Messaging foundations — not a component.
 ///
@@ -138,14 +137,27 @@ enum DabblerDeliveryState {
   /// Linear or bold.
   final DabblerIconWeight weight;
 
-  /// The glyph colour: muted while in flight, soft ink once delivered, brand
-  /// when read and the strong error ink on failure.
+  /// The glyph colour. Source tones and the roles they resolve to:
+  ///
+  /// | `DELIVERY` tone | Role | Light value |
+  /// |---|---|---|
+  /// | `--muted` (sending, sent) | [DabblerColors.textTertiary] | `#8C8C8C` |
+  /// | `--ink-soft` (delivered) | [DabblerColors.textSecondary] | `#404040` |
+  /// | `--color-brand-primary` (read) | [DabblerColors.brandPrimary] | theme |
+  /// | `--color-status-error-strong` (failed) | error `strong` | theme |
+  ///
+  /// The glyph is an icon, not text, so `--muted` takes the tertiary role
+  /// (D-003(a): `--muted` is the light tertiary value, legitimate for icons),
+  /// and `--ink-soft` takes the secondary role, which resolves to exactly
+  /// `--ink-soft` in light and follows dark mode (the earlier port used the
+  /// light-only `DabblerPalette.inkSoft` literal). This keeps the source's
+  /// sent/delivered contrast: same glyph family, lighter tone until delivered.
   Color colorFor(DabblerColors colors) => switch (this) {
-        sending || sent => colors.textSecondary,
-        delivered => DabblerPalette.inkSoft,
-        read => colors.brandPrimary,
-        failed => colors.error.strong,
-      };
+    sending || sent => colors.textTertiary,
+    delivered => colors.textSecondary,
+    read => colors.brandPrimary,
+    failed => colors.error.strong,
+  };
 }
 
 /// One coordination reaction — `REACTIONS` in the source. Iconsax glyphs, not
@@ -179,11 +191,13 @@ abstract final class DabblerReactions {
     DabblerReactionDef('star', 'star', 'Standout'),
   ];
 
-  /// The definition for [key], falling back to the first as the source does.
+  /// The definition for [key]. The source's `REACTION_BY_KEY[key]` yields
+  /// `undefined` for an unknown key; this port falls back to the first
+  /// definition instead so a caller can never render an empty pill.
   static DabblerReactionDef byKey(String key) => all.firstWhere(
-        (DabblerReactionDef r) => r.key == key,
-        orElse: () => all.first,
-      );
+    (DabblerReactionDef r) => r.key == key,
+    orElse: () => all.first,
+  );
 }
 
 /// Press, focus ring and keyboard activation around a tappable child — the
