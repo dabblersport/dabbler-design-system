@@ -273,11 +273,10 @@ class DabblerCardPricing extends StatelessWidget {
   /// size and face are the ramp's; only the leading the ramp cannot express is
   /// overridden, and the 1.5-ratio leading the pricing tile uses throughout is
   /// **reported** as a ramp gap rather than flattened onto the step.
-  static TextStyle planStyleFor(TextDirection direction) =>
-      DabblerType.subheadline.resolveForDirection(direction).copyWith(
-            fontWeight: DabblerType.bold,
-            height: 22.5 / 15,
-          );
+  static TextStyle planStyleFor(TextDirection direction) => DabblerType
+      .subheadline
+      .resolveForDirection(direction)
+      .copyWith(fontWeight: DabblerType.bold, height: 22.5 / 15);
 
   /// [price]'s style: `.t-footnote`, unmodified.
   ///
@@ -285,10 +284,10 @@ class DabblerCardPricing extends StatelessWidget {
   /// exactly.
   /// **The leading is the drawn 19.5, not the step's 18** — see
   /// [planStyleFor] for why the override is the faithful reading.
-  static TextStyle priceStyleFor(TextDirection direction) =>
-      DabblerType.footnote
-          .resolveForDirection(direction)
-          .copyWith(height: 19.5 / 13);
+  static TextStyle priceStyleFor(TextDirection direction) => DabblerType
+      .footnote
+      .resolveForDirection(direction)
+      .copyWith(height: 19.5 / 13);
 
   /// The style of [priceNote] and [billingNote]: `.t-caption-2`, unmodified.
   ///
@@ -298,10 +297,9 @@ class DabblerCardPricing extends StatelessWidget {
   /// three gaps, and the one that most changes the tile: two note lines set at
   /// 13 instead of 16.5 pull the card 7px short of the drawn height. See
   /// [planStyleFor].
-  static TextStyle noteStyleFor(TextDirection direction) =>
-      DabblerType.caption2
-          .resolveForDirection(direction)
-          .copyWith(height: 16.5 / 11);
+  static TextStyle noteStyleFor(TextDirection direction) => DabblerType.caption2
+      .resolveForDirection(direction)
+      .copyWith(height: 16.5 / 11);
 
   /// Which [DabblerCard] shell a tile in state [selected] is drawn on.
   ///
@@ -326,8 +324,7 @@ class DabblerCardPricing extends StatelessWidget {
     String? priceNote,
     String? billingNote,
     String? trialLabel,
-  }) =>
-      <String>[plan, price, ?priceNote, ?billingNote, ?trialLabel].join(', ');
+  }) => <String>[plan, price, ?priceNote, ?billingNote, ?trialLabel].join(', ');
 
   @override
   Widget build(BuildContext context) {
@@ -348,7 +345,9 @@ class DabblerCardPricing extends StatelessWidget {
               plan,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: planStyleFor(direction).copyWith(color: colors.textPrimary),
+              style: planStyleFor(
+                direction,
+              ).copyWith(color: colors.textPrimary),
             ),
           ),
           const SizedBox(width: DabblerSpacing.iconGap),
@@ -361,8 +360,9 @@ class DabblerCardPricing extends StatelessWidget {
               billingNote!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style:
-                  noteStyleFor(direction).copyWith(color: colors.textSecondary),
+              style: noteStyleFor(
+                direction,
+              ).copyWith(color: colors.textSecondary),
             ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -379,8 +379,9 @@ class DabblerCardPricing extends StatelessWidget {
               priceNote!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style:
-                  noteStyleFor(direction).copyWith(color: colors.textSecondary),
+              style: noteStyleFor(
+                direction,
+              ).copyWith(color: colors.textSecondary),
             ),
         ],
       ),
@@ -395,7 +396,8 @@ class DabblerCardPricing extends StatelessWidget {
       selected: selected,
       inMutuallyExclusiveGroup: true,
       onTap: interactive ? onTap : null,
-      label: semanticLabel ??
+      label:
+          semanticLabel ??
           defaultSemanticLabel(
             plan: plan,
             price: price,

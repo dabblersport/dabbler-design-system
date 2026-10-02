@@ -178,10 +178,10 @@ class DabblerCardHouse extends StatelessWidget {
   /// carries weight 400, so the source's own weight is applied on top of the
   /// step rather than a new step being invented — the precedent
   /// `lib/src/surfaces/badge.dart` set for `Badge`'s 11px Bold.
-  static TextStyle nameStyleFor(TextDirection direction) =>
-      DabblerType.subheadline
-          .resolveForDirection(direction)
-          .copyWith(fontWeight: DabblerType.bold);
+  static TextStyle nameStyleFor(TextDirection direction) => DabblerType
+      .subheadline
+      .resolveForDirection(direction)
+      .copyWith(fontWeight: DabblerType.bold);
 
   /// [meta]'s style: `.t-footnote`, unmodified.
   ///
@@ -225,16 +225,18 @@ class DabblerCardHouse extends StatelessWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: nameStyleFor(direction)
-                      .copyWith(color: colors.textPrimary),
+                  style: nameStyleFor(
+                    direction,
+                  ).copyWith(color: colors.textPrimary),
                 ),
                 if (meta != null)
                   Text(
                     meta!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: metaStyleFor(direction)
-                        .copyWith(color: colors.textSecondary),
+                    style: metaStyleFor(
+                      direction,
+                    ).copyWith(color: colors.textSecondary),
                   ),
               ],
             ),
@@ -256,7 +258,8 @@ class DabblerCardHouse extends StatelessWidget {
       ),
       child: IconTheme.merge(
         data: IconThemeData(color: colors.onBrand),
-        child: icon ??
+        child:
+            icon ??
             DabblerIcon(
               'home-2',
               size: DabblerSizing.iconLg,
@@ -298,10 +301,7 @@ class DabblerCardHouse extends StatelessWidget {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onAction,
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: pill,
-            ),
+            child: MouseRegion(cursor: SystemMouseCursors.click, child: pill),
           ),
         ),
       ),

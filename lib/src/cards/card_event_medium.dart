@@ -116,8 +116,7 @@ class DabblerCardEventMedium extends StatelessWidget {
   /// ([DabblerCardEventGeometry.mediumThumbRadius]), and [DabblerRadius.lg]
   /// exactly: the step `tokens/spacing.css:27` annotates *"cards, icon
   /// tiles"* and the one `CardHouse`'s well already takes.
-  static const double thumbRadius =
-      DabblerCardEventGeometry.mediumThumbRadius;
+  static const double thumbRadius = DabblerCardEventGeometry.mediumThumbRadius;
 
   /// One line, then an ellipsis. See [DabblerCardEventLarge]'s truncation
   /// section for why the row sizes cap at one.
@@ -168,8 +167,7 @@ class DabblerCardEventMedium extends StatelessWidget {
                   direction,
                   colors,
                   maxLines: titleMaxLines,
-                  style:
-                      DabblerCardEventLarge.compactTitleStyleFor(direction),
+                  style: DabblerCardEventLarge.compactTitleStyleFor(direction),
                 ),
                 if (meta != null) ...<Widget>[
                   const SizedBox(height: DabblerSpacing.stackTight),

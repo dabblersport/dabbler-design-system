@@ -122,7 +122,6 @@ abstract final class DabblerCardEventGeometry {
   static const double overlayInset = 8;
 }
 
-
 /// CardEventLarge — one event at full width: a cover image carrying the
 /// sport's mark, the event's title, and the date/time and place beneath it.
 ///
@@ -379,10 +378,10 @@ class DabblerCardEventLarge extends StatelessWidget {
   /// step and applies the source's own 700 on top of it rather than inventing
   /// a ramp step — the two row cards sit in the same lists as `CardHouse` and
   /// must read as the same size of thing.
-  static TextStyle compactTitleStyleFor(TextDirection direction) =>
-      DabblerType.subheadline
-          .resolveForDirection(direction)
-          .copyWith(fontWeight: DabblerType.bold);
+  static TextStyle compactTitleStyleFor(TextDirection direction) => DabblerType
+      .subheadline
+      .resolveForDirection(direction)
+      .copyWith(fontWeight: DabblerType.bold);
 
   /// The metadata line's style: `.t-footnote`, unmodified — the step
   /// [DabblerCardHouse.metaStyleFor] already uses for a card's second line.
@@ -402,8 +401,8 @@ class DabblerCardEventLarge extends StatelessWidget {
     bool overlay = true,
   }) {
     final DabblerColors colors = DabblerColors.of(context);
-    final Widget? art = cover ??
-        (sport == null ? null : DabblerSportBackground.maybe(sport));
+    final Widget? art =
+        cover ?? (sport == null ? null : DabblerSportBackground.maybe(sport));
 
     return Stack(
       fit: StackFit.expand,
@@ -490,8 +489,9 @@ class DabblerCardEventLarge extends StatelessWidget {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: metaStyleFor(direction)
-                  .copyWith(color: colors.textSecondary),
+              style: metaStyleFor(
+                direction,
+              ).copyWith(color: colors.textSecondary),
             ),
           ),
         ],

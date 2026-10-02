@@ -213,8 +213,9 @@ class DabblerCard extends StatelessWidget {
   static const double defaultRadius = DabblerRadius.card;
 
   /// `--card-padding` → `--space-6` (18) — `tokens/spacing.css:17`.
-  static const EdgeInsets defaultPadding =
-      EdgeInsets.all(DabblerSpacing.cardPadding);
+  static const EdgeInsets defaultPadding = EdgeInsets.all(
+    DabblerSpacing.cardPadding,
+  );
 
   /// The [DabblerSurface] fill step each shell is built on.
   ///
@@ -227,12 +228,10 @@ class DabblerCard extends StatelessWidget {
   static DabblerSurfaceVariant surfaceVariantOf(DabblerCardVariant variant) {
     return switch (variant) {
       DabblerCardVariant.white ||
-      DabblerCardVariant.pricingSelected =>
-        DabblerSurfaceVariant.card,
+      DabblerCardVariant.pricingSelected => DabblerSurfaceVariant.card,
       DabblerCardVariant.standard ||
       DabblerCardVariant.outlined ||
-      DabblerCardVariant.pricingUnselected =>
-        DabblerSurfaceVariant.sunken,
+      DabblerCardVariant.pricingUnselected => DabblerSurfaceVariant.sunken,
     };
   }
 
@@ -242,11 +241,10 @@ class DabblerCard extends StatelessWidget {
       // `var(--surface-sunken)` — the tonal card fill, neutral-200 in light.
       DabblerCardVariant.standard ||
       DabblerCardVariant.outlined ||
-      DabblerCardVariant.pricingUnselected =>
-        colors.surfaceSunken,
+      DabblerCardVariant.pricingUnselected => colors.surfaceSunken,
       // `var(--surface-card)`.
-      DabblerCardVariant.white || DabblerCardVariant.pricingSelected =>
-        colors.surfaceCard,
+      DabblerCardVariant.white ||
+      DabblerCardVariant.pricingSelected => colors.surfaceCard,
     };
   }
 
@@ -257,8 +255,7 @@ class DabblerCard extends StatelessWidget {
       // `1px solid var(--outline-card)` / `2px solid var(--outline-card)`.
       DabblerCardVariant.outlined ||
       DabblerCardVariant.white ||
-      DabblerCardVariant.pricingUnselected =>
-        colors.borderDefault,
+      DabblerCardVariant.pricingUnselected => colors.borderDefault,
       // `2px solid var(--color-brand-primary)`.
       DabblerCardVariant.pricingSelected => colors.brandPrimary,
     };
@@ -270,11 +267,9 @@ class DabblerCard extends StatelessWidget {
     return switch (variant) {
       DabblerCardVariant.standard => 0,
       DabblerCardVariant.outlined ||
-      DabblerCardVariant.white =>
-        DabblerSizing.borderDefault,
+      DabblerCardVariant.white => DabblerSizing.borderDefault,
       DabblerCardVariant.pricingSelected ||
-      DabblerCardVariant.pricingUnselected =>
-        DabblerSizing.borderDefault * 2,
+      DabblerCardVariant.pricingUnselected => DabblerSizing.borderDefault * 2,
     };
   }
 
@@ -285,8 +280,9 @@ class DabblerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final double resolvedRadius = radius ?? defaultRadius;
-    final BorderRadius borderRadius =
-        BorderRadius.all(Radius.circular(resolvedRadius));
+    final BorderRadius borderRadius = BorderRadius.all(
+      Radius.circular(resolvedRadius),
+    );
 
     final Widget surface = DabblerSurface(
       variant: surfaceVariantOf(variant),
@@ -326,11 +322,7 @@ class DabblerCard extends StatelessWidget {
   /// The slot stack. Null when no slot was filled — an empty card is a
   /// legitimate skeleton or media well, exactly as [DabblerSurface] allows.
   Widget? _content() {
-    final List<Widget> padded = <Widget>[
-      ?header,
-      ?child,
-      ?footer,
-    ];
+    final List<Widget> padded = <Widget>[?header, ?child, ?footer];
 
     if (padded.isEmpty && media == null) return null;
 

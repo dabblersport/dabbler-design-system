@@ -56,6 +56,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...menuGalleryEntries,
   ...motionGalleryEntries,
   ...navigationGalleryEntries,
+  ...panelCardsGalleryEntries,
   ...progressBarGalleryEntries,
   ...sectionGalleryEntries,
   ...sheetGalleryEntries,

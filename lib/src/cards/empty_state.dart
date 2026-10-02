@@ -170,16 +170,16 @@ class DabblerEmptyState extends StatelessWidget {
   /// [DabblerSpacing.space9] and [DabblerSpacing.space4].
   static const EdgeInsetsDirectional inlinePadding =
       EdgeInsetsDirectional.symmetric(
-    vertical: DabblerSpacing.space9,
-    horizontal: DabblerSpacing.space4,
-  );
+        vertical: DabblerSpacing.space9,
+        horizontal: DabblerSpacing.space4,
+      );
 
   /// `size: 'page'` padding — `var(--space-10) var(--space-6)`, i.e. 36 and 18.
   static const EdgeInsetsDirectional pagePadding =
       EdgeInsetsDirectional.symmetric(
-    vertical: DabblerSpacing.space10,
-    horizontal: DabblerSpacing.space6,
-  );
+        vertical: DabblerSpacing.space10,
+        horizontal: DabblerSpacing.space6,
+      );
 
   /// `min-height: 60dvh` on the page size, as a fraction of the viewport.
   static const double pageMinHeightFraction = 0.60;
@@ -200,14 +200,15 @@ class DabblerEmptyState extends StatelessWidget {
   static TextStyle titleStyleFor(
     DabblerEmptyStateSize size,
     TextDirection direction,
-  ) =>
-      switch (size) {
-        DabblerEmptyStateSize.page =>
-          DabblerType.title3.resolveForDirection(direction),
-        DabblerEmptyStateSize.inline => DabblerType.body
-            .resolveForDirection(direction)
-            .copyWith(fontWeight: DabblerType.semibold),
-      };
+  ) => switch (size) {
+    DabblerEmptyStateSize.page => DabblerType.title3.resolveForDirection(
+      direction,
+    ),
+    DabblerEmptyStateSize.inline =>
+      DabblerType.body
+          .resolveForDirection(direction)
+          .copyWith(fontWeight: DabblerType.semibold),
+  };
 
   /// The copy's style — `fontSize: 14, lineHeight: '19px'` at both sizes.
   ///
@@ -224,20 +225,19 @@ class DabblerEmptyState extends StatelessWidget {
 
     return switch (size) {
       DabblerEmptyStateSize.inline => DabblerCard(
-          variant: DabblerCardVariant.white,
-          padding: inlinePadding,
-          child: content,
-        ),
+        variant: DabblerCardVariant.white,
+        padding: inlinePadding,
+        child: content,
+      ),
       DabblerEmptyStateSize.page => ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight:
-                MediaQuery.sizeOf(context).height * pageMinHeightFraction,
-          ),
-          child: Padding(
-            padding: pagePadding,
-            child: Center(child: content),
-          ),
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.sizeOf(context).height * pageMinHeightFraction,
         ),
+        child: Padding(
+          padding: pagePadding,
+          child: Center(child: content),
+        ),
+      ),
     };
   }
 
@@ -255,12 +255,16 @@ class DabblerEmptyState extends StatelessWidget {
     if (icon != null || iconWidget != null) add(_well(colors));
 
     if (title != null) {
-      add(Text(
-        title!,
-        textAlign: TextAlign.center,
-        style: titleStyleFor(size, direction)
-            .copyWith(color: colors.textPrimary),
-      ));
+      add(
+        Text(
+          title!,
+          textAlign: TextAlign.center,
+          style: titleStyleFor(
+            size,
+            direction,
+          ).copyWith(color: colors.textPrimary),
+        ),
+      );
     }
 
     if (text != null) {
@@ -269,13 +273,14 @@ class DabblerEmptyState extends StatelessWidget {
         textAlign: TextAlign.center,
         style: textStyleFor(direction).copyWith(color: colors.textSecondary),
       );
-      add(page
-          ? ConstrainedBox(
-              constraints:
-                  const BoxConstraints(maxWidth: pageTextMaxWidth),
-              child: copy,
-            )
-          : copy);
+      add(
+        page
+            ? ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: pageTextMaxWidth),
+                child: copy,
+              )
+            : copy,
+      );
     }
 
     if (action != null) add(action!, space: gap + actionGap);
@@ -309,7 +314,8 @@ class DabblerEmptyState extends StatelessWidget {
       ),
       child: IconTheme.merge(
         data: IconThemeData(color: colors.textTertiary),
-        child: iconWidget ??
+        child:
+            iconWidget ??
             DabblerIcon(
               icon!,
               size: DabblerSizing.iconMd,

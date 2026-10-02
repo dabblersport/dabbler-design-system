@@ -93,6 +93,10 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardPricing](components/card-pricing.md) — one subscription plan as a selectable tile.
 - [CardTicket](components/card-ticket.md) — a booking as a ticket, with its own type scale.
 - [StatTile](components/stat-tile.md) — the bento stat tile used across the profile screens.
+- [PanelCard](components/panel-card.md) — the framed panel with a header, an inset body and a footer.
+- [ChecklistPanel](components/checklist-panel.md) — the task rows inside a panel.
+- [MemberListPanel](components/member-list-panel.md) — people rows with an add or remove button.
+- [MutualsCard](components/mutuals-card.md) — avatars beside a line of context.
 
 ### 3 · Identity and status — who or what a piece of content is
 

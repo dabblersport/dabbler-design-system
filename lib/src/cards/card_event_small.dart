@@ -164,8 +164,7 @@ class DabblerCardEventSmall extends StatelessWidget {
                   direction,
                   colors,
                   maxLines: titleMaxLines,
-                  style:
-                      DabblerCardEventLarge.compactTitleStyleFor(direction),
+                  style: DabblerCardEventLarge.compactTitleStyleFor(direction),
                 ),
                 if (meta != null) ...<Widget>[
                   const SizedBox(height: DabblerSpacing.stackTight),

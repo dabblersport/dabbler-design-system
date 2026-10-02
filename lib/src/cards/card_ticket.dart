@@ -223,9 +223,9 @@ class DabblerCardTicket extends StatelessWidget {
   /// base-3 grid, both transcribed without deviation.
   static const EdgeInsetsDirectional stripPadding =
       EdgeInsetsDirectional.symmetric(
-    vertical: DabblerSpacing.space5,
-    horizontal: DabblerSpacing.space8,
-  );
+        vertical: DabblerSpacing.space5,
+        horizontal: DabblerSpacing.space8,
+      );
 
   /// The body's padding — `padding: '18px 24px 21px'`.
   ///
@@ -236,11 +236,11 @@ class DabblerCardTicket extends StatelessWidget {
   /// literals DS-800 had to correct, nothing here is off the ramp.
   static const EdgeInsetsDirectional bodyPadding =
       EdgeInsetsDirectional.fromSTEB(
-    DabblerSpacing.space8,
-    DabblerSpacing.cardPadding,
-    DabblerSpacing.space8,
-    DabblerSpacing.space7,
-  );
+        DabblerSpacing.space8,
+        DabblerSpacing.cardPadding,
+        DabblerSpacing.space8,
+        DabblerSpacing.space7,
+      );
 
   /// The gap between the body's three slots — `gap: 15`
   /// ([DabblerSpacing.space5]), not [DabblerCard]'s default 12.
@@ -305,10 +305,7 @@ class DabblerCardTicket extends StatelessWidget {
   static Color indigoFill(DabblerColors colors) => DabblerPalette.accentIndigo;
 
   /// The strip's fill for [header], resolved against [colors].
-  static Color headerFillOf(
-    DabblerTicketHeader header,
-    DabblerColors colors,
-  ) =>
+  static Color headerFillOf(DabblerTicketHeader header, DabblerColors colors) =>
       switch (header) {
         DabblerTicketHeader.brand => colors.brandPrimary,
         DabblerTicketHeader.indigo => indigoFill(colors),
@@ -323,10 +320,7 @@ class DabblerCardTicket extends StatelessWidget {
   /// it takes [DabblerPalette.paper] directly: the strip's fill is
   /// brightness-invariant, so its ink has to be too, and `--surface-card` is
   /// not white in dark mode.
-  static Color headerInkOf(
-    DabblerTicketHeader header,
-    DabblerColors colors,
-  ) =>
+  static Color headerInkOf(DabblerTicketHeader header, DabblerColors colors) =>
       switch (header) {
         DabblerTicketHeader.brand => colors.onBrand,
         DabblerTicketHeader.indigo => DabblerPalette.paper,
@@ -341,18 +335,14 @@ class DabblerCardTicket extends StatelessWidget {
       switch (tone) {
         DabblerTicketStatusTone.pending => DabblerColors.tagPending,
         DabblerTicketStatusTone.progress ||
-        DabblerTicketStatusTone.upcoming =>
-          DabblerColors.tagProgress,
+        DabblerTicketStatusTone.upcoming => DabblerColors.tagProgress,
         DabblerTicketStatusTone.submitted => DabblerColors.tagSubmitted,
         DabblerTicketStatusTone.review ||
-        DabblerTicketStatusTone.past =>
-          DabblerColors.tagReview,
+        DabblerTicketStatusTone.past => DabblerColors.tagReview,
         DabblerTicketStatusTone.success ||
-        DabblerTicketStatusTone.live =>
-          DabblerColors.tagSuccess,
+        DabblerTicketStatusTone.live => DabblerColors.tagSuccess,
         DabblerTicketStatusTone.failed ||
-        DabblerTicketStatusTone.cancelled =>
-          DabblerColors.tagFailed,
+        DabblerTicketStatusTone.cancelled => DabblerColors.tagFailed,
         DabblerTicketStatusTone.expired => DabblerColors.tagExpired,
       };
 
@@ -395,11 +385,10 @@ class DabblerCardTicket extends StatelessWidget {
   ///
   /// The step's face, script resolution and fallbacks are kept — only the two
   /// metrics the ramp cannot express are overridden.
-  static TextStyle organiserStyleFor(TextDirection direction) =>
-      DabblerType.footnote.resolveForDirection(direction).copyWith(
-            fontSize: 14,
-            height: 19 / 14,
-          );
+  static TextStyle organiserStyleFor(TextDirection direction) => DabblerType
+      .footnote
+      .resolveForDirection(direction)
+      .copyWith(fontSize: 14, height: 19 / 14);
 
   /// The title — `fontSize: 22, lineHeight: '28px', fontWeight: 500` set in
   /// `var(--font-sans)`.
@@ -422,10 +411,10 @@ class DabblerCardTicket extends StatelessWidget {
   /// An action pill's label — `fontSize: 15, lineHeight: '20px',
   /// fontWeight: 500`, which is `.t-subheadline`'s metrics at Medium where the
   /// step carries 400.
-  static TextStyle actionStyleFor(TextDirection direction) =>
-      DabblerType.subheadline
-          .resolveForDirection(direction)
-          .copyWith(fontWeight: DabblerType.medium);
+  static TextStyle actionStyleFor(TextDirection direction) => DabblerType
+      .subheadline
+      .resolveForDirection(direction)
+      .copyWith(fontWeight: DabblerType.medium);
 
   /// [step]'s metrics, re-set in the sans face at [weight].
   ///
@@ -441,11 +430,14 @@ class DabblerCardTicket extends StatelessWidget {
     final DabblerTypeScript script = direction == TextDirection.rtl
         ? DabblerTypeScript.arabic
         : DabblerTypeScript.latin;
-    return step.resolve(script).copyWith(
-          fontFamily:
-              DabblerType.fontFamilyFor(DabblerTypeRole.sans, script),
-          fontFamilyFallback:
-              DabblerType.fontFamilyFallbackFor(DabblerTypeRole.sans, script),
+    return step
+        .resolve(script)
+        .copyWith(
+          fontFamily: DabblerType.fontFamilyFor(DabblerTypeRole.sans, script),
+          fontFamilyFallback: DabblerType.fontFamilyFallbackFor(
+            DabblerTypeRole.sans,
+            script,
+          ),
           fontWeight: weight,
         );
   }
@@ -477,8 +469,9 @@ class DabblerCardTicket extends StatelessWidget {
   /// See [_BodyCap] for the second half of that sentence, which this file used
   /// to declare impossible.
   Widget _strip(DabblerColors colors, TextDirection direction) {
-    final TextStyle style = codeStyleFor(direction)
-        .copyWith(color: headerInkOf(header, colors));
+    final TextStyle style = codeStyleFor(
+      direction,
+    ).copyWith(color: headerInkOf(header, colors));
     final Color fill = headerFillOf(header, colors);
 
     final Widget band = Container(
@@ -532,8 +525,9 @@ class DabblerCardTicket extends StatelessWidget {
                   organiser!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: organiserStyleFor(direction)
-                      .copyWith(color: colors.textSecondary),
+                  style: organiserStyleFor(
+                    direction,
+                  ).copyWith(color: colors.textSecondary),
                 ),
               if (organiser != null && title != null)
                 const SizedBox(height: titleGap),
@@ -542,8 +536,9 @@ class DabblerCardTicket extends StatelessWidget {
                   title!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: titleStyleFor(direction)
-                      .copyWith(color: colors.textPrimary),
+                  style: titleStyleFor(
+                    direction,
+                  ).copyWith(color: colors.textPrimary),
                 ),
             ],
           ),
@@ -615,8 +610,7 @@ class DabblerCardTicket extends StatelessWidget {
             price ?? '',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style:
-                priceStyleFor(direction).copyWith(color: colors.textPrimary),
+            style: priceStyleFor(direction).copyWith(color: colors.textPrimary),
           ),
         ),
         for (final DabblerTicketAction action in actions) ...<Widget>[
@@ -653,9 +647,7 @@ class DabblerCardTicket extends StatelessWidget {
     final Widget pill = Container(
       height: actionHeight,
       alignment: Alignment.center,
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: actionPadding,
-      ),
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: actionPadding),
       decoration: BoxDecoration(
         color: colors.textPrimary,
         borderRadius: DabblerRadius.pillAll,
@@ -679,10 +671,7 @@ class DabblerCardTicket extends StatelessWidget {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: action.onPressed,
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: pill,
-            ),
+            child: MouseRegion(cursor: SystemMouseCursors.click, child: pill),
           ),
         ),
       ),
@@ -780,8 +769,10 @@ class _DashedRulePainter extends CustomPainter {
         DabblerCardTicket.dashLength + DabblerCardTicket.dashGap;
 
     for (double x = 0; x < size.width; x += step) {
-      final double end =
-          (x + DabblerCardTicket.dashLength).clamp(0.0, size.width);
+      final double end = (x + DabblerCardTicket.dashLength).clamp(
+        0.0,
+        size.width,
+      );
       canvas.drawLine(Offset(x, y), Offset(end, y), paint);
     }
   }

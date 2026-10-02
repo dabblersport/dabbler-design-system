@@ -87,7 +87,8 @@ const List<GalleryEntry> cardsGalleryEntries = <GalleryEntry>[
     page: 'components/card-house',
     group: GalleryPurpose.contentContainers,
     title: 'Card — house, pricing, ticket',
-    description: 'The venue card, both pricing states, and the ticket with '
+    description:
+        'The venue card, both pricing states, and the ticket with '
         'its header tones and status tones.',
     builder: _others,
   ),
