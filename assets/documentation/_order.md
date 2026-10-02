@@ -113,6 +113,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [Badge](components/badge.md) — the pill that labels a row, a card or a tab.
 - [Rating](components/rating.md) — a score, shown or collected.
 - [ConversationRow](components/conversation-row.md) — one conversation in the inbox: identity, latest activity, unread and status.
+- [ConversationAvatar](components/conversation-avatar.md) — a conversation's avatar with its kind badge and presence dot.
 
 ### 4 · Selection and input — capturing what the user tells you
 
@@ -168,10 +169,14 @@ lot about the rest.
 - [Skeleton](components/skeleton.md) — placeholder geometry for content that hasn't arrived yet.
 - [EmptyState](components/empty-state.md) — the "nothing here yet" state, and the only one this
   system has.
+- [SystemMessage](components/system-message.md) — product-generated activity in a conversation, never a bubble.
+- [TypingIndicator](components/typing-indicator.md) — three dots, with or without a name line, while someone types.
 
 ### 9 · Structure — the one thing that separates, and nothing else
 
 - [Divider](components/divider.md) — the only line this system draws between things.
+- [DateSeparator](components/date-separator.md) — the day boundary pill in a conversation timeline.
+- [UnreadDivider](components/unread-divider.md) — the brand-coloured "new messages" boundary.
 
 ## Patterns
 
