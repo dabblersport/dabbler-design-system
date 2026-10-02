@@ -106,7 +106,7 @@ Widget _rows(BuildContext context) => GalleryStack(
             title: 'فريق الأحد',
             sender: 'عمر',
             preview: 'من سيحضر القمصان؟',
-            timestamp: '١٧:٠٢',
+            timestamp: '17:02',
             unread: 4,
             divider: false,
             onTap: _noop,

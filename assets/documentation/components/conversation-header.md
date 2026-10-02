@@ -48,7 +48,7 @@ A subtitle, the typing indicator, or nothing.
 
 ## Direction
 
-Every inset is logical, so back sits at the inline start and overflow at the inline end, and the identity text is start-aligned. The back glyph is the same arrow-circle-left in both directions, exactly as the source passes it; it is not mirrored. The title and subtitle switch to the Arabic subheadline and caption-2 metrics.
+Every inset is logical, so back sits at the inline start and overflow at the inline end, and the identity text is start-aligned. The back glyph is mirrored by name: arrow-circle-left in LTR, arrow-circle-right in RTL, so it always points to the inline end it leads back toward. This is an intentional deviation: the live JSX does not flip; RTL back must point to the end. The title and subtitle switch to the Arabic subheadline and caption-2 metrics.
 
 ## Tokens used
 
@@ -56,7 +56,7 @@ Fills and ink: the page surface, the faint hairline, primary ink for title and g
 
 ## Change log
 
-- Added from the live design project (`ConversationHeader.jsx`). The muted subtitle follows the text role ruled in D-003(a). The back arrow is not mirrored under RTL, matching the source; whether it should be is an open question.
+- Added from the live design project (`ConversationHeader.jsx`). The muted subtitle follows the text role ruled in D-003(a). Intentional deviation: the live JSX does not flip the back arrow; RTL back must point to the end, so RTL uses arrow-circle-right (design review).
 
 ## Source
 

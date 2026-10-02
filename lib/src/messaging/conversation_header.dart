@@ -38,7 +38,7 @@ enum DabblerConversationSubtitleTone {
 /// | `paddingInline: var(--space-2)`, `gap: var(--space-1)` | inline 6, gap 3 |
 /// | `borderBlockEnd: 1px solid var(--faint)`, `background: var(--surface-page)` | 1px [DabblerColors.bgTertiary], [DabblerColors.bgPrimary] |
 /// | back / overflow: `--touch-target-min` square, `--radius-pill`, `--ink`, `Icon size 24` | [target] 45, pill focus ring, [DabblerColors.textPrimary], 24 |
-/// | back icon `arrow-circle-left`, overflow icon `more` | same names, never mirrored (see Direction) |
+/// | back icon `arrow-circle-left`, overflow icon `more` | `arrow-circle-left` in LTR, `arrow-circle-right` in RTL (intentional deviation, see Direction); `more` |
 /// | `aria-label={backLabel}` / `{overflowLabel}`, defaults `Back` / `More` | [backLabel] / [overflowLabel] |
 /// | identity `button`: `flex: 1`, `gap --space-3`, `paddingInline --space-1`, `height --touch-target-min`, `textAlign: start` | [Expanded], gap 9, inline 3, height 45, start-aligned |
 /// | `ConversationAvatar size={36}`, `seed={seed \|\| title}` | [DabblerConversationAvatar] size 36, seed falls back to [title] |
@@ -50,11 +50,11 @@ enum DabblerConversationSubtitleTone {
 ///
 /// The row is built from logical insets, so it mirrors under RTL: back sits at
 /// the inline start (right in RTL) and overflow at the inline end. **The back
-/// glyph is not mirrored.** The live JSX passes `arrow-circle-left` in both
-/// directions, and [DabblerIcon] never mirrors itself (the Icon card selects a
-/// mirrored glyph *name* instead, and this source does not). So under RTL the
-/// back arrow at the right edge still points left; this matches live and is
-/// recorded as an open question rather than silently corrected.
+/// glyph is mirrored by name: an intentional deviation from live.** The live
+/// JSX passes `arrow-circle-left` in both directions, so in RTL its arrow
+/// points into the content; RTL back must point to the end. [DabblerIcon]
+/// never mirrors itself (the Icon card selects the mirrored glyph *name*), so
+/// [backIconFor] picks `arrow-circle-right` under RTL (design review, cxo).
 ///
 /// ## Accessibility
 ///
@@ -92,8 +92,15 @@ class DabblerConversationHeader extends StatelessWidget {
   /// The icon size — `size={24}`.
   static const double iconSize = 24;
 
-  /// The back glyph — `arrow-circle-left`, in both directions.
+  /// The LTR back glyph — `arrow-circle-left`.
   static const String backIcon = 'arrow-circle-left';
+
+  /// The RTL back glyph — `arrow-circle-right` (mirrored by name).
+  static const String backIconRtl = 'arrow-circle-right';
+
+  /// The back glyph for [direction].
+  static String backIconFor(TextDirection direction) =>
+      direction == TextDirection.rtl ? backIconRtl : backIcon;
 
   /// The overflow glyph — `more`.
   static const String overflowIcon = 'more';
@@ -263,7 +270,7 @@ class DabblerConversationHeader extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          _iconTarget(colors, backIcon, backLabel, onBack),
+          _iconTarget(colors, backIconFor(dir), backLabel, onBack),
           const SizedBox(width: DabblerSpacing.space1),
           Expanded(child: identity),
           const SizedBox(width: DabblerSpacing.space1),

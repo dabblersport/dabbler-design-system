@@ -67,7 +67,10 @@ void main() {
             find.byType(DabblerConversationHeader),
           );
           expect(bar.height, 52); // height: 52
-          final Rect back = _iconRect(tester, 'arrow-circle-left');
+          final Rect back = _iconRect(
+            tester,
+            DabblerConversationHeader.backIconFor(dir),
+          );
           final Rect more = _iconRect(tester, 'more');
           expect(back.size, const Size(45, 45)); // --touch-target-min
           expect(more.size, const Size(45, 45));
@@ -234,28 +237,37 @@ void main() {
   });
 
   group('direction', () {
-    testWidgets('RTL mirrors order; back glyph is not mirrored (as live)', (
-      tester,
-    ) async {
-      await tester.pumpWidget(_host(_basic, direction: TextDirection.rtl));
-      final Rect back = _iconRect(tester, 'arrow-circle-left');
-      final Rect more = _iconRect(tester, 'more');
-      expect(back.left, greaterThan(more.left));
-      // Same glyph name in RTL, and no Transform with a negative x scale
-      // (the press scale is a positive uniform scale).
-      final Iterable<Transform> ts = tester.widgetList<Transform>(
-        find.ancestor(
-          of: find.byWidgetPredicate(
+    testWidgets(
+      'RTL mirrors order and the back glyph by name (deviation from live)',
+      (tester) async {
+        await tester.pumpWidget(_host(_basic, direction: TextDirection.rtl));
+        expect(
+          find.byWidgetPredicate(
             (Widget w) => w is DabblerIcon && w.name == 'arrow-circle-left',
           ),
-          matching: find.byType(Transform),
+          findsNothing,
+        );
+        final Rect back = _iconRect(tester, 'arrow-circle-right');
+        final Rect more = _iconRect(tester, 'more');
+        expect(back.left, greaterThan(more.left));
+        expect(_text(tester, 'Layla Haddad').textAlign, TextAlign.start);
+      },
+    );
+
+    testWidgets('LTR keeps arrow-circle-left', (tester) async {
+      await tester.pumpWidget(_host(_basic));
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'arrow-circle-left',
         ),
+        findsOneWidget,
       );
-      for (final Transform t in ts) {
-        expect(t.transform.entry(0, 0), greaterThan(0));
-      }
-      // Text starts at the inline start (right edge of the text column).
-      expect(_text(tester, 'Layla Haddad').textAlign, TextAlign.start);
+      expect(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'arrow-circle-right',
+        ),
+        findsNothing,
+      );
     });
   });
 
