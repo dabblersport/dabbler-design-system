@@ -109,6 +109,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [Avatar](components/avatar.md) — a person's circular, deterministically generated portrait.
 - [Badge](components/badge.md) — the pill that labels a row, a card or a tab.
 - [Rating](components/rating.md) — a score, shown or collected.
+- [ConversationRow](components/conversation-row.md) — one conversation in the inbox: identity, latest activity, unread and status.
 
 ### 4 · Selection and input — capturing what the user tells you
 
