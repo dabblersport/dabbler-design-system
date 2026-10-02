@@ -126,6 +126,7 @@ lot about the rest.
 - [Stepper](components/stepper.md) — a small bounded integer, nudged rather than typed.
 - [CodeInput](components/code-input.md) — one-time-code and PIN entry.
 - [InputRow](components/input-row.md) — the settings-list row: leading slot, text, trailing slot.
+- [ChatComposer](components/chat-composer.md) — the message input, with attach, emoji, quick replies and send.
 - [FieldShell](components/field-shell.md) — the internal chrome every text-entry field paints from.
 - [PickerFieldShell](components/picker-field-shell.md) — the internal chrome every
   typed-or-picked field paints from.

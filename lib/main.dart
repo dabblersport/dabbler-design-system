@@ -42,6 +42,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...buttonGalleryEntries,
   ...calendarGalleryEntries,
   ...cardsGalleryEntries,
+  ...chatComposerGalleryEntries,
   ...chipGalleryEntries,
   ...colorsGalleryEntries,
   ...dialogGalleryEntries,

@@ -135,6 +135,8 @@ export 'src/navigation/bottom_bar.dart';
 export 'src/navigation/tab_bar.dart';
 export 'src/navigation/tab_bar_gallery.dart';
 export 'src/navigation/top_bar.dart';
+export 'src/messaging/chat_composer.dart';
+export 'src/messaging/chat_composer_gallery.dart';
 export 'src/messaging/message.dart';
 export 'src/messaging/message_thread.dart';
 export 'src/messaging/messaging_atoms.dart';
