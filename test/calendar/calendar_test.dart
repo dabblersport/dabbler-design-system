@@ -17,33 +17,40 @@ final DateTime specimenMonth = DateTime(2078, DateTime.february);
 void main() {
   group('DabblerCalendarMonth — the grid arithmetic (AC1)', () {
     test('a month fills whole weeks, opening on the first weekday', () {
-      final List<DabblerCalendarCell> cells =
-          DabblerCalendarMonth.cellsFor(specimenMonth);
+      final List<DabblerCalendarCell> cells = DabblerCalendarMonth.cellsFor(
+        specimenMonth,
+      );
       expect(cells.length % DabblerCalendarMonth.daysInWeek, 0);
       expect(cells.first.date.weekday, DateTime.monday);
       expect(cells.last.date.weekday, DateTime.sunday);
     });
 
-    test('the body is exactly the month, and the padding is its neighbours', () {
-      final List<DabblerCalendarCell> cells =
-          DabblerCalendarMonth.cellsFor(specimenMonth);
-      final List<DabblerCalendarCell> inside =
-          cells.where((DabblerCalendarCell c) => !c.outside).toList();
-      // 2078 is not a leap year; February has 28 days.
-      expect(DabblerCalendarMonth.daysIn(specimenMonth), 28);
-      expect(inside.length, 28);
-      expect(inside.first.date, DateTime(2078, 2, 1));
-      expect(inside.last.date, DateTime(2078, 2, 28));
-      for (final DabblerCalendarCell c in cells) {
-        expect(c.outside, c.date.month != DateTime.february);
-      }
-    });
+    test(
+      'the body is exactly the month, and the padding is its neighbours',
+      () {
+        final List<DabblerCalendarCell> cells = DabblerCalendarMonth.cellsFor(
+          specimenMonth,
+        );
+        final List<DabblerCalendarCell> inside = cells
+            .where((DabblerCalendarCell c) => !c.outside)
+            .toList();
+        // 2078 is not a leap year; February has 28 days.
+        expect(DabblerCalendarMonth.daysIn(specimenMonth), 28);
+        expect(inside.length, 28);
+        expect(inside.first.date, DateTime(2078, 2, 1));
+        expect(inside.last.date, DateTime(2078, 2, 28));
+        for (final DabblerCalendarCell c in cells) {
+          expect(c.outside, c.date.month != DateTime.february);
+        }
+      },
+    );
 
     test('the trailing cells are the next month opening at 1', () {
-      // `Calendar.jsx:25` spells this `cells.length - lead - days + 1`, which
+      // `Calendar.jsx:24` spells this `cells.length - lead - days + 1`, which
       // evaluates to 1, 2, 3 …
-      final List<DabblerCalendarCell> cells =
-          DabblerCalendarMonth.cellsFor(DateTime(2026, DateTime.september));
+      final List<DabblerCalendarCell> cells = DabblerCalendarMonth.cellsFor(
+        DateTime(2026, DateTime.september),
+      );
       final List<DabblerCalendarCell> trailing = cells
           .skipWhile((DabblerCalendarCell c) => c.outside)
           .skipWhile((DabblerCalendarCell c) => !c.outside)
@@ -55,11 +62,14 @@ void main() {
     });
 
     test('a leap February is 29 days', () {
-      expect(DabblerCalendarMonth.daysIn(DateTime(2028, DateTime.february)), 29);
+      expect(
+        DabblerCalendarMonth.daysIn(DateTime(2028, DateTime.february)),
+        29,
+      );
     });
 
     test('leadingFor matches the source for a Monday-first week', () {
-      // `Calendar.jsx:19` — `(first.getDay() + 6) % 7`, i.e. Monday-first.
+      // `Calendar.jsx:18` — `(first.getDay() + 6) % 7`, i.e. Monday-first.
       final DateTime first = DateTime(2078, 2, 1);
       expect(
         DabblerCalendarMonth.leadingFor(specimenMonth),
@@ -70,9 +80,9 @@ void main() {
     test('a Saturday-first week shifts the leading count, not the month', () {
       final List<DabblerCalendarCell> saturdayFirst =
           DabblerCalendarMonth.cellsFor(
-        specimenMonth,
-        firstWeekday: DateTime.saturday,
-      );
+            specimenMonth,
+            firstWeekday: DateTime.saturday,
+          );
       expect(saturdayFirst.first.date.weekday, DateTime.saturday);
       expect(
         saturdayFirst.where((DabblerCalendarCell c) => !c.outside).length,
@@ -88,34 +98,39 @@ void main() {
     });
 
     test('weekdayOrder starts where it is told and stays logical', () {
-      expect(
-        DabblerCalendarMonth.weekdayOrder(DateTime.monday),
-        <int>[1, 2, 3, 4, 5, 6, 7],
-      );
-      expect(
-        DabblerCalendarMonth.weekdayOrder(DateTime.saturday),
-        <int>[
-          DateTime.saturday,
-          DateTime.sunday,
-          DateTime.monday,
-          DateTime.tuesday,
-          DateTime.wednesday,
-          DateTime.thursday,
-          DateTime.friday,
-        ],
-      );
+      expect(DabblerCalendarMonth.weekdayOrder(DateTime.monday), <int>[
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+      ]);
+      expect(DabblerCalendarMonth.weekdayOrder(DateTime.saturday), <int>[
+        DateTime.saturday,
+        DateTime.sunday,
+        DateTime.monday,
+        DateTime.tuesday,
+        DateTime.wednesday,
+        DateTime.thursday,
+        DateTime.friday,
+      ]);
     });
 
-    test('the week-start default is Monday in LTR and Saturday in RTL (AC3)', () {
-      expect(
-        DabblerCalendarMonth.defaultFirstWeekdayFor(TextDirection.ltr),
-        DateTime.monday,
-      );
-      expect(
-        DabblerCalendarMonth.defaultFirstWeekdayFor(TextDirection.rtl),
-        DateTime.saturday,
-      );
-    });
+    test(
+      'the week-start default is Monday in LTR and Saturday in RTL (AC3)',
+      () {
+        expect(
+          DabblerCalendarMonth.defaultFirstWeekdayFor(TextDirection.ltr),
+          DateTime.monday,
+        );
+        expect(
+          DabblerCalendarMonth.defaultFirstWeekdayFor(TextDirection.rtl),
+          DateTime.saturday,
+        );
+      },
+    );
 
     test('monthAdd rolls the year in both directions', () {
       expect(
@@ -166,7 +181,9 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.byKey(DabblerCalendar.dayKey(DateTime(2078, 2, 14))));
+      await tester.tap(
+        find.byKey(DabblerCalendar.dayKey(DateTime(2078, 2, 14))),
+      );
       expect(picked, DateTime(2078, 2, 14));
     });
 
@@ -206,7 +223,9 @@ void main() {
         warnIfMissed: false,
       );
       expect(picked, isNull);
-      await tester.tap(find.byKey(DabblerCalendar.dayKey(DateTime(2078, 2, 10))));
+      await tester.tap(
+        find.byKey(DabblerCalendar.dayKey(DateTime(2078, 2, 10))),
+      );
       expect(picked, DateTime(2078, 2, 10));
     });
 
@@ -241,8 +260,9 @@ void main() {
           ),
         ),
       );
-      final DabblerCalendar widget =
-          tester.widget<DabblerCalendar>(find.byType(DabblerCalendar));
+      final DabblerCalendar widget = tester.widget<DabblerCalendar>(
+        find.byType(DabblerCalendar),
+      );
       expect(
         widget.isSelected(
           DabblerCalendarCell(date: DateTime(2078, 2, 3), outside: false),
@@ -336,15 +356,19 @@ void main() {
         ),
       );
       return <double>[
-        for (final int weekday
-            in DabblerCalendarMonth.weekdayOrder(firstWeekday))
+        for (final int weekday in DabblerCalendarMonth.weekdayOrder(
+          firstWeekday,
+        ))
           tester.getRect(find.byKey(DabblerCalendar.weekdayKey(weekday))).left,
       ];
     }
 
     testWidgets('LTR runs the week left to right', (WidgetTester tester) async {
-      final List<double> lefts =
-          await columnLefts(tester, TextDirection.ltr, DateTime.monday);
+      final List<double> lefts = await columnLefts(
+        tester,
+        TextDirection.ltr,
+        DateTime.monday,
+      );
       for (int i = 1; i < lefts.length; i++) {
         expect(
           lefts[i],
@@ -355,8 +379,11 @@ void main() {
     });
 
     testWidgets('RTL runs the week right to left', (WidgetTester tester) async {
-      final List<double> lefts =
-          await columnLefts(tester, TextDirection.rtl, DateTime.saturday);
+      final List<double> lefts = await columnLefts(
+        tester,
+        TextDirection.rtl,
+        DateTime.saturday,
+      );
       for (int i = 1; i < lefts.length; i++) {
         expect(
           lefts[i],
@@ -369,12 +396,18 @@ void main() {
     testWidgets('the first day of the week is the outermost leading column', (
       WidgetTester tester,
     ) async {
-      final List<double> ltr =
-          await columnLefts(tester, TextDirection.ltr, DateTime.monday);
+      final List<double> ltr = await columnLefts(
+        tester,
+        TextDirection.ltr,
+        DateTime.monday,
+      );
       expect(ltr.first, lessThan(ltr.last));
 
-      final List<double> rtl =
-          await columnLefts(tester, TextDirection.rtl, DateTime.saturday);
+      final List<double> rtl = await columnLefts(
+        tester,
+        TextDirection.rtl,
+        DateTime.saturday,
+      );
       expect(rtl.first, greaterThan(rtl.last));
     });
 
@@ -434,18 +467,21 @@ void main() {
       );
     });
 
-    test('the arrow glyphs swap with direction, because an icon never does', () {
-      expect(
-        DabblerCalendar.previousIconFor(TextDirection.ltr),
-        'arrow-left-2',
-      );
-      expect(DabblerCalendar.nextIconFor(TextDirection.ltr), 'arrow-right-3');
-      expect(
-        DabblerCalendar.previousIconFor(TextDirection.rtl),
-        'arrow-right-3',
-      );
-      expect(DabblerCalendar.nextIconFor(TextDirection.rtl), 'arrow-left-2');
-    });
+    test(
+      'the arrow glyphs swap with direction, because an icon never does',
+      () {
+        expect(
+          DabblerCalendar.previousIconFor(TextDirection.ltr),
+          'arrow-left-2',
+        );
+        expect(DabblerCalendar.nextIconFor(TextDirection.ltr), 'arrow-right-3');
+        expect(
+          DabblerCalendar.previousIconFor(TextDirection.rtl),
+          'arrow-right-3',
+        );
+        expect(DabblerCalendar.nextIconFor(TextDirection.rtl), 'arrow-left-2');
+      },
+    );
 
     testWidgets('"next" advances calendar time in both directions', (
       WidgetTester tester,
@@ -481,12 +517,17 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          DabblerCalendar(month: specimenMonth, firstWeekday: DateTime.saturday),
+          DabblerCalendar(
+            month: specimenMonth,
+            firstWeekday: DateTime.saturday,
+          ),
           direction: TextDirection.rtl,
         ),
       );
-      final List<String> strings =
-          renderedStrings(tester, find.byType(DabblerCalendar));
+      final List<String> strings = renderedStrings(
+        tester,
+        find.byType(DabblerCalendar),
+      );
       expect(strings, contains('2078'));
       expect(strings, contains('28'));
       for (final String s in strings) {
@@ -527,8 +568,9 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
-      for (final DabblerCalendarCell cell
-          in DabblerCalendarMonth.cellsFor(specimenMonth)) {
+      for (final DabblerCalendarCell cell in DabblerCalendarMonth.cellsFor(
+        specimenMonth,
+      )) {
         expect(
           tester.getRect(find.byKey(DabblerCalendar.dayKey(cell.date))).height,
           greaterThanOrEqualTo(DabblerSizing.touchTargetMin),
@@ -636,7 +678,8 @@ void main() {
           expect(
             ratio,
             lessThan(4.5),
-            reason: '$theme is recorded as failing; if it now passes, the '
+            reason:
+                '$theme is recorded as failing; if it now passes, the '
                 'token changed and this ticket\'s reported finding is stale',
           );
         } else {
@@ -662,8 +705,10 @@ void main() {
         DabblerTheme.active,
       };
       for (final DabblerTheme theme in DabblerTheme.values) {
-        final DabblerColors c =
-            colorsFor(theme: theme, brightness: Brightness.dark);
+        final DabblerColors c = colorsFor(
+          theme: theme,
+          brightness: Brightness.dark,
+        );
         final double ratio = contrastRatio(c.onBrand, c.brandPrimary);
         expect(
           ratio < 4.5,
@@ -676,7 +721,7 @@ void main() {
     testWidgets('the weekday label is --muted taken as textSecondary (D-003a)', (
       WidgetTester tester,
     ) async {
-      // Live `Calendar.jsx:50` — `color: var(--muted)`; D-003(a) maps `--muted`
+      // Live `Calendar.jsx:46` — `color: var(--muted)`; D-003(a) maps `--muted`
       // text to textSecondary, which clears 4.5:1 where raw `--muted` does not.
       await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
       final Text label = tester.widget<Text>(
@@ -689,10 +734,7 @@ void main() {
       expect(label.style!.color, c.textSecondary);
       expect(label.style!.fontSize, 11);
       expect(label.style!.fontWeight, FontWeight.w600);
-      expect(
-        contrastRatio(DabblerPalette.muted, c.surfaceCard),
-        lessThan(4.5),
-      );
+      expect(contrastRatio(DabblerPalette.muted, c.surfaceCard), lessThan(4.5));
       expect(
         contrastRatio(c.textSecondary, c.surfaceCard),
         greaterThanOrEqualTo(4.5),
@@ -731,7 +773,7 @@ void main() {
     });
 
     test('--subtle is never a text colour here (D-003)', () {
-      // `Calendar.jsx:58` uses `var(--subtle)` for an outside day. Since
+      // `Calendar.jsx:55` uses `var(--subtle)` for an outside day. Since
       // D-003(a) no light text role resolves to `--subtle` at all; what this
       // still guards is that the outside day is not painted in the tertiary
       // de-emphasis role either.
@@ -787,8 +829,19 @@ void main() {
               DateTime.friday: 'ج',
             },
             monthLabels: const <String>[
-              '', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-              'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+              '',
+              'يناير',
+              'فبراير',
+              'مارس',
+              'أبريل',
+              'مايو',
+              'يونيو',
+              'يوليو',
+              'أغسطس',
+              'سبتمبر',
+              'أكتوبر',
+              'نوفمبر',
+              'ديسمبر',
             ],
           ),
           direction: TextDirection.rtl,
@@ -821,9 +874,9 @@ void main() {
 
   group('DabblerCalendar — live Calendar.jsx pins', () {
     test('constants equal the live values', () {
-      // `Calendar.jsx`: card radius 18 (:38), chip height 30 and font 14 (:29,
-      // :31), chip gap 4 (:29), caret size 14 (:33), weekday padding `2px 0`
-      // (:50), cell height 39 (:55).
+      // `Calendar.jsx`: card radius 18 (:37), chip height 30 / gap 4 (:30), font 14
+      // (:32), caret size 14 (:33), weekday padding `2px 0` (:46), cell
+      // height 39 (:53).
       expect(DabblerCalendar.cardRadius, 18);
       expect(DabblerCalendar.chipHeight, 30);
       expect(DabblerCalendar.chipFontSize, 14);
@@ -887,6 +940,45 @@ void main() {
             ? caret.left - text.right
             : text.left - caret.right;
         expect(gap, closeTo(4, 0.01), reason: '$d');
+      }
+    });
+  });
+
+  group('DabblerCalendar — chevron direction follows the layout', () {
+    testWidgets('previous points toward the start, next toward the end', (
+      WidgetTester tester,
+    ) async {
+      for (final TextDirection d in TextDirection.values) {
+        await tester.pumpWidget(
+          host(
+            DabblerCalendar(month: specimenMonth, onMonthChanged: (_) {}),
+            direction: d,
+          ),
+        );
+        DabblerIcon iconOf(Key k) => tester.widget<DabblerIcon>(
+          find.descendant(
+            of: find.byKey(k),
+            matching: find.byType(DabblerIcon),
+          ),
+        );
+        final DabblerIcon prev = iconOf(DabblerCalendar.previousMonthKey);
+        final DabblerIcon next = iconOf(DabblerCalendar.nextMonthKey);
+        final double prevX = tester
+            .getCenter(find.byKey(DabblerCalendar.previousMonthKey))
+            .dx;
+        final double nextX = tester
+            .getCenter(find.byKey(DabblerCalendar.nextMonthKey))
+            .dx;
+        if (d == TextDirection.ltr) {
+          expect(prevX, lessThan(nextX));
+          expect(prev.name, 'arrow-left-2');
+          expect(next.name, 'arrow-right-3');
+        } else {
+          // Previous sits on the right (the start) and its glyph points right.
+          expect(prevX, greaterThan(nextX));
+          expect(prev.name, 'arrow-right-3');
+          expect(next.name, 'arrow-left-2');
+        }
       }
     });
   });

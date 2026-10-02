@@ -1,3 +1,4 @@
+import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/overlays/menu.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
@@ -157,10 +158,27 @@ void main() {
     await tester.pumpWidget(
       _host(const DabblerMenuItem(label: 's', icon: 'star', selected: true)),
     );
-    final Iterable<Rect> icons = tester
-        .widgetList<Icon>(find.byType(Icon))
-        .map((Icon i) => Rect.fromLTWH(0, 0, i.size!, i.size!));
-    expect(icons.every((Rect r) => r.width == 18), isTrue);
-    expect(icons.length, 2);
+    // Live `MenuItem`: `<Icon name="tick-circle" type="bold" size={18}
+    // color="var(--color-brand-primary)" />` when `selected`.
+    final DabblerIcon tick = tester.widget<DabblerIcon>(
+      find.byWidgetPredicate(
+        (Widget w) => w is DabblerIcon && w.name == 'tick-circle',
+      ),
+    );
+    final DabblerColors c = DabblerColors.resolve(
+      theme: DabblerTheme.main,
+      brightness: Brightness.light,
+    );
+    expect(tick.weight, DabblerIconWeight.bold);
+    expect(tick.size, 18);
+    expect(tick.color, c.brandPrimary);
+    // The leading glyph is the other icon: linear, 18.
+    final DabblerIcon lead = tester.widget<DabblerIcon>(
+      find.byWidgetPredicate(
+        (Widget w) => w is DabblerIcon && w.name == 'star',
+      ),
+    );
+    expect(lead.weight, DabblerIconWeight.linear);
+    expect(lead.size, 18);
   });
 }

@@ -394,6 +394,27 @@ void main() {
   });
 
   group('the trial pill', () {
+    testWidgets('is filled with the theme\'s 700 step (live --purple-700)', (
+      WidgetTester tester,
+    ) async {
+      // Live `CardPricingDefault.jsx` digest: badge `background:
+      // var(--purple-700)`; fig-tokens.css `--purple-700: rgb(90,30,168)`.
+      await tester.pumpWidget(_host(_yearly));
+      final DabblerColors c = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      final DecoratedBox box = tester.widget<DecoratedBox>(
+        find
+            .descendant(
+              of: find.byType(DabblerBadge),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect((box.decoration as BoxDecoration).color, c.brandPrimaryHover);
+    });
+
     testWidgets('straddles the card\'s top edge', (WidgetTester tester) async {
       await tester.pumpWidget(_host(_yearly));
 

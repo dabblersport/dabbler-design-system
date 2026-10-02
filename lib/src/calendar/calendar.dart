@@ -10,7 +10,7 @@ import '../tokens/dabbler_type.dart';
 
 /// One square of the month grid.
 ///
-/// `Calendar.jsx:20-25` builds `{ n, out }` — a day *number* plus a flag for
+/// `Calendar.jsx:21-24` builds `{ n, out }` — a day *number* plus a flag for
 /// "belongs to a neighbouring month". This carries the whole [DateTime]
 /// instead, because a bare day number cannot answer the two questions AC1 and
 /// AC4 need answered: which month a leading `31` belongs to, and whether a
@@ -26,7 +26,7 @@ class DabblerCalendarCell {
 
   /// Whether [date] falls outside the displayed month — the source's `out`.
   ///
-  /// `Calendar.jsx:57` — an outside cell is muted and **not selectable**
+  /// `Calendar.jsx:55` — an outside cell is muted and **not selectable**
   /// (`onClick={() => !c.out && …}`, `cursor: 'default'`).
   final bool outside;
 
@@ -51,7 +51,7 @@ class DabblerCalendarCell {
 ///
 /// ## The week start is a locale fact, not a direction fact (AC3)
 ///
-/// `Calendar.jsx:5` fixes `DOW = ['MO' … 'SU']` and `:19` fixes
+/// `Calendar.jsx:5` fixes `DOW = ['MO' … 'SU']` and `:18` fixes
 /// `lead = (first.getDay() + 6) % 7`, i.e. Monday-first, unconditionally. AC3
 /// requires the week to start on *the correct day*, which for the Arabic
 /// locales Dabbler ships to is Saturday, not Monday — and which is a property
@@ -74,12 +74,12 @@ class DabblerCalendarCell {
 abstract final class DabblerCalendarMonth {
   const DabblerCalendarMonth._();
 
-  /// Seven — the source's `repeat(7,1fr)` (`Calendar.jsx:47`).
+  /// Seven — the source's `repeat(7,1fr)` (`Calendar.jsx:44`).
   static const int daysInWeek = 7;
 
   /// The two-letter weekday abbreviations, keyed by [DateTime.weekday].
   ///
-  /// `Calendar.jsx:5` — `['MO','TU','WE','TH','FR','SA','SU']`, re-keyed by
+  /// `Calendar.jsx:4` — `['MO','TU','WE','TH','FR','SA','SU']`, re-keyed by
   /// weekday number so the list survives a week start other than Monday.
   /// Latin only; Arabic labels are a `content-manager` hand-off and are passed
   /// in through [DabblerCalendar.weekdayLabels].
@@ -95,7 +95,7 @@ abstract final class DabblerCalendarMonth {
 
   /// The three-letter month abbreviations, `DateTime.january`-indexed at 1.
   ///
-  /// `Calendar.jsx:6` — `['Jan' … 'Dec']`. Index 0 is a placeholder so
+  /// `Calendar.jsx:5` — `['Jan' … 'Dec']`. Index 0 is a placeholder so
   /// `monthAbbreviations[date.month]` reads directly.
   static const List<String> monthAbbreviations = <String>[
     '',
@@ -136,7 +136,7 @@ abstract final class DabblerCalendarMonth {
 
   /// How many leading cells the month needs before its first day.
   ///
-  /// `Calendar.jsx:19` — `(first.getDay() + 6) % 7`, generalised. JavaScript's
+  /// `Calendar.jsx:18` — `(first.getDay() + 6) % 7`, generalised. JavaScript's
   /// `getDay()` is 0 = Sunday; Dart's [DateTime.weekday] is 1 = Monday, which
   /// is what the `+ 6` in the source was converting to in the first place.
   static int leadingFor(DateTime month, {int firstWeekday = DateTime.monday}) {
@@ -146,14 +146,14 @@ abstract final class DabblerCalendarMonth {
 
   /// The number of days in [month]'s month.
   ///
-  /// `Calendar.jsx:20` — `new Date(year, month + 1, 0).getDate()`. Dart's
+  /// `Calendar.jsx:19` — `new Date(year, month + 1, 0).getDate()`. Dart's
   /// [DateTime] normalises a zeroth day the same way.
   static int daysIn(DateTime month) =>
       DateTime(month.year, month.month + 1, 0).day;
 
   /// Every square of the grid, in reading order, padded to whole weeks.
   ///
-  /// `Calendar.jsx:21-25`: the leading cells come from the previous month, the
+  /// `Calendar.jsx:21-24`: the leading cells come from the previous month, the
   /// body from this one, and the trailing cells from the next until the length
   /// is a multiple of seven. The source spells the trailing number as
   /// `cells.length - lead - days + 1`, which evaluates to 1, 2, 3 … — i.e. the
@@ -298,14 +298,14 @@ abstract final class DabblerCalendarMonth {
 /// | Weekday label | `--muted` | [DabblerColors.textSecondary] | D-003(a): `--muted` text is `textSecondary`, which resolves to `--ink-soft` |
 /// | Outside day | `--subtle` | [DabblerColors.textSecondary] | **deviation**; 10.37:1 |
 ///
-/// **Weekday label.** `Calendar.jsx:50` sets the column labels in `--muted`
+/// **Weekday label.** `Calendar.jsx:46` sets the column labels in `--muted`
 /// (`#8C8C8C`) and so does this: `--muted` text is [DabblerColors.textSecondary]
 /// under D-003(a), which resolves to `--ink-soft` and clears 4.5:1 on the card
 /// where the raw `--muted` measures **3.36:1**. (This used to be set in
 /// [DabblerColors.textPrimary], a deviation from the live colour that D-003(a)
 /// made unnecessary.)
 ///
-/// **Outside day.** `Calendar.jsx:58` sets these in `--subtle`, which
+/// **Outside day.** `Calendar.jsx:55` sets these in `--subtle`, which
 /// `DECISIONS.md` D-003 forbids as a text colour outright. They are set in
 /// [DabblerColors.textSecondary], which since D-003(a) (KAN-260) resolves to
 /// `--ink-soft` rather than `--muted` — **10.37:1** on the card. The WCAG
@@ -313,7 +313,7 @@ abstract final class DabblerCalendarMonth {
 /// longer needed: no text in this widget, interactive or not, is below 4.5:1.
 ///
 /// **Touch targets.** Every date cell is a target. Each is at least
-/// [DabblerSizing.touchTargetMin] (45) **tall** — `Calendar.jsx:55` says `39`.
+/// [DabblerSizing.touchTargetMin] (45) **tall** — `Calendar.jsx:53` says `39`.
 /// The selection pill is *painted* at the live 39 ([cellPillHeight]) and the
 /// remaining 6px is hit area and row pitch only; the 45 pitch is the
 /// **documented deviation** taken for AC4. Cell *width* is the
@@ -328,7 +328,7 @@ abstract final class DabblerCalendarMonth {
 /// composer makes when it sizes the card.
 ///
 /// The month and year chips keep their 30px visual height
-/// (`Calendar.jsx:29`) inside a 45px target, as do the two header arrows.
+/// (`Calendar.jsx:30`) inside a 45px target, as do the two header arrows.
 class DabblerCalendar extends StatelessWidget {
   /// Creates a month grid.
   const DabblerCalendar({
@@ -353,10 +353,10 @@ class DabblerCalendar extends StatelessWidget {
     this.nextMonthLabel = defaultNextMonthLabel,
   });
 
-  /// `Confirm` — `Calendar.jsx:70`.
+  /// `Confirm` — `Calendar.jsx:69`.
   static const String defaultConfirmLabel = 'Confirm';
 
-  /// `Cancel` — `Calendar.jsx:67`.
+  /// `Cancel` — `Calendar.jsx:73`.
   static const String defaultCancelLabel = 'Cancel';
 
   /// The previous-month control's accessible name. Not in the source, which
@@ -367,28 +367,28 @@ class DabblerCalendar extends StatelessWidget {
   /// [defaultPreviousMonthLabel].
   static const String defaultNextMonthLabel = 'Next month';
 
-  /// `border-radius: 18` on the card (`Calendar.jsx:38`) — [DabblerRadius.xl].
+  /// `border-radius: 18` on the card (`Calendar.jsx:37`) — [DabblerRadius.xl].
   static const double cardRadius = DabblerRadius.xl;
 
   /// The chips' visual height, inside a [DabblerSizing.touchTargetMin] target
-  /// (`Calendar.jsx:29`).
+  /// (`Calendar.jsx:30`).
   static const double chipHeight = 30;
 
-  /// `gap: 4` between a chip's label and its caret (`Calendar.jsx:29`).
+  /// `gap: 4` between a chip's label and its caret (`Calendar.jsx:30`).
   static const double chipGap = 4;
 
   /// `<Icon name="arrow-down-1" size={14} />` — the caret in a month/year chip
   /// (`Calendar.jsx:33`).
   static const double chipCaretSize = 14;
 
-  /// `padding: '2px 0'` on a weekday column label (`Calendar.jsx:50`).
+  /// `padding: '2px 0'` on a weekday column label (`Calendar.jsx:46`).
   static const double weekdayLabelPadding = 2;
 
-  /// `height: 39` on a date cell (`Calendar.jsx:55`) — the *painted* height of
+  /// `height: 39` on a date cell (`Calendar.jsx:53`) — the *painted* height of
   /// the selection pill. The hit target is [DabblerSizing.touchTargetMin].
   static const double cellPillHeight = 39;
 
-  /// `fontSize: 14` on a month/year chip (`Calendar.jsx:31`). Off the type
+  /// `fontSize: 14` on a month/year chip (`Calendar.jsx:32`). Off the type
   /// ramp; transcribed.
   static const double chipFontSize = 14;
 
@@ -490,7 +490,7 @@ class DabblerCalendar extends StatelessWidget {
   /// Fired by the month chip. Null renders the chip as a plain label with no
   /// affordance.
   ///
-  /// `Calendar.jsx:29-34` draws both chips with a dropdown caret and a pointer
+  /// `Calendar.jsx:28-34` draws both chips with a dropdown caret and a pointer
   /// cursor but wires **no handler** — the month/year *selects* the `d.ts`
   /// summary names are a stub in the source. They are a real seam here, and a
   /// caller that supplies neither gets a header that does not claim to be
@@ -548,17 +548,17 @@ class DabblerCalendar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         // `background: var(--surface-card)`, `border-radius: 18`
-        // (`Calendar.jsx:38`). Flat — no shadow anywhere in this file.
+        // (`Calendar.jsx:37`). Flat — no shadow anywhere in this file.
         color: colors.surfaceCard,
         borderRadius: const BorderRadius.all(Radius.circular(cardRadius)),
       ),
       child: Padding(
-        // `padding: 15` (`Calendar.jsx:38`) — `--space-5`.
+        // `padding: 15` (`Calendar.jsx:37`) — `--space-5`.
         padding: const EdgeInsets.all(DabblerSpacing.space5),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          // `gap: 12` (`Calendar.jsx:38`) — `--space-4`.
+          // `gap: 12` (`Calendar.jsx:37`) — `--space-4`.
           spacing: DabblerSpacing.space4,
           children: <Widget>[
             _header(context, colors, direction),
@@ -570,7 +570,7 @@ class DabblerCalendar extends StatelessWidget {
     );
   }
 
-  /// `Calendar.jsx:39-44` — prev, the two chips, next, space-between.
+  /// `Calendar.jsx:38-42` — prev, the two chips, next, space-between.
   Widget _header(
     BuildContext context,
     DabblerColors colors,
@@ -580,7 +580,7 @@ class DabblerCalendar extends StatelessWidget {
         monthLabels ?? DabblerCalendarMonth.monthAbbreviations;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      // `gap: 9` (`Calendar.jsx:39`) — `--space-3`.
+      // `gap: 9` (`Calendar.jsx:38`) — `--space-3`.
       spacing: DabblerSpacing.space3,
       children: <Widget>[
         _arrow(
@@ -636,7 +636,7 @@ class DabblerCalendar extends StatelessWidget {
 
   /// One header arrow: an 18px glyph centred in a 45×45 target.
   ///
-  /// `Calendar.jsx:40` draws the bare glyph with no box at all. The box is
+  /// `Calendar.jsx:39` draws the bare glyph with no box at all. The box is
   /// AC4's: a glyph on its own is an 18px target.
   Widget _arrow({
     required Key key,
@@ -686,7 +686,7 @@ class DabblerCalendar extends StatelessWidget {
   }) {
     final Widget pill = Container(
       height: chipHeight,
-      // `padding: '0 10px'` (`Calendar.jsx:29`). 10 is off the base-3 grid and
+      // `padding: '0 10px'` (`Calendar.jsx:30`). 10 is off the base-3 grid and
       // is transcribed literally, as DS-401 transcribes its own off-grid
       // button padding.
       padding: const EdgeInsetsDirectional.symmetric(horizontal: 10),
@@ -699,7 +699,7 @@ class DabblerCalendar extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        // `gap: 4` (`Calendar.jsx:29`), transcribed at its live value.
+        // `gap: 4` (`Calendar.jsx:30`), transcribed at its live value.
         spacing: chipGap,
         children: <Widget>[
           Flexible(
@@ -707,7 +707,7 @@ class DabblerCalendar extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              // `fontSize: 14, fontWeight: 600` (`Calendar.jsx:31`). 14 is
+              // `fontSize: 14, fontWeight: 600` (`Calendar.jsx:32`). 14 is
               // transcribed literally below: the ramp has no 14, and rounding
               // to `.t-footnote` (13) draws the month/year chips a step small
               // against the specimen. Recorded as a ramp conflict.
@@ -752,7 +752,7 @@ class DabblerCalendar extends StatelessWidget {
     );
   }
 
-  /// The column labels and the weeks — `Calendar.jsx:46-64`.
+  /// The column labels and the weeks — `Calendar.jsx:44-61`.
   Widget _grid(
     BuildContext context,
     DabblerColors colors,
@@ -765,7 +765,7 @@ class DabblerCalendar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      // `gap: 3` on the grid (`Calendar.jsx:47`) — `--space-1`, applied on both
+      // `gap: 3` on the grid (`Calendar.jsx:44`) — `--space-1`, applied on both
       // axes as a CSS grid `gap` does.
       spacing: DabblerSpacing.space1,
       children: <Widget>[
@@ -784,7 +784,7 @@ class DabblerCalendar extends StatelessWidget {
                       labels[weekday] ?? '',
                       textAlign: TextAlign.center,
                       // `fontSize: 11, fontWeight: 600, color: var(--muted)`
-                      // (`Calendar.jsx:50`) — `.t-caption-2` at semibold, with
+                      // (`Calendar.jsx:46`) — `.t-caption-2` at semibold, with
                       // `--muted` text taken as [DabblerColors.textSecondary]
                       // (D-003(a)).
                       style: DabblerType.caption2
@@ -811,7 +811,7 @@ class DabblerCalendar extends StatelessWidget {
     );
   }
 
-  /// One date square — `Calendar.jsx:52-63`.
+  /// One date square — `Calendar.jsx:51-58`.
   Widget _cell(
     DabblerColors colors,
     TextDirection direction,
@@ -826,7 +826,7 @@ class DabblerCalendar extends StatelessWidget {
         : colors.textPrimary;
 
     final Widget pill = Container(
-      // `height: 39` (`Calendar.jsx:55`) — the painted pill.
+      // `height: 39` (`Calendar.jsx:53`) — the painted pill.
       height: cellPillHeight,
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -835,7 +835,7 @@ class DabblerCalendar extends StatelessWidget {
       ),
       child: Text(
         DabblerType.toWesternDigits('${cell.date.day}'),
-        // `fontSize: 13, fontWeight: on ? 700 : 500` (`Calendar.jsx:61`) —
+        // `fontSize: 13, fontWeight: on ? 700 : 500` (`Calendar.jsx:56`) —
         // `.t-footnote` at bold or medium.
         style: DabblerType.footnote
             .resolveForDirection(direction)
@@ -877,7 +877,7 @@ class DabblerCalendar extends StatelessWidget {
     );
   }
 
-  /// Confirm / Cancel — `Calendar.jsx:67-78`.
+  /// Confirm / Cancel — `Calendar.jsx:63-75`.
   Widget _actions(DabblerColors colors, TextDirection direction) {
     // A [Wrap], not a [Row]: the source lays the two actions out in a
     // `flex-direction: row` that is free to overflow its 320px card, and a

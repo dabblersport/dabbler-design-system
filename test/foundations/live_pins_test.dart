@@ -17,7 +17,7 @@ void main() {
   });
 
   test('Icon.jsx PRO_FALLBACKS keys are the web-gated names', () {
-    // Live `PRO_FALLBACKS` keys, in order (Icon.jsx:34-46).
+    // Live `PRO_FALLBACKS` keys, in order (Icon.jsx:30-42).
     expect(DabblerIconRegistry.webProGatedNames, <String>[
       'arrow-right',
       'arrow-right-1',

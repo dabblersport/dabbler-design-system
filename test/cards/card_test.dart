@@ -1,3 +1,4 @@
+import 'package:flutter/semantics.dart';
 import 'package:dabbler_design_system/src/cards/card.dart';
 import 'package:dabbler_design_system/src/interaction/focus_ring.dart';
 import 'package:dabbler_design_system/src/interaction/press_scale.dart';
@@ -435,18 +436,26 @@ void main() {
       WidgetTester tester,
     ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
-      await tester.pumpWidget(
-        _host(
-          DabblerCard(
-            onTap: () {},
-            semanticLabel: 'Sunday five-a-side',
-            child: const Text('b'),
+      try {
+        await tester.pumpWidget(
+          _host(
+            DabblerCard(
+              onTap: () {},
+              semanticLabel: 'Sunday five-a-side',
+              child: const Text('b'),
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.bySemanticsLabel('Sunday five-a-side'), findsOneWidget);
-      handle.dispose();
+        expect(find.bySemanticsLabel('Sunday five-a-side'), findsOneWidget);
+        final SemanticsNode node = tester.getSemantics(
+          find.bySemanticsLabel('Sunday five-a-side'),
+        );
+        expect(node.getSemanticsData().flagsCollection.isButton, isTrue);
+        expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+      } finally {
+        handle.dispose();
+      }
     });
 
     testWidgets(

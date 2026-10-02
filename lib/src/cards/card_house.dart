@@ -55,7 +55,7 @@ import 'card.dart';
 ///
 /// | Source literal | Taken here | Why |
 /// |---|---|---|
-/// | `padding: "16px"` on the row | [DabblerCard.defaultPadding] (18) | `--card-padding` is `--space-6` |
+/// | `padding: "16px"` on the row | [DabblerCard.defaultPadding] (16) | the live `Card.jsx` padding, now taken literally |
 /// | pill `height: 41` | [DabblerSizing.touchTargetMin] (45) | `--touch-target-min` is 45 and clears Apple's 44pt floor; 41 does not |
 ///
 /// **The shell's corner is no longer a deviation.** This file used to record

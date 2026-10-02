@@ -117,6 +117,7 @@ Future<File> renderPng(
   await tester.pump();
 
   late final File file;
+  String? problem;
   await tester.runAsync(() async {
     final RenderRepaintBoundary render =
         boundary.currentContext!.findRenderObject()! as RenderRepaintBoundary;
@@ -124,8 +125,47 @@ Future<File> renderPng(
     final ByteData? data = await image.toByteData(
       format: ui.ImageByteFormat.png,
     );
+    final Uint8List bytes = data!.buffer.asUint8List();
     file = File('build/png/$name.png')..createSync(recursive: true);
-    file.writeAsBytesSync(data!.buffer.asUint8List());
+    file.writeAsBytesSync(bytes);
+    problem = await _verifyPng(bytes, name, size * pixelRatio);
   });
+  expect(problem, isNull, reason: problem);
   return file;
+}
+
+/// Checks the written bytes are a real PNG of the expected pixel size and are
+/// not a single flat colour (a component that painted nothing).
+///
+/// Decodes through `dart:ui`, so a truncated or mislabelled file fails here
+/// rather than being counted as evidence because its length is non-zero.
+Future<String?> _verifyPng(Uint8List bytes, String name, Size expected) async {
+  const List<int> signature = <int>[137, 80, 78, 71, 13, 10, 26, 10];
+  for (int i = 0; i < 8; i++) {
+    if (bytes[i] != signature[i]) return '$name: not a PNG (bad signature)';
+  }
+  final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+  final ui.FrameInfo frame = await codec.getNextFrame();
+  final ui.Image decoded = frame.image;
+  final Size got = Size(decoded.width.toDouble(), decoded.height.toDouble());
+  String? result;
+  if (got != expected) {
+    result = '$name: decoded size $got != size * pixelRatio $expected';
+  } else {
+    final Uint8List px = (await decoded.toByteData())!.buffer.asUint8List();
+    bool varied = false;
+    for (int i = 4; i < px.length; i += 4) {
+      if (px[i] != px[0] ||
+          px[i + 1] != px[1] ||
+          px[i + 2] != px[2] ||
+          px[i + 3] != px[3]) {
+        varied = true;
+        break;
+      }
+    }
+    if (!varied) result = '$name: the image is a single flat colour';
+  }
+  decoded.dispose();
+  codec.dispose();
+  return result;
 }

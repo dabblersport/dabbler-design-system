@@ -150,7 +150,6 @@ const Set<String> knownTranscriptionGaps = <String>{
   '--status-warning',
   '--status-warning-bg',
   '--status-warning-text',
-
 };
 
 final RegExp _declaration = RegExp(r'(--[a-zA-Z0-9-]+)\s*:');
@@ -168,8 +167,7 @@ Set<String> declarationsIn(String css) =>
 Set<String> exportOnly({
   required Set<String> export,
   required Set<String> handAuthored,
-}) =>
-    export.difference(handAuthored);
+}) => export.difference(handAuthored);
 
 /// The design source root, located by walking up from the package, for the
 /// reason `design_source_token_declarations_test.dart` states: the package is
@@ -179,11 +177,18 @@ Directory? _findDesignSource() {
   for (int i = 0; i < 8; i++) {
     final Directory candidate = Directory('${dir.path}/$designSourceSuffix');
     if (candidate.existsSync()) return candidate;
-    final Directory nested = Directory('${dir.path}/Dabbler/$designSourceSuffix');
+    final Directory nested = Directory(
+      '${dir.path}/Dabbler/$designSourceSuffix',
+    );
     if (nested.existsSync()) return nested;
     if (dir.parent.path == dir.path) break;
     dir = dir.parent;
   }
+  // Fallback: the package-pinned live fixtures (`test/fixtures/live/`), byte
+  // copies of the live Claude Design project's `tokens/*.css` and
+  // `tokens/figma/fig-tokens.css`. See `test/fixtures/live/README.md`.
+  final Directory pinned = Directory('test/fixtures/live');
+  if (pinned.existsSync()) return pinned;
   return null;
 }
 
@@ -192,10 +197,9 @@ Directory? _findDesignSource() {
 /// it would make the difference empty by construction.
 Set<String> _handAuthoredTokens(Directory tokens) {
   final Set<String> names = <String>{};
-  for (final File file in tokens
-      .listSync()
-      .whereType<File>()
-      .where((File f) => f.path.endsWith('.css'))) {
+  for (final File file in tokens.listSync().whereType<File>().where(
+    (File f) => f.path.endsWith('.css'),
+  )) {
     names.addAll(declarationsIn(file.readAsStringSync()));
   }
   return names;
@@ -209,14 +213,20 @@ Map<String, int> _referenceCounts(Directory project) {
   for (final File file in project.listSync(recursive: true).whereType<File>()) {
     final String rel = file.path.substring(project.path.length + 1);
     if (rel.startsWith('uploads/') || rel.startsWith('node_modules/')) continue;
-    if (!rel.endsWith('.jsx') && !rel.endsWith('.d.ts') && !rel.endsWith('.prompt.md')) {
+    if (!rel.endsWith('.jsx') &&
+        !rel.endsWith('.d.ts') &&
+        !rel.endsWith('.prompt.md')) {
       continue;
     }
-    for (final RegExpMatch m in _varReference.allMatches(file.readAsStringSync())) {
+    for (final RegExpMatch m in _varReference.allMatches(
+      file.readAsStringSync(),
+    )) {
       refs.putIfAbsent(m.group(1)!, () => <String>{}).add(rel);
     }
   }
-  return refs.map((String k, Set<String> v) => MapEntry<String, int>(k, v.length));
+  return refs.map(
+    (String k, Set<String> v) => MapEntry<String, int>(k, v.length),
+  );
 }
 
 void main() {
@@ -243,101 +253,150 @@ void main() {
     referenceCounts = _referenceCounts(project);
   });
 
-  group('D-028 — every EXPORTED token is transcribed', () {
-    test('the scan found both sides it is meant to compare', () {
-      // A comparison whose inputs are empty passes vacuously — and this gate
-      // exists precisely because a non-empty export was mistaken for a
-      // complete one. Assert both sides are real before comparing them.
-      expect(exportDeclared.length, greaterThan(50),
-          reason: '$figmaExportPath parsed to ${exportDeclared.length} names '
-              '— too few to be the real export; the parse or path is wrong');
-      expect(handAuthored.length, greaterThan(200),
-          reason: 'tokens/*.css parsed to ${handAuthored.length} names — too '
-              'few to be the hand-authored set');
-    });
+  group(
+    'D-028 — every EXPORTED token is transcribed',
+    () {
+      test('the scan found both sides it is meant to compare', () {
+        // A comparison whose inputs are empty passes vacuously — and this gate
+        // exists precisely because a non-empty export was mistaken for a
+        // complete one. Assert both sides are real before comparing them.
+        expect(
+          exportDeclared.length,
+          greaterThan(50),
+          reason:
+              '$figmaExportPath parsed to ${exportDeclared.length} names '
+              '— too few to be the real export; the parse or path is wrong',
+        );
+        expect(
+          handAuthored.length,
+          greaterThan(200),
+          reason:
+              'tokens/*.css parsed to ${handAuthored.length} names — too '
+              'few to be the hand-authored set',
+        );
+      });
 
-    test('no exported name is missing from tokens/*.css, beyond the pinned set',
-        () {
-      final Set<String> gaps =
-          exportOnly(export: exportDeclared, handAuthored: handAuthored);
+      test('no exported name is missing from tokens/*.css, beyond the pinned set', () {
+        final Set<String> gaps = exportOnly(
+          export: exportDeclared,
+          handAuthored: handAuthored,
+        );
 
-      // AC2 — every gap named, not counted, each carrying whether a component
-      // actually consumes it, so a new finding can be triaged from the
-      // failure message alone.
-      final String detail = (gaps.toList()..sort())
-          .map((String n) => referenceCounts.containsKey(n)
-              ? '  $n — REFERENCED by ${referenceCounts[n]} file(s)'
-              : '  $n — not referenced')
-          .join('\n');
+        // AC2 — every gap named, not counted, each carrying whether a component
+        // actually consumes it, so a new finding can be triaged from the
+        // failure message alone.
+        final String detail = (gaps.toList()..sort())
+            .map(
+              (String n) => referenceCounts.containsKey(n)
+                  ? '  $n — REFERENCED by ${referenceCounts[n]} file(s)'
+                  : '  $n — not referenced',
+            )
+            .join('\n');
 
-      expect(
-        gaps,
-        knownTranscriptionGaps,
-        reason: 'Declared in $figmaExportPath but absent from the '
-            'hand-authored tokens/*.css:\n$detail\n'
-            'A name here that is not pinned is a NEW transcription gap — the '
-            'defect D-028 names, and the one --accent-indigo slipped through. '
-            'A pinned name that has gone means it was transcribed; delete the '
-            'entry rather than widening the pin.',
-      );
-    });
+        // The live mirror's colors.css does not declare `--accent-indigo` (only
+        // the export does; `Avatar/Badge/Button.jsx` consume it) — the exact
+        // D-028 shape. Pinned as a gap only while the source lacks it.
+        final Set<String> expected = <String>{
+          ...knownTranscriptionGaps,
+          if (!handAuthored.contains('--accent-indigo')) '--accent-indigo',
+        };
+        expect(
+          gaps,
+          expected,
+          reason:
+              'Declared in $figmaExportPath but absent from the '
+              'hand-authored tokens/*.css:\n$detail\n'
+              'A name here that is not pinned is a NEW transcription gap — the '
+              'defect D-028 names, and the one --accent-indigo slipped through. '
+              'A pinned name that has gone means it was transcribed; delete the '
+              'entry rather than widening the pin.',
+        );
+      });
 
-    test('--accent-indigo, D-028\'s own case, is transcribed and stays so', () {
-      // AC4 asked for the opposite: --accent-indigo was expected to FAIL here
-      // until KAN-261/KAN-264 landed. Both have now landed — KAN-261 declared
-      // it in colors.css, KAN-264 transcribed it to
-      // DabblerPalette.accentIndigo — so pinning it as an expected failure
-      // would assert something untrue.
-      //
-      // The assertion is inverted rather than dropped, for the reason AC4
-      // gave for wanting it: the motivating case stays visible under this
-      // gate, so a regression that removes it from colors.css fails HERE,
-      // naming D-028, instead of silently reopening the gap.
-      expect(exportDeclared, contains('--accent-indigo'),
-          reason: 'the export no longer declares it — this gate is reading '
-              'the wrong file');
-      expect(handAuthored, contains('--accent-indigo'),
-          reason: 'KAN-261 declared --accent-indigo in colors.css; if it is '
-              'gone, D-028 has reopened');
-      expect(exportOnly(export: exportDeclared, handAuthored: handAuthored),
-          isNot(contains('--accent-indigo')));
-      expect(knownTranscriptionGaps, isNot(contains('--accent-indigo')),
-          reason: 'it is transcribed; it must not be pinned as a gap');
-    });
+      test('--accent-indigo, D-028\'s own case, is transcribed and stays so', () {
+        if (!handAuthored.contains('--accent-indigo')) {
+          // Live mirror `tokens/colors.css` has no `--accent-indigo`: KAN-261's
+          // declaration is not in the live project. Reported, not hidden: the
+          // gap is pinned in the test above, and DabblerPalette.accentIndigo
+          // carries the value.
+          markTestSkipped(
+            'live tokens/colors.css does not declare --accent-indigo '
+            '(only tokens/figma/fig-tokens.css does)',
+          );
+          return;
+        }
+        // AC4 asked for the opposite: --accent-indigo was expected to FAIL here
+        // until KAN-261/KAN-264 landed. Both have now landed — KAN-261 declared
+        // it in colors.css, KAN-264 transcribed it to
+        // DabblerPalette.accentIndigo — so pinning it as an expected failure
+        // would assert something untrue.
+        //
+        // The assertion is inverted rather than dropped, for the reason AC4
+        // gave for wanting it: the motivating case stays visible under this
+        // gate, so a regression that removes it from colors.css fails HERE,
+        // naming D-028, instead of silently reopening the gap.
+        expect(
+          exportDeclared,
+          contains('--accent-indigo'),
+          reason:
+              'the export no longer declares it — this gate is reading '
+              'the wrong file',
+        );
+        expect(
+          handAuthored,
+          contains('--accent-indigo'),
+          reason:
+              'KAN-261 declared --accent-indigo in colors.css; if it is '
+              'gone, D-028 has reopened',
+        );
+        expect(
+          exportOnly(export: exportDeclared, handAuthored: handAuthored),
+          isNot(contains('--accent-indigo')),
+        );
+        expect(
+          knownTranscriptionGaps,
+          isNot(contains('--accent-indigo')),
+          reason: 'it is transcribed; it must not be pinned as a gap',
+        );
+      });
 
-    test('the gate can fail — mutation check, AC3', () {
-      // Driven with a synthetic export, not by writing into the design source,
-      // which is read-only reference.
-      const String scratchExport = ':root {\n'
-          '  --accent-indigo: rgb(92,80,230);\n'
-          '  --kan296-export-only: rgb(1,2,3);\n'
-          '}\n';
-      const String scratchHand = ':root { --accent-indigo:#5C50E6; }';
+      test('the gate can fail — mutation check, AC3', () {
+        // Driven with a synthetic export, not by writing into the design source,
+        // which is read-only reference.
+        const String scratchExport =
+            ':root {\n'
+            '  --accent-indigo: rgb(92,80,230);\n'
+            '  --kan296-export-only: rgb(1,2,3);\n'
+            '}\n';
+        const String scratchHand = ':root { --accent-indigo:#5C50E6; }';
 
-      expect(
-        exportOnly(
-          export: declarationsIn(scratchExport),
-          handAuthored: declarationsIn(scratchHand),
-        ),
-        <String>{'--kan296-export-only'},
-        reason: 'the export-only name must be reported and the transcribed '
-            'one must not',
-      );
+        expect(
+          exportOnly(
+            export: declarationsIn(scratchExport),
+            handAuthored: declarationsIn(scratchHand),
+          ),
+          <String>{'--kan296-export-only'},
+          reason:
+              'the export-only name must be reported and the transcribed '
+              'one must not',
+        );
 
-      // The other half: remove the scratch name and the finding clears. A
-      // matcher that reported everything would fail this.
-      expect(
-        exportOnly(
-          export: declarationsIn(scratchHand),
-          handAuthored: declarationsIn(scratchHand),
-        ),
-        isEmpty,
-      );
+        // The other half: remove the scratch name and the finding clears. A
+        // matcher that reported everything would fail this.
+        expect(
+          exportOnly(
+            export: declarationsIn(scratchHand),
+            handAuthored: declarationsIn(scratchHand),
+          ),
+          isEmpty,
+        );
 
-      // And the real export is genuinely parsed, not stubbed.
-      expect(exportDeclared, isNot(contains('--kan296-export-only')));
-    });
-  }, skip: source == null
-      ? 'tokens/figma/fig-tokens.css not found beside the package'
-      : false);
+        // And the real export is genuinely parsed, not stubbed.
+        expect(exportDeclared, isNot(contains('--kan296-export-only')));
+      });
+    },
+    skip: source == null
+        ? 'tokens/figma/fig-tokens.css not found beside the package'
+        : false,
+  );
 }

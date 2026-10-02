@@ -29,6 +29,24 @@ Widget _text(String family, String text) => Padding(
 );
 
 void main() {
+  testWidgets('a render that paints only the flat page fill is rejected', (
+    tester,
+  ) async {
+    Object? failure;
+    try {
+      await renderPng(
+        tester,
+        const SizedBox.shrink(),
+        name: 'harness_flat_probe',
+        size: const Size(60, 40),
+      );
+    } on TestFailure catch (e) {
+      failure = e;
+    }
+    expect(failure, isNotNull, reason: 'flat image must fail the harness');
+    expect(failure.toString(), contains('single flat colour'));
+  });
+
   testWidgets('renders one component in LTR and RTL to non-empty PNGs', (
     tester,
   ) async {

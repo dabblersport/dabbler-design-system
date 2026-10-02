@@ -95,6 +95,7 @@ import 'card.dart';
 /// | `padding: "16px"` | [DabblerCard.defaultPadding] (16) | live `Card.jsx` `padding = 16` |
 /// | `width: 186, height: 123` | neither is fixed | Figma frame measurements; see [width] |
 /// | line 2 box `height: 24`, line 4 box `height: 25` | [priceSlotHeight], [billingSlotHeight]; no gap ([slotGap] 0) | the source stacks fixed-height line boxes |
+/// | trial pill fill `--purple-700` | [DabblerColors.brandPrimaryHover] (the theme's 700 step; main `#5A1FA1` vs live `rgb(90,30,168)`) | no exact palette constant; theme-following |
 /// | trial pill `left: 14`, `top: -10` | [trialInset] 14, [trialTop] -10 | transcribed at the live value |
 /// | trial pill `top: -10` | a half-height translation | see [trialLabel] |
 /// | trial pill fill `--purple-700` | [DabblerBadgeTone.defaultTone] (`--color-brand-primary`, purple-600) | see below |
@@ -223,6 +224,11 @@ class DabblerCardPricing extends StatelessWidget {
   static const double billingSlotHeight = 25;
 
   /// The selection indicator's side — **28**, transcribed literally.
+  ///
+  /// Re-checked against the live digest: the disc is `24x24` with
+  /// `border: 2px solid`, and only the root and the padded line boxes are
+  /// stated `boxSizing: border-box`; the disc is not, so the border adds to the
+  /// box (24 + 2 + 2 = 28). The 28 is therefore consistent with the live export.
   ///
   /// Measured on the rendered specimen
   /// (`components/cards/cards.card.html`): both the selected tick disc and the
@@ -433,7 +439,7 @@ class DabblerCardPricing extends StatelessWidget {
       // of the card to an explicit [semanticLabel], so an author who supplied
       // one would not get the label they asked for.
       child: ExcludeSemantics(
-        child: trialLabel == null ? card : _withTrialPill(card),
+        child: trialLabel == null ? card : _withTrialPill(card, colors),
       ),
     );
   }
@@ -474,7 +480,7 @@ class DabblerCardPricing extends StatelessWidget {
   /// must not clip it. A caller laying tiles out in a tight row should leave
   /// half a pill of headroom above them — the overhang is the source's design,
   /// not an accident of this port.
-  Widget _withTrialPill(Widget card) {
+  Widget _withTrialPill(Widget card, DabblerColors colors) {
     return Stack(
       clipBehavior: Clip.none,
       children: <Widget>[
@@ -482,7 +488,13 @@ class DabblerCardPricing extends StatelessWidget {
         PositionedDirectional(
           top: trialTop,
           start: trialInset,
-          child: DabblerBadge(label: trialLabel!),
+          // Live pill fill is `--purple-700` (rgb(90,30,168)); the theme's own
+          // 700 step ([DabblerColors.brandPrimaryHover]) is the nearest token
+          // (main: #5A1FA1) and re-tints with the section theme.
+          child: DabblerBadge(
+            label: trialLabel!,
+            fill: colors.brandPrimaryHover,
+          ),
         ),
       ],
     );

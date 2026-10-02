@@ -127,6 +127,7 @@ class DabblerBadge extends StatelessWidget {
     this.icon,
     this.paddingInline,
     this.minWidth,
+    this.fill,
   });
 
   /// The pill's text.
@@ -151,6 +152,10 @@ class DabblerBadge extends StatelessWidget {
   /// A minimum width. Live `ConversationRow` sets `minWidth: 24` on its unread
   /// pill; the badge is `fit-content` otherwise.
   final double? minWidth;
+
+  /// Overrides the tone's fill for a decorative badge (not for [status]).
+  /// `CardPricing` uses it for the live trial pill's `--purple-700`.
+  final Color? fill;
 
   /// Vertical padding — `4` (`Badge.jsx:39`, `padding: '4px 10px'`).
   ///
@@ -230,6 +235,11 @@ class DabblerBadge extends StatelessWidget {
         _ => colors.surfaceCard,
       };
 
+  /// **A single, theme-independent value.** `--accent-indigo` is
+  /// `rgb(92, 80, 230)` in the live `tokens/figma/fig-tokens.css` and has no
+  /// dark variant there, so this does not follow the theme or brightness. If
+  /// design wants a dark-mode indigo it must be specified; flagged, not invented.
+  ///
   /// `Badge.jsx:24` — the decorative `info` tone is `--accent-indigo`
   /// (`rgb(92, 80, 230)`, [DabblerPalette.accentIndigo]). This used to paint
   /// `DabblerColors.info.base` (`#3B82F6`, a blue); compared against the live
@@ -254,7 +264,8 @@ class DabblerBadge extends StatelessWidget {
     final TextDirection direction = Directionality.of(context);
     final DabblerStatusColor? semantic = status;
 
-    final Color background = semantic?.surface ?? backgroundOf(tone, colors);
+    final Color background =
+        semantic?.surface ?? fill ?? backgroundOf(tone, colors);
     final Color foreground = semantic?.strong ?? foregroundOf(tone, colors);
     // `Badge.jsx:41` — decorative tones draw no border at all.
     final Color? hairline = semantic == null
