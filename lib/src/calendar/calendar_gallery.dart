@@ -16,7 +16,8 @@ const List<GalleryEntry> calendarGalleryEntries = <GalleryEntry>[
     page: 'components/calendar',
     group: GalleryPurpose.dateAndTime,
     title: 'Calendar — month grid',
-    description: 'A fixed month so the specimen does not change under review, '
+    description:
+        'A fixed month so the specimen does not change under review, '
         'with and without the confirm/cancel actions.',
     builder: _calendars,
   ),
@@ -25,8 +26,20 @@ const List<GalleryEntry> calendarGalleryEntries = <GalleryEntry>[
     page: 'components/time-picker',
     group: GalleryPurpose.dateAndTime,
     title: 'TimePicker — hour, minute, period',
-    description: 'The three wheels at the default minute step.',
+    description:
+        'The D-030 listbox: hour and minute columns and a meridiem pill at '
+        'the default minute step.',
     builder: _timePickers,
+  ),
+  GalleryEntry(
+    id: 'time-picker/ruler',
+    page: 'components/time-picker',
+    group: GalleryPurpose.dateAndTime,
+    title: 'TimeRuler — opt-in drag ruler',
+    description:
+        'Opt-in only, not the D-030 component: the live TimePicker.jsx '
+        'Ruler geometry, fidelity unverified.',
+    builder: _timeRulers,
   ),
 ];
 
@@ -58,6 +71,15 @@ Widget _timePickers(BuildContext context) => GalleryStack(
         height: 340,
         child: DabblerTimePicker(value: const TimeOfDay(hour: 18, minute: 30)),
       ),
+    ),
+  ],
+);
+
+Widget _timeRulers(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'opt-in ruler (not the D-030 component)',
+      child: DabblerTimeRuler(value: const TimeOfDay(hour: 18, minute: 30)),
     ),
   ],
 );
