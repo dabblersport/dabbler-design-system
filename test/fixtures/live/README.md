@@ -1,10 +1,11 @@
 # Live token fixtures
 
 `tokens/spacing.css`, `tokens/typography.css`, `tokens/colors.css` and
-`tokens/figma/fig-tokens.css` are the live Claude Design project
+`tokens/figma/fig-tokens.css` stand for the live Claude Design project
 4286affa-bf50-4ff6-9576-917f76a93ca1 (Dabbler Design System) files of the same path,
-read via DesignSync `get_file` on 2026-10-02 and transcribed to a local mirror by the
-coordinator. The files here are byte copies of that mirror (`cmp` clean).
+read via DesignSync `get_file` on 2026-10-02 and hand-transcribed to a local mirror by the
+coordinator. The files here are byte copies of that mirror (`cmp` clean); see
+"Provenance and limits" below for what that does and does not show.
 
 They stand in for the removed sibling checkout (`dabbler-design-system-design/project/`)
 that the token tests used to locate by walking up the tree. A sibling checkout, when
@@ -30,8 +31,9 @@ present, is still preferred.
 `design_source_token_declarations_test.dart` — every test in the file is skipped. It scans
 every `*.jsx`, `*.d.ts` and `*.prompt.md` of the whole live project for `var(--…)` and bare
 `--name` references and requires them all to be declared under `tokens/`. The mirror holds
-only a subset of those files (about 35 component `.jsx`, the messaging `.prompt.md` set and
-the digests); running it on a subset would pass or fail for the wrong reason. Missing:
+only a subset of those files (the component `.jsx` files listed in the mirror's own
+README, the messaging `.prompt.md` set, and the Figma-export components, which are
+hand-transcribed like the rest); running it on a subset would pass or fail for the wrong reason. Missing:
 the rest of the project's `*.jsx` / `*.d.ts` / `*.prompt.md` files.
 
 ## Reconciling the count
@@ -43,3 +45,16 @@ The earlier "26 skipped" came from 7 skip sites that each skip a whole group:
 5 + 10 + 3 + 4 + 4 = 26. After these fixtures the first three sites run in full (18
 tests), the export-transcription group runs with 1 skipped test, and the declarations
 group keeps its 4 skipped: 5 skipped tests in total, not 8 (the earlier report said 8).
+
+## Provenance and limits
+
+Rendered against a hand-transcribed mirror of the live design-system export, with no pinned hash and no independent byte check. The mirror files are LLM transcriptions of DesignSync get_file output (read 2026-10-02); the token CSS fixtures in this directory were compared byte-for-byte with that mirror, which shows fixture == mirror and not mirror == live. Figma-export components were transcribed verbatim by hand. No pixel or browser comparison against live has been run; fidelity to live is unverified.
+
+Line citations of the form `Name.jsx:NN` (also `.css`, `.prompt.md`, `.d.ts`) in `lib/` and
+`test/` were checked on 2026-10-02, every one by eye, against that mirror (not against live):
+573 citations checked; 282 correct as cited; 215 corrected (the value was on a different line
+of the same mirror file); 1 claim removed (the quoted text is not in the mirror file); 75
+labelled "unverified: file not mirrored" (`*.d.ts` and non-messaging `*.prompt.md`). 55 further
+citations sit in files another seat was editing at the time (TimePicker, TimeField, Card,
+Badge, IconTile) and were not checked here. Citations without a line number, and
+`*.card.html` citations, were not counted.

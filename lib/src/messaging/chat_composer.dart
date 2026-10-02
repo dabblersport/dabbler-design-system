@@ -24,7 +24,7 @@ part 'chat_composer_notice.dart';
 /// Ported from the live Claude Design project 4286affa-bf50-4ff6-9576-917f76a93ca1
 /// (Dabbler Design System), `components/messaging/ChatComposer.jsx` and
 /// `ChatComposer.prompt.md`, read via DesignSync `get_file` on 2026-10-02 and
-/// transcribed verbatim to the coordinator's local mirror. No browser or
+/// hand-transcribed to the coordinator's local mirror (no byte check). No browser or
 /// side-by-side comparison has been done.
 ///
 /// **Injected view-model only.** The widget holds no backend, audio, realtime or

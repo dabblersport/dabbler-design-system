@@ -49,7 +49,7 @@ The status tones through the banner, secondary ink for the timestamp, spacing 3 
 
 ## Change log
 
-- Covered against the live source: the banner now stretches to the thread width with only the timestamp centred, as the source's column does.
+- Covered against the hand-transcribed mirror of the live source (no byte or pixel check): the banner now stretches to the thread width with only the timestamp centred, as the source's column does.
 
 ## Source
 

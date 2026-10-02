@@ -7,7 +7,7 @@ import 'text_field.dart';
 
 /// One row of a [DabblerSelect]'s option list.
 ///
-/// Transcribed from `components/forms/Select.d.ts:3-10` — *"value, label,
+/// Transcribed from `components/forms/Select.d.ts:3-10` (unverified: file not mirrored) — *"value, label,
 /// icon, disabled"*. [icon] is the kebab-case Iconsax name the source
 /// documents as *"shown leading in the option list"*, which is exactly
 /// [DabblerMenuEntry.icon].
@@ -26,7 +26,7 @@ class DabblerSelectOption<T> {
 
   /// The row's text, and the field's display text once chosen.
   ///
-  /// `Select.d.ts:5` types this `ReactNode`; here it is a [String], because
+  /// `Select.d.ts:5` (unverified: file not mirrored) types this `ReactNode`; here it is a [String], because
   /// [DabblerMenuEntry.label] is a [String] and the type-ahead in DS-700
   /// matches on it. A row that cannot be typed at is a row the source's own
   /// keyboard contract cannot reach.
@@ -111,11 +111,11 @@ class DabblerSelectOption<T> {
 /// ## Single and multiple
 ///
 /// The source carries one `value` prop that *"is an array when `multiple`"*
-/// (`Select.d.ts:14`). Dart has no such union, so the two are two
+/// (`Select.d.ts:14` (unverified: file not mirrored)). Dart has no such union, so the two are two
 /// constructors: [DabblerSelect.new] with `value`/`onChanged`, and
 /// [DabblerSelect.multiple] with `values`/`onChangedAll`. The behavioural
 /// difference is the source's: multiple keeps the list open
-/// (`closeOnSelect={!multiple}`, `Select.jsx:69`) and toggles membership;
+/// (`closeOnSelect={!multiple}`, `Select.jsx:70`) and toggles membership;
 /// single closes and replaces.
 ///
 /// ## RTL
@@ -163,7 +163,7 @@ class DabblerSelect<T> extends StatefulWidget {
   static const String defaultPlaceholder = 'select';
 
   /// `placeholder="search"` on the searchable header's field
-  /// (`Select.jsx:76`).
+  /// (`Select.jsx:75`).
   static const String defaultSearchPlaceholder = 'search';
 
   /// The rows, in order.
@@ -179,7 +179,7 @@ class DabblerSelect<T> extends StatefulWidget {
   final List<T> values;
 
   /// Called with the whole next selection — the source passes the array back,
-  /// not the delta (`Select.jsx:48-51`).
+  /// not the delta (`Select.jsx:47-52`).
   final ValueChanged<List<T>>? onChangedAll;
 
   /// Whether this is the multi-value form.
@@ -201,14 +201,14 @@ class DabblerSelect<T> extends StatefulWidget {
   final bool enabled;
 
   /// Adds a search field above the option list and filters by label
-  /// (`Select.jsx:39-41`). `Select.prompt.md` asks for it at 8+ options.
+  /// (`Select.jsx:43-45`). `Select.prompt.md` asks for it at 8+ options.
   final bool searchable;
 
   /// The search field's placeholder.
   final String searchPlaceholder;
 
   /// The field's display text for [selected] — the source's `display`
-  /// (`Select.jsx:34-37`).
+  /// (`Select.jsx:39-41`).
   ///
   /// Public and pure so the join rule is testable without pumping a frame:
   /// an unknown value falls back to its own `toString`, which is the source's
@@ -219,7 +219,7 @@ class DabblerSelect<T> extends StatefulWidget {
   ) => selected.map((T v) => labelOf<T>(options, v)).join(', ');
 
   /// The label of [value] among [options], or its `toString`
-  /// (`Select.jsx:29-32`).
+  /// (`Select.jsx:34-37`).
   static String labelOf<T>(List<DabblerSelectOption<T>> options, T value) {
     for (final DabblerSelectOption<T> option in options) {
       if (option.value == value) {
@@ -253,7 +253,7 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
 
   bool _isOn(T value) => _selected.contains(value);
 
-  /// `Select.jsx:43-52` — single replaces, multiple toggles membership.
+  /// `Select.jsx:47-53` — single replaces, multiple toggles membership.
   void _pick(DabblerSelectOption<T> option) {
     if (!widget.multiple) {
       widget.onChanged?.call(option.value);
@@ -268,7 +268,7 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
   }
 
   /// `onOpenChange={(v) => { setOpen(v); if (!v) setQuery(''); }}`
-  /// (`Select.jsx:67`), plus the focus return the web gets for free from the
+  /// (`Select.jsx:69`), plus the focus return the web gets for free from the
   /// browser restoring focus to the trigger.
   void _setOpen(bool value) {
     if (_open == value) {
@@ -300,7 +300,7 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
     return KeyEventResult.ignored;
   }
 
-  /// `Select.jsx:39-41` — filtered by label, case-insensitively, only while a
+  /// `Select.jsx:43-45` — filtered by label, case-insensitively, only while a
   /// query is typed.
   List<DabblerSelectOption<T>> get _shown {
     if (!widget.searchable || _query.isEmpty) {
@@ -339,7 +339,7 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
         helperText: widget.helperText,
         errorText: widget.errorText,
         enabled: widget.enabled,
-        // `open={open && !disabled}` (`Select.jsx:88`).
+        // `open={open && !disabled}` (`Select.jsx:68`).
         open: _open && !disabled,
         focusNode: _fieldFocus,
         // Focus only. Opening is [DabblerMenu]'s trigger wrapper, which
@@ -352,11 +352,11 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
     );
 
     return DabblerMenu(
-      // `fullWidth` — the dropdown is the width of the field (`Select.jsx:65`).
+      // `fullWidth` — the dropdown is the width of the field (`Select.jsx:67`).
       fullWidth: true,
       open: _open && !disabled,
       onOpenChanged: _setOpen,
-      // `closeOnSelect={!multiple}` (`Select.jsx:69`).
+      // `closeOnSelect={!multiple}` (`Select.jsx:70`).
       closeOnSelect: !widget.multiple,
       label: widget.label,
       items: items,

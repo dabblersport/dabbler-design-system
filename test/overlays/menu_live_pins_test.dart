@@ -5,9 +5,9 @@ import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Pinned against live `components/overlays/Menu.jsx` of the Claude Design
+/// Pinned against a hand-transcribed mirror of live `components/overlays/Menu.jsx` of the Claude Design
 /// project 4286affa-bf50-4ff6-9576-917f76a93ca1 (Dabbler Design System), read
-/// via DesignSync get_file on 2026-10-02 and transcribed to a local mirror by
+/// via DesignSync get_file on 2026-10-02 and hand-transcribed (no byte check) to a local mirror by
 /// the coordinator.
 Widget _host(Widget child, {TextDirection d = TextDirection.ltr}) {
   final DabblerColors c = DabblerColors.resolve(

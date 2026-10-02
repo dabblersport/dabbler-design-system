@@ -21,7 +21,7 @@ part of 'sheet.dart';
 /// transparent because the wash is [DabblerScrim], drawn inside the page so
 /// the sheet owns one scrim and not two. The barrier is still present, so it
 /// absorbs pointers and the content behind cannot be scrolled — the Flutter
-/// equivalent of the source's `useScrollLock` (`Sheet.prompt.md:65`). The
+/// equivalent of the source's `useScrollLock` (`Sheet.prompt.md:65`, unverified: file not mirrored). The
 /// route also supplies the focus trap and focus restoration that
 /// `useFocusTrap` provides on the web.
 class DabblerSheetRoute<T> extends PopupRoute<T> {

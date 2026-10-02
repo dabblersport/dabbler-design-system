@@ -142,13 +142,13 @@ class DabblerSlider extends StatefulWidget {
   /// first — the source sorts the pair before handing it back.
   final ValueChanged<DabblerSliderRange>? onRangeChanged;
 
-  /// The axis minimum. `min = 0` (`Slider.jsx:17`).
+  /// The axis minimum. `min = 0` (`Slider.jsx:14`).
   final double min;
 
-  /// The axis maximum. `max = 100` (`Slider.jsx:18`).
+  /// The axis maximum. `max = 100` (`Slider.jsx:15`).
   final double max;
 
-  /// The snap increment. `step = 1` (`Slider.jsx:19`).
+  /// The snap increment. `step = 1` (`Slider.jsx:16`).
   final double step;
 
   /// The caption on the start edge of the readout row, `.t-subheadline` at
@@ -160,7 +160,7 @@ class DabblerSlider extends StatefulWidget {
   final String Function(num value)? formatValue;
 
   /// Tick positions **in value space, not pixels** (`marks` in
-  /// `Slider.d.ts:16`). Decorative: they are excluded from semantics, exactly
+  /// `Slider.d.ts:16` (unverified: file not mirrored)). Decorative: they are excluded from semantics, exactly
   /// as the source marks them `aria-hidden="true"`.
   final List<double>? marks;
 
@@ -183,33 +183,33 @@ class DabblerSlider extends StatefulWidget {
   /// The source's `aria-label` for the high thumb.
   static const String defaultMaximumLabel = 'Maximum';
 
-  /// `height: 6` on the track and the fill (`Slider.jsx:139, 144`) —
+  /// `height: 6` on the track and the fill (`Slider.jsx:135, 139`) —
   /// [DabblerSpacing.space2], the same 6 `DabblerProgressBar.trackHeightMd`
   /// resolves.
   static const double trackHeight = DabblerSpacing.space2;
 
-  /// `width: 24, height: 24` on the thumb (`Slider.jsx:117`) —
+  /// `width: 24, height: 24` on the thumb (`Slider.jsx:105`) —
   /// [DabblerSizing.iconMd].
   static const double thumbSize = DabblerSizing.iconMd;
 
-  /// `height: 12` on a mark (`Slider.jsx:153`) — [DabblerSpacing.space4].
+  /// `height: 12` on a mark (`Slider.jsx:147`) — [DabblerSpacing.space4].
   static const double markHeight = DabblerSpacing.space4;
 
-  /// `width: 1` on a mark (`Slider.jsx:153`) — [DabblerSizing.borderDefault].
+  /// `width: 1` on a mark (`Slider.jsx:147`) — [DabblerSizing.borderDefault].
   static const double markWidth = DabblerSizing.borderDefault;
 
-  /// `opacity: disabled ? 0.45 : 1` (`Slider.jsx:131`), and the specimen's
+  /// `opacity: disabled ? 0.45 : 1` (`Slider.jsx:114`), and the specimen's
   /// *"disabled (45% opacity, no pointer or key handling)"*.
   static const double disabledOpacity = 0.45;
 
-  /// `gap: var(--space-2)` on the outer column (`Slider.jsx:131`).
+  /// `gap: var(--space-2)` on the outer column (`Slider.jsx:114`).
   static const double columnGap = DabblerSpacing.space2;
 
   /// `gap: var(--space-3)` between the caption and the readout
-  /// (`Slider.jsx:133`).
+  /// (`Slider.jsx:116`).
   static const double readoutGap = DabblerSpacing.space3;
 
-  /// `step * 10` on PageUp / PageDown (`Slider.jsx:99-100`).
+  /// `step * 10` on PageUp / PageDown (`Slider.jsx:82-83`).
   static const int pageStepMultiplier = 10;
 
   /// Snaps [value] to [step] and clamps it into `[min, max]` — the source's
@@ -509,7 +509,7 @@ class _DabblerSliderState extends State<DabblerSlider> {
           onHorizontalDragEnd: (DragEndDetails details) => _dragging = null,
           onHorizontalDragCancel: () => _dragging = null,
           child: SizedBox(
-            // `minHeight: var(--touch-target-min)` (`Slider.jsx:136`) — the
+            // `minHeight: var(--touch-target-min)` (`Slider.jsx:130`) — the
             // hit area stays 45 tall at every width.
             height: DabblerSizing.touchTargetMin,
             child: Stack(

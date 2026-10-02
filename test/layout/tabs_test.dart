@@ -127,7 +127,7 @@ Future<void> _pressKey(WidgetTester tester, LogicalKeyboardKey key) async {
 void main() {
   // ------------------------------------------------------------------
   // AC1 — content switches by `id === value`, an identity match.
-  //        Source: components/layout/Tabs.jsx:31 and :154.
+  //        Source: components/layout/Tabs.jsx:30 and :147.
   // ------------------------------------------------------------------
   group('AC1 — identity match, not index', () {
     testWidgets('only the panel whose id equals value renders', (
@@ -311,7 +311,7 @@ void main() {
     testWidgets('the arrow keys swap under RTL — ArrowLeft advances', (
       WidgetTester tester,
     ) async {
-      // Tabs.jsx:59-63 and Tabs.prompt.md — "RTL behaviour".
+      // Tabs.jsx:64-69 and Tabs.prompt.md — "RTL behaviour".
       await tester.pumpWidget(
         _host(const _Harness(), direction: TextDirection.rtl),
       );
@@ -965,7 +965,7 @@ void main() {
   });
 
   // ------------------------------------------------------------------
-  // Semantics — the ARIA wiring of Tabs.jsx:97-104 and :155-156.
+  // Semantics — the ARIA wiring of Tabs.jsx:103-107 and :149-150.
   // ------------------------------------------------------------------
   group('semantics', () {
     testWidgets('tablist, tabs, and the selected state', (

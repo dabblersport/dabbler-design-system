@@ -31,14 +31,14 @@ part 'sheet_panel.dart';
 part 'sheet_route.dart';
 
 /// How a [DabblerSheet] presents itself, transcribed from the source's
-/// `presentation` prop (`components/overlays/Sheet.d.ts:21`).
+/// `presentation` prop (`components/overlays/Sheet.d.ts:21`, unverified: file not mirrored).
 enum DabblerSheetPresentation {
   /// Owns the viewport: scrim, bottom alignment, Escape and focus capture.
   modal,
 
   /// The panel only — no scrim, no positioning. The source restricts this to
   /// *"documentation cards and embedded previews only, never for a live
-  /// modal"* (`Sheet.prompt.md:76`).
+  /// modal"* (`Sheet.prompt.md:76`, unverified: file not mirrored).
   inline,
 }
 
@@ -53,7 +53,7 @@ enum DabblerSheetPresentation {
 ///
 /// The wash is DS-200's [DabblerScrim] and nothing here re-declares its
 /// colour, its opacity or its fade — `Sheet.prompt.md:34` and
-/// `Dialog.prompt.md:34` name the same `--color-scrim` token precisely so
+/// `Dialog.prompt.md:34` (both unverified: files not mirrored) name the same `--color-scrim` token precisely so
 /// there is one scrim, not three. Everything the scrim documents itself as
 /// *not* doing — the panel, the positioning, the entry and exit transition,
 /// drag-to-dismiss, Escape and focus capture — is owned here.
@@ -68,10 +68,10 @@ enum DabblerSheetPresentation {
 /// ## Detents and dragging
 ///
 /// [detents] are fractions of the viewport height, sorted ascending
-/// (`Sheet.jsx:30`). Dragging the handle moves the panel with a
+/// (`Sheet.jsx:32`). Dragging the handle moves the panel with a
 /// [Transform.translate] and nothing else — the source is explicit that the
 /// gesture must use *"`transform` only — never height, top or margin"*
-/// (`Sheet.prompt.md:58`) so it stays off the layout path. On release the
+/// (`Sheet.prompt.md:58`, unverified: file not mirrored) so it stays off the layout path. On release the
 /// panel snaps to the nearest detent; dragging well past the smallest detent
 /// dismisses when [dismissible]. Both thresholds are transcribed:
 /// [dragResistance] (24) and [dismissFraction] (0.55).
@@ -83,7 +83,7 @@ enum DabblerSheetPresentation {
 /// [DabblerSizing.touchTargetMin] (45) square — above the 44pt floor — and is
 /// a **visible** affordance, which is a deliberate addition to the source,
 /// whose web presentation relies on the pointer alone. The drag handle's row
-/// is the same 45 tall (`Sheet.jsx:104`).
+/// is the same 45 tall (`Sheet.jsx:101`).
 ///
 /// ## Route integration
 ///
@@ -116,23 +116,23 @@ class DabblerSheet extends StatefulWidget {
   /// The default English semantics label for the scrim's dismiss gesture.
   static const String defaultScrimLabel = 'Dismiss';
 
-  /// `max-width: 520` (`Sheet.jsx:80`). Full width below it, centred above.
+  /// `max-width: 520` (`Sheet.jsx:83`). Full width below it, centred above.
   static const double maxPanelWidth = 520;
 
-  /// `max-height: 96dvh` (`Sheet.jsx:82`), as a fraction.
+  /// `max-height: 96dvh` (`Sheet.jsx:85`), as a fraction.
   static const double maxHeightFraction = 0.96;
 
-  /// The 40×4 grab bar (`Sheet.jsx:112`). Its radius is [DabblerRadius.pill].
+  /// The 40×4 grab bar (`Sheet.jsx:104`). Its radius is [DabblerRadius.pill].
   static const double handleWidth = 40;
 
-  /// The grab bar's thickness — `height: 4` (`Sheet.jsx:112`).
+  /// The grab bar's thickness — `height: 4` (`Sheet.jsx:104`).
   static const double handleHeight = 4;
 
-  /// Upward drag is clamped to `Math.max(-24, …)` (`Sheet.jsx:60`): the panel
+  /// Upward drag is clamped to `Math.max(-24, …)` (`Sheet.jsx:57`): the panel
   /// resists being dragged above its detent instead of growing.
   static const double dragResistance = 24;
 
-  /// A release below `stops[0] * 0.55` dismisses (`Sheet.jsx:68`).
+  /// A release below `stops[0] * 0.55` dismisses (`Sheet.jsx:65`).
   static const double dismissFraction = 0.55;
 
   /// Whether the sheet is shown. Toggling it slides and fades.
@@ -146,7 +146,7 @@ class DabblerSheet extends StatefulWidget {
   final List<double> detents;
 
   /// Index into [detents] to snap to. Controlled snapping; null uses the
-  /// largest detent, as `Sheet.jsx:33` does.
+  /// largest detent, as `Sheet.jsx:33-35` does.
   final int? snapTo;
 
   /// Whether the draggable grab handle is shown. Default true.
@@ -156,7 +156,7 @@ class DabblerSheet extends StatefulWidget {
   final String? title;
 
   /// Pinned footer — actions. Safe-area padded, and separated by a `--faint`
-  /// hairline. `Sheet.prompt.md:79` requires actions to live here rather than
+  /// hairline. `Sheet.prompt.md:79` (unverified: file not mirrored) requires actions to live here rather than
   /// at the end of the scroll area so they stay reachable at every detent.
   final Widget? footer;
 

@@ -9,7 +9,7 @@ Sources  : lib/src/messaging/chat_composer.dart (class dartdoc, incl. the
            Live Claude Design project 4286affa-bf50-4ff6-9576-917f76a93ca1
            (Dabbler Design System), files components/messaging/ChatComposer.jsx
            and ChatComposer.prompt.md, tokens/{colors,spacing,typography}.css,
-           read via DesignSync get_file on 2026-10-02 and transcribed verbatim
+           read via DesignSync get_file on 2026-10-02 and hand-transcribed (no byte check)
            to a local mirror by the coordinator. No browser or side-by-side
            comparison was made.
 -->

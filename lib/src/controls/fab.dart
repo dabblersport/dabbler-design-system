@@ -50,7 +50,7 @@ enum DabblerFabTone {
 /// stated exception, and the source says why in its own words: *"This is the
 /// ONE component that keeps a drop shadow: the Figma file draws it with
 /// `0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1)`, and Figma
-/// wins over the otherwise-flat surface rule."* (`FAB.jsx:11-14`). `FAB.d.ts`
+/// wins over the otherwise-flat surface rule."* (`FAB.jsx:10-12`). `FAB.d.ts`
 /// and `FAB.prompt.md` both repeat it: *"the one component that keeps a drop
 /// shadow because the Figma file draws one"*.
 ///
@@ -72,7 +72,7 @@ enum DabblerFabTone {
 ///
 /// ## Corner: 21, not a circle
 ///
-/// `FAB.d.ts` describes the FAB as "fully round". `FAB.jsx:8-10` overrides that
+/// `FAB.d.ts` describes the FAB as "fully round". `FAB.jsx:7-8` overrides that
 /// in the source itself: *"the Figma file draws the FAB fully round (9999). The
 /// 21px corner is a deliberate override from the team, matching the full-width
 /// Button's corner."* The implementation is the later statement and the one
@@ -143,7 +143,7 @@ class DabblerFab extends StatelessWidget {
   /// [DabblerSizing.touchTargetMin] (45) with room to spare.
   static const double size = 56;
 
-  /// The corner radius — [DabblerSpacing.space7] (21), per `FAB.jsx:8-10`.
+  /// The corner radius — [DabblerSpacing.space7] (21), per `FAB.jsx:7-8`.
   static const double cornerRadius = DabblerSpacing.space7;
 
   /// The disabled opacity, from `FAB.jsx` (`opacity: disabled ? 0.45 : 1`).

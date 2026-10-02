@@ -11,8 +11,8 @@ import '../tokens/dabbler_type.dart';
 part 'dialog_panel.dart';
 
 /// The two panel widths a [DabblerDialog] can take, transcribed from the
-/// `MAX_WIDTH` map of the design source `components/overlays/Dialog.jsx:16`
-/// and documented in `Dialog.d.ts:21`.
+/// `MAX_WIDTH` map of the design source `components/overlays/Dialog.jsx:13`
+/// and documented in `Dialog.d.ts:21` (unverified: file not mirrored).
 enum DabblerDialogSize {
   /// `sm` — max width 340px.
   sm(340),
@@ -26,15 +26,15 @@ enum DabblerDialogSize {
   ///
   /// These two are the only raw numbers in this file. They are not spacing and
   /// not a radius, so no [DabblerSpacing] step expresses them; they are the
-  /// source's own container widths, copied verbatim from `Dialog.jsx:16`.
+  /// source's own container widths, copied verbatim from `Dialog.jsx:13`.
   final double maxWidth;
 }
 
-/// One of a [DabblerDialog]'s two actions — `Dialog.d.ts:3-8`'s
+/// One of a [DabblerDialog]'s two actions — `Dialog.d.ts:3-8`'s (unverified: file not mirrored)
 /// `DialogAction`.
 ///
 /// A value, not a widget: the dialog builds the [DabblerButton] itself, which
-/// is how `Dialog.prompt.md:77`'s rule — *"actions are `Button` instances —
+/// is how `Dialog.prompt.md:77`'s rule (unverified: file not mirrored) — *"actions are `Button` instances —
 /// never raw `<button>`s"* — becomes something the type system enforces
 /// rather than something a caller is asked to remember.
 @immutable
@@ -52,13 +52,13 @@ class DabblerDialogAction {
   /// Run when the action fires. Null renders the button disabled.
   ///
   /// On [DabblerDialog.secondaryAction] a null callback falls back to
-  /// [DabblerDialog.onClose] instead of disabling — `Dialog.jsx:102`'s
+  /// [DabblerDialog.onClose] instead of disabling — `Dialog.jsx:101`'s
   /// `secondaryAction.onPress || onClose`.
   final VoidCallback? onPressed;
 
   /// Overrides the primary action's tone.
   ///
-  /// **Ignored when [DabblerDialog.destructive] is set** — `Dialog.d.ts:6`
+  /// **Ignored when [DabblerDialog.destructive] is set** — `Dialog.d.ts:6` (unverified: file not mirrored)
   /// says so in as many words, and `Dialog.jsx:52` implements it as
   /// `destructive ? 'destructive' : (tone || 'primary')`. Unused on the
   /// secondary action, which is always [DabblerButtonTone.outlined].
@@ -81,7 +81,7 @@ class DabblerDialogAction {
 /// carries exactly that shadow for the current brightness, so the reservation
 /// is checked rather than merely written down.
 ///
-/// **A deliberate deviation from `Dialog.prompt.md:37`**, recorded here because
+/// **A deliberate deviation from `Dialog.prompt.md:37`** (unverified: file not mirrored), recorded here because
 /// the two sources disagree. The prompt says of the web component: *"No shadow
 /// appears in computed styles — separation comes from the scrim and the
 /// hairline, not elevation. (`--elevation-2` remains legal only for Material
@@ -95,19 +95,19 @@ class DabblerDialogAction {
 /// The wash is [DabblerScrim] (DS-200), never a colour of this component's
 /// own. The panel, the fade, the focus trap and the key handling are Dialog's.
 /// A screen must not build its own modal wrapper, scrim or focus trap —
-/// `Dialog.prompt.md:78-80` is explicit that the plumbing is shared.
+/// `Dialog.prompt.md:78-80` (unverified: file not mirrored) is explicit that the plumbing is shared.
 ///
 /// ## Actions
 ///
 /// [secondaryAction] then [primaryAction], in that order — `Dialog.jsx:101`
 /// and `:104`. Both are [DabblerDialogAction] values and the dialog builds the
-/// buttons, so `Dialog.prompt.md:77`'s *"actions are `Button` instances —
+/// buttons, so `Dialog.prompt.md:77`'s (unverified: file not mirrored) *"actions are `Button` instances —
 /// never raw `<button>`s"* is enforced by the type rather than trusted.
 ///
 /// The primary takes [DabblerButtonTone.primary], or
 /// [DabblerDialogAction.tone] if given, or [DabblerButtonTone.destructive]
-/// when [destructive] is set — which outranks `tone`, per `Dialog.d.ts:6`.
-/// The secondary is always [DabblerButtonTone.outlined] (`Dialog.jsx:101`) and
+/// when [destructive] is set — which outranks `tone`, per `Dialog.d.ts:6` (unverified: file not mirrored).
+/// The secondary is always [DabblerButtonTone.outlined] (`Dialog.jsx:100`) and
 /// falls back to [onClose] when it carries no callback of its own.
 ///
 /// **This replaced an untyped `actions: List<Widget>` slot** (KAN-267), which
@@ -116,8 +116,8 @@ class DabblerDialogAction {
 /// second callback that could disagree with the button the user can see.
 ///
 /// Below a 360px viewport the action row stacks vertically and each action is
-/// stretched to full width (`Dialog.prompt.md:57-59`, and the `stack`
-/// media query at `Dialog.jsx:29`).
+/// stretched to full width (`Dialog.prompt.md:57-59`, unverified: file not mirrored, and the `stack`
+/// media query at `Dialog.jsx:30`).
 ///
 /// ## Behaviour
 ///
@@ -126,14 +126,14 @@ class DabblerDialogAction {
 /// * Escape closes when [dismissible].
 /// * A press on the scrim closes when [dismissible].
 /// * Enter fires [primaryAction] — *"`Enter` triggers the primary action"*
-///   (`Dialog.prompt.md:51`). **Unless an action button already holds focus**,
+///   (`Dialog.prompt.md:51`, unverified: file not mirrored). **Unless an action button already holds focus**,
 ///   in which case that button takes the key: `Dialog.jsx:46-48` skips its own
 ///   handler when the event target is a `button`, because the browser
 ///   activates a focused button on Enter natively. [DabblerButton] binds
 ///   `ActivateIntent` and does the same, so the guard is transcribed rather
 ///   than dropped — without it, Tabbing to Cancel and pressing Enter would
 ///   confirm.
-/// * Body scroll lock (`Dialog.prompt.md:53`) has no Flutter counterpart and
+/// * Body scroll lock (`Dialog.prompt.md:53`, unverified: file not mirrored) has no Flutter counterpart and
 ///   is deliberately not ported: the route is modal and the content beneath it
 ///   receives no pointers, which is what the CSS lock exists to achieve.
 ///
@@ -161,7 +161,7 @@ class DabblerDialog extends StatefulWidget {
   });
 
   /// Whether the dialog is shown. `false` renders nothing at all — the source
-  /// returns `null` and leaves no hidden DOM (`Dialog.jsx:38`).
+  /// returns `null` and leaves no hidden DOM (`Dialog.jsx:37`).
   final bool open;
 
   /// Called when the dialog asks to close: Escape, or a press on the scrim.
@@ -188,7 +188,7 @@ class DabblerDialog extends StatefulWidget {
   final DabblerDialogAction? secondaryAction;
 
   /// Paints [primaryAction] with `--color-status-error-solid`
-  /// ([DabblerButtonTone.destructive]) — `Dialog.d.ts:18`. Outranks
+  /// ([DabblerButtonTone.destructive]) — `Dialog.d.ts:18` (unverified: file not mirrored). Outranks
   /// [DabblerDialogAction.tone]. Defaults to false.
   final bool destructive;
 
@@ -205,7 +205,7 @@ class DabblerDialog extends StatefulWidget {
   final String? scrimDismissLabel;
 
   /// The viewport width below which the action row stacks —
-  /// `(max-width: 359px)` at `Dialog.jsx:29`, i.e. stack **below** 360.
+  /// `(max-width: 359px)` at `Dialog.jsx:30`, i.e. stack **below** 360.
   static const double stackBelowWidth = 360;
 
   /// Identifies the panel, so a test can measure the rendered box and read its
@@ -233,7 +233,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
 
   /// The node that had focus when the dialog opened, restored on close —
   /// *"focus returns to the invoking element on close"*
-  /// (`Dialog.prompt.md:51`).
+  /// (`Dialog.prompt.md:51`, unverified: file not mirrored).
   FocusNode? _restoreTo;
 
   @override
@@ -301,7 +301,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
     );
 
     // The fade is the panel's only motion: `--motion-base` opacity, no scale
-    // and no slide (`Dialog.prompt.md:69-71`). Under reduced motion the source
+    // and no slide (`Dialog.prompt.md:69-71`, unverified: file not mirrored). Under reduced motion the source
     // drops the animation entirely (`overlay.jsx:39`).
     final Widget faded = AnimatedOpacity(
       opacity: 1,
@@ -311,7 +311,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
     );
 
     // `role="dialog"`, `aria-modal="true"`, `aria-labelledby` on the title
-    // (`Dialog.jsx:64-67`). `scopesRoute` + `namesRoute` is the Flutter
+    // (`Dialog.jsx:67-69`). `scopesRoute` + `namesRoute` is the Flutter
     // spelling of a modal with an accessible name; `explicitChildNodes` keeps
     // the title, body and actions as their own nodes rather than merging them
     // into one announcement.
@@ -324,7 +324,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
     );
 
     // The source gives the panel `tabIndex={-1}` and moves focus to it on open
-    // (`Dialog.jsx:68`). The [Focus] node is that: something inside the scope
+    // (`Dialog.jsx:71`). The [Focus] node is that: something inside the scope
     // that can hold focus even when the dialog has no focusable content, so
     // the key handling below is reachable from the moment it opens.
     final Widget focusable = Focus(autofocus: true, child: semantic);
@@ -386,7 +386,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
           ),
         ),
         Positioned.fill(
-          // `padding: var(--space-8)` on the scrim container, Dialog.jsx:60 —
+          // `padding: var(--space-8)` on the scrim container, Dialog.jsx:62 —
           // the gutter that keeps the panel off the viewport edge.
           child: Padding(
             padding: const EdgeInsets.all(DabblerSpacing.space8),
@@ -468,7 +468,7 @@ class _DabblerDialogRoute<T> extends PopupRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    // Opacity only — no scale, no slide (`Dialog.prompt.md:69-71`).
+    // Opacity only — no scale, no slide (`Dialog.prompt.md:69-71`, unverified: file not mirrored).
     return FadeTransition(
       opacity: CurvedAnimation(parent: animation, curve: DabblerMotion.easeOut),
       child: child,

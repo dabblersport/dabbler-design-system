@@ -32,7 +32,7 @@ void main() {
       expect(
         _box(tester).borderRadius,
         DabblerRadius.smAll,
-        reason: 'Checkbox.jsx:11 — borderRadius: var(--radius-sm)',
+        reason: 'Checkbox.jsx:9 — borderRadius: var(--radius-sm)',
       );
       expect(
         tester.getSize(find.byType(DabblerCheckbox)).height,
@@ -95,7 +95,7 @@ void main() {
       expect(
         DabblerCheckMarkPainter.points,
         const <Offset>[Offset(20, 6), Offset(9, 17), Offset(4, 12)],
-        reason: 'Checkbox.jsx:15 — d="M20 6 9 17l-5-5"',
+        reason: 'Checkbox.jsx:14 — d="M20 6 9 17l-5-5"',
       );
       expect(paint.size, const Size.square(DabblerCheckbox.markSize));
       expect(DabblerCheckbox.markSize, DabblerSizing.iconSm);

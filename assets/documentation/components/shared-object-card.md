@@ -49,7 +49,7 @@ The decorative info and accent tile surfaces, card surface, card outline, brand,
 
 ## Change log
 
-- Covered against the live source: chips now actually paint their pastel fill, footnotes show on games only and chips on venues and players only, only a game title truncates, the empty venue slot shows its placeholder, and meta text follows the secondary role instead of a light-only palette value. The prompt file says card surface; the source paints the pastel ground, and the source was followed. The tile surfaces have no dark value, so the ground stays pastel in dark mode, as in the source.
+- Covered against the hand-transcribed mirror of the live source (no byte or pixel check): chips now actually paint their pastel fill, footnotes show on games only and chips on venues and players only, only a game title truncates, the empty venue slot shows its placeholder, and meta text follows the secondary role instead of a light-only palette value. The prompt file says card surface; the source paints the pastel ground, and the source was followed. The tile surfaces have no dark value, so the ground stays pastel in dark mode, as in the source.
 
 ## Source
 

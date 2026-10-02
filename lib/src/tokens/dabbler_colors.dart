@@ -50,7 +50,7 @@ enum DabblerStatusTone {
 /// [DabblerStatusColor] is never `==` to a [Color], however its fields are
 /// valued.
 ///
-/// Roles, from `tokens/colors.css:118-131`:
+/// Roles, from `tokens/colors.css:123-131`:
 /// * [base] — the bare indicator (`--color-status-<tone>`). An indicator only;
 ///   white on it measures 2.1–3.8:1, which is why [solid] exists.
 /// * [surface] — the tint background (`-surface`).
@@ -97,7 +97,7 @@ class DabblerStatusColor {
 ///
 /// Like [DabblerStatusColor] this is deliberately not a [Color]. The two uses
 /// are kept apart by the field that exposes them, never by the type: a tag
-/// carries workflow meaning, a tile carries none. `tokens/colors.css:92-104`
+/// carries workflow meaning, a tile carries none. `tokens/colors.css:84-91`
 /// is explicit that the tile tones are decorative and are **not** part of the
 /// `--color-status-*` API.
 @immutable
@@ -136,7 +136,7 @@ class DabblerToneColor {
 /// through `Theme.of(context).extension<DabblerColors>()`. They are *not* 14
 /// independent colour schemes: at a given brightness all seven share one
 /// background, card, ink and border ramp byte for byte. The design source
-/// states the rule directly (`tokens/colors.css:64`): *"Neutrals are the Figma
+/// states the rule directly (`tokens/colors.css:61`): *"Neutrals are the Figma
 /// paper ramp — literal, shared, never a brand tint"*, and
 /// `tokens/colors.css:28-31`: the section themes re-tint the **brand**, never
 /// the paper. Only [brandPrimary], [brandPrimaryHover], [onBrand], [accent],

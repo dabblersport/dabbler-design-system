@@ -138,7 +138,7 @@ void main() {
   });
 
   group('the panel', () {
-    testWidgets('open: false renders nothing at all (Dialog.jsx:38)', (
+    testWidgets('open: false renders nothing at all (Dialog.jsx:37)', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -170,7 +170,7 @@ void main() {
       expect(decoration.gradient, isNull);
     });
 
-    testWidgets('padding is --space-8 (Dialog.jsx:79)', (
+    testWidgets('padding is --space-8 (Dialog.jsx:81)', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(host(const DabblerDialog(title: 'leave?')));
@@ -184,7 +184,7 @@ void main() {
       expect(scroller.padding, const EdgeInsets.all(DabblerSpacing.space8));
     });
 
-    testWidgets('md caps at 420 and sm at 340 (Dialog.jsx:16)', (
+    testWidgets('md caps at 420 and sm at 340 (Dialog.jsx:13)', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(host(const DabblerDialog(title: 'leave?')));
@@ -278,6 +278,7 @@ void main() {
       expect(
         buttonAt(tester, DabblerDialog.primaryActionKey).tone,
         DabblerButtonTone.destructive,
+        // `Dialog.d.ts:18` (unverified: file not mirrored).
         reason: 'Dialog.d.ts:18 — destructive paints the primary action',
       );
       expect(
@@ -290,7 +291,7 @@ void main() {
     testWidgets('AC2 — destructive outranks a per-action tone', (
       WidgetTester tester,
     ) async {
-      // `Dialog.d.ts:6` — "Button tone; ignored when destructive is set".
+      // `Dialog.d.ts:6` (unverified: file not mirrored) — "Button tone; ignored when destructive is set".
       await tester.pumpWidget(
         host(
           const DabblerDialog(
@@ -337,7 +338,7 @@ void main() {
       );
     });
 
-    testWidgets('the secondary falls back to onClose (Dialog.jsx:102)', (
+    testWidgets('the secondary falls back to onClose (Dialog.jsx:101)', (
       WidgetTester tester,
     ) async {
       int closed = 0;
@@ -369,7 +370,7 @@ void main() {
           size: const Size(359, 600),
         ),
       );
-      // `fullWidth={stack}` — Dialog.jsx:101 and :104.
+      // `fullWidth={stack}` — Dialog.jsx:100 and :104.
       expect(buttonAt(tester, DabblerDialog.primaryActionKey).fullWidth, isTrue);
       expect(
         buttonAt(tester, DabblerDialog.secondaryActionKey).fullWidth,
@@ -388,6 +389,7 @@ void main() {
       expect(row.mainAxisAlignment, MainAxisAlignment.end);
     });
 
+    // `Dialog.prompt.md:57-59` (unverified: file not mirrored).
     testWidgets('stacks below 360px (Dialog.prompt.md:57-59)', (
       WidgetTester tester,
     ) async {
@@ -517,6 +519,7 @@ void main() {
       expect(closed, 0);
     });
 
+    // `Dialog.prompt.md:51` (unverified: file not mirrored).
     testWidgets('Enter fires primaryAction (Dialog.prompt.md:51)', (
       WidgetTester tester,
     ) async {

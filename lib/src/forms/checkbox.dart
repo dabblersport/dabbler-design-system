@@ -71,12 +71,12 @@ class DabblerCheckbox extends StatefulWidget {
   final ValueChanged<bool>? onChanged;
 
   /// Whether the control is inert: 50% opacity and no click
-  /// (`Checkbox.jsx:29`, and the specimen's *"Disabled drops to 50% opacity
+  /// (`Checkbox.jsx:27-28`, and the specimen's *"Disabled drops to 50% opacity
   /// and takes no click"*).
   final bool disabled;
 
   /// The optional trailing label, `.t-body` at [DabblerColors.textPrimary]
-  /// (`Checkbox.jsx:32-33` — `fontSize: 16, lineHeight: '21px'`, which is the
+  /// (`Checkbox.jsx:30` — `fontSize: 16, lineHeight: '21px'`, which is the
   /// `.t-body` step).
   final String? label;
 
@@ -84,21 +84,21 @@ class DabblerCheckbox extends StatefulWidget {
   /// should differ from the visible one.
   final String? semanticLabel;
 
-  /// `width: 24, height: 24` (`Checkbox.jsx:11`) — [DabblerSizing.iconMd], and
+  /// `width: 24, height: 24` (`Checkbox.jsx:9`) — [DabblerSizing.iconMd], and
   /// the specimen's *"24px — the Checkbox box, the Radio circle, the Toggle
   /// knob"*.
   static const double boxSize = DabblerSizing.iconMd;
 
   /// `width="18" height="18"` on the check mark's `svg`
-  /// (`Checkbox.jsx:15`) — [DabblerSizing.iconSm].
+  /// (`Checkbox.jsx:14`) — [DabblerSizing.iconSm].
   static const double markSize = DabblerSizing.iconSm;
 
-  /// `strokeWidth="3"` in the mark's own 24-unit viewBox (`Checkbox.jsx:15`),
+  /// `strokeWidth="3"` in the mark's own 24-unit viewBox (`Checkbox.jsx:14`),
   /// expressed here in those same viewBox units; [DabblerCheckMarkPainter]
   /// scales it with the path.
   static const double markStrokeWidth = 3;
 
-  /// `opacity: disabled ? 0.5 : 1` (`Checkbox.jsx:29`).
+  /// `opacity: disabled ? 0.5 : 1` (`Checkbox.jsx:28`).
   static const double disabledOpacity = 0.5;
 
   /// The box fill: brand when checked, nothing when not
@@ -236,7 +236,7 @@ class _DabblerCheckboxState extends State<DabblerCheckbox> {
 
 /// The check mark, painted from the source's own path.
 ///
-/// `Checkbox.jsx:15` draws `<path d="M20 6 9 17l-5-5" />` in a 24-unit
+/// `Checkbox.jsx:14` draws `<path d="M20 6 9 17l-5-5" />` in a 24-unit
 /// viewBox, `fill="none"`, `strokeWidth="3"`, `strokeLinecap="round"`,
 /// `strokeLinejoin="round"`, rendered at 18×18. The three points are therefore
 /// (20, 6), (9, 17) and (4, 12) in viewBox units, scaled to whatever size the

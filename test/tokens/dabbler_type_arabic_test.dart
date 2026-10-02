@@ -38,7 +38,7 @@ void main() {
       );
     });
 
-    test('latin size, arabic size and both leadings match the live table', () {
+    test('latin size, arabic size and both leadings match the transcribed live table (mirror, no byte check)', () {
       for (final DabblerTypeStyle s in DabblerType.styles) {
         final (double ls, double ars, double ll, double al) = _live[s.name]!;
         expect(s.fontSize, ls, reason: '${s.name} latin size');

@@ -17,7 +17,7 @@ import '../tokens/dabbler_type.dart';
 import 'sheet.dart';
 
 /// Which corner of the trigger the popover hangs from, transcribed from the
-/// `placement` union in `components/overlays/Menu.d.ts:38`.
+/// `placement` union in `components/overlays/Menu.d.ts:38` (unverified: file not mirrored).
 ///
 /// `start` and `end` are **inline** edges, not left and right: under RTL
 /// [bottomStart] anchors to the trigger's right edge, which is the source's own
@@ -37,7 +37,7 @@ enum DabblerMenuPlacement {
 }
 
 /// The semantic tone of a [DabblerMenuEntry]'s leading tile
-/// (`Menu.d.ts:11-15`).
+/// (`Menu.d.ts:11-15` (unverified: file not mirrored)).
 ///
 /// Deliberately a closed set of **semantic names**: the source states there is
 /// *"no `background` / hex prop"* (`Menu.prompt.md` — *Leading-icon tone*), so
@@ -64,7 +64,7 @@ enum DabblerMenuIconTone {
   neutral,
 }
 
-/// A menu item's text tone — `tone` in `Menu.d.ts:16`.
+/// A menu item's text tone — `tone` in `Menu.d.ts:16` (unverified: file not mirrored).
 enum DabblerMenuItemTone {
   /// `--color-text-primary`.
   defaultTone,
@@ -74,7 +74,7 @@ enum DabblerMenuItemTone {
   destructive,
 }
 
-/// The list's accessibility role — `role` in `Menu.d.ts:52`.
+/// The list's accessibility role — `role` in `Menu.d.ts:52` (unverified: file not mirrored).
 enum DabblerMenuRole {
   /// `role="menu"` with `role="menuitem"` children. The default.
   menu,
@@ -85,7 +85,7 @@ enum DabblerMenuRole {
   listbox,
 }
 
-/// One row of a [DabblerMenu] — `MenuItemSpec` in `Menu.d.ts:3-28`.
+/// One row of a [DabblerMenu] — `MenuItemSpec` in `Menu.d.ts:3-28` (unverified: file not mirrored).
 ///
 /// A separator is an entry too, exactly as in the source, where `separator:
 /// true` replaces the item rather than being a different array
@@ -140,7 +140,7 @@ class DabblerMenuEntry {
   /// but **kept in the list** (`Menu.prompt.md` — *Accessibility*).
   final bool disabled;
 
-  /// Draws a trailing brand tick (`Menu.d.ts:19`).
+  /// Draws a trailing brand tick (`Menu.d.ts:19` (unverified: file not mirrored)).
   final bool selected;
 
   /// A node at the inline end — a shortcut hint, a count, a Badge.
@@ -373,19 +373,19 @@ class DabblerMenu extends StatefulWidget {
   final ValueChanged<DabblerMenuEntry>? onSelected;
 
   /// The accessible name of the list, and the sheet's title below
-  /// [sheetBreakpoint] (`Menu.d.ts:47`).
+  /// [sheetBreakpoint] (`Menu.d.ts:47` (unverified: file not mirrored)).
   final String? label;
 
   /// A node pinned above the items — `Select` passes its search field here
-  /// (`Menu.d.ts:49`).
+  /// (`Menu.d.ts:49` (unverified: file not mirrored)).
   final Widget? header;
 
   /// Match the trigger's width instead of the 200–320 popover range
-  /// (`Menu.d.ts:51`). This is how `Select` makes its dropdown the width of
+  /// (`Menu.d.ts:51` (unverified: file not mirrored)). This is how `Select` makes its dropdown the width of
   /// its field.
   final bool fullWidth;
 
-  /// Close after a selection. Default true (`Menu.d.ts:52`).
+  /// Close after a selection. Default true (`Menu.d.ts:52` (unverified: file not mirrored)).
   final bool closeOnSelect;
 
   /// `menu` or `listbox`. `Select` passes `listbox`.

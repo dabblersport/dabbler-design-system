@@ -18,7 +18,7 @@ import '../tokens/dabbler_type.dart';
 /// CodeInput — one-time-code and PIN entry.
 ///
 /// Transcribed from `components/forms/CodeInput.jsx:1-104`,
-/// `CodeInput.d.ts:3-15`, `CodeInput.prompt.md` and the specimen
+/// `CodeInput.d.ts:3-15` (unverified: file not mirrored), `CodeInput.prompt.md` and the specimen
 /// `components/forms/fields.card.html:141-162`.
 ///
 /// ```dart
@@ -53,7 +53,7 @@ import '../tokens/dabbler_type.dart';
 /// it *"the documented exception"*: a verification code is a number, numbers
 /// read left-to-right in both scripts, and mirroring the boxes would change
 /// the value the user sees (`fields.card.html:162`,
-/// `CodeInput.prompt.md:47-50`).
+/// `CodeInput.prompt.md:47-50` (unverified: file not mirrored)).
 ///
 /// This is the one component in the package that pins a direction. It is not a
 /// missing [EdgeInsetsDirectional]: the box row is wrapped in an explicit
@@ -67,7 +67,7 @@ import '../tokens/dabbler_type.dart';
 ///
 /// ## Every box is a real input
 ///
-/// `CodeInput.prompt.md:52-55` requires it: *"Every box is a real input, so
+/// `CodeInput.prompt.md:52-55` (unverified: file not mirrored) requires it: *"Every box is a real input, so
 /// screen readers and password managers behave."* Each box is therefore a
 /// Material [TextField] with its own [FocusNode] and [TextEditingController],
 /// carrying [TextInputType.number] and [AutofillHints.oneTimeCode] so the
@@ -121,7 +121,7 @@ class DabblerCodeInput extends StatefulWidget {
     this.autofocus = false,
   }) : assert(length > 0, 'a code has at least one digit');
 
-  /// `length = 6` (`CodeInput.jsx:12`, `CodeInput.prompt.md:18`).
+  /// `length = 6` (`CodeInput.jsx:12`, `CodeInput.prompt.md:18` (unverified: file not mirrored)).
   static const int defaultLength = 6;
 
   /// Each box's width — `width: 45` (`CodeInput.jsx:90`).
@@ -152,7 +152,7 @@ class DabblerCodeInput extends StatefulWidget {
   /// The source uses `type="password"`, which leaves the glyph to the browser
   /// (`CodeInput.jsx:79`); Flutter makes it explicit and defaults to the same
   /// bullet the platform uses. The prompt calls the masked rendering *"dots"*
-  /// (`CodeInput.prompt.md:22`).
+  /// (`CodeInput.prompt.md:22` (unverified: file not mirrored)).
   static const String maskCharacter = '•';
 
   /// Number of boxes.
@@ -167,7 +167,7 @@ class DabblerCodeInput extends StatefulWidget {
   /// Called with the code once every box is filled — the source's
   /// `onComplete`. Fires in the same edit as the final [onChanged], after it.
   ///
-  /// `CodeInput.prompt.md:65-66`: verification is triggered from here rather
+  /// `CodeInput.prompt.md:65-66` (unverified: file not mirrored): verification is triggered from here rather
   /// than from a separate submit button.
   final ValueChanged<String>? onCompleted;
 

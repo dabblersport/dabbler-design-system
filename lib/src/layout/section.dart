@@ -21,12 +21,12 @@ import '../tokens/dabbler_type.dart';
 ///
 /// | gap | design source | token |
 /// |---|---|---|
-/// | title ↔ action | `gap: 12`, `Section.jsx:18` | [DabblerSpacing.stackDefault] (12) |
-/// | header ↔ subtitle | `margin-top: var(--stack-tight)`, `:26` | [DabblerSpacing.stackTight] (6) |
-/// | header ↔ children | `margin-top: var(--stack-default)`, `:31` | [DabblerSpacing.stackDefault] (12) |
-/// | child ↔ child | `gap: var(--stack-default)`, `:30` | [DabblerSpacing.stackDefault] (12) |
+/// | title ↔ action | `gap: 12`, `Section.jsx:16` | [DabblerSpacing.stackDefault] (12) |
+/// | header ↔ subtitle | `margin-top: var(--stack-tight)`, `:25` | [DabblerSpacing.stackTight] (6) |
+/// | header ↔ children | `margin-top: var(--stack-default)`, `:29` | [DabblerSpacing.stackDefault] (12) |
+/// | child ↔ child | `gap: var(--stack-default)`, `:28` | [DabblerSpacing.stackDefault] (12) |
 ///
-/// `Section.jsx:18` writes the header gap as the bare number `12` rather than
+/// `Section.jsx:16` writes the header gap as the bare number `12` rather than
 /// `var(--stack-default)`. It is the same value, and the two neighbouring gaps
 /// in the same component are both `--stack-default`, so it is transcribed as
 /// the token. Carrying it as a literal would put a number in the Dart that the
@@ -100,7 +100,7 @@ class DabblerSection extends StatelessWidget {
   ///
   /// Lands on the trailing edge in both directions. Present without a [title],
   /// it still sits trailing: the source keeps an empty flexing spacer in the
-  /// title's place (`Section.jsx:22`).
+  /// title's place (`Section.jsx:20`).
   final Widget? action;
 
   /// The section's content, stacked with [DabblerSpacing.stackDefault] gaps.
@@ -110,7 +110,7 @@ class DabblerSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
-    // Section.jsx:9 — `title != null || action != null`.
+    // Section.jsx:12 — `title != null || action != null`.
     final bool hasHeader = title != null || action != null;
 
     final List<Widget> column = <Widget>[];

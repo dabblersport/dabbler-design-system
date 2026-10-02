@@ -48,7 +48,7 @@ Card surface, card outline, brand, on-brand, secondary ink. Spacing 3 and 6, the
 
 ## Change log
 
-- Covered against the live source: the idle glyph follows the secondary text role instead of a light-only palette value, and an idle target paints no fill.
+- Covered against the hand-transcribed mirror of the live source (no byte or pixel check): the idle glyph follows the secondary text role instead of a light-only palette value, and an idle target paints no fill.
 
 ## Source
 

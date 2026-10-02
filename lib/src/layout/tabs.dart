@@ -100,7 +100,7 @@ class DabblerTabItem {
 ///
 /// The active tab is the one whose [DabblerTabItem.id] equals [value], and
 /// [DabblerTabPanel] renders on the same `id == value` test
-/// (`Tabs.jsx:31, 154`). Reordering [items] therefore never changes which panel
+/// (`Tabs.jsx:30, 147`). Reordering [items] therefore never changes which panel
 /// is shown. A [value] that matches nothing falls back to the first tab, which
 /// is what the source's `Math.max(0, findIndex(...))` does with `findIndex`'s
 /// `-1`.
@@ -140,7 +140,7 @@ class DabblerTabItem {
 /// positioned with [AnimatedPositionedDirectional]; the scroller is nudged
 /// along the same inline-start axis; and the arrow keys swap, so
 /// [LogicalKeyboardKey.arrowLeft] advances under RTL. That is the source's own
-/// rule (`Tabs.jsx:59-63`, `Tabs.prompt.md` — *RTL behaviour*).
+/// rule (`Tabs.jsx:64-69`, `Tabs.prompt.md` — *RTL behaviour*).
 class DabblerTabs extends StatefulWidget {
   /// Creates a tab strip.
   const DabblerTabs({
@@ -203,7 +203,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   int _measuredIndex = -1;
   double _measuredWidth = -1;
 
-  /// `--space-4` (12): the source's scroll-into-view margin, `Tabs.jsx:50-51`.
+  /// `--space-4` (12): the source's scroll-into-view margin, `Tabs.jsx:51-52`.
   static const double _scrollMargin = DabblerSpacing.space4;
 
   /// Sub-pixel slack, so a rounding difference never provokes a jump. Not a
@@ -279,7 +279,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   ///
   /// The source reads `offsetLeft` / `offsetWidth` and converts to an
   /// inline-start offset under RTL with
-  /// `scrollWidth - (offsetLeft + offsetWidth)` (`Tabs.jsx:41-43`). The Flutter
+  /// `scrollWidth - (offsetLeft + offsetWidth)` (`Tabs.jsx:43-45`). The Flutter
   /// equivalent is [RenderBox.localToGlobal] against the strip, mirrored the
   /// same way — and the strip's own width is the content width, because the
   /// [Row] is the scroller's child rather than its viewport.
@@ -318,7 +318,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   /// Keeps the active tab inside the scroller by adjusting the scroller's own
   /// offset — **never** an ensure-visible that could scroll an ancestor. That
   /// is the source's rule verbatim: *"never `scrollIntoView`, which would
-  /// scroll the whole page"* (`Tabs.jsx:45-53`).
+  /// scroll the whole page"* (`Tabs.jsx:36-38`).
   void _keepInView({required double start, required double size}) {
     if (!_scrollable || !_scroll.hasClients) {
       return;
@@ -391,7 +391,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   /// Selects [index] and moves focus onto it.
   ///
   /// **Deviation, deliberate.** The source moves focus for the arrow keys
-  /// (`Tabs.jsx:62`) but not for Home / End, which leaves the keyboard focus
+  /// (`Tabs.jsx:60-61`) but not for Home / End, which leaves the keyboard focus
   /// on a tab that the roving tab order has just removed from traversal. Focus
   /// follows selection here in all four cases; anything else contradicts the
   /// roving-tabindex contract the same file sets up.
@@ -477,7 +477,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   }
 
   /// `--surface-sunken` pill track, 45 tall, with `--space-1` of inline
-  /// padding (`Tabs.jsx:82-85`).
+  /// padding (`Tabs.jsx:87-89`).
   ///
   /// **Deviation, documented.** The source puts 3px of padding on all four
   /// sides of the track and gives each tab a 39px min-height
@@ -506,7 +506,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   ///
   /// **Deviation, documented.** The source draws the indicator at
   /// `bottom: -1` so it straddles the container's own 1px bottom border
-  /// (`Tabs.jsx:141`). A Flutter [Stack] child at a negative offset would be
+  /// (`Tabs.jsx:135`). A Flutter [Stack] child at a negative offset would be
   /// outside the painted bounds; instead the rail is a sibling at the block
   /// end and the 2px indicator is drawn over it at the same edge. The result
   /// on screen — a 2px brand bar covering the rail beneath the active tab — is
@@ -611,7 +611,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
 
     // The painted body. Colour and background change over `--motion-base`,
     // matching the source's `transition: background …, color …`
-    // (`Tabs.jsx:121`); the underline variant has no background to animate.
+    // (`Tabs.jsx:124`); the underline variant has no background to animate.
     final Duration duration = DabblerMotion.reduceMotion(context)
         ? Duration.zero
         : DabblerMotion.base;
@@ -695,7 +695,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
 
 /// The panel a [DabblerTabs] tab controls.
 ///
-/// Transcribed from `TabPanel` in `components/layout/Tabs.jsx:151-158`. Wire
+/// Transcribed from `TabPanel` in `components/layout/Tabs.jsx:146-152`. Wire
 /// [id] and [value] to the same strings as the tabs:
 ///
 /// ```dart
@@ -735,7 +735,7 @@ class DabblerTabPanel extends StatelessWidget {
   /// matching tab names in its `controlsNodes`.
   ///
   /// This is the Flutter equivalent of the source's `id="tabpanel-${id}"` /
-  /// `aria-controls="tabpanel-${id}"` pair (`Tabs.jsx:103, 156`): the two
+  /// `aria-controls="tabpanel-${id}"` pair (`Tabs.jsx:106, 149`): the two
   /// sides are generated from one function so they cannot drift apart.
   static String semanticsIdentifier(String id) => 'tabpanel-$id';
 

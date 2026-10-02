@@ -296,7 +296,7 @@ class DabblerAvatar extends StatelessWidget {
   final Color? ringColor;
 
   /// The corner badge's diameter. Defaults to [badgeDiameter] (24, `Avatar.jsx`);
-  /// `NavigationTopBar` draws a 16px one (Figma-export digest: `16x16`).
+  /// `NavigationTopBar` draws a 16px one (`NavigationTopBar.jsx:189-190`).
   final double badgeSize;
 
   /// The 2px of `Avatar.jsx`'s group ring and badge border.
