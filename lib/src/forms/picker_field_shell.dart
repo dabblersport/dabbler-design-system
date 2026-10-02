@@ -37,7 +37,7 @@ part of 'picker_field.dart';
 /// ## Why this is not `DabblerTextField(variant: select)`
 ///
 /// DS-600's `select` variant is the shared shell for pickers whose value can
-/// *only* be picked, and `fields.card.html:100` is explicit that `Select`,
+/// *only* be picked, and `fields.card.html:100` (unverified: file not mirrored) is explicit that `Select`,
 /// `DateField` and `TimeField` must not fork the input. This shell does not
 /// fork it — it is the same [DabblerFieldShell], the same `--radius-xxl`, the
 /// same four border states, the same `focused || open` rule — but it cannot be
@@ -53,7 +53,7 @@ part of 'picker_field.dart';
 /// * The trailing affordance differs: `PickerField.jsx:60-73` is a 45×45
 ///   `--color-brand-primary` icon button carrying `aria-expanded`, whereas
 ///   `select`'s is an 18px `--color-text-secondary` `arrow-down` that rotates
-///   (`TextField.jsx` / `fields.card.html:65`). `fields.card.html:122` names
+///   (`TextField.jsx` / `fields.card.html:65` (unverified: file not mirrored)). `fields.card.html:122` (unverified: file not mirrored) names
 ///   the picker button's size and tint directly.
 ///
 /// So: `Select` (DS-601) is `variant: select`; `DateField` and `TimeField` are
@@ -307,7 +307,7 @@ class _DabblerPickerFieldShellState extends State<DabblerPickerFieldShell> {
 ///
 /// `PickerField.jsx:60-73`: `width`/`height` are `--touch-target-min`, the
 /// tint is `--color-brand-primary`, the glyph is 24, and the hit shape is
-/// `--radius-pill`. `fields.card.html:122` restates the size and the tint.
+/// `--radius-pill`. `fields.card.html:122` (unverified: file not mirrored) restates the size and the tint.
 ///
 /// ## Keyboard (KAN-276)
 ///

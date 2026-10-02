@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// Raw colour primitives for the Dabbler design system.
 ///
 /// Every constant here is a literal hex value declared in the `:root` block of
-/// the design source `tokens/colors.css` (version 4.0), transcribed verbatim.
+/// the design source `tokens/colors.css` (version 4.0), transcribed from the hand-transcribed mirror (no byte check).
 /// The Dart name is the CSS custom-property name in camelCase, and each
 /// constant's doc comment records the CSS token it came from.
 ///

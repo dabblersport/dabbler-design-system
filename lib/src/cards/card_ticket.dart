@@ -97,7 +97,7 @@ class DabblerTicketAction {
 ///
 /// Transcribed from `components/cards/CardTicket.jsx`, `CardTicket.d.ts` and
 /// `CardTicket.prompt.md`, and checked against the four specimens in
-/// `components/cards/cards.card.html:63-66`.
+/// `components/cards/cards.card.html:63-66` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerCardTicket(

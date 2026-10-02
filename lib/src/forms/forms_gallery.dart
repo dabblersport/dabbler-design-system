@@ -227,7 +227,7 @@ Widget _fields(BuildContext context) {
               size: DabblerSizing.iconMd,
             ),
             // `<span style={{fontSize:13,color:'var(--muted)'}}>AED</span>`
-            // (`fields.card.html:56`) — specimen demo content, and the one
+            // (`fields.card.html:56` (unverified: file not mirrored)) — specimen demo content, and the one
             // place the forms area paints a surface neutral as text. It is
             // the sheet's own inline label, not a component role, so it takes
             // the field's secondary ink here.

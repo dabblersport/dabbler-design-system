@@ -88,7 +88,7 @@ class DabblerTabItem {
 ///
 /// Transcribed from `components/layout/Tabs.jsx`, `Tabs.d.ts` and
 /// `Tabs.prompt.md`, with the measurements confirmed against the rendered
-/// specimen `components/controls/buttons.card.html:140-165`.
+/// specimen `components/controls/buttons.card.html:140-165` (unverified: file not mirrored).
 ///
 /// Deliberately **not** a navigation bar. The source is explicit that
 /// `NavigationTabBar` / `NavigationBottomBar` switch top-level app sections and
@@ -559,7 +559,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   }
 
   /// The indicator is 2px — the specimen's own figure
-  /// (`buttons.card.html:158`). It is not a spacing step, so it is stated
+  /// (`buttons.card.html:158` (unverified: file not mirrored)). It is not a spacing step, so it is stated
   /// here rather than borrowed from a token that happens to equal it.
   static const double _indicatorHeight = 2;
 

@@ -11,7 +11,7 @@ import '../tokens/dabbler_palette.dart';
 ///
 /// The enum collapses the Figma kit's **four separate FAB symbols** into one
 /// component — `FAB.d.ts` says so explicitly ("merged from the Figma kit's four
-/// FAB symbols"), and `controls.card.html:36` names them in this order:
+/// FAB symbols"), and `controls.card.html:36` (unverified: file not mirrored) names them in this order:
 /// *default indigo · primary purple · accent pink · dark neutral*.
 enum DabblerFabTone {
   /// `default` — indigo fill, card ink.

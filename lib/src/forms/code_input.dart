@@ -19,7 +19,7 @@ import '../tokens/dabbler_type.dart';
 ///
 /// Transcribed from `components/forms/CodeInput.jsx:1-104`,
 /// `CodeInput.d.ts:3-15` (unverified: file not mirrored), `CodeInput.prompt.md` and the specimen
-/// `components/forms/fields.card.html:141-162`.
+/// `components/forms/fields.card.html:141-162` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerCodeInput(
@@ -37,7 +37,7 @@ import '../tokens/dabbler_type.dart';
 /// all. The specimen is explicit about why the error state stops at the
 /// hairline — *"the boxes themselves only carry the error hairline — pair with
 /// a `Banner tone="error"` or a message below"*
-/// (`fields.card.html:162`). A shell here would add a 24-radius 45-min box
+/// (`fields.card.html:162` (unverified: file not mirrored)). A shell here would add a 24-radius 45-min box
 /// around a grid of 12-radius boxes and a message line the component does not
 /// own, so the shell is deliberately absent rather than forgotten.
 ///
@@ -52,7 +52,7 @@ import '../tokens/dabbler_type.dart';
 /// `direction: 'ltr'` on the group (`CodeInput.jsx:74`) and the specimen calls
 /// it *"the documented exception"*: a verification code is a number, numbers
 /// read left-to-right in both scripts, and mirroring the boxes would change
-/// the value the user sees (`fields.card.html:162`,
+/// the value the user sees (`fields.card.html:162` (unverified: file not mirrored),
 /// `CodeInput.prompt.md:47-50` (unverified: file not mirrored)).
 ///
 /// This is the one component in the package that pins a direction. It is not a
@@ -128,7 +128,7 @@ class DabblerCodeInput extends StatefulWidget {
   ///
   /// This *is* [DabblerSizing.touchTargetMin], which the specimen's token
   /// table states outright: `--touch-target-min` applies to *"each CodeInput
-  /// box (45×54)"* (`fields.card.html:171`). No deviation.
+  /// box (45×54)"* (`fields.card.html:171` (unverified: file not mirrored)). No deviation.
   static const double boxWidth = DabblerSizing.touchTargetMin;
 
   /// Each box's height — `height: 54` (`CodeInput.jsx:90`).
@@ -144,7 +144,7 @@ class DabblerCodeInput extends StatefulWidget {
 
   /// Each box's corner radius — `borderRadius: var(--radius-lg)`
   /// (`CodeInput.jsx:97`). The specimen's token table gives `--radius-lg` as
-  /// *"CodeInput boxes"* (`fields.card.html:170`).
+  /// *"CodeInput boxes"* (`fields.card.html:170` (unverified: file not mirrored)).
   static const double boxRadius = DabblerRadius.lg;
 
   /// The character drawn in place of a digit while [masked].
@@ -177,7 +177,7 @@ class DabblerCodeInput extends StatefulWidget {
   /// Swaps every hairline for `--color-status-error`.
   ///
   /// The boxes carry **only** the hairline: there is no message line here, and
-  /// `fields.card.html:162` says to pair the component with a `DabblerBanner`
+  /// `fields.card.html:162` (unverified: file not mirrored) says to pair the component with a `DabblerBanner`
   /// in the error tone for *"that code didn't work"*.
   final bool error;
 

@@ -243,7 +243,7 @@ void main() {
       await tester.pumpWidget(_host(const _SelectHarness()));
       await _open(tester);
 
-      // `fields.card.html:113` — *"the list is role="menu" with role="menuitem"
+      // `fields.card.html:113` (unverified: file not mirrored) — *"the list is role="menu" with role="menuitem"
       // options"*. DS-700's own dartdoc suggests listbox; the source wins.
       expect(
         tester.widget<DabblerMenuList>(find.byType(DabblerMenuList)).role,

@@ -52,9 +52,9 @@ Rendered against a hand-transcribed mirror of the live design-system export, wit
 
 Line citations of the form `Name.jsx:NN` (also `.css`, `.prompt.md`, `.d.ts`) in `lib/` and
 `test/` were checked on 2026-10-02, every one by eye, against that mirror (not against live):
-573 citations checked; 282 correct as cited; 215 corrected (the value was on a different line
-of the same mirror file); 1 claim removed (the quoted text is not in the mirror file); 75
-labelled "unverified: file not mirrored" (`*.d.ts` and non-messaging `*.prompt.md`). 55 further
-citations sit in files another seat was editing at the time (TimePicker, TimeField, Card,
-Badge, IconTile) and were not checked here. Citations without a line number, and
-`*.card.html` citations, were not counted.
+793 citations found (665 `Name.ext:NN`, 56 `*.card.html:NN`, 72 bare same-file `:NN`
+continuations); 444 correct as cited; 216 corrected (the value was on a different line of
+the same mirror file); 1 claim removed (the quoted text is not in the mirror file); 132
+labelled "unverified: file not mirrored" (`*.d.ts`, non-messaging `*.prompt.md` and every
+`*.card.html` specimen). Citations without a line number, and line references to files that
+are not design sources (`DECISIONS.md`, the Flutter SDK), were not counted.

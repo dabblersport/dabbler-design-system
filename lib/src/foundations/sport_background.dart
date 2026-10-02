@@ -15,7 +15,7 @@ enum DabblerSportBackgroundVariant {
   /// `matchDay` — match/game-day context. **Structurally anticipated and
   /// entirely unpopulated.**
   ///
-  /// `sport-backgrounds.card.html:76` is explicit: *"Do not treat `main` as an
+  /// `sport-backgrounds.card.html:76` (unverified: file not mirrored) is explicit: *"Do not treat `main` as an
   /// interim Match Day background — requesting `matchDay` today returns
   /// `null`."* Batch 2 registers the real assets through
   /// [DabblerSportBackgroundRegistry.registerSportBackgrounds] without
@@ -108,7 +108,7 @@ class DabblerSportArtwork {
 /// `main` is registered for the eleven sports the bundle ships artwork for:
 /// football, padel, tennis, basketball, volleyball, cricket, running,
 /// swimming, cycling, badminton, gym. That list comes from two agreeing
-/// sources — the `MAIN_SRC` map in `sport-backgrounds.card.html:31-41`, and
+/// sources — the `MAIN_SRC` map in `sport-backgrounds.card.html:31-41` (unverified: file not mirrored), and
 /// the eleven PNG files actually present in `project/uploads/`
 /// (`Football.png`, `Padel.png`, `Tennis.png`, `Basketball.png`,
 /// `Vollyball.png` [sic], `Cricket.png`, `Running.png`, `Swimming.png`,
@@ -123,7 +123,7 @@ class DabblerSportArtwork {
 ///
 /// ## Composition — never treat this artwork
 ///
-/// `sport-backgrounds.card.html:71`: the art is ~941×1672 (9:16) editorial
+/// `sport-backgrounds.card.html:71` (unverified: file not mirrored): the art is ~941×1672 (9:16) editorial
 /// illustration with *"a deliberate quiet zone for overlaid content"*, and
 /// *"never scrim, blur, darken or fade this artwork — text-legibility
 /// treatment, if needed, belongs to the consuming screen"*. [DabblerSportBackground]
@@ -179,7 +179,7 @@ abstract final class DabblerSportBackgroundRegistry {
   ];
 
   /// The canonical `main` asset paths, transcribed from `MAIN_SRC`
-  /// (`sport-backgrounds.card.html:31-41`).
+  /// (`sport-backgrounds.card.html:31-41` (unverified: file not mirrored)).
   static const Map<DabblerSport, DabblerSportArtwork> defaultMainArtwork =
       <DabblerSport, DabblerSportArtwork>{
         DabblerSport.football: DabblerSportArtwork.asset(

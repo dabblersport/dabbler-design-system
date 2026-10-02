@@ -52,7 +52,7 @@ enum DabblerSheetPresentation {
 /// ## What it composes, and what it does not restate
 ///
 /// The wash is DS-200's [DabblerScrim] and nothing here re-declares its
-/// colour, its opacity or its fade — `Sheet.prompt.md:34` and
+/// colour, its opacity or its fade — `Sheet.prompt.md:34` (unverified: file not mirrored) and
 /// `Dialog.prompt.md:34` (both unverified: files not mirrored) name the same `--color-scrim` token precisely so
 /// there is one scrim, not three. Everything the scrim documents itself as
 /// *not* doing — the panel, the positioning, the entry and exit transition,

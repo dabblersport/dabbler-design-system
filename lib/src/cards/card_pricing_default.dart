@@ -215,18 +215,21 @@ class DabblerCardPricing extends StatelessWidget {
   static const double slotGap = 0;
 
   /// The price line's box — `height: 24` with `padding: 4px 0`
-  /// (`CardPricingDefault.jsx` line 2, Figma-export digest).
+  /// (`CardPricingDefault.jsx:66,69`, the Figma-export source as
+  /// hand-transcribed to the mirror).
   static const double priceSlotHeight = 24;
 
-  /// The billing line's box — `height: 25` with `padding: 8px 0` (line 4).
+  /// The billing line's box — `height: 25` with `padding: 8px 0` (`CardPricingDefault.jsx:109,112`).
   static const double billingSlotHeight = 25;
 
   /// The selection indicator's side — **28**, transcribed literally.
   ///
-  /// Re-checked against the live digest: the disc is `24x24` with
-  /// `border: 2px solid`, and only the root and the padded line boxes are
-  /// stated `boxSizing: border-box`; the disc is not, so the border adds to the
-  /// box (24 + 2 + 2 = 28). The 28 is therefore consistent with the live export.
+  /// Re-checked against the hand-transcribed mirror of the live Figma-export
+  /// source (no byte or pixel check): the disc is `24x24` with
+  /// `2px solid` borders (`CardPricingDefault.jsx:143-150`), and only the root,
+  /// the padded line boxes and the disc's wrapper are stated
+  /// `boxSizing: border-box`; the disc is not, so the border adds to the box
+  /// (24 + 2 + 2 = 28). The 28 is therefore consistent with that mirror.
   ///
   /// Measured on the rendered specimen
   /// (`components/cards/cards.card.html`): both the selected tick disc and the

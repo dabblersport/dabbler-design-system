@@ -33,7 +33,7 @@ import '../tokens/dabbler_type.dart';
 /// spacing scale already names.
 ///
 /// The header→children gap appears **only when there is both a header and at
-/// least one child** (`hasHeader && items.length ? … : 0`, `:31`). A subtitle
+/// least one child** (`hasHeader && items.length ? … : 0`, `:29`). A subtitle
 /// alone does not open it.
 ///
 /// Section does **not** apply [DabblerSpacing.sectionGap] or

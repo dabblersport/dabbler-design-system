@@ -51,7 +51,7 @@ Widget _host(
   );
 }
 
-/// The `Default` dump's content, verbatim from `CardPricingDefault.d.ts`.
+/// The `Default` dump's content, from `CardPricingDefault.d.ts` (unverified: file not mirrored).
 const DabblerCardPricing _yearly = DabblerCardPricing(
   plan: 'yearly',
   price: r'$59.99/yr',
@@ -61,7 +61,7 @@ const DabblerCardPricing _yearly = DabblerCardPricing(
   selected: true,
 );
 
-/// The `Selected` dump's content, verbatim from `CardPricingSelected.d.ts`.
+/// The `Selected` dump's content, from `CardPricingSelected.d.ts` (unverified: file not mirrored).
 const DabblerCardPricing _monthly = DabblerCardPricing(
   plan: 'monthly',
   price: r'$5.99/mo',
@@ -298,7 +298,7 @@ void main() {
         // right constraint — do not snap this back to `iconMd`.
         expect(size, const Size(28, 28));
         expect(DabblerCardPricing.indicatorSide, 28);
-        // Live digest: 24x24 disc + `border: 2px solid`, not border-box:
+        // Mirrored CardPricingDefault.jsx:143-150: 24x24 disc + 2px borders, not border-box:
         // 24 + 2 + 2 = 28 outer.
         expect(DabblerCardPricing.indicatorBorderWidth, 2);
         expect(
@@ -386,10 +386,11 @@ void main() {
       );
     });
 
-    test('line boxes and pill offsets equal the live export', () {
-      // Live `components/cards/CardPricingDefault.jsx` (Figma node 8:39,
-      // digest): line 2 box height 24, line 4 box height 25, badge left 14 /
-      // top -10, card padding 16, radius 16.
+    test('line boxes and pill offsets equal the mirrored live export', () {
+      // Mirrored `components/cards/CardPricingDefault.jsx` (Figma node 8:39,
+      // hand-transcribed): price box height 24 (:66), billing box height 25
+      // (:109), badge left 14 / top -10 (:180-181), card padding 16 (:16),
+      // radius 16 (:8).
       expect(DabblerCardPricing.slotGap, 0);
       expect(DabblerCardPricing.priceSlotHeight, 24);
       expect(DabblerCardPricing.billingSlotHeight, 25);
@@ -404,8 +405,8 @@ void main() {
     testWidgets('is filled with the theme\'s 700 step (live --purple-700)', (
       WidgetTester tester,
     ) async {
-      // Live `CardPricingDefault.jsx` digest: badge `background:
-      // var(--purple-700)`; fig-tokens.css `--purple-700: rgb(90,30,168)`.
+      // Mirrored `CardPricingDefault.jsx:183`: badge `background:
+      // var(--purple-700)`; fig-tokens.css:59 `--purple-700: rgb(90,30,168)`.
       await tester.pumpWidget(_host(_yearly));
       final DabblerColors c = DabblerColors.resolve(
         theme: DabblerTheme.main,
@@ -459,7 +460,7 @@ void main() {
       final Rect card = tester.getRect(find.byType(DabblerCard));
       final Rect pill = tester.getRect(find.byType(DabblerBadge));
 
-      // `top: -10` in the Figma dump (CardPricingDefault.jsx digest).
+      // `top: -10` in the Figma export (CardPricingDefault.jsx:181).
       expect(card.top - pill.top, closeTo(10, 0.5));
       expect(pill.bottom, greaterThan(card.top));
     });

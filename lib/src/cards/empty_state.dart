@@ -26,7 +26,7 @@ enum DabblerEmptyStateSize {
 ///
 /// Transcribed from `components/cards/EmptyState.jsx`, `EmptyState.d.ts` and
 /// `EmptyState.prompt.md`, and checked against the specimen at
-/// `components/cards/cards.card.html:100`.
+/// `components/cards/cards.card.html:100` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerEmptyState(

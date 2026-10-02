@@ -132,7 +132,7 @@ class DabblerSportIconResolution {
 ///
 /// ## Open blocker — the glyph set does not exist
 ///
-/// `SportIcon.prompt.md` → *BLOCKER* and `icons-system.card.html:157` both
+/// `SportIcon.prompt.md` → *BLOCKER* and `icons-system.card.html:157` (unverified: file not mirrored) both
 /// record it: the set needs 13 sports × linear/bold = **26 glyphs**, drawn on
 /// the Iconsax 24px grid at 1.5px stroke, matching Iconsax's optical weight,
 /// under a licence permitting redistribution in the app and this kit. Neither
@@ -214,7 +214,7 @@ abstract final class DabblerSportIconRegistry {
 
   /// The documented Iconsax fallback for every sport, transcribed from
   /// `SportIcon.jsx` → `const FALLBACKS` and cross-checked against the
-  /// fallback table in `icons-system.card.html:151-153`.
+  /// fallback table in `icons-system.card.html:151-153` (unverified: file not mirrored).
   ///
   /// The source's own rationale, kept verbatim in its three groups:
   ///
@@ -382,7 +382,7 @@ abstract final class DabblerSportIconRegistry {
 /// ## RTL
 ///
 /// Sport glyphs are pictograms, *"never mirrored"* in RTL
-/// (`icons-system.card.html:177,180`). This widget has no RTL-aware property
+/// (`icons-system.card.html:177,180` (unverified: file not mirrored)). This widget has no RTL-aware property
 /// and never mirrors itself.
 ///
 /// ## Composition rules, from the source

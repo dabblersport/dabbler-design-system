@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Asserts the sport vocabulary against the design source
 /// `components/foundations/SportIcon.jsx` -> `export const SPORTS`, which
-/// `icons-system.card.html:155` calls "the current, complete SPORTS list".
+/// `icons-system.card.html:155` (unverified: file not mirrored) calls "the current, complete SPORTS list".
 void main() {
   /// Transcribed literally from the source array, in its order.
   const List<String> sourceSports = <String>[
@@ -22,7 +22,7 @@ void main() {
 
     test('gym is present — the code wins over the "twelve" prose', () {
       // SportIcon.d.ts's union and parts of SportIcon.prompt.md say twelve and
-      // omit gym; SPORTS, FALLBACKS, icons-system.card.html:152 and the
+      // omit gym; SPORTS, FALLBACKS, icons-system.card.html:152 (unverified: file not mirrored) and the
       // shipped gym artwork all say thirteen.
       expect(kDabblerSports, contains(DabblerSport.gym));
       expect(kDabblerSports, hasLength(13));

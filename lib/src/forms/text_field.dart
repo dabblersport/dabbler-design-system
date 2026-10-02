@@ -39,8 +39,8 @@ enum DabblerTextFieldVariant {
 ///
 /// Transcribed from `components/forms/TextField.jsx:83-162`,
 /// `TextField.d.ts:1-40` (unverified: file not mirrored), `TextField.prompt.md` and the specimens
-/// `components/forms/fields.card.html:70-100` (the five states and the five
-/// variants) and `forms.card.html:28-34`.
+/// `components/forms/fields.card.html:70-100` (unverified: file not mirrored) (the five states and the five
+/// variants) and `forms.card.html:28-34` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerTextField(
@@ -472,7 +472,7 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
 }
 
 /// The password visibility toggle — a 45×45 target, which
-/// `fields.card.html:99` calls out explicitly.
+/// `fields.card.html:99` (unverified: file not mirrored) calls out explicitly.
 class _PasswordToggle extends StatelessWidget {
   const _PasswordToggle({
     required this.revealed,

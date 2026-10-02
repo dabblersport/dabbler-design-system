@@ -8,7 +8,7 @@ import '../tokens/dabbler_type.dart';
 
 /// The eight **decorative** badge tones.
 ///
-/// Transcribed verbatim from the `TONES` table of the design source
+/// Transcribed from the `TONES` table (as hand-transcribed to the mirror) of the design source
 /// `components/surfaces/Badge.jsx:19-28`, which merges the Figma kit's eight
 /// standalone Badge symbols into one component.
 ///
@@ -248,8 +248,8 @@ class DabblerBadge extends StatelessWidget {
   ///
   /// `Badge.jsx:24` — the decorative `info` tone is `--accent-indigo`
   /// (`rgb(92, 80, 230)`, [DabblerPalette.accentIndigo]). This used to paint
-  /// `DabblerColors.info.base` (`#3B82F6`, a blue); compared against the live
-  /// source it now takes the same indigo [DabblerAvatarBadgeTone.indigo] and the
+  /// `DabblerColors.info.base` (`#3B82F6`, a blue); compared against the
+  /// hand-transcribed mirror of live (no byte or pixel check) it now takes the same indigo [DabblerAvatarBadgeTone.indigo] and the
   /// button's accent tone use.
   static Color decorativeIndigo(DabblerColors colors) =>
       DabblerPalette.accentIndigo;

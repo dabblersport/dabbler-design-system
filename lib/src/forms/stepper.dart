@@ -47,7 +47,7 @@ enum DabblerStepperSize {
 ///
 /// The shell is the whole of this widget's chrome: the label, the
 /// [DabblerRadius.xxl] box, the four border states and the helper / error
-/// line. `fields.card.html:169` lists the Stepper among the components sharing
+/// line. `fields.card.html:169` (unverified: file not mirrored) lists the Stepper among the components sharing
 /// that 24 radius, *"so it lines up with `TextField` and `Select` in the same
 /// form"*, and this file paints none of it itself.
 ///
@@ -185,7 +185,7 @@ class _DabblerStepperState extends State<DabblerStepper> {
       TextEditingController(text: '${widget.value}');
   late final FocusNode _fieldNode = FocusNode()..addListener(_handleFocus);
 
-  // One shared ring for three controls (`value-controls.card.html:133,138`):
+  // One shared ring for three controls (`value-controls.card.html:133,138` (unverified: file not mirrored)):
   // the shell's focused border is the union of the numeral's focus and each
   // button's, so it activates from whichever control has focus and clears
   // only when none does.

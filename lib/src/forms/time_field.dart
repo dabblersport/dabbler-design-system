@@ -8,7 +8,7 @@ import 'picker_field.dart';
 /// The time half of the formatting layer (AC1) and of the numerals rule (AC2).
 ///
 /// Transcribed from `components/forms/TimeField.jsx:12-23`,
-/// `TimeField.prompt.md` and `components/forms/fields.card.html:136`.
+/// `TimeField.prompt.md` and `components/forms/fields.card.html:136` (unverified: file not mirrored).
 ///
 /// ## Western Arabic numerals, regardless of locale (AC2)
 ///
@@ -24,7 +24,7 @@ import 'picker_field.dart';
 /// ## The meridiem is not localised either
 ///
 /// `TimeField.jsx:12` formats the period as the literal `AM` / `PM` the value
-/// already carries, and `fields.card.html:137` calls `H:MM AM` *"the product's
+/// already carries, and `fields.card.html:137` (unverified: file not mirrored) calls `H:MM AM` *"the product's
 /// own format"*. [amLabel] and [pmLabel] are therefore constants, not a
 /// locale lookup — a design-system decision transcribed, not an oversight.
 abstract final class DabblerTimeFormat {
@@ -115,7 +115,7 @@ abstract final class DabblerTimeFormat {
 /// TimeField — a time of day, typed or picked.
 ///
 /// Transcribed from `components/forms/TimeField.jsx`, `TimeField.d.ts`,
-/// `TimeField.prompt.md` and `components/forms/fields.card.html:128-137`.
+/// `TimeField.prompt.md` and `components/forms/fields.card.html:128-137` (unverified: file not mirrored).
 ///
 /// ```dart
 /// DabblerTimeField(
@@ -140,7 +140,7 @@ abstract final class DabblerTimeFormat {
 ///
 /// ## The value type
 ///
-/// **Documented deviation:** `TimeField.d.ts:4` types the value as the display
+/// **Documented deviation:** `TimeField.d.ts:4` (unverified: file not mirrored) types the value as the display
 /// string itself — `"6:00 PM"`. This takes Flutter's [TimeOfDay] instead. The
 /// string is a *rendering* of a time, and round-tripping every read through a
 /// parser that can return null makes a caller handle a failure that cannot

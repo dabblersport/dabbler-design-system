@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '_host.dart';
 
-/// The specimen's month — `calendar.card.html:21` renders
+/// The specimen's month — `calendar.card.html:21` (unverified: file not mirrored) renders
 /// `<Calendar month={1} year={2078} …>`, and `month` is 0-indexed
 /// (`Calendar.d.ts:5` (unverified: file not mirrored)), so it is February 2078.
 final DateTime specimenMonth = DateTime(2078, DateTime.february);

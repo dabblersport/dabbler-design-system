@@ -2,7 +2,7 @@
 ///
 /// Transcribed from the design source `components/foundations/SportIcon.jsx` →
 /// `export const SPORTS`, and cross-checked against
-/// `components/foundations/icons-system.card.html:155`, which calls that array
+/// `components/foundations/icons-system.card.html:155` (unverified: file not mirrored), which calls that array
 /// *"the current, complete `SPORTS` list"*.
 ///
 /// ## Thirteen, not twelve
@@ -17,7 +17,7 @@
 ///
 /// `gym` wins on three independent counts: it is in the executable `SPORTS`
 /// array, it has a `FALLBACKS` entry (`activity`), and the card's own fallback
-/// table (`icons-system.card.html:152`) lists it by name. Dropping it would
+/// table (`icons-system.card.html:152` (unverified: file not mirrored)) lists it by name. Dropping it would
 /// also break `SportBackground`, whose bundle ships `gym` artwork. The
 /// "twelve" wording is treated as stale prose.
 library;
