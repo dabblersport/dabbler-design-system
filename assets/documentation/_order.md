@@ -68,6 +68,8 @@ The first thing on most screens, and the reason it comes first here.
 - [BottomBar](components/bottom-bar.md) — the primary destination switcher, plus the create action.
 - [TabBar](components/tab-bar.md) — the four-slot icon bar for top-level sections.
 - [Tabs](components/tabs.md) — switching between peer views of one screen.
+- [ConversationHeader](components/conversation-header.md) — the top bar of a conversation: back, a
+  tappable identity, overflow.
 
 ### 2 · Content containers — holding what you show
 
