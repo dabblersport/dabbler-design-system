@@ -293,15 +293,17 @@ abstract final class DabblerPalette {
   /// `--tag-pending-surface` — `#FDEDE3`.
   static const Color tagPendingSurface = Color(0xFFFDEDE3);
 
-  /// `--tag-pending-ink` — `#A34A08`. **Named targeted override.**
+  /// Transcribes live `--tag-pending-ink` `#B4530E` (live parity, hand-
+  /// transcribed mirror).
   ///
-  /// Deliberately deviates from live `#B4530E` (4.40:1 on `#FDEDE3`, a real
-  /// defect): `#A34A08` measures 5.20:1 and holds the hue. Authority:
-  /// `Dabbler/dabbler-docs/DECISIONS.md:11914-11919` and ruling
-  /// cdispatch-d92eff45 (reaffirmed by cdispatch-5e71152a). The live
-  /// fixture `test/fixtures/live/tokens/colors.css:76` still mirrors live
-  /// `#B4530E`; the live-parity tests list this key as a named exception.
-  static const Color tagPendingInk = Color(0xFFA34A08);
+  /// **Known defect: 4.40:1 on [tagPendingSurface], below AA 4.5:1.**
+  /// `Dabbler/dabbler-docs/DECISIONS.md:11914-11919` rules the fix (`#A34A08`,
+  /// 5.20:1) a Figma change request, not a code change, and `:11941-11947`
+  /// says the pins must not be edited to match until `colors.css` is
+  /// re-exported. Do not change this value until then.
+  ///
+  /// `--tag-pending-ink` — `#B4530E`.
+  static const Color tagPendingInk = Color(0xFFB4530E);
 
   /// `--tag-progress-surface` — `#DBEAFB`.
   static const Color tagProgressSurface = Color(0xFFDBEAFB);

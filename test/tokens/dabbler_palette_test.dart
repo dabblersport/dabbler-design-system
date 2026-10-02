@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
 import 'package:flutter/material.dart';
@@ -36,19 +37,18 @@ const Set<String> literalAllowlist = <String>{
   'lib/src/tokens/dabbler_dark_provisional.dart',
 };
 
-/// Live tokens the package deliberately does NOT mirror. Each entry is a
-/// named, documented exception so this live-parity test cannot silently
-/// "fix" the override back to the live value.
-///
-/// `tag-pending-ink`: live `#B4530E` measures 4.40:1 on `--tag-pending-surface`
-/// `#FDEDE3` (fails AA 4.5:1, "a real defect"); the package ships `#A34A08`
-/// at 5.20:1. Authority: `Dabbler/dabbler-docs/DECISIONS.md:11914-11919`,
-/// ruling cdispatch-d92eff45 (reaffirmed cdispatch-5e71152a). See
-/// `test/tokens/tag_pending_ink_override_test.dart`.
-const Map<String, ({String live, String package})> liveParityExceptions =
-    <String, ({String live, String package})>{
-  'tag-pending-ink': (live: 'B4530E', package: 'A34A08'),
-};
+/// WCAG 2.x relative luminance of an opaque colour.
+double _luminance(Color c) {
+  double ch(double v) =>
+      v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+  return 0.2126 * ch(c.r) + 0.7152 * ch(c.g) + 0.0722 * ch(c.b);
+}
+
+double _contrast(Color a, Color b) {
+  final double la = _luminance(a);
+  final double lb = _luminance(b);
+  return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+}
 
 final RegExp _hexLiteral = RegExp(r'Color\(0x[0-9A-Fa-f]{6,8}\)');
 
@@ -90,24 +90,6 @@ void main() {
       // Each token's doc comment records its CSS name; the constant below it
       // must carry that token's exact hex.
       for (final MapEntry<String, String> entry in tokens.entries) {
-        final ({String live, String package})? exception =
-            liveParityExceptions[entry.key];
-        if (exception != null) {
-          // The live value is still the one the exception was granted
-          // against; if live changes, the exception must be re-judged.
-          expect(entry.value, exception.live,
-              reason: 'live --${entry.key} changed; re-judge the override');
-          expect(
-            RegExp('/// `--${RegExp.escape(entry.key)}` — `#${exception.package}`'
-                    r'\.[^\n]*\n(?:  ///[^\n]*\n)*'
-                    r'  static const Color \w+ = '
-                    'Color\\(0xFF${exception.package}\\);')
-                .hasMatch(source),
-            isTrue,
-            reason: 'override for --${entry.key} must be #${exception.package}',
-          );
-          continue;
-        }
         final RegExp decl = RegExp(
           '/// `--${RegExp.escape(entry.key)}` — `#${entry.value}`\\.\\n'
           r'  static const Color \w+ = '
@@ -161,6 +143,20 @@ void main() {
   }, skip: source == null
       ? 'tokens/colors.css not found beside the package'
       : false);
+
+  // KNOWN DEFECT, pinned as the SOURCE records it (not a pass): live
+  // `--tag-pending-ink` #B4530E on `--tag-pending-surface` #FDEDE3 is 4.40:1,
+  // below AA 4.5:1. `Dabbler/dabbler-docs/DECISIONS.md:11914-11919` rules the
+  // fix (#A34A08) a Figma change request, and `:11941-11947` says the pins
+  // record the source and move to the gate only after `colors.css` is
+  // re-exported. This test must keep asserting 4.40 until then.
+  test('known defect: tag-pending-ink is #B4530E at 4.40:1 on its surface', () {
+    expect(DabblerPalette.tagPendingInk, const Color(0xFFB4530E));
+    expect(
+      _contrast(DabblerPalette.tagPendingInk, DabblerPalette.tagPendingSurface),
+      closeTo(4.40, 0.01),
+    );
+  });
 
   test('no Color(0x...) literal outside the palette files', () {
     final List<String> offenders = <String>[];
