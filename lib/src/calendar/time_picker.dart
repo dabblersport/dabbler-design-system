@@ -9,22 +9,31 @@ import '../controls/button.dart';
 import '../forms/time_field.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
-import '../tokens/dabbler_motion.dart';
+import '../overlays/menu.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 import 'calendar.dart';
 
+part 'time_picker_chrome.dart';
+part 'time_picker_column.dart';
 part 'time_picker_ruler.dart';
 part 'time_picker_values.dart';
+part 'time_ruler.dart';
 
 /// TimePicker — the hour, minute and meridiem picker that pairs with
-/// [DabblerCalendar].
+/// [DabblerCalendar]. Each column is a selectable listbox.
+///
+/// This is the D-030 component (`Dabbler/dabbler-docs/DECISIONS.md`, D-030:
+/// the shipped vertical side-by-side listbox columns "are correct and stay").
+/// Its API and semantics are those of commit `9ed2a55`, restored.
 ///
 /// Transcribed from `components/calendar/TimePicker.jsx` in the live Claude
 /// Design project 4286affa-bf50-4ff6-9576-917f76a93ca1 (Dabbler Design System),
 /// read via DesignSync get_file on 2026-10-02 and transcribed to a local mirror
-/// by the coordinator.
+/// by the coordinator. Fidelity to live is unverified; no pixel comparison has
+/// been run.
 ///
 /// ```dart
 /// DabblerTimePicker(
@@ -32,57 +41,62 @@ part 'time_picker_values.dart';
 ///   onChanged: (TimeOfDay next) => setState(() => kickOff = next),
 ///   onConfirm: close,
 ///   onCancel: close,
+///   visibleRows: 3,
+///   minuteStep: 5,
 /// )
 /// ```
 ///
-/// ## Source to Dart
+/// ## What is transcribed, and the one thing that is not
 ///
-/// | Live (`TimePicker.jsx`) | Dart |
-/// |---|---|
-/// | card `--surface-card`, radius 18, padding 15, gap 10 (`:98`) | [cardRadius], [DabblerSpacing.space5], [cardGap] |
-/// | header `20 / 700` sans, gap 10 (`:95-96`) | [headerFontSize], [headerGap] |
-/// | meridiem pill, `1px --outline-card`, `4px 10px`, `12 / 700`, inactive `--muted` (`:99-104`) | [DabblerColors.textSecondary] for `--muted` (D-003(a)) |
-/// | `Ruler` height 64, pitch 46 (`:3`, `:39`) | [rulerHeight], [rulerPitch] |
-/// | tick strip bottom 6, height 14, `1.5px` ticks every `pitch / 4` (`:41-44`) | [tickBottom], [tickHeight], [tickWidth] |
-/// | numerals display face, 24 selected / 18 other, opacity `max(.2, 1 - dist * .3)` (`:50-57`) | [selectedFontSize], [otherFontSize], [minOpacity], [opacityStep] |
-/// | centre window: top/bottom 4, width `pitch + 14`, radius 12, `2px` brand, shadow `0 2px 8px rgba(0,0,0,.05)` (`:65-68`) | [windowInset], [windowExtra], [windowRadius], [windowBorder] |
-/// | pin: bottom 8, `2 x 16`, radius 1 (`:70-72`) | [pinBottom], [pinWidth], [pinHeight] |
-/// | track glide `200ms cubic-bezier(.2,.8,.2,1)` (`:16`, `:43`) | [glide], [glideCurve] |
-/// | drag end: `shift = round(-dx / pitch)`, wraps modulo n (`:26-27`) | same |
-/// | hours `1..12`, minutes `i * 5` (`:77-78`), default `7 AM` (`:86`) | [DabblerTimeValues] |
+/// Kept: the card shell (`--surface-card`, an 18px corner, 15px padding —
+/// `TimePicker.jsx:94`); the centred header showing the value and the AM/PM
+/// segmented pill (`:95-108`); the value set — twelve hours and twelve
+/// five-minute steps (`:77-78`); the default of `7:00 AM` (`:86`); the
+/// nearest-step fold (`:91`); and the Confirm / Cancel footer (`:111-123`).
 ///
-/// ## Additions beyond the source (accessibility)
+/// **Not ported here: the two horizontal drag rulers** (`TimePicker.jsx:3-75`).
+/// The live `Ruler` is driven entirely by pointer events, with no key handler,
+/// no discrete target and no announced value, and its non-centre numerals are
+/// drawn at `opacity: max(0.2, ...)`. D-030 rules that the listbox stays and
+/// that a scroll-wheel picker "comes back as a new component with a drawn
+/// source and a stated keyboard contract". The ruler is available only as the
+/// separate, opt-in [DabblerTimeRuler]; this widget never builds it. Each
+/// column here is a real list of [DabblerMenuItem] rows (DS-700's
+/// [DabblerMenuList] at [DabblerMenuRole.listbox]): 45px targets, a visible
+/// selected state, listitem children, and arrow-key navigation this widget
+/// drives (see *Keyboard*).
 ///
-/// The source ruler is pointer-only. Kept on top of the faithful drawing:
+/// ## The seam to DS-602
 ///
-/// * **Keyboard.** Each ruler is one focus stop: Left/Down step to the previous
-///   enabled value, Right/Up to the next, Home/End jump to the first/last
-///   enabled value. Every move commits through [onChanged] at once, as the
-///   source does on pointer-up.
-/// * **Semantics.** A ruler is an adjustable node with increase/decrease
-///   actions and its two-digit value.
-/// * **Tap.** A tap picks the numeral under the finger, so a discrete target
-///   exists. The source's tap changes nothing.
+/// The header renders through [DabblerTimeFormat.format], so the picker prints
+/// the field's own `H:MM AM`, and the value type is [TimeOfDay] — what
+/// `DabblerTimeField` speaks. [minimum]/[maximum] are checked with
+/// [DabblerTimeFormat.inBounds].
 ///
-/// Values disabled by [minimum]/[maximum] are never committed (the source's
-/// `TimeField` `inBounds` guard, applied here where the value is chosen) and
-/// are skipped by the keys.
+/// ## Keyboard
 ///
-/// ## The pin runs into the numerals — and so does live
+/// [DabblerMenuList] at [DabblerMenuRole.listbox] is driven by its composer and
+/// handles no keys, so each column is one focus stop and this widget owns the
+/// keys:
 ///
-/// Live `TimePicker.jsx:70` puts the 2x16 pin at `bottom: 8` of the 64px box
-/// (y 40-56) while numerals are centred at y 32 (24px glyphs reach about y 44),
-/// so the pin overlaps the lower edge of the centred numeral. The port keeps
-/// that geometry; it is not a defect of the Dart port.
+/// * **Up / Down** move to the previous or next **enabled** value, without
+///   wrapping. A value disabled by [minimum]/[maximum] is skipped.
+/// * **Home / End** jump to the first and last enabled value.
+/// * Every move commits through [onChanged] immediately (the source's `set()`
+///   fires on each change, `TimePicker.jsx:90`).
 ///
-/// ## Remaining documented deviations
+/// ## RTL
 ///
-/// * The meridiem segments keep a [DabblerSizing.touchTargetMin] (45) minimum
-///   height; the live `4px 10px` pill paints 24 tall.
-/// * Confirm / Cancel are [DabblerButton]s (D-023), not the live 40px spans.
-/// * The ruler is drawn in a left-to-right frame in both directions: it is a
-///   scale (numbers ascend to the right), exactly as the physical CSS is. The
-///   numerals use the Arabic size (Latin less 0.9px) under RTL.
+/// The columns and the AM/PM pill are [Row]s, so [TextDirection.rtl] mirrors
+/// them: the hour column sits on the right. Numerals are Western Arabic in both
+/// scripts and the meridiem stays the literal `AM`/`PM`.
+///
+/// ## Touch targets and contrast
+///
+/// Every value row is a [DabblerMenuItem] (minimum height
+/// [DabblerSizing.touchTargetMin], 45). The inactive meridiem segment, `--muted`
+/// in the source (`TimePicker.jsx:104`), is [DabblerColors.textSecondary] under
+/// D-003(a).
 class DabblerTimePicker extends StatefulWidget {
   /// Creates a time picker.
   const DabblerTimePicker({
@@ -100,76 +114,20 @@ class DabblerTimePicker extends StatefulWidget {
     this.hourColumnLabel = defaultHourColumnLabel,
     this.minuteColumnLabel = defaultMinuteColumnLabel,
     this.periodLabel = defaultPeriodLabel,
-  }) : assert(minuteStep > 0 && minuteStep <= 60, 'minuteStep must be 1..60');
+    this.visibleRows = defaultVisibleRows,
+  }) : assert(minuteStep > 0 && minuteStep <= 60, 'minuteStep must be 1..60'),
+       assert(visibleRows > 0, 'visibleRows must be positive');
 
-  /// `border-radius: 18` (`TimePicker.jsx:94`).
+  /// `border-radius: 18` on the card (`TimePicker.jsx:94`) — the same shell as
+  /// [DabblerCalendar], and the same constant.
   static const double cardRadius = DabblerCalendar.cardRadius;
 
-  /// `gap: 10` between the card's rows (`TimePicker.jsx:94`).
-  static const double cardGap = 10;
+  /// How many rows a column shows before it scrolls. Not a source value — the
+  /// live ruler showed a fixed 64px strip and had no row concept.
+  static const int defaultVisibleRows = 3;
 
-  /// `gap: 10` between the value and the meridiem pill (`:95`).
-  static const double headerGap = 10;
-
-  /// `fontSize: 20` of the header value (`:101`).
-  static const double headerFontSize = 20;
-
-  /// `height: 64` of a ruler (`:39`).
-  static const double rulerHeight = 64;
-
-  /// `pitch = 46` — the width of one numeral cell (`:3`).
-  static const double rulerPitch = 46;
-
-  /// Tick strip `bottom: 6` (`:41`).
-  static const double tickBottom = 6;
-
-  /// Tick strip `height: 14` (`:41`).
-  static const double tickHeight = 14;
-
-  /// Tick width `1.5px` (`:44`).
-  static const double tickWidth = 1.5;
-
-  /// Numeral size when centred (`:57`).
-  static const double selectedFontSize = 24;
-
-  /// Numeral size when not centred (`:57`).
-  static const double otherFontSize = 18;
-
-  /// Opacity floor of a non-centre numeral (`:50`).
-  static const double minOpacity = 0.2;
-
-  /// Opacity lost per cell of distance (`:50`).
-  static const double opacityStep = 0.3;
-
-  /// Window `top: 4; bottom: 4` (`:65`).
-  static const double windowInset = 4;
-
-  /// Window width is `pitch + 14` (`:65`).
-  static const double windowExtra = 14;
-
-  /// Window `borderRadius: 12` (`:66`).
-  static const double windowRadius = 12;
-
-  /// Window `border: 2px solid brand` (`:66`).
-  static const double windowBorder = 2;
-
-  /// Window shadow alpha, `rgba(0,0,0,0.05)` (`:67`).
-  static const double windowShadowAlpha = 0.05;
-
-  /// Pin `bottom: 8` (`:70`).
-  static const double pinBottom = 8;
-
-  /// Pin `width: 2` (`:70`).
-  static const double pinWidth = 2;
-
-  /// Pin `height: 16` (`:70`).
-  static const double pinHeight = 16;
-
-  /// Track transition `200ms` (`:16`, `:43`).
-  static const Duration glide = Duration(milliseconds: 200);
-
-  /// Track transition `cubic-bezier(.2,.8,.2,1)` (`:16`, `:43`).
-  static const Cubic glideCurve = Cubic(0.2, 0.8, 0.2, 1);
+  /// The height of one value row: a [DabblerMenuItem]'s `minHeight`.
+  static const double rowExtent = DabblerSizing.touchTargetMin;
 
   /// The hour column's accessible name.
   static const String defaultHourColumnLabel = 'Hour';
@@ -180,10 +138,10 @@ class DabblerTimePicker extends StatefulWidget {
   /// The meridiem control's accessible name.
   static const String defaultPeriodLabel = 'AM or PM';
 
-  /// The key of the hour ruler.
+  /// The key of the hour column.
   static const Key hourColumnKey = ValueKey<String>('DabblerTimePicker.hours');
 
-  /// The key of the minute ruler.
+  /// The key of the minute column.
   static const Key minuteColumnKey = ValueKey<String>(
     'DabblerTimePicker.minutes',
   );
@@ -203,30 +161,32 @@ class DabblerTimePicker extends StatefulWidget {
   /// The key of the cancel action.
   static const Key cancelKey = ValueKey<String>('DabblerTimePicker.cancel');
 
-  /// The key of the track inside the ruler keyed [columnKey].
-  static Key trackKey(Key columnKey) =>
-      ValueKey<String>('${(columnKey as ValueKey<String>).value}.track');
-
-  /// The key of the numeral cell at absolute index [absIdx] of [columnKey].
-  static Key cellKey(Key columnKey, int absIdx) =>
-      ValueKey<String>('${(columnKey as ValueKey<String>).value}.cell.$absIdx');
-
   /// The chosen time. Null shows [DabblerTimeValues.defaultValue].
+  ///
+  /// The live `TimePicker` takes `hour`, `minute` and `period` separately. One
+  /// [TimeOfDay] replaces the three — a documented deviation: it is what a
+  /// Flutter time field already speaks, and three loose fields admit
+  /// combinations (`hour: 0`, `period: 'PM'`) that the type does not.
   final TimeOfDay? value;
 
   /// Called on every change — hour, minute or meridiem.
   final ValueChanged<TimeOfDay>? onChanged;
 
-  /// The minute ruler's step. 5 in the source.
+  /// The minute column's step. 5 in the source.
   final int minuteStep;
 
-  /// The earliest selectable time, inclusive.
+  /// The earliest selectable time, inclusive. A value before it renders
+  /// disabled and is skipped by the arrow keys.
+  ///
+  /// Not in `TimePicker.jsx`, which has no bounds; `TimeField.jsx:51-57` has
+  /// them on the typed path. The predicate is [DabblerTimeFormat.inBounds].
   final TimeOfDay? minimum;
 
-  /// The latest selectable time, inclusive.
+  /// The latest selectable time, inclusive. See [minimum].
   final TimeOfDay? maximum;
 
-  /// Whether to draw the Confirm / Cancel row.
+  /// Whether to draw the Confirm / Cancel row (`showActions`,
+  /// `TimePicker.jsx:87`, default true).
   final bool showActions;
 
   /// Fired by Confirm.
@@ -241,14 +201,17 @@ class DabblerTimePicker extends StatefulWidget {
   /// The Cancel label.
   final String cancelLabel;
 
-  /// The hour ruler's accessible name.
+  /// The hour column's accessible name.
   final String hourColumnLabel;
 
-  /// The minute ruler's accessible name.
+  /// The minute column's accessible name.
   final String minuteColumnLabel;
 
   /// The meridiem control's accessible name.
   final String periodLabel;
+
+  /// How many rows a column shows before it scrolls.
+  final int visibleRows;
 
   /// The value in force: [value], or [DabblerTimeValues.defaultValue].
   TimeOfDay get effectiveValue => value ?? DabblerTimeValues.defaultValue;
@@ -264,53 +227,66 @@ class DabblerTimePicker extends StatefulWidget {
 class _DabblerTimePickerState extends State<DabblerTimePicker> {
   @override
   Widget build(BuildContext context) {
-    final DabblerColors colors = DabblerColors.of(context);
-    final TextDirection direction = Directionality.of(context);
     final TimeOfDay value = widget.effectiveValue;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surfaceCard,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(DabblerTimePicker.cardRadius),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(DabblerSpacing.space5),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: DabblerTimePicker.cardGap,
+    return _TimePickerChrome(
+      value: value,
+      // `gap: 10` (`TimePicker.jsx:94`); the nearest base-3 step is
+      // `--space-3` (9).
+      gap: DabblerSpacing.space3,
+      headerGap: DabblerSpacing.space3,
+      commit: _commit,
+      valueKey: DabblerTimePicker.valueKey,
+      amKey: DabblerTimePicker.amKey,
+      pmKey: DabblerTimePicker.pmKey,
+      confirmKey: DabblerTimePicker.confirmKey,
+      cancelKey: DabblerTimePicker.cancelKey,
+      periodLabel: widget.periodLabel,
+      confirmLabel: widget.confirmLabel,
+      cancelLabel: widget.cancelLabel,
+      showActions: widget.showActions,
+      onConfirm: widget.onConfirm,
+      onCancel: widget.onCancel,
+      body: <Widget>[
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: DabblerSpacing.space3,
           children: <Widget>[
-            _header(colors, direction, value),
-            _TimeRuler(
-              key: DabblerTimePicker.hourColumnKey,
-              label: widget.hourColumnLabel,
-              values: DabblerTimeValues.hours,
-              selected: DabblerTimeValues.hourOfPeriodOf(value),
-              enabledOf: (int hour) => widget.isAllowed(
-                DabblerTimeValues.withHourOfPeriod(value, hour),
+            Expanded(
+              child: _ValueColumn(
+                key: DabblerTimePicker.hourColumnKey,
+                label: widget.hourColumnLabel,
+                values: DabblerTimeValues.hours,
+                selected: DabblerTimeValues.hourOfPeriodOf(value),
+                enabledOf: (int hour) => widget.isAllowed(
+                  DabblerTimeValues.withHourOfPeriod(value, hour),
+                ),
+                onSelected: (int hour) =>
+                    _commit(DabblerTimeValues.withHourOfPeriod(value, hour)),
+                visibleRows: widget.visibleRows,
               ),
-              onSelected: (int hour) =>
-                  _commit(DabblerTimeValues.withHourOfPeriod(value, hour)),
             ),
-            _TimeRuler(
-              key: DabblerTimePicker.minuteColumnKey,
-              label: widget.minuteColumnLabel,
-              values: DabblerTimeValues.minutesFor(widget.minuteStep),
-              selected: DabblerTimeValues.nearestMinute(
-                value.minute,
-                widget.minuteStep,
+            Expanded(
+              child: _ValueColumn(
+                key: DabblerTimePicker.minuteColumnKey,
+                label: widget.minuteColumnLabel,
+                values: DabblerTimeValues.minutesFor(widget.minuteStep),
+                selected: DabblerTimeValues.nearestMinute(
+                  value.minute,
+                  widget.minuteStep,
+                ),
+                enabledOf: (int minute) => widget.isAllowed(
+                  DabblerTimeValues.withMinute(value, minute),
+                ),
+                onSelected: (int minute) =>
+                    _commit(DabblerTimeValues.withMinute(value, minute)),
+                visibleRows: widget.visibleRows,
+                padded: true,
               ),
-              enabledOf: (int minute) =>
-                  widget.isAllowed(DabblerTimeValues.withMinute(value, minute)),
-              onSelected: (int minute) =>
-                  _commit(DabblerTimeValues.withMinute(value, minute)),
             ),
-            if (widget.showActions) _actions(),
           ],
         ),
-      ),
+      ],
     );
   }
 
@@ -319,150 +295,5 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
       return;
     }
     widget.onChanged?.call(next);
-  }
-
-  Widget _header(
-    DabblerColors colors,
-    TextDirection direction,
-    TimeOfDay value,
-  ) {
-    final bool rtl = direction == TextDirection.rtl;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      spacing: DabblerTimePicker.headerGap,
-      children: <Widget>[
-        Text(
-          DabblerTimeFormat.format(value),
-          key: DabblerTimePicker.valueKey,
-          // `H:MM AM` is the product's own format in both scripts; under an RTL
-          // paragraph the bidi algorithm would draw `PM 6:35`.
-          textDirection: TextDirection.ltr,
-          // `fontSize: 20, fontWeight: 700`, sans (`TimePicker.jsx:96`);
-          // Arabic size is Latin less 0.9.
-          style: DabblerType.headline
-              .resolveForDirection(direction)
-              .copyWith(
-                fontSize: DabblerTimePicker.headerFontSize - (rtl ? 0.9 : 0),
-                color: colors.textPrimary,
-                fontWeight: DabblerType.bold,
-              ),
-        ),
-        _periodPill(colors, direction, value),
-      ],
-    );
-  }
-
-  Widget _periodPill(
-    DabblerColors colors,
-    TextDirection direction,
-    TimeOfDay value,
-  ) {
-    return Semantics(
-      container: true,
-      label: widget.periodLabel,
-      child: ClipRRect(
-        borderRadius: DabblerRadius.pillAll,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: DabblerRadius.pillAll,
-            border: Border.all(
-              color: colors.borderDefault,
-              width: DabblerSizing.borderDefault,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _periodSegment(
-                key: DabblerTimePicker.amKey,
-                colors: colors,
-                direction: direction,
-                label: DabblerTimeFormat.amLabel,
-                on: value.period == DayPeriod.am,
-                onPressed: () =>
-                    _commit(DabblerTimeValues.withPeriod(value, DayPeriod.am)),
-              ),
-              _periodSegment(
-                key: DabblerTimePicker.pmKey,
-                colors: colors,
-                direction: direction,
-                label: DabblerTimeFormat.pmLabel,
-                on: value.period == DayPeriod.pm,
-                onPressed: () =>
-                    _commit(DabblerTimeValues.withPeriod(value, DayPeriod.pm)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _periodSegment({
-    required Key key,
-    required DabblerColors colors,
-    required TextDirection direction,
-    required String label,
-    required bool on,
-    required VoidCallback onPressed,
-  }) {
-    return Semantics(
-      key: key,
-      button: true,
-      selected: on,
-      child: DabblerFocusRing(
-        borderRadius: DabblerRadius.pillAll,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onPressed,
-          child: DabblerPressScale.gesture(
-            child: Container(
-              constraints: const BoxConstraints(
-                minHeight: DabblerSizing.touchTargetMin,
-                minWidth: DabblerSizing.touchTargetMin,
-              ),
-              // `padding: '4px 10px'` (`TimePicker.jsx:102`).
-              padding: const EdgeInsetsDirectional.symmetric(horizontal: 10),
-              alignment: Alignment.center,
-              color: on ? colors.brandPrimary : null,
-              child: Text(
-                label,
-                // `12 / 700`; inactive `--muted` (`:102-104`).
-                style: DabblerType.caption1
-                    .resolveForDirection(direction)
-                    .copyWith(
-                      color: on ? colors.onBrand : colors.textSecondary,
-                      fontWeight: DabblerType.bold,
-                    ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _actions() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: DabblerSpacing.space3,
-      runSpacing: DabblerSpacing.space3,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: <Widget>[
-        DabblerButton(
-          key: DabblerTimePicker.confirmKey,
-          label: widget.confirmLabel,
-          onPressed: widget.onConfirm,
-          disabled: widget.onConfirm == null,
-        ),
-        DabblerButton(
-          key: DabblerTimePicker.cancelKey,
-          label: widget.cancelLabel,
-          tone: DabblerButtonTone.text,
-          onPressed: widget.onCancel,
-          disabled: widget.onCancel == null,
-        ),
-      ],
-    );
   }
 }

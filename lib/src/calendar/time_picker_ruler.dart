@@ -31,7 +31,7 @@ class _TimeRuler extends StatefulWidget {
 }
 
 class _TimeRulerState extends State<_TimeRuler> {
-  final FocusNode _node = FocusNode(debugLabel: 'DabblerTimePicker ruler');
+  final FocusNode _node = FocusNode(debugLabel: 'DabblerTimeRuler ruler');
   double _dragPx = 0;
   bool _dragging = false;
   bool _focused = false;
@@ -99,7 +99,7 @@ class _TimeRulerState extends State<_TimeRuler> {
   }
 
   void _dragEnd() {
-    final int shift = (-_dragPx / DabblerTimePicker.rulerPitch).round();
+    final int shift = (-_dragPx / DabblerTimeRuler.rulerPitch).round();
     setState(() {
       _dragPx = 0;
       _dragging = false;
@@ -112,14 +112,14 @@ class _TimeRulerState extends State<_TimeRuler> {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     final bool rtl = direction == TextDirection.rtl;
-    const double pitch = DabblerTimePicker.rulerPitch;
+    const double pitch = DabblerTimeRuler.rulerPitch;
     final int n = _n;
     final int trackLen = n * 3;
     final int centerAbs = n + _idx;
     final double translate = -(centerAbs * pitch + pitch / 2) + _dragPx;
     final Duration duration = (_dragging || DabblerMotion.reduceMotion(context))
         ? Duration.zero
-        : DabblerTimePicker.glide;
+        : DabblerTimeRuler.glide;
     final String valueText = DabblerType.toWesternDigits(
       widget.selected.toString().padLeft(2, '0'),
     );
@@ -130,7 +130,7 @@ class _TimeRulerState extends State<_TimeRuler> {
       builder: (BuildContext context, BoxConstraints box) {
         final double w = box.maxWidth;
         return SizedBox(
-          height: DabblerTimePicker.rulerHeight,
+          height: DabblerTimeRuler.rulerHeight,
           width: w,
           child: ClipRect(
             child: Directionality(
@@ -143,21 +143,21 @@ class _TimeRulerState extends State<_TimeRuler> {
                   // numerals is an opaque card-coloured fill that the shadow
                   // cannot show through, and the ticks and numerals draw above.
                   Positioned(
-                    left: (w - (pitch + DabblerTimePicker.windowExtra)) / 2,
-                    top: DabblerTimePicker.windowInset,
-                    bottom: DabblerTimePicker.windowInset,
-                    width: pitch + DabblerTimePicker.windowExtra,
+                    left: (w - (pitch + DabblerTimeRuler.windowExtra)) / 2,
+                    top: DabblerTimeRuler.windowInset,
+                    bottom: DabblerTimeRuler.windowInset,
+                    width: pitch + DabblerTimeRuler.windowExtra,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: colors.surfaceCard,
                         borderRadius: BorderRadius.circular(
-                          DabblerTimePicker.windowRadius,
+                          DabblerTimeRuler.windowRadius,
                         ),
                         boxShadow: <BoxShadow>[
                           BoxShadow(
                             // `0 2px 8px rgba(0,0,0,0.05)` — ink at 5%.
                             color: colors.textPrimary.withValues(
-                              alpha: DabblerTimePicker.windowShadowAlpha,
+                              alpha: DabblerTimeRuler.windowShadowAlpha,
                             ),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
@@ -168,13 +168,13 @@ class _TimeRulerState extends State<_TimeRuler> {
                   ),
                   Positioned(
                     left: w / 2,
-                    bottom: DabblerTimePicker.tickBottom,
-                    height: DabblerTimePicker.tickHeight,
+                    bottom: DabblerTimeRuler.tickBottom,
+                    height: DabblerTimeRuler.tickHeight,
                     width: trackLen * pitch,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(end: translate),
                       duration: duration,
-                      curve: DabblerTimePicker.glideCurve,
+                      curve: DabblerTimeRuler.glideCurve,
                       builder: (BuildContext c, double t, Widget? _) =>
                           Transform.translate(
                             offset: Offset(t, 0),
@@ -190,15 +190,15 @@ class _TimeRulerState extends State<_TimeRuler> {
                   Positioned(
                     left: w / 2,
                     top: 0,
-                    height: DabblerTimePicker.rulerHeight,
+                    height: DabblerTimeRuler.rulerHeight,
                     width: trackLen * pitch,
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(end: translate),
                       duration: duration,
-                      curve: DabblerTimePicker.glideCurve,
+                      curve: DabblerTimeRuler.glideCurve,
                       builder: (BuildContext c, double t, Widget? _) =>
                           Transform.translate(
-                            key: DabblerTimePicker.trackKey(widget.key!),
+                            key: DabblerTimeRuler.trackKey(widget.key!),
                             offset: Offset(t, 0),
                             child: Stack(
                               clipBehavior: Clip.none,
@@ -218,29 +218,29 @@ class _TimeRulerState extends State<_TimeRuler> {
                     ),
                   ),
                   Positioned(
-                    left: (w - (pitch + DabblerTimePicker.windowExtra)) / 2,
-                    top: DabblerTimePicker.windowInset,
-                    bottom: DabblerTimePicker.windowInset,
-                    width: pitch + DabblerTimePicker.windowExtra,
+                    left: (w - (pitch + DabblerTimeRuler.windowExtra)) / 2,
+                    top: DabblerTimeRuler.windowInset,
+                    bottom: DabblerTimeRuler.windowInset,
+                    width: pitch + DabblerTimeRuler.windowExtra,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(
-                            DabblerTimePicker.windowRadius,
+                            DabblerTimeRuler.windowRadius,
                           ),
                           border: Border.all(
                             color: colors.brandPrimary,
-                            width: DabblerTimePicker.windowBorder,
+                            width: DabblerTimeRuler.windowBorder,
                           ),
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                    left: (w - DabblerTimePicker.pinWidth) / 2,
-                    bottom: DabblerTimePicker.pinBottom,
-                    width: DabblerTimePicker.pinWidth,
-                    height: DabblerTimePicker.pinHeight,
+                    left: (w - DabblerTimeRuler.pinWidth) / 2,
+                    bottom: DabblerTimeRuler.pinBottom,
+                    width: DabblerTimeRuler.pinWidth,
+                    height: DabblerTimeRuler.pinHeight,
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -318,13 +318,13 @@ class _TimeRulerState extends State<_TimeRuler> {
     final double opacity = on
         ? 1
         : math.max(
-            DabblerTimePicker.minOpacity,
-            1 - dist * DabblerTimePicker.opacityStep,
+            DabblerTimeRuler.minOpacity,
+            1 - dist * DabblerTimeRuler.opacityStep,
           );
     final double size =
         (on
-            ? DabblerTimePicker.selectedFontSize
-            : DabblerTimePicker.otherFontSize) -
+            ? DabblerTimeRuler.selectedFontSize
+            : DabblerTimeRuler.otherFontSize) -
         (rtl ? 0.9 : 0);
     return Positioned(
       left: absIdx * pitch,
@@ -337,7 +337,7 @@ class _TimeRulerState extends State<_TimeRuler> {
             DabblerType.toWesternDigits(
               widget.values[absIdx % _n].toString().padLeft(2, '0'),
             ),
-            key: DabblerTimePicker.cellKey(widget.key!, absIdx),
+            key: DabblerTimeRuler.cellKey(widget.key!, absIdx),
             style: base.copyWith(
               fontSize: size,
               height: 1,
@@ -365,7 +365,7 @@ class _TickPainter extends CustomPainter {
     final Paint paint = Paint()..color = color;
     for (double x = 0; x < size.width; x += period) {
       canvas.drawRect(
-        Rect.fromLTWH(x, 0, DabblerTimePicker.tickWidth, size.height),
+        Rect.fromLTWH(x, 0, DabblerTimeRuler.tickWidth, size.height),
         paint,
       );
     }
