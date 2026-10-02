@@ -126,14 +126,13 @@ void main() {
       }
     });
 
-    test('Arabic runs the same sizes as Latin at every step', () {
+    test('Arabic size is pinned: Latin less 0.9 at every step (live RTL rules)',
+        () {
       for (final DabblerTypeStyle style in DabblerType.styles) {
         expect(
-          style
-              .resolve(DabblerTypeScript.arabic)
-              .fontSize,
-          style.resolve(DabblerTypeScript.latin).fontSize,
-          reason: '${style.name} must not take a size bump in Arabic',
+          style.resolve(DabblerTypeScript.arabic).fontSize,
+          closeTo(style.resolve(DabblerTypeScript.latin).fontSize! - 0.9, 1e-9),
+          reason: '${style.name} Arabic size is the declared Latin less 0.9',
         );
       }
     });

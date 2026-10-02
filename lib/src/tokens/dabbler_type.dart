@@ -54,6 +54,19 @@ import 'package:flutter/widgets.dart';
 /// **A freeze is not a decision** — it holds the line while the decision is
 /// made. It lifts when KAN-281 is answered, and not by anyone else.
 ///
+/// ## Arabic size and the live header's contradiction
+///
+/// Arabic is the Latin size less 0.9px on all twelve styles
+/// ([DabblerTypeStyle.arabicFontSize]), as the RTL block of the live
+/// `tokens/typography.css` (1.2.0) declares each one. That file's own header
+/// still says Arabic "runs the SAME sizes as Latin"; the declarations render and
+/// the header is prose about them, so the declarations govern. The
+/// inconsistency lives in the design source and is recorded here rather than
+/// edited there. Arabic leading is separate and unchanged (see
+/// [DabblerTypeStyle.arabicLeading]). Components that take a size from a step
+/// inherit the offset; an explicit pixel override keeps its Latin pixels in
+/// RTL unless that component's own live CSS offsets it too.
+///
 /// ## Structure only
 ///
 /// DS-103a delivers the ramp's structure. The font binaries, and therefore any
@@ -117,6 +130,7 @@ abstract final class DabblerType {
     name: 'largeTitle',
     role: DabblerTypeRole.display,
     fontSize: 34,
+    arabicFontSize: 33.1,
     latinLeading: 41,
     arabicLeading: 41,
     fontWeight: regular,
@@ -127,6 +141,7 @@ abstract final class DabblerType {
     name: 'title1',
     role: DabblerTypeRole.display,
     fontSize: 28,
+    arabicFontSize: 27.1,
     latinLeading: 34,
     arabicLeading: 34,
     fontWeight: regular,
@@ -137,6 +152,7 @@ abstract final class DabblerType {
     name: 'title2',
     role: DabblerTypeRole.display,
     fontSize: 22,
+    arabicFontSize: 21.1,
     latinLeading: 28,
     arabicLeading: 28,
     fontWeight: regular,
@@ -147,6 +163,7 @@ abstract final class DabblerType {
     name: 'title3',
     role: DabblerTypeRole.display,
     fontSize: 20,
+    arabicFontSize: 19.1,
     latinLeading: 25,
     arabicLeading: 25,
     fontWeight: regular,
@@ -157,6 +174,7 @@ abstract final class DabblerType {
     name: 'headline',
     role: DabblerTypeRole.sans,
     fontSize: 17,
+    arabicFontSize: 16.1,
     latinLeading: 22,
     arabicLeading: 25,
     fontWeight: semibold,
@@ -167,6 +185,7 @@ abstract final class DabblerType {
     name: 'body',
     role: DabblerTypeRole.sans,
     fontSize: 16,
+    arabicFontSize: 15.1,
     latinLeading: 21,
     arabicLeading: 24,
     fontWeight: regular,
@@ -177,6 +196,7 @@ abstract final class DabblerType {
     name: 'callout',
     role: DabblerTypeRole.sans,
     fontSize: 17,
+    arabicFontSize: 16.1,
     latinLeading: 22,
     arabicLeading: 25,
     fontWeight: medium,
@@ -187,6 +207,7 @@ abstract final class DabblerType {
     name: 'subheadline',
     role: DabblerTypeRole.sans,
     fontSize: 15,
+    arabicFontSize: 14.1,
     latinLeading: 20,
     arabicLeading: 23,
     fontWeight: regular,
@@ -197,6 +218,7 @@ abstract final class DabblerType {
     name: 'footnote',
     role: DabblerTypeRole.sans,
     fontSize: 13,
+    arabicFontSize: 12.1,
     latinLeading: 18,
     arabicLeading: 18,
     fontWeight: regular,
@@ -207,6 +229,7 @@ abstract final class DabblerType {
     name: 'caption1',
     role: DabblerTypeRole.sans,
     fontSize: 12,
+    arabicFontSize: 11.1,
     latinLeading: 16,
     arabicLeading: 16,
     fontWeight: regular,
@@ -217,6 +240,7 @@ abstract final class DabblerType {
     name: 'caption2',
     role: DabblerTypeRole.sans,
     fontSize: 11,
+    arabicFontSize: 10.1,
     latinLeading: 13,
     arabicLeading: 13,
     fontWeight: regular,
@@ -228,6 +252,7 @@ abstract final class DabblerType {
     name: 'label',
     role: DabblerTypeRole.sans,
     fontSize: 17,
+    arabicFontSize: 16.1,
     latinLeading: 22,
     arabicLeading: 22,
     fontWeight: medium,
@@ -348,8 +373,8 @@ enum DabblerTypeRole {
   sans,
 }
 
-/// Which script a style is being resolved for. Direction picks the face; the
-/// sizes are identical in both.
+/// Which script a style is being resolved for. Direction picks the face, the
+/// size (Arabic is Latin less 0.9px) and the leading.
 enum DabblerTypeScript {
   /// Latin (LTR).
   latin,
@@ -360,7 +385,7 @@ enum DabblerTypeScript {
 
 /// One named step of the [DabblerType] ramp.
 ///
-/// Carries the ramp's structure — size, leading per script, weight and role —
+/// Carries the ramp's structure — size and leading per script, weight and role —
 /// and resolves to a [TextStyle] on demand. Tracking is near-zero on purpose,
 /// so [letterSpacing] is `0` on every style.
 @immutable
@@ -369,6 +394,7 @@ class DabblerTypeStyle {
     required this.name,
     required this.role,
     required this.fontSize,
+    required this.arabicFontSize,
     required this.latinLeading,
     required this.arabicLeading,
     required this.fontWeight,
@@ -381,9 +407,20 @@ class DabblerTypeStyle {
   /// Which face role the style is set in.
   final DabblerTypeRole role;
 
-  /// Size in logical pixels. Identical in both scripts — Wingx and Gloock read
-  /// at matching optical weight, so Arabic takes no size bump.
+  /// Latin size in logical pixels.
   final double fontSize;
+
+  /// Arabic size in logical pixels — the Latin size less 0.9, on every style.
+  ///
+  /// `typography.css` 1.2.0 declares this in its RTL block (`[dir="rtl"]
+  /// .t-* { font-size: 33.1px; … }` and so on for all twelve), with the
+  /// comment *"size = Latin size − 0.9px at every step (Meral Sans / Wingx
+  /// render optically larger and heavier than Glory / Gloock)"*. The same
+  /// file's header says the opposite (*"Arabic runs the SAME sizes as Latin at
+  /// every step … there is no size bump"*). The declarations are what render,
+  /// so they govern (D-004: the CSS is the source, prose about it is not); the
+  /// header is a design-source inconsistency recorded here and upstream.
+  final double arabicFontSize;
 
   /// Leading (line box height) in logical pixels, Latin.
   final double latinLeading;
@@ -398,6 +435,10 @@ class DabblerTypeStyle {
 
   /// Tracking, near-zero throughout.
   final double letterSpacing;
+
+  /// Size for [script], in logical pixels.
+  double sizeFor(DabblerTypeScript script) =>
+      script == DabblerTypeScript.arabic ? arabicFontSize : fontSize;
 
   /// Leading for [script], in logical pixels.
   double leadingFor(DabblerTypeScript script) =>
@@ -442,8 +483,8 @@ class DabblerTypeStyle {
       TextStyle(
         fontFamily: DabblerType.fontFamilyFor(role, script),
         fontFamilyFallback: DabblerType.fontFamilyFallbackFor(role, script),
-        fontSize: fontSize,
-        height: leadingFor(script) / fontSize,
+        fontSize: sizeFor(script),
+        height: leadingFor(script) / sizeFor(script),
         leadingDistribution: TextLeadingDistribution.even,
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,

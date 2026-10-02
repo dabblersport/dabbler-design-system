@@ -97,8 +97,11 @@ enum DabblerStatTileTone {
 /// * `wide` — `title-2` at its own 22/28; the source's 26 leading is one step
 ///   from the ramp's 28, so the ramp wins.
 /// * label — `footnote` 13/18 at weight 600; sub — `caption-1` 12/16.
-/// * The source tracks the value at `-0.01em`; that is kept, as letter spacing
-///   on the named step, and is **not** a ruled override — recorded for `cxo`.
+/// * The source tracks the value at `-0.01em`. **That is not applied**: no ramp
+///   step declares tracking (all are 0) and overrides are limited to size,
+///   leading and weight, so the value keeps the step's tracking. This is a
+///   recorded reference deviation (a design-source change request), not a
+///   package decision to reopen.
 ///
 /// ## Not built
 ///
@@ -190,9 +193,6 @@ class DabblerStatTile extends StatefulWidget {
 
   /// `artOpacity` default in the source.
   static const double defaultArtOpacity = 0.32;
-
-  /// The value's tracking, `letterSpacing: '-0.01em'`.
-  static const double valueTracking = -0.01;
 
   /// The label's weight — `fontWeight: 600` (`StatTile.jsx:82`).
   static const FontWeight labelWeight = FontWeight.w600;
@@ -287,13 +287,10 @@ class DabblerStatTile extends StatefulWidget {
       DabblerStatTileSize.wide => DabblerType.title2,
     };
     final TextStyle resolved = base.resolveForDirection(direction);
-    if (size == DabblerStatTileSize.wide) {
-      return resolved.copyWith(letterSpacing: valueTracking * 22);
-    }
+    if (size == DabblerStatTileSize.wide) return resolved;
     return resolved.copyWith(
       fontSize: size.valueSize,
       height: size.valueLeading / size.valueSize,
-      letterSpacing: valueTracking * size.valueSize,
     );
   }
 

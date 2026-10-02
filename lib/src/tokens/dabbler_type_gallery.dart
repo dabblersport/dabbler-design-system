@@ -191,8 +191,11 @@ Widget _scale(BuildContext context) => GalleryStack(
       children: <Widget>[
         const GalleryUsage(
           '**Eleven styles plus one button/label convenience.** '
-          '**Arabic runs the SAME sizes as Latin at every step — there is no '
-          'size bump.** Only four text styles take extra Arabic leading — '
+          '**Arabic size is the Latin size less 0.9px on every style** — the '
+          'declared RTL rules in `typography.css` 1.2.0, which govern over that '
+          'file\'s own header (it says "same sizes"; the header contradicts its '
+          'declarations, recorded upstream). Only four text styles take extra '
+          'Arabic leading — '
           '`headline`, `body`, `callout`, `subheadline`. Titles, footnote and '
           'the captions inherit Latin\'s leading unchanged, and `.t-label` is '
           '*not* one of the four exceptions despite sharing headline\'s '
@@ -379,7 +382,8 @@ class _RampRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           GalleryMono(
-            '${style.name} · ${style.role.name} · ${_n(style.fontSize)}px · '
+            '${style.name} · ${style.role.name} · '
+            '${_n(style.fontSize)}px Latin / ${_n(style.arabicFontSize)}px Arabic · '
             'leading $leading · weight ${style.fontWeight.value}'
             '${style.takesArabicExtraLeading ? ' · Arabic takes extra leading' : ''}',
           ),

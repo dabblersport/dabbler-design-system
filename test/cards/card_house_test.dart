@@ -232,7 +232,7 @@ void main() {
       expect(
         style.height,
         DabblerType.subheadline.arabicLeading /
-            DabblerType.subheadline.fontSize,
+            DabblerType.subheadline.arabicFontSize,
       );
     });
   });

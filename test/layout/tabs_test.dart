@@ -653,7 +653,7 @@ void main() {
       expect(
         _labelStyle(tester, 'overview').height,
         DabblerType.subheadline.arabicLeading /
-            DabblerType.subheadline.fontSize,
+            DabblerType.subheadline.arabicFontSize,
       );
     });
 

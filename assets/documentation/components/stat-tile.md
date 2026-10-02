@@ -30,7 +30,7 @@ Every tone, a bento grid and an interactive tile — see `stat_tile_gallery.dart
 
 **The art is yours to supply.** `art` takes an `ImageProvider`; the package ships no illustration. On the `brand` and `ink` tones the art knocks out to white, as in the source.
 
-**The value's type is a documented display-numeral exception.** `small` draws 26/30 on the title-1 face and `hero` 46/48 on the large-title face; neither size is a ramp step, and the exception is recorded rather than rounded. The `-0.01em` tracking the source applies to the value is kept as letter spacing and is not yet a ruled override.
+**The value's type is a documented display-numeral exception.** `small` draws 26/30 on the title-1 face and `hero` 46/48 on the large-title face; neither size is a ramp step, and the exception is recorded rather than rounded. The `-0.01em` tracking the source applies to the value is not applied: no ramp step declares tracking, so the value keeps the step's zero and the difference is recorded as a design-source change request.
 
 ## Axes
 
