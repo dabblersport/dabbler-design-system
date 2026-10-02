@@ -89,7 +89,7 @@ class DabblerMemberListPanel extends StatelessWidget {
     required bool added,
     required bool dark,
   }) {
-    if (!added) return const Color(0x00000000);
+    if (!added) return const Color.fromARGB(0, 0, 0, 0);
     return dark ? colors.surfaceCard : DabblerPalette.ink;
   }
 
