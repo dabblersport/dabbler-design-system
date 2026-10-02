@@ -35,7 +35,7 @@ import '../tokens/dabbler_type.dart';
 /// source's `fill: var(--color-brand-primary)` with `borderColor: transparent`.
 ///
 /// The label on the selected fill is [DabblerColors.onBrand] and never a
-/// hardcoded white. `Chip.jsx:14` is emphatic about this — *"Label colour on
+/// hardcoded white. `Chip.jsx:6-8` is emphatic about this — *"Label colour on
 /// the selected fill is always onBrand — dark in Bright/Sport, never a
 /// hardcoded white"* — and it is load-bearing: in `bright` the brand is amber
 /// and `--color-on-brand` resolves to ink, so white text would be unreadable.
@@ -109,7 +109,7 @@ class DabblerChip extends StatefulWidget {
   ///
   /// A null [onTap] renders a static tag: no press, no focus, no button
   /// semantics — the source's own behaviour when `onClick` is omitted
-  /// (`Chip.jsx:20-23` withholds `role` and `aria-pressed` too).
+  /// (`Chip.jsx:22-24` withholds `role` and `aria-pressed` too).
   const DabblerChip({
     super.key,
     required this.label,
@@ -181,12 +181,12 @@ class DabblerChip extends StatefulWidget {
   static const double visualHeight = 20 + verticalPadding * 2;
 
   /// The label colour for [selected]: [DabblerColors.onBrand] on the brand
-  /// fill, [DabblerColors.textPrimary] otherwise (`Chip.jsx:19`).
+  /// fill, [DabblerColors.textPrimary] otherwise (`Chip.jsx:14`).
   static Color labelColorFor(DabblerColors colors, {required bool selected}) =>
       selected ? colors.onBrand : colors.textPrimary;
 
   /// The [leadingIcon] colour for [selected]: [DabblerColors.onBrand] on the
-  /// brand fill, [DabblerColors.brandPrimary] otherwise (`Chip.jsx:20`).
+  /// brand fill, [DabblerColors.brandPrimary] otherwise (`Chip.jsx:15`).
   ///
   /// Note this differs from [labelColorFor] in the unselected state — the
   /// source tints the icon brand while the label stays ink.

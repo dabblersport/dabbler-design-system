@@ -302,7 +302,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
 
     // The fade is the panel's only motion: `--motion-base` opacity, no scale
     // and no slide (`Dialog.prompt.md:69-71`). Under reduced motion the source
-    // drops the animation entirely (`overlay.jsx:43`).
+    // drops the animation entirely (`overlay.jsx:39`).
     final Widget faded = AnimatedOpacity(
       opacity: 1,
       duration: reduceMotion ? Duration.zero : DabblerMotion.base,

@@ -116,12 +116,12 @@ class DabblerDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    // Divider.jsx:20 — `strong ? var(--outline-card) : var(--faint)`.
+    // Divider.jsx:18 — `strong ? var(--outline-card) : var(--faint)`.
     final Color color = strong ? colors.borderDefault : colors.bgTertiary;
 
     switch (orientation) {
       case DabblerDividerOrientation.vertical:
-        // Divider.jsx:24-25 — width 1, `align-self: stretch`, `min-height:
+        // Divider.jsx:22-23 — width 1, `align-self: stretch`, `min-height:
         // var(--space-8)`, `margin-block: inset`, `flex-shrink: 0`.
         return ExcludeSemantics(
           child: Padding(
@@ -147,7 +147,7 @@ class DabblerDivider extends StatelessWidget {
       case DabblerDividerOrientation.horizontal:
         final String? label = this.label;
         if (label != null) {
-          // Divider.jsx:29-40 — a flex row, `gap: var(--space-4)`, a caption
+          // Divider.jsx:26-36 — a flex row, `gap: var(--space-4)`, a caption
           // between two flexing rules.
           return Padding(
             padding: EdgeInsetsDirectional.symmetric(horizontal: inset),

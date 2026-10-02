@@ -449,7 +449,7 @@ void main() {
       expect(fade.curve, DabblerMotion.easeOut);
     });
 
-    testWidgets('reduced motion drops the fade entirely (overlay.jsx:43)', (
+    testWidgets('reduced motion drops the fade entirely (overlay.jsx:39)', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
