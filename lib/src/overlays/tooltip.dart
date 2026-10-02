@@ -210,9 +210,20 @@ class _DabblerTooltipState extends State<DabblerTooltip> {
               targetAnchor: anchor.target,
               followerAnchor: anchor.follower,
               offset: anchor.offset,
-              child: Directionality(
-                textDirection: direction,
-                child: panel,
+              // The overlay hands its entry tight, full-screen constraints, and
+              // a `ConstrainedBox` (the panel's `maxWidth`) cannot loosen a
+              // tight incoming constraint — without this the panel painted at
+              // the size of the whole overlay. The shrink-wrapping [Align]
+              // loosens them so the panel sizes to its text, capped at
+              // [DabblerTooltip.maxWidth] (`Tooltip.jsx:72`).
+              child: Align(
+                alignment: AlignmentDirectional.topStart,
+                widthFactor: 1,
+                heightFactor: 1,
+                child: Directionality(
+                  textDirection: direction,
+                  child: panel,
+                ),
               ),
             ),
           ),
