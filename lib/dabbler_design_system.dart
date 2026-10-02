@@ -61,6 +61,8 @@ export 'src/cards/card_pricing_default.dart';
 export 'src/cards/card_pricing_selected.dart';
 export 'src/cards/card_ticket.dart';
 export 'src/cards/empty_state.dart';
+export 'src/cards/stat_tile.dart';
+export 'src/cards/stat_tile_gallery.dart';
 export 'src/cards/cards_gallery.dart';
 export 'src/controls/button.dart';
 export 'src/controls/button_gallery.dart';

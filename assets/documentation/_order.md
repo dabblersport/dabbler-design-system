@@ -92,6 +92,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardHouse](components/card-house.md) — a house (a recurring room series) as one row.
 - [CardPricing](components/card-pricing.md) — one subscription plan as a selectable tile.
 - [CardTicket](components/card-ticket.md) — a booking as a ticket, with its own type scale.
+- [StatTile](components/stat-tile.md) — the bento stat tile used across the profile screens.
 
 ### 3 · Identity and status — who or what a piece of content is
 
