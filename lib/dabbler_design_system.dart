@@ -140,6 +140,7 @@ export 'src/messaging/chat_composer_gallery.dart';
 export 'src/messaging/message.dart';
 export 'src/messaging/message_thread.dart';
 export 'src/messaging/messaging_atoms.dart';
+export 'src/messaging/messaging_atoms_gallery.dart';
 export 'src/messaging/messaging_foundations.dart';
 export 'src/messaging/messaging_parts.dart';
 export 'src/navigation/navigation_gallery.dart';

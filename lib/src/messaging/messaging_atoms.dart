@@ -29,7 +29,10 @@ class DabblerDateSeparator extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: DabblerSpacing.space2),
+      // `display: flex; justify-content: center` centres inline only; the
+      // block size hugs the pill (`heightFactor: 1`).
       child: Center(
+        heightFactor: 1,
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: colors.surfaceSunken,
@@ -80,6 +83,9 @@ class DabblerUnreadDivider extends StatelessWidget {
               const SizedBox(width: DabblerSpacing.space4),
               Text(
                 label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
                 style: _t(context, DabblerType.caption2).copyWith(
                   fontWeight: FontWeight.w700,
                   color: colors.brandPrimary,
@@ -101,15 +107,37 @@ class _Rule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: DabblerSizing.borderDefault,
-        child: ColoredBox(color: color),
-      );
+    height: DabblerSizing.borderDefault,
+    child: ColoredBox(color: color),
+  );
+}
+
+/// The two tones of a [DabblerSystemMessage] — live `tone` prop.
+enum DabblerSystemMessageTone {
+  /// `neutral` — `--muted` text, `--subtle` glyph.
+  neutral,
+
+  /// `positive` — `--color-status-success-strong` text and glyph.
+  positive,
 }
 
 /// SystemMessage — centred activity text ("Mina joined"), never a bubble.
 ///
-/// `SystemMessage.jsx`: an optional 14px glyph, `caption-1` text, an optional
-/// ` · timestamp`; neutral is muted, `positive` is the success strong ink.
+/// Live Claude Design project 4286affa-bf50-4ff6-9576-917f76a93ca1 (Dabbler
+/// Design System), file `components/messaging/SystemMessage.jsx`, read via
+/// DesignSync get_file on 2026-10-02 and transcribed to a local mirror by the
+/// coordinator.
+///
+/// | Source | Dart |
+/// |---|---|
+/// | `role="status"` | `Semantics(container, liveRegion)` |
+/// | `gap: var(--space-2)` | 6 between glyph and text |
+/// | `paddingBlock: SPACING.systemBlock` | 3 |
+/// | `paddingInline: var(--space-6)` | 18 (directional) |
+/// | `<Icon size={14}>`, `aria-hidden` | [glyphSize], excluded from semantics |
+/// | glyph `--subtle` / success strong | `textTertiary` (D-003(a)) / `success.strong` |
+/// | `.t-caption-1`, `--muted` / success strong | caption1, `textSecondary` / `success.strong` |
+/// | ` · {timestamp}` span, always `--muted` | a `textSecondary` span in every tone |
 class DabblerSystemMessage extends StatelessWidget {
   /// A system line.
   const DabblerSystemMessage({
@@ -117,6 +145,7 @@ class DabblerSystemMessage extends StatelessWidget {
     required this.text,
     this.icon,
     this.timestamp,
+    this.tone = DabblerSystemMessageTone.neutral,
     this.positive = false,
   });
 
@@ -126,11 +155,18 @@ class DabblerSystemMessage extends StatelessWidget {
   /// An optional Iconsax glyph.
   final String? icon;
 
-  /// An optional timestamp appended as ` · …`.
+  /// An optional timestamp appended as ` · …`, always in the muted ink.
   final String? timestamp;
 
-  /// The success tone.
+  /// The tone — live `tone`, default `neutral`.
+  final DabblerSystemMessageTone tone;
+
+  /// Shorthand for [DabblerSystemMessageTone.positive], kept for
+  /// `DabblerThreadSystem.positive`; either one selects the success tone.
   final bool positive;
+
+  /// Whether the success tone applies.
+  bool get isPositive => positive || tone == DabblerSystemMessageTone.positive;
 
   /// The glyph size — `size={14}`.
   static const double glyphSize = 14;
@@ -138,12 +174,14 @@ class DabblerSystemMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final Color ink = positive ? colors.success.strong : colors.textSecondary;
+    final bool pos = isPositive;
+    final Color ink = pos ? colors.success.strong : colors.textSecondary;
+    final TextStyle base = _t(context, DabblerType.caption1);
     return Semantics(
       container: true,
       liveRegion: true,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding: const EdgeInsetsDirectional.symmetric(
           vertical: DabblerMessagingSpacing.systemBlock,
           horizontal: DabblerSpacing.space6,
         ),
@@ -155,16 +193,25 @@ class DabblerSystemMessage extends StatelessWidget {
                 child: DabblerIcon(
                   icon!,
                   size: glyphSize,
-                  color: positive ? colors.success.strong : colors.textTertiary,
+                  color: pos ? colors.success.strong : colors.textTertiary,
                 ),
               ),
               const SizedBox(width: DabblerSpacing.space2),
             ],
             Flexible(
-              child: Text(
-                timestamp == null ? text : '$text · $timestamp',
+              child: Text.rich(
+                TextSpan(
+                  text: text,
+                  style: base.copyWith(color: ink),
+                  children: <InlineSpan>[
+                    if (timestamp != null)
+                      TextSpan(
+                        text: ' · $timestamp',
+                        style: base.copyWith(color: colors.textSecondary),
+                      ),
+                  ],
+                ),
                 textAlign: TextAlign.center,
-                style: _t(context, DabblerType.caption1).copyWith(color: ink),
               ),
             ),
           ],
@@ -177,7 +224,7 @@ class DabblerSystemMessage extends StatelessWidget {
 /// TypingIndicator — three pulsing dots, with or without the sentence.
 ///
 /// `TypingIndicator.jsx`: 4px dots 3 apart, opacity `.25 → 1` over 1200ms with
-/// 180ms stagger; the sentence is built from [names] when [label] is null.
+/// 180ms stagger, `ease-in-out` per keyframe segment; the sentence is built from [names] when [label] is null.
 /// Reduced motion draws the dots still at full opacity.
 class DabblerTypingIndicator extends StatefulWidget {
   /// A typing indicator.
@@ -222,15 +269,17 @@ class DabblerTypingIndicator extends StatefulWidget {
     final double shifted =
         (t - index * stagger.inMilliseconds / period.inMilliseconds) % 1.0;
     final double p = shifted < 0 ? shifted + 1 : shifted;
-    // keyframes 0%,70%,100% → .25 ; 35% → 1, linear between.
-    if (p <= 0.35) return 0.25 + 0.75 * (p / 0.35);
-    if (p <= 0.70) return 1 - 0.75 * ((p - 0.35) / 0.35);
+    // keyframes 0%,70%,100% → .25 ; 35% → 1. CSS applies the
+    // `ease-in-out` timing function to each keyframe segment, not the cycle.
+    if (p <= 0.35) return 0.25 + 0.75 * Curves.easeInOut.transform(p / 0.35);
+    if (p <= 0.70) {
+      return 1 - 0.75 * Curves.easeInOut.transform((p - 0.35) / 0.35);
+    }
     return 0.25;
   }
 
   @override
-  State<DabblerTypingIndicator> createState() =>
-      _DabblerTypingIndicatorState();
+  State<DabblerTypingIndicator> createState() => _DabblerTypingIndicatorState();
 }
 
 class _DabblerTypingIndicatorState extends State<DabblerTypingIndicator>
@@ -305,8 +354,10 @@ class _DabblerTypingIndicatorState extends State<DabblerTypingIndicator>
             Flexible(
               child: Text(
                 text,
-                style: _t(context, DabblerType.caption1)
-                    .copyWith(color: colors.textSecondary),
+                style: _t(
+                  context,
+                  DabblerType.caption1,
+                ).copyWith(color: colors.textSecondary),
               ),
             ),
           ],
@@ -353,8 +404,8 @@ class DabblerConversationAvatar extends StatelessWidget {
   static DabblerAvatarSize avatarSizeFor(double size) => size >= 48
       ? DabblerAvatarSize.md
       : size >= 36
-          ? DabblerAvatarSize.sm
-          : DabblerAvatarSize.xs;
+      ? DabblerAvatarSize.sm
+      : DabblerAvatarSize.xs;
 
   /// The kind tile's side — `round(size * 0.4)`.
   static double tileFor(double size) => (size * 0.4).roundToDouble();
