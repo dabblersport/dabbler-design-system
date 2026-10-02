@@ -52,7 +52,7 @@ Brand, on-brand, sunken surface, secondary ink for the quote and tertiary ink fo
 
 ## Change log
 
-- Covered against the live source: the 9px gap before cancel and the 6px pull of cancel into the end padding were added; the sender line no longer truncates; the cancel glyph takes the tertiary role, which is the light value of the source's muted. The source's negative block margin on cancel is not ported, so with cancel the composer variant is taller than the source.
+- Covered against the hand-transcribed mirror of the live source (no byte or pixel check): the 9px gap before cancel and the 6px pull of cancel into the end padding were added; the sender line no longer truncates; the cancel glyph takes the tertiary role, which is the light value of the source's muted. The source's negative block margin on cancel is not ported, so with cancel the composer variant is taller than the source.
 
 ## Source
 

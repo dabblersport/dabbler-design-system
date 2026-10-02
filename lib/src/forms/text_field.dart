@@ -12,7 +12,7 @@ import 'field_shell.dart';
 
 /// The five shapes a [DabblerTextField] takes.
 ///
-/// `components/forms/TextField.d.ts:3` — *"standard · search · password ·
+/// `components/forms/TextField.d.ts:3` (unverified: file not mirrored) — *"standard · search · password ·
 /// multiline · select"*.
 enum DabblerTextFieldVariant {
   /// Plain single-line input. `--radius-xxl`.
@@ -37,8 +37,8 @@ enum DabblerTextFieldVariant {
 
 /// TextField — the flat input.
 ///
-/// Transcribed from `components/forms/TextField.jsx:86-177`,
-/// `TextField.d.ts:1-40`, `TextField.prompt.md` and the specimens
+/// Transcribed from `components/forms/TextField.jsx:83-162`,
+/// `TextField.d.ts:1-40` (unverified: file not mirrored), `TextField.prompt.md` and the specimens
 /// `components/forms/fields.card.html:70-100` (the five states and the five
 /// variants) and `forms.card.html:28-34`.
 ///
@@ -122,7 +122,7 @@ class DabblerTextField extends StatefulWidget {
        ),
        assert(rows > 0, 'a multiline field has at least one row');
 
-  /// `rows` default in the source (`TextField.jsx:89`).
+  /// `rows` default in the source (`TextField.jsx:94`).
   static const int defaultRows = 3;
 
   /// `search-normal` — the leading glyph of the `search` variant
@@ -290,7 +290,7 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
     final bool multiline = widget.variant == DabblerTextFieldVariant.multiline;
     final bool password = widget.variant == DabblerTextFieldVariant.password;
 
-    // `TextField.jsx:100-107` — the input's own type is `.t-body`'s metrics,
+    // `TextField.jsx:105-110` — the input's own type is `.t-body`'s metrics,
     // 16/21, which is exactly [DabblerType.body].
     final TextStyle textStyle = DabblerType.body
         .resolveForDirection(direction)

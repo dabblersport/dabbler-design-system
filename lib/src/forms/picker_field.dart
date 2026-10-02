@@ -29,14 +29,14 @@ part 'picker_field_shell.dart';
 /// PickerField — [DabblerPickerFieldShell] plus the responsive presentation
 /// of the picker.
 ///
-/// Transcribed from `components/forms/PickerField.jsx:1-119`,
+/// Transcribed from `components/forms/PickerField.jsx:1-93`,
 /// `PickerField.d.ts`, `PickerField.prompt.md` and the specimen
 /// `components/forms/fields.card.html:115-123`.
 ///
 /// The shell above is the box and the typed input — the half `DateField` and
 /// `TimeField` use, because each of those owns its own picker surface. This
 /// widget is that shell **plus** the presentation branch the source writes at
-/// `PickerField.jsx:97-118`: a [DabblerSheet] below
+/// `PickerField.jsx:74-92`: a [DabblerSheet] below
 /// [DabblerMenu.sheetBreakpoint] and an anchored [DabblerMenu] above it, so a
 /// call site that does not want to own an overlay does not have to. Both
 /// halves are DS-700's, not a second popover and not a second sheet.
@@ -93,10 +93,10 @@ class DabblerPickerField extends StatefulWidget {
     this.child,
   });
 
-  /// `icon = 'calendar'` (`PickerField.jsx:25`).
+  /// `icon = 'calendar'` (`PickerField.jsx:23`).
   static const String defaultIcon = 'calendar';
 
-  /// `detents = [0.62]` (`PickerField.jsx:31`) — taller than Menu's 0.45,
+  /// `detents = [0.62]` (`PickerField.jsx:30`) — taller than Menu's 0.45,
   /// because a calendar needs the room.
   static const List<double> defaultDetents = <double>[0.62];
 
@@ -117,7 +117,7 @@ class DabblerPickerField extends StatefulWidget {
   final ValueChanged<String>? onTextChanged;
 
   /// Called on blur and on Enter — *"parse the typed text here"*
-  /// (`PickerField.d.ts:10`).
+  /// (`PickerField.d.ts:10` (unverified: file not mirrored)).
   final ValueChanged<String>? onTextCommitted;
 
   /// Kebab-case Iconsax name for the trailing button.
@@ -170,7 +170,7 @@ class _DabblerPickerFieldState extends State<DabblerPickerField> {
   /// The text last handed to [DabblerPickerField.onTextCommitted]; cleared by
   /// the next edit.
   ///
-  /// The source commits on Enter *and* on blur (`PickerField.jsx:56,58`), and
+  /// The source commits on Enter *and* on blur (`PickerField.jsx:50-51`), and
   /// on the web those are two different moments. In Flutter, submitting the
   /// keyboard action also drops focus, so the shell would parse the same text
   /// twice. Committing the same string twice is the deviation, not the guard.
@@ -279,7 +279,7 @@ class _DabblerPickerFieldState extends State<DabblerPickerField> {
     }
 
     return DabblerMenu(
-      // `fullWidth` (`PickerField.jsx:112`): the popover is the field's width.
+      // `fullWidth` (`PickerField.jsx:87`): the popover is the field's width.
       fullWidth: true,
       open: widget.open && widget.enabled,
       onOpenChanged: (bool v) => widget.onOpenChanged?.call(v),

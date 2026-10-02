@@ -9,7 +9,7 @@ import '../tokens/dabbler_type.dart';
 
 /// How the shell's row aligns its content on the cross axis.
 ///
-/// The source's `align` prop (`components/forms/TextField.jsx:37`), which is
+/// The source's `align` prop (`components/forms/TextField.jsx:26`), which is
 /// `'center'` everywhere except the multiline variant, where the label-side
 /// content must sit against the first line rather than float in the middle of
 /// a grown box.
@@ -23,8 +23,8 @@ enum DabblerFieldAlign {
 
 /// FieldShell — the field chrome every field in the system paints from.
 ///
-/// Transcribed from `components/forms/TextField.jsx:14-84` (the `FieldShell`
-/// function and its `RADIUS` table), `components/forms/TextField.d.ts:41-54`
+/// Transcribed from `components/forms/TextField.jsx:5-81` (the `FieldShell`
+/// function and its `RADIUS` table), `components/forms/TextField.d.ts:41-54` (unverified: file not mirrored)
 /// (`FieldShellProps`) and the specimen `components/forms/fields.card.html:68`,
 /// which states the rule this file exists to enforce: *"**Every field in the
 /// system paints from it**, which is why no picker can drift into a visual fork
@@ -80,7 +80,7 @@ enum DabblerFieldAlign {
 /// The system focus ring — [DabblerFocusRing], DS-200 — is additionally drawn
 /// only when [focusRingVisible] is set, which is the port of the source
 /// applying its `.dbl-focus` class **only to the `as="button"` inner element**
-/// (`TextField.jsx:52`). A text input never gets the outline ring in the
+/// (`TextField.jsx:57`). A text input never gets the outline ring in the
 /// source, and does not get one here; the `select` shell, which is a real
 /// button, gets both. This file defines no ring width, offset or colour of its
 /// own — all three live in `lib/src/interaction/focus_ring.dart`.
@@ -88,7 +88,7 @@ enum DabblerFieldAlign {
 /// ## Helper and error colour — D-003
 ///
 /// Helper text is [DabblerColors.textSecondary] and error text is the error
-/// tone's `--color-status-error`, which is what `TextField.jsx:81` already
+/// tone's `--color-status-error`, which is what `TextField.jsx:74` already
 /// says. `cxo`'s ruling D-003 — that `--muted` and `--subtle` are surface
 /// neutrals wrongly exposed as text roles, and that `--subtle` at 2.15:1 must
 /// never be used as a text colour — therefore costs this file nothing: the
@@ -114,7 +114,7 @@ class DabblerFieldShell extends StatelessWidget {
     this.expanded,
   });
 
-  /// `padding: '9px 12px'` (`TextField.jsx:58`) — `--space-3` block,
+  /// `padding: '9px 12px'` (`TextField.jsx:61`) — `--space-3` block,
   /// `--space-4` inline. Directional so it mirrors in RTL.
   static const EdgeInsetsDirectional defaultInnerPadding =
       EdgeInsetsDirectional.fromSTEB(
@@ -125,7 +125,7 @@ class DabblerFieldShell extends StatelessWidget {
   );
 
   /// `paddingInlineStart: 12` on the helper / error line
-  /// (`TextField.jsx:80`), so it lines up with the text inside the box.
+  /// (`TextField.jsx:73`), so it lines up with the text inside the box.
   static const EdgeInsetsDirectional messagePadding =
       EdgeInsetsDirectional.only(start: DabblerSpacing.space4);
 
@@ -188,7 +188,7 @@ class DabblerFieldShell extends StatelessWidget {
   /// The disabled fill.
   ///
   /// The source is `color-mix(in srgb, var(--color-brand-primary) 4%, white)`
-  /// (`TextField.jsx:45`) — the same construction as
+  /// (`TextField.jsx:51`) — the same construction as
   /// [DabblerSurface.brandTintFill], at half its light-mode strength.
   ///
   /// **Deviation, documented:** the source declares no dark-mode value for

@@ -84,15 +84,15 @@ class DabblerPickerFieldShell extends StatefulWidget {
     'DabblerPickerFieldShell.button',
   );
 
-  /// `aria-label="Open picker"` — `PickerField.jsx:64`.
+  /// `aria-label="Open picker"` — `PickerField.jsx:61`.
   static const String defaultOpenSemanticsLabel = 'Open picker';
 
-  /// `aria-label="Close picker"` — `PickerField.jsx:64`.
+  /// `aria-label="Close picker"` — `PickerField.jsx:61`.
   static const String defaultCloseSemanticsLabel = 'Close picker';
 
   /// The shell's inner padding.
   ///
-  /// `PickerField.jsx:43` overrides the shell's trailing inset to
+  /// `PickerField.jsx:41` overrides the shell's trailing inset to
   /// `--space-1` (3) so the 45×45 button ends 3 from the box edge; the other
   /// three sides stay at [DabblerFieldShell.defaultInnerPadding]'s `9px 12px`.
   static const EdgeInsetsDirectional innerPadding =
@@ -108,7 +108,7 @@ class DabblerPickerFieldShell extends StatefulWidget {
   final TextEditingController controller;
 
   /// The trailing button's Iconsax glyph: `calendar` or `clock`
-  /// (`DateField.jsx:120`, `TimeField.jsx:67`).
+  /// (`DateField.jsx:114`, `TimeField.jsx:67`).
   final String iconName;
 
   /// The label above the box.
@@ -128,7 +128,7 @@ class DabblerPickerFieldShell extends StatefulWidget {
 
   /// Whether the picker this field fronts is currently open.
   ///
-  /// Drives `focused={focused || open}` (`PickerField.jsx:41`) and the
+  /// Drives `focused={focused || open}` (`PickerField.jsx:40`) and the
   /// button's `aria-expanded`.
   final bool open;
 
@@ -207,10 +207,10 @@ class _DabblerPickerFieldShellState extends State<DabblerPickerFieldShell> {
     final TextDirection direction = Directionality.of(context);
     final bool disabled = !widget.enabled;
 
-    // `fontSize: 16, lineHeight: '21px'` (`PickerField.jsx:55`) — [DabblerType
+    // `fontSize: 16, lineHeight: '21px'` (`PickerField.jsx:54`) — [DabblerType
     // .body]'s metrics, and with them [DabblerType.numeralFeatures], which is
     // the render half of the numerals rule (`fontVariantNumeric: lining-nums`
-    // at `PickerField.jsx:56`).
+    // at `PickerField.jsx:55`).
     final TextStyle textStyle = DabblerType.body
         .resolveForDirection(direction)
         .copyWith(color: disabled ? colors.textTertiary : colors.textPrimary);
@@ -234,7 +234,7 @@ class _DabblerPickerFieldShellState extends State<DabblerPickerFieldShell> {
               style: textStyle,
               cursorColor: colors.brandPrimary,
               maxLines: 1,
-              // `inputMode="numeric"` (`PickerField.jsx:48`). **Documented
+              // `inputMode="numeric"` (`PickerField.jsx:47`). **Documented
               // deviation:** a bare numeric pad cannot type `/`, `:` or `AM`,
               // so the source's own typed-entry contract is unreachable from
               // it on a touch keyboard. [TextInputType.datetime] is the

@@ -11,7 +11,7 @@ import '../tokens/dabbler_type.dart';
 /// InputRow — the settings / content row.
 ///
 /// Transcribed from `components/layout/InputRow.jsx:1-63`,
-/// `InputRow.d.ts:1-26`, `InputRow.prompt.md` and the specimen
+/// `InputRow.d.ts:1-26` (unverified: file not mirrored), `InputRow.prompt.md` and the specimen
 /// `components/layout/layout.card.html:22-29`.
 ///
 /// ```dart
@@ -311,7 +311,7 @@ class DabblerInputRow extends StatelessWidget {
 ///
 /// `components/layout/InputRow.jsx:53-63`: `arrow-right` at 18, in
 /// `var(--subtle)`, *"exported alongside for the trailing disclosure glyph"*
-/// (`InputRow.prompt.md:9`).
+/// (`InputRow.prompt.md:9` (unverified: file not mirrored)).
 ///
 /// ## It mirrors by name, not by transform
 ///

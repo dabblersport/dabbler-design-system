@@ -27,7 +27,7 @@ import '../tokens/dabbler_geometry.dart';
 /// ## Geometry
 ///
 /// A 48×28 track at pill radius with a 24px knob at a 2px inset
-/// (`Toggle.jsx:16-31`, and the specimen's token table: *"24px — the Checkbox
+/// (`Toggle.jsx:14-27`, and the specimen's token table: *"24px — the Checkbox
 /// box, the Radio circle, the Toggle knob"*, *"48×28 — the Toggle track"*).
 /// [trackWidth] is [DabblerSpacing.space11] and the knob is
 /// [DabblerSizing.iconMd], so both sit on the base-3 grid by construction;
@@ -74,7 +74,7 @@ class DabblerToggle extends StatefulWidget {
   final ValueChanged<bool>? onChanged;
 
   /// Whether the switch is disabled: 45% opacity, no pointer or key handling,
-  /// out of the tab order (`Toggle.jsx:20`, and the specimen's *"Disabled
+  /// out of the tab order (`Toggle.jsx:19`, and the specimen's *"Disabled
   /// drops to 45% opacity"*).
   final bool disabled;
 
@@ -83,25 +83,25 @@ class DabblerToggle extends StatefulWidget {
   /// announced as an unnamed control.
   final String? semanticLabel;
 
-  /// `width: 48` (`Toggle.jsx:17`) — [DabblerSpacing.space11].
+  /// `width: 48` (`Toggle.jsx:14`) — [DabblerSpacing.space11].
   static const double trackWidth = DabblerSpacing.space11;
 
-  /// `height: 28` (`Toggle.jsx:17`). Stated by the source and by the
+  /// `height: 28` (`Toggle.jsx:14`). Stated by the source and by the
   /// specimen's token table; no `--space-*` step is 28.
   static const double trackHeight = 28;
 
-  /// `padding: 2` (`Toggle.jsx:17`) — the gap between knob and track edge.
+  /// `padding: 2` (`Toggle.jsx:14`) — the gap between knob and track edge.
   static const double knobInset = 2;
 
-  /// `width: 24, height: 24` (`Toggle.jsx:28`) — [DabblerSizing.iconMd], the
+  /// `width: 24, height: 24` (`Toggle.jsx:25`) — [DabblerSizing.iconMd], the
   /// same 24 the Checkbox box and the Radio circle take.
   static const double knobSize = DabblerSizing.iconMd;
 
-  /// `opacity: disabled ? 0.45 : 1` (`Toggle.jsx:21`).
+  /// `opacity: disabled ? 0.45 : 1` (`Toggle.jsx:19`).
   static const double disabledOpacity = 0.45;
 
   /// The track colour: `--color-brand-primary` when on, `--outline-card` when
-  /// off (`Toggle.jsx:19`; `--outline-card` is [DabblerColors.borderDefault],
+  /// off (`Toggle.jsx:15`; `--outline-card` is [DabblerColors.borderDefault],
   /// `tokens/colors.css:36`).
   static Color trackColorFor(DabblerColors colors, {required bool checked}) =>
       checked ? colors.brandPrimary : colors.borderDefault;
@@ -143,7 +143,7 @@ class _DabblerToggleState extends State<DabblerToggle> {
         duration: duration,
         curve: DabblerMotion.easeOut,
         // `justifyContent: checked ? 'flex-end' : 'flex-start'`
-        // (`Toggle.jsx:21`) — a *flex* alignment, so it is directional in the
+        // (`Toggle.jsx:17`) — a *flex* alignment, so it is directional in the
         // source too. The specimen is explicit that the switch "needs no
         // mirroring": under RTL the knob sits on the physical left when on,
         // which is the same "towards the end of the row" reading.

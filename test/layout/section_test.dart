@@ -156,7 +156,7 @@ void main() {
           ),
         ),
       );
-      // Section.jsx:31 — the children margin is `hasHeader && items.length`.
+      // Section.jsx:29 — the children margin is `hasHeader && items.length`.
       expect(_gapHeights(tester), isEmpty);
     });
 

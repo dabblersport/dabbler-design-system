@@ -67,7 +67,7 @@ class DabblerRadio extends StatefulWidget {
   final ValueChanged<bool>? onChanged;
 
   /// Whether the control is inert: 50% opacity, no click, no focus stop
-  /// (`Radio.jsx:22`).
+  /// (`Radio.jsx:19-20`).
   final bool disabled;
 
   /// The optional trailing label, `.t-body` at [DabblerColors.textPrimary].
@@ -76,17 +76,17 @@ class DabblerRadio extends StatefulWidget {
   /// The accessible name when [label] is null or should differ.
   final String? semanticLabel;
 
-  /// `width: 24, height: 24` (`Radio.jsx:11`) — [DabblerSizing.iconMd].
+  /// `width: 24, height: 24` (`Radio.jsx:9`) — [DabblerSizing.iconMd].
   static const double circleSize = DabblerSizing.iconMd;
 
-  /// `width: 9, height: 9` on the selected dot (`Radio.jsx:14`). 9 is
+  /// `width: 9, height: 9` on the selected dot (`Radio.jsx:12`). 9 is
   /// [DabblerSpacing.space3], so the dot is on the base-3 grid.
   static const double dotSize = DabblerSpacing.space3;
 
-  /// `${selected ? 2 : 1}px solid …` (`Radio.jsx:13`) — the selected ring.
+  /// `${selected ? 2 : 1}px solid …` (`Radio.jsx:11`) — the selected ring.
   static const double selectedRingWidth = 2;
 
-  /// `opacity: disabled ? 0.5 : 1` (`Radio.jsx:22`).
+  /// `opacity: disabled ? 0.5 : 1` (`Radio.jsx:20`).
   static const double disabledOpacity = 0.5;
 
   /// The ring colour: brand when selected, `--color-border-default` when not.
@@ -202,7 +202,7 @@ class _DabblerRadioState extends State<DabblerRadio> {
             child: Opacity(
               opacity: widget.disabled ? DabblerRadio.disabledOpacity : 1,
               child: ConstrainedBox(
-                // `minHeight: var(--touch-target-min)` (`Radio.jsx:20`).
+                // `minHeight: var(--touch-target-min)` (`Radio.jsx:19`).
                 constraints: const BoxConstraints(
                   minHeight: DabblerSizing.touchTargetMin,
                 ),

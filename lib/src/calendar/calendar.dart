@@ -210,7 +210,7 @@ abstract final class DabblerCalendarMonth {
 
   /// The month [offset] months from [month], normalised to its first day.
   ///
-  /// `onPrevMonth` / `onNextMonth` (`Calendar.d.ts:11-12`) are callbacks in
+  /// `onPrevMonth` / `onNextMonth` (`Calendar.d.ts:11-12` (unverified: file not mirrored)) are callbacks in
   /// the source and the parent does the arithmetic. This is that arithmetic,
   /// exposed so every caller does it the same way — and **always in calendar
   /// time**: "next" is later in both directions, whatever the text direction
@@ -251,7 +251,7 @@ abstract final class DabblerCalendarMonth {
 ///
 /// ## Selection
 ///
-/// `Calendar.d.ts:9` types `range` as `number[]` — *"a plain list of day
+/// `Calendar.d.ts:9` (unverified: file not mirrored) types `range` as `number[]` — *"a plain list of day
 /// numbers, so non-contiguous selections work"* (`Calendar.prompt.md`). This
 /// takes a `Set<DateTime>` instead. **Documented deviation.** Day numbers
 /// cannot distinguish a selected `3` in the displayed month from a selected
@@ -431,7 +431,7 @@ class DabblerCalendar extends StatelessWidget {
 
   /// Any date inside the month to display. Only its year and month are read.
   ///
-  /// `Calendar.d.ts:5-6` takes `month` (0-indexed) and `year` as two numbers.
+  /// `Calendar.d.ts:5-6` (unverified: file not mirrored) takes `month` (0-indexed) and `year` as two numbers.
   /// One [DateTime] replaces both — **documented deviation** — because two
   /// loose ints let a caller pass a month of `13`, and because every arithmetic
   /// this widget does ([DabblerCalendarMonth.monthAdd]) is already date
@@ -441,7 +441,7 @@ class DabblerCalendar extends StatelessWidget {
   /// The selected days. See *Selection*.
   final Set<DateTime> selected;
 
-  /// Called with the day tapped. `onSelect` — `Calendar.d.ts:10`.
+  /// Called with the day tapped. `onSelect` — `Calendar.d.ts:10` (unverified: file not mirrored).
   ///
   /// Never fired for an outside cell, nor for one outside
   /// [minimum]/[maximum].
@@ -450,7 +450,7 @@ class DabblerCalendar extends StatelessWidget {
   /// Called with the month to show next.
   ///
   /// Replaces the source's two separate `onPrevMonth` / `onNextMonth`
-  /// (`Calendar.d.ts:11-12`) — **documented deviation**. The two callbacks
+  /// (`Calendar.d.ts:11-12` (unverified: file not mirrored)) — **documented deviation**. The two callbacks
   /// exist there because the parent holds `month` and `year` as loose numbers
   /// and must do its own wrapping; here the arithmetic is
   /// [DabblerCalendarMonth.monthAdd] and the widget hands the caller the
@@ -462,8 +462,8 @@ class DabblerCalendar extends StatelessWidget {
   /// unselectable.
   ///
   /// Not in the source: `Calendar.jsx` has no bounds at all, and
-  /// `DateField.jsx:100` leaves the picked path's bounds *"to whoever owns the
-  /// picker"* — which, for a date field's overlay, is this widget. The check
+  /// `DateField.jsx:93` drops an out-of-bounds pick with its own `inBounds` (the quoted phrase "to whoever owns the
+  /// picker" is not in the mirror) — for a date field's overlay, this widget. The check
   /// itself is DS-602's `DabblerDateFormat.inBounds`, not a second one.
   final DateTime? minimum;
 
@@ -501,7 +501,7 @@ class DabblerCalendar extends StatelessWidget {
   final VoidCallback? onYearPressed;
 
   /// Whether to draw the Confirm / Cancel row. `showActions` —
-  /// `Calendar.d.ts:17`, default true.
+  /// `Calendar.d.ts:17` (unverified: file not mirrored), default true.
   final bool showActions;
 
   /// Fired by Confirm.

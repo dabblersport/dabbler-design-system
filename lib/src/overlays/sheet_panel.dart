@@ -60,7 +60,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
 
   void _onDragEnd(double panelHeight, double viewportHeight) {
     // Where the panel ended up, as a fraction of the viewport — the source's
-    // `settled = (h - drag) / vh` (`Sheet.jsx:66`).
+    // `settled = (h - drag) / vh` (`Sheet.jsx:64`).
     final double settled =
         viewportHeight == 0 ? 0 : (panelHeight - _drag) / viewportHeight;
     if (_canDismiss && settled < _stops.first * DabblerSheet.dismissFraction) {
@@ -141,10 +141,10 @@ class _DabblerSheetState extends State<DabblerSheet> {
 
     final Widget body = DecoratedBox(
       decoration: BoxDecoration(
-        // `background: var(--surface-card)` (`Sheet.jsx:83`).
+        // `background: var(--surface-card)` (`Sheet.jsx:86`).
         color: colors.surfaceCard,
         // `1px solid var(--outline-card)`; the modal presentation drops the
-        // bottom edge, which sits off-screen (`Sheet.jsx:84-85`).
+        // bottom edge, which sits off-screen (`Sheet.jsx:87-88`).
         border: Border(
           top: BorderSide(
             color: colors.borderDefault,
@@ -165,7 +165,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
                   width: DabblerSizing.borderDefault,
                 ),
         ),
-        // Top corners only when modal (`Sheet.jsx:86`).
+        // Top corners only when modal (`Sheet.jsx:89`).
         borderRadius: modal
             ? const BorderRadius.vertical(top: Radius.circular(DabblerRadius.xl))
             : DabblerRadius.xlAll,
@@ -209,9 +209,9 @@ class _DabblerSheetState extends State<DabblerSheet> {
       return clipped;
     }
     // The drag and the snap back are both a translation and nothing else —
-    // never height, top or margin (`Sheet.prompt.md:58`). During an active
+    // never height, top or margin (`Sheet.prompt.md:58`, unverified: file not mirrored). During an active
     // drag the transition is off so the panel tracks the finger; on release
-    // it animates home over `--motion-slow` (`Sheet.prompt.md:69`).
+    // it animates home over `--motion-slow` (`Sheet.prompt.md:69`, unverified: file not mirrored).
     return AnimatedContainer(
       duration: _dragging || reduceMotion ? Duration.zero : DabblerMotion.slow,
       curve: DabblerMotion.easeOut,
@@ -249,7 +249,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
             _dragging = false;
           }),
           child: SizedBox(
-            // `min-height: var(--touch-target-min)` (`Sheet.jsx:104`).
+            // `min-height: var(--touch-target-min)` (`Sheet.jsx:101`).
             height: DabblerSizing.touchTargetMin,
             child: Center(
               // The bar itself carries no semantics: it is a pointer
@@ -276,7 +276,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
     if (widget.title != null || close != null) {
       rows.add(
         Padding(
-          // `padding: 0 var(--space-6) var(--space-4)` (`Sheet.jsx:117`).
+          // `padding: 0 var(--space-6) var(--space-4)` (`Sheet.jsx:108`).
           padding: const EdgeInsetsDirectional.fromSTEB(
             DabblerSpacing.space6,
             0,
@@ -351,7 +351,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
     final double safeBottom = MediaQuery.viewPaddingOf(context).bottom;
     return DecoratedBox(
       decoration: BoxDecoration(
-        // `border-block-start: 1px solid var(--faint)` (`Sheet.jsx:126`).
+        // `border-block-start: 1px solid var(--faint)` (`Sheet.jsx:121`).
         border: Border(
           top: BorderSide(
             color: colors.bgTertiary,
@@ -362,7 +362,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
       child: Padding(
         // `var(--space-4) var(--space-6)`, with the bottom at
         // `calc(var(--space-6) + env(safe-area-inset-bottom))`
-        // (`Sheet.jsx:124-125`).
+        // (`Sheet.jsx:119-120`).
         padding: EdgeInsetsDirectional.fromSTEB(
           DabblerSpacing.space6,
           DabblerSpacing.space4,

@@ -4,10 +4,10 @@ import 'package:dabbler_design_system/src/foundations/sport_icon.dart';
 import 'package:dabbler_design_system/src/foundations/sports.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Values pinned against the live Claude Design project
+/// Values pinned against a hand-transcribed mirror of the live Claude Design project
 /// 4286affa-bf50-4ff6-9576-917f76a93ca1 (Dabbler Design System), files
 /// `components/foundations/Icon.jsx`, `SportIcon.jsx` and `SportBackground.jsx`,
-/// read via DesignSync get_file on 2026-10-02 and transcribed to a local mirror
+/// read via DesignSync get_file on 2026-10-02 and hand-transcribed (no byte check) to a local mirror
 /// by the coordinator.
 void main() {
   setUp(() {

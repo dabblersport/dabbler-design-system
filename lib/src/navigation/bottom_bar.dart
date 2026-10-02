@@ -13,7 +13,7 @@ import '../tokens/dabbler_type.dart';
 
 /// One destination in a [DabblerNavigationBottomBar], transcribed from
 /// `NavigationBottomBarItem` in
-/// `components/navigation/NavigationBottomBar.d.ts:12-19`.
+/// `components/navigation/NavigationBottomBar.d.ts:12-19` (unverified: file not mirrored).
 @immutable
 class DabblerNavigationItem {
   /// Creates a destination.
@@ -52,7 +52,7 @@ class DabblerNavigationItem {
 }
 
 /// One create-menu tile, transcribed from `NavigationBottomBarCreateItem`
-/// (`NavigationBottomBar.d.ts:21-28`).
+/// (`NavigationBottomBar.d.ts:21-28`, unverified: file not mirrored).
 @immutable
 class DabblerNavigationCreateItem {
   /// Creates a tile.
@@ -175,7 +175,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   });
 
   /// Home / Explore / Games / You — the source's own `ITEMS`
-  /// (`NavigationBottomBar.jsx:25-30`).
+  /// (`NavigationBottomBar.jsx:23-28`).
   static const List<DabblerNavigationItem> defaultItems =
       <DabblerNavigationItem>[
     DabblerNavigationItem(id: 'home', icon: 'home-2', label: 'Home'),
@@ -186,7 +186,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   ];
 
   /// Create post / Create game / Create meetup — the source's `CREATE_ITEMS`
-  /// (`NavigationBottomBar.jsx:32-36`).
+  /// (`NavigationBottomBar.jsx:30-34`).
   static const List<DabblerNavigationCreateItem> defaultCreateItems =
       <DabblerNavigationCreateItem>[
     DabblerNavigationCreateItem(
@@ -239,7 +239,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   final bool safeArea;
 
   /// Every destination's hit box: `height: 44` / `width: 44`
-  /// (`NavigationBottomBar.jsx:141,143`).
+  /// (`NavigationBottomBar.jsx:150,152`).
   ///
   /// **Transcribed literally, against the token.** `--touch-target-min` is 45
   /// and the previous cut snapped to it; the rendered specimen draws 44, and a
@@ -247,20 +247,20 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   /// Recorded as a token conflict rather than resolved in favour of the ramp.
   static const double itemSize = 44;
 
-  /// `gap: on ? 8 : 0` on the active chip (`NavigationBottomBar.jsx:139`).
+  /// `gap: on ? 8 : 0` on the active chip (`NavigationBottomBar.jsx:149`).
   /// Off the base-3 grid; transcribed rather than rounded to `--space-3` (9).
   static const double activeGap = 8;
 
-  /// `gap: 8` between create tiles (`NavigationBottomBar.jsx:88`). Off-grid,
+  /// `gap: 8` between create tiles (`NavigationBottomBar.jsx:89`). Off-grid,
   /// transcribed.
   static const double createGridGap = 8;
 
   /// `gap: 7` between a create tile's plate and its label
-  /// (`NavigationBottomBar.jsx:103`). Off-grid, transcribed.
+  /// (`NavigationBottomBar.jsx:104`). Off-grid, transcribed.
   static const double createTileGap = 7;
 
   /// `size={26}` on the action glyph and on each create-tile glyph
-  /// (`NavigationBottomBar.jsx:117,194`). Off the 18/24/30 icon ramp;
+  /// (`NavigationBottomBar.jsx:116,193`). Off the 18/24/30 icon ramp;
   /// transcribed, because 24 visibly under-fills the 56 action.
   static const double glyph26 = 26;
 
@@ -269,7 +269,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   static const double createLabelSize = 12.5;
 
   /// The create tile's glyph plate height — `height: 62`
-  /// (`NavigationBottomBar.jsx:112`).
+  /// (`NavigationBottomBar.jsx:110`).
   ///
   /// Off the base-3 grid and stated here rather than borrowed from a spacing
   /// step that happens to be near it.
@@ -281,7 +281,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   static const double actionOpenTurns = 0.125;
 
   /// The create menu's grid is `repeat(min(n, 4), 1fr)`
-  /// (`NavigationBottomBar.jsx:86`), so tiles beyond the fourth wrap.
+  /// (`NavigationBottomBar.jsx:88`), so tiles beyond the fourth wrap.
   static const int createColumns = 4;
 
   @override
@@ -606,7 +606,7 @@ class _DabblerNavigationBottomBarState
                   child: DabblerIcon(
                     widget.actionIcon,
                     weight: DabblerIconWeight.bold,
-                    // `size={26}` (`NavigationBottomBar.jsx:194`) — off the
+                    // `size={26}` (`NavigationBottomBar.jsx:193`) — off the
                     // 18/24/30 ramp, transcribed: 24 under-fills the 56 disc.
                     size: DabblerNavigationBottomBar.glyph26,
                     color: colors.onBrand,
@@ -658,7 +658,7 @@ class _DabblerNavigationBottomBarState
       role: SemanticsRole.menu,
       child: TweenAnimationBuilder<double>(
         // `opacity 0 → 1`, `scale .92 → 1` on the frame after mount
-        // (`NavigationBottomBar.jsx:50-56, 96-98`). The source's 160/180ms sit
+        // (`NavigationBottomBar.jsx:53-59, 96-98`). The source's 160/180ms sit
         // between the tokens; `--motion-slow` (200) is the enter duration the
         // system uses for a panel.
         key: ValueKey<int>(tiles.length),
@@ -691,7 +691,7 @@ class _DabblerNavigationBottomBarState
             // carrying `--elevation-2`, the system's one legal shadow, which
             // the ruling scopes to transient overlays rather than to Dialog
             // alone. The source draws a shadow here
-            // (`NavigationBottomBar.jsx:90`) and the previous cut dropped it
+            // (`NavigationBottomBar.jsx:93`) and the previous cut dropped it
             // on a blanket flatness reading.
             //
             // [DabblerElevation]'s own doc still says *"Dialog (DS-702)
@@ -725,7 +725,7 @@ class _DabblerNavigationBottomBarState
           ),
           child: DabblerIcon(
             tile.icon,
-            // `size={26}` (`NavigationBottomBar.jsx:117`) — off-ramp,
+            // `size={26}` (`NavigationBottomBar.jsx:116`) — off-ramp,
             // transcribed.
             size: DabblerNavigationBottomBar.glyph26,
             color: colors.textPrimary,

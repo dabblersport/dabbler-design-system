@@ -54,7 +54,7 @@ The selected outline is 2px at a 2px offset; press scale 0.98; sending opacity 0
 
 ## Change log
 
-- Corrected against the live source: the bubble width cap is 76% of the whole row (it was computed after removing the avatar gutter); the sender name and the reaction row now sit 3px from the bubble; the selected outline no longer adds 4px of layout around the bubble; Retry sits 3px after the glyph instead of 9px; the reply reference spans the bubble's width; the sending fade animates. Retry keeps its 45px height by growing the metadata line, because Flutter has no negative margin.
+- Corrected against the hand-transcribed mirror of the live source (no byte or pixel check): the bubble width cap is 76% of the whole row (it was computed after removing the avatar gutter); the sender name and the reaction row now sit 3px from the bubble; the selected outline no longer adds 4px of layout around the bubble; Retry sits 3px after the glyph instead of 9px; the reply reference spans the bubble's width; the sending fade animates. Retry keeps its 45px height by growing the metadata line, because Flutter has no negative margin.
 
 ## Source
 

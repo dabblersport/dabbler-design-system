@@ -35,7 +35,7 @@ import '../tokens/dabbler_type.dart';
 enum DabblerToastTone {
   /// Card surface, primary ink, card outline. Carries no status meaning.
   ///
-  /// The source's default (`Toast.jsx:77`, `Toast.prompt.md` props table).
+  /// The source's default (`Toast.jsx:78`, `Toast.prompt.md` props table).
   neutral(null),
 
   /// `--color-status-success-*`.
@@ -82,7 +82,7 @@ class DabblerToastAction {
 
   /// Called when the button is pressed, immediately before the toast is
   /// dismissed — the source fires `action.onPress()` and then `onDismiss()`
-  /// from the same handler (`Toast.jsx:129`). A null callback leaves the
+  /// from the same handler (`Toast.jsx:134`). A null callback leaves the
   /// button rendered but inert, matching the source's optional `onPress`.
   final VoidCallback? onPressed;
 }
@@ -408,7 +408,7 @@ class _DabblerToastProviderState extends State<DabblerToastProvider> {
             child: IgnorePointer(
               child: Padding(
                 // `bottom: calc(var(--space-4) + env(safe-area-inset-bottom))`
-                // (Toast.jsx:63) — ADDITIVE, so the toast clears the home
+                // (Toast.jsx:62) — ADDITIVE, so the toast clears the home
                 // indicator by the full gutter. SafeArea would take the
                 // maximum of the two instead, which is a different rule.
                 padding: EdgeInsets.only(
@@ -541,7 +541,7 @@ abstract final class _DabblerToastMetrics {
 ///
 /// **Deviation, written down:** the source describes an *exit* animation, but
 /// `ToastProvider` removes the item with a plain `setItems(list.filter(...))`
-/// (`Toast.jsx:37-39`), which unmounts the node immediately — the exit
+/// (`Toast.jsx:41`), which unmounts the node immediately — the exit
 /// transition never runs there either. This cut is faithful to the behaviour:
 /// entry animates, removal is immediate. Animating removal would require the
 /// queue to keep dismissed entries alive, which would change what "max 3
@@ -577,7 +577,7 @@ class DabblerToast extends StatefulWidget {
   /// The message.
   final String message;
 
-  /// The tone. Default [DabblerToastTone.neutral], as in `Toast.jsx:77`.
+  /// The tone. Default [DabblerToastTone.neutral], as in `Toast.jsx:78`.
   final DabblerToastTone tone;
 
   /// The trailing action.
@@ -620,7 +620,7 @@ class _DabblerToastState extends State<DabblerToast>
       ..onKeyEvent = _onActionKey;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // The source starts at opacity 0 and flips on the next frame
-      // (`requestAnimationFrame`, Toast.jsx:92) so the transition has a
+      // (`requestAnimationFrame`, Toast.jsx:93) so the transition has a
       // starting value to animate from.
       if (mounted) {
         _entry.forward();
@@ -736,7 +736,7 @@ class _DabblerToastState extends State<DabblerToast>
             );
 
     final Widget body = Container(
-      // `width: '100%', maxWidth: 420` (`Toast.jsx:115`). The previous cut left
+      // `width: '100%', maxWidth: 420` (`Toast.jsx:118`). The previous cut left
       // the width unconstrained and the row at `MainAxisSize.min`, so a toast
       // shrank to its message instead of filling its column the way the
       // specimen draws it.
@@ -745,7 +745,7 @@ class _DabblerToastState extends State<DabblerToast>
         minHeight: DabblerSizing.touchTargetMin,
         maxWidth: _DabblerToastMetrics.maxWidth,
       ),
-      // `padding: '12px 15px'` — Toast.jsx:117 — which is space4 / space5.
+      // `padding: '12px 15px'` — Toast.jsx:119 — which is space4 / space5.
       padding: const EdgeInsetsDirectional.symmetric(
         vertical: DabblerSpacing.space4,
         horizontal: DabblerSpacing.space5,

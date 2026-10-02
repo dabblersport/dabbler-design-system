@@ -16,7 +16,7 @@ import '../tokens/dabbler_type.dart';
 import 'field_shell.dart';
 
 /// The two control sizes a [DabblerStepper] takes — `size` in
-/// `components/forms/Stepper.d.ts:9`.
+/// `components/forms/Stepper.d.ts:9` (unverified: file not mirrored).
 enum DabblerStepperSize {
   /// `sm` — 39px controls. *"for dense rows (a ticket line inside a card), not
   /// for primary forms"* (`Stepper.prompt.md`).
@@ -55,7 +55,7 @@ enum DabblerStepperSize {
 /// normally hand the shell their row's items as separate `children`, so the
 /// `--icon-gap` (6) between them stays the shell's. The Stepper's source does
 /// the opposite on purpose — `innerStyle={{ padding: 0, gap: 0 }}`
-/// (`Stepper.jsx:73`) — because the two 45×45 buttons *are* the padding: they
+/// (`Stepper.jsx:57`) — because the two 45×45 buttons *are* the padding: they
 /// must reach the box's edge, and a gap between them and the numeral would
 /// break the symmetry of the row. Passing one child is how that is expressed
 /// without forking the shell: with a single child the shell inserts no gap,
@@ -117,13 +117,13 @@ class DabblerStepper extends StatefulWidget {
   /// Called with the next, already-clamped value.
   final ValueChanged<int>? onChanged;
 
-  /// The lower bound. `min = 0` (`Stepper.jsx:22`).
+  /// The lower bound. `min = 0` (`Stepper.jsx:17`).
   final int min;
 
-  /// The upper bound. `max = 99` (`Stepper.jsx:23`).
+  /// The upper bound. `max = 99` (`Stepper.jsx:18`).
   final int max;
 
-  /// How much one press moves the value. `step = 1` (`Stepper.jsx:24`).
+  /// How much one press moves the value. `step = 1` (`Stepper.jsx:19`).
   final int step;
 
   /// The control size. Defaults to [DabblerStepperSize.md].
@@ -142,11 +142,11 @@ class DabblerStepper extends StatefulWidget {
   /// Whether the whole control is inert.
   final bool disabled;
 
-  /// `aria-label="Decrease"` (`Stepper.jsx:84`), exposed so a host can
+  /// `aria-label="Decrease"` (`Stepper.jsx:58`), exposed so a host can
   /// localise it — this package ships no strings of its own.
   final String decreaseSemanticLabel;
 
-  /// `aria-label="Increase"` (`Stepper.jsx:86`).
+  /// `aria-label="Increase"` (`Stepper.jsx:79`).
   final String increaseSemanticLabel;
 
   /// The source's `aria-label` for the decrement button.
@@ -165,10 +165,10 @@ class DabblerStepper extends StatefulWidget {
         DabblerStepperSize.md => DabblerSizing.touchTargetMin,
       };
 
-  /// The Iconsax glyph on the decrement button (`Stepper.jsx:84`).
+  /// The Iconsax glyph on the decrement button (`Stepper.jsx:58`).
   static const String decreaseIcon = 'minus';
 
-  /// The Iconsax glyph on the increment button (`Stepper.jsx:86`).
+  /// The Iconsax glyph on the increment button (`Stepper.jsx:79`).
   static const String increaseIcon = 'add';
 
   /// Clamps [value] into `[min, max]`, which is the source's
@@ -305,7 +305,7 @@ class _DabblerStepperState extends State<DabblerStepper> {
   }
 
   /// The centred numeric field: `.t-callout` at weight 500
-  /// (`Stepper.jsx:92-96` — `fontSize: 17, lineHeight: '22px', fontWeight:
+  /// (`Stepper.jsx:74` — `fontSize: 17, lineHeight: '22px', fontWeight:
   /// 500`, which is the `.t-callout` step), tertiary while disabled.
   Widget _numeral(
     DabblerColors colors,
@@ -338,7 +338,7 @@ class _DabblerStepperState extends State<DabblerStepper> {
             ),
           },
           child: Directionality(
-            // `direction: 'ltr'` (`Stepper.jsx:96`) — the numeral itself never
+            // `direction: 'ltr'` (`Stepper.jsx:77`) — the numeral itself never
             // reorders, whatever the surrounding script.
             textDirection: TextDirection.ltr,
             child: Material(

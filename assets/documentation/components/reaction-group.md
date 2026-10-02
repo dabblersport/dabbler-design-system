@@ -48,7 +48,7 @@ Card surface, card outline, brand, secondary ink, tertiary ink for the add glyph
 
 ## Change log
 
-- Covered against the live source: tallies now wrap with a 3px run gap, and the idle ink follows the secondary text role instead of a light-only palette value, so it follows dark mode.
+- Covered against the hand-transcribed mirror of the live source (no byte or pixel check): tallies now wrap with a 3px run gap, and the idle ink follows the secondary text role instead of a light-only palette value, so it follows dark mode.
 
 ## Source
 

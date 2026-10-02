@@ -37,6 +37,11 @@ Every tone, a bento grid and an interactive tile — see `stat_tile_gallery.dart
 ### Size
 `small` (2 columns by 1 row), `hero` (4 by 2), `wide` (6 by 2); `span` and `rows` override the footprint.
 
+@figure 2 lib/src/cards/stat_tile.dart#DabblerStatTileSize
+@figure 1 lib/src/cards/stat_tile.dart#DabblerStatTileSize
+@figure 4 lib/src/cards/stat_tile.dart#DabblerStatTileSize
+@figure 6 lib/src/cards/stat_tile.dart#DabblerStatTileSize
+
 ### Tone
 `card`, `sunken`, `brand`, `ink`, `amber`, `info`, `accent`, `danger`.
 

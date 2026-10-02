@@ -11,7 +11,7 @@ import '_host.dart';
 
 /// The specimen's month — `calendar.card.html:21` renders
 /// `<Calendar month={1} year={2078} …>`, and `month` is 0-indexed
-/// (`Calendar.d.ts:5`), so it is February 2078.
+/// (`Calendar.d.ts:5` (unverified: file not mirrored)), so it is February 2078.
 final DateTime specimenMonth = DateTime(2078, DateTime.february);
 
 void main() {

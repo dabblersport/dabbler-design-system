@@ -35,7 +35,7 @@ void main() {
       expect(
         shell.innerPadding,
         EdgeInsetsDirectional.zero,
-        reason: "Stepper.jsx:73 — innerStyle {padding: 0, gap: 0}",
+        reason: "Stepper.jsx:57 — innerStyle {padding: 0, gap: 0}",
       );
       expect(find.text('players'), findsOneWidget);
       expect(find.text('4–22'), findsOneWidget);

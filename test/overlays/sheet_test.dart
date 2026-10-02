@@ -91,7 +91,7 @@ void main() {
 
       final Rect panel = tester.getRect(find.byType(ClipRRect).first);
       expect(panel.bottom, _viewport.height);
-      // Default detent 0.5 of the viewport (`Sheet.d.ts:8`).
+      // Default detent 0.5 of the viewport (`Sheet.d.ts:8` (unverified: file not mirrored)).
       expect(panel.height, closeTo(_viewport.height * 0.5, 0.5));
     });
 
@@ -154,7 +154,7 @@ void main() {
       final Border border = decoration.border! as Border;
       expect(border.top.color, _colours().borderDefault);
       expect(border.top.width, DabblerSizing.borderDefault);
-      // Modal drops the bottom edge; it is off-screen (`Sheet.jsx:85`).
+      // Modal drops the bottom edge; it is off-screen (`Sheet.jsx:88`).
       expect(border.bottom, BorderSide.none);
     });
 
@@ -360,7 +360,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Height is untouched by the gesture: the drag is a translation only
-      // (`Sheet.prompt.md:58`).
+      // (`Sheet.prompt.md:58` (unverified: file not mirrored)).
       expect(
         tester.getRect(find.byType(ClipRRect).first).height,
         before,

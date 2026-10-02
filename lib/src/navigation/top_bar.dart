@@ -10,7 +10,7 @@ import '../tokens/dabbler_geometry.dart';
 /// One trailing action in a [DabblerNavigationTopBar].
 ///
 /// The source's export carries these as free-form `text1` / `text2` node slots
-/// (`components/navigation/NavigationTopBar.d.ts:6-9`), whose documented
+/// (`components/navigation/NavigationTopBar.d.ts:6-9`, unverified: file not mirrored), whose documented
 /// defaults are an Iconsax `sms` and `notification-bing`. A bare slot cannot
 /// meet this ticket's ≥44×44 target or carry an accessible name, so the slot is
 /// modelled instead: a glyph, a name and a callback.
@@ -114,7 +114,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// (`navigation-system.card.html` — *Anatomy*).
   static const String defaultAvatarSeed = 'Alen Rahman';
 
-  /// `height: 62` (`NavigationTopBar.jsx:8`), applied as a **fixed height**.
+  /// `height: 62` (`NavigationTopBar.jsx:10`), applied as a **fixed height**.
   ///
   /// The export draws 62 with a 1px border top and bottom (`:15`, `:17`), so
   /// the interior is **60**. A 45-tall [actionTarget] centred in 60 leaves
@@ -136,7 +136,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// own badge is 24).
   static const double avatarBadgeSide = 16;
 
-  /// `padding: '12px 16px'` (`NavigationTopBar.jsx:33`). 16 is off the base-3
+  /// `padding: '12px 16px'` (`NavigationTopBar.jsx:32`, written there as `'12px 16px 12px 16px'`). 16 is off the base-3
   /// grid and is transcribed literally: the previous cut rounded it to
   /// `--space-5` (15), which pulls the wordmark a pixel in from where the
   /// specimen draws it. Recorded as a token conflict, not resolved to the ramp.
@@ -147,13 +147,13 @@ class DabblerNavigationTopBar extends StatelessWidget {
       );
 
   /// `gap: 12` between the trailing actions and the avatar
-  /// (`NavigationTopBar.jsx:124`) — `--space-4`.
+  /// (`NavigationTopBar.jsx:115`) — `--space-4`.
   static const double trailingGap = DabblerSpacing.space4;
 
   /// `16` — the inline half of `padding: '12px 16px'`. Off-grid, transcribed.
   static const double barPaddingInline = 16;
 
-  /// `size={22}` on each trailing glyph (`NavigationTopBar.jsx:165,184`). Off
+  /// `size={22}` on each trailing glyph (`NavigationTopBar.jsx:139,160`). Off
   /// the 18/24/30 icon ramp and transcribed: the previous cut drew 24, which
   /// crowds the 12px gap the specimen leaves between the two glyphs and the
   /// avatar.
@@ -170,7 +170,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// axis the floor is measured against.
   static const Size actionTarget = Size(34, DabblerSizing.touchTargetMin);
 
-  /// The wordmark's intrinsic box, `100 × 19` (`NavigationTopBar.jsx:46-50`).
+  /// The wordmark's intrinsic box, `100 × 19` (`NavigationTopBar.jsx:42-43`).
   static const Size wordmarkSize = Size(100, 19);
 
   /// The trailing icon actions, in visual order. Empty by default; the
@@ -253,7 +253,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
         // `backgroundColor: 'var(--neutral-100)'`, which is `--surface-page`
         // (`tokens/colors.css:32`).
         color: colors.bgPrimary,
-        // Root `borderRadius: 16` (NavigationTopBar.jsx digest).
+        // Root `borderRadius: 16` (`NavigationTopBar.jsx:14`).
         borderRadius: border ? DabblerRadius.cardAll : null,
         border: border
             ? Border.all(
@@ -327,7 +327,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
       seed: avatarSeed,
       size: DabblerAvatarSize.sm,
       badge: avatarBadge,
-      // Digest: badge `16x16`, `2px solid var(--neutral-100)`.
+      // Badge `16x16`, `2px solid var(--neutral-100)` (`NavigationTopBar.jsx:189-196`).
       badgeSize: avatarBadgeSide,
     );
 
@@ -362,7 +362,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
 }
 
 /// The Dabbler wordmark, transcribed path-for-path from the SVG the export
-/// inlines (`components/navigation/NavigationTopBar.jsx:51-113`).
+/// inlines (`components/navigation/NavigationTopBar.jsx:47-109`).
 ///
 /// It is drawn rather than loaded because the design source's own note —
 /// *"the real `dabbler_logo.svg` mark and wordmark, used as-is"* — means an

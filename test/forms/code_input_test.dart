@@ -297,7 +297,7 @@ void main() {
           i < 4 ? '4815'[i] : '',
         );
       }
-      // `CodeInput.jsx:69`: focusBox(min(pasted.length, length - 1)).
+      // `CodeInput.jsx:68`: focusBox(min(pasted.length, length - 1)).
       expect(tester.widget<EditableText>(_field(4)).focusNode.hasFocus, isTrue);
     });
 

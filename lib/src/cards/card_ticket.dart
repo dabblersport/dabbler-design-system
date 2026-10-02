@@ -347,7 +347,7 @@ class DabblerCardTicket extends StatelessWidget {
       };
 
   /// The status pill's vertical padding — `padding: '5px 12px'`
-  /// (`CardTicket.jsx:34`).
+  /// (`CardTicket.jsx:33`).
   ///
   /// **Off the base-3 grid, and transcribed anyway**, for the same reason
   /// [actionPadding] is: 5 is not a step of [DabblerSpacing], and snapping it
@@ -733,7 +733,7 @@ class _BodyCap extends StatelessWidget {
 }
 
 /// The `1px dashed var(--outline-card)` rule between the ticket's title row and
-/// its price row (`CardTicket.jsx:93`).
+/// its price row (`CardTicket.jsx:83`).
 ///
 /// A [CustomPaint] rather than a [Border], because Flutter's border painters
 /// draw solid strokes only. It is deliberately not part of DS-600's

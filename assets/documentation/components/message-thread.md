@@ -43,7 +43,7 @@ Spacing: 3 inside a group, 12 between groups and for the gutters, the 28px avata
 
 ## Change log
 
-- Corrected against the live source: the unread anchor now rests 72px above the divider (it used a 10% viewport alignment); the scrollbar is hidden; message rows forward the edited label, retry, retry label and the sender and avatar overrides, as the source forwards every item field.
+- Corrected against the hand-transcribed mirror of the live source (no byte or pixel check): the unread anchor now rests 72px above the divider (it used a 10% viewport alignment); the scrollbar is hidden; message rows forward the edited label, retry, retry label and the sender and avatar overrides, as the source forwards every item field.
 
 ## Source
 

@@ -43,7 +43,7 @@ void main() {
             )
             .last,
       );
-      expect(dot, const Size(9, 9), reason: 'Radio.jsx:14');
+      expect(dot, const Size(9, 9), reason: 'Radio.jsx:12');
       expect(DabblerRadio.dotSize, DabblerSpacing.space3);
     });
 
@@ -77,7 +77,7 @@ void main() {
       expect(
         reported,
         <bool>[true],
-        reason: 'Radio.jsx:19 — onChange(true), even when already selected',
+        reason: 'Radio.jsx:17 — onChange(true), even when already selected',
       );
     });
 

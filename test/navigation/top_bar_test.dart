@@ -221,7 +221,7 @@ void main() {
       expect(icons.map((DabblerIcon i) => i.name),
           <String>['sms', 'notification-bing']);
       for (final DabblerIcon icon in icons) {
-        // `size={22}` (`NavigationTopBar.jsx:165,184`) — OFF the 18/24/30 icon
+        // `size={22}` (`NavigationTopBar.jsx:139,160`) — OFF the 18/24/30 icon
         // ramp, transcribed literally. This test previously asserted
         // `--icon-md` (24), which is what pinned the glyphs to the ramp and
         // crowded the 12px gap the specimen leaves between them and the avatar.
@@ -453,7 +453,7 @@ void main() {
         matching: find.byType(Container),
       ).first);
       final BoxDecoration decoration = bar.decoration! as BoxDecoration;
-      // Live NavigationTopBar.jsx digest: root `borderRadius: 16`.
+      // Mirrored live NavigationTopBar.jsx:14: root `borderRadius: 16`.
       expect(decoration.borderRadius, DabblerRadius.cardAll);
       expect(DabblerRadius.card, 16);
       expect(

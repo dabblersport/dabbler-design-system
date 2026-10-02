@@ -39,7 +39,7 @@ class DabblerAccordionItem {
   final Widget content;
 
   /// Optional leading Iconsax glyph, drawn at 24 in
-  /// [DabblerColors.brandPrimary] (`Accordion.jsx:107`).
+  /// [DabblerColors.brandPrimary] (`Accordion.jsx:110`).
   final String? icon;
 }
 
@@ -172,7 +172,7 @@ class _DabblerAccordionState extends State<DabblerAccordion> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      // `gap: variant === 'card' ? var(--space-3) : 0` (`Accordion.jsx:60`).
+      // `gap: variant === 'card' ? var(--space-3) : 0` (`Accordion.jsx:61`).
       spacing: card ? DabblerSpacing.space3 : 0,
       children: <Widget>[
         for (int i = 0; i < widget.items.length; i++)
@@ -228,7 +228,7 @@ class _DabblerAccordionItemView extends StatelessWidget {
               ),
               alignment: AlignmentDirectional.centerStart,
               child: Row(
-                // `gap: var(--space-3)` (`Accordion.jsx:100`).
+                // `gap: var(--space-3)` (`Accordion.jsx:104`).
                 spacing: DabblerSpacing.space3,
                 children: <Widget>[
                   if (item.icon != null)
@@ -245,7 +245,7 @@ class _DabblerAccordionItemView extends StatelessWidget {
                           .copyWith(color: colors.textPrimary),
                     ),
                   ),
-                  // `transform: rotate(180deg)` on open (`Accordion.jsx:110`).
+                  // `transform: rotate(180deg)` on open (`Accordion.jsx:114`).
                   AnimatedRotation(
                     turns: open ? 0.5 : 0,
                     duration: DabblerMotion.reduceMotion(context)
@@ -274,7 +274,7 @@ class _DabblerAccordionItemView extends StatelessWidget {
         DabblerCollapse(
           open: open,
           child: Padding(
-            // `paddingBlockEnd: var(--space-4)` (`Accordion.jsx:116`).
+            // `paddingBlockEnd: var(--space-4)` (`Accordion.jsx:119`).
             padding: const EdgeInsetsDirectional.only(
               bottom: DabblerSpacing.space4,
             ),
@@ -289,7 +289,7 @@ class _DabblerAccordionItemView extends StatelessWidget {
 
     return Container(
       padding: card
-          // `paddingInline: var(--space-5)` (`Accordion.jsx:93`).
+          // `paddingInline: var(--space-5)` (`Accordion.jsx:97`).
           ? const EdgeInsetsDirectional.symmetric(
               horizontal: DabblerSpacing.space5,
             )

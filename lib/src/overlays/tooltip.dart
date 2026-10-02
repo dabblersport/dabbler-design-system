@@ -38,7 +38,7 @@ enum DabblerTooltipPlacement {
 /// The one place in the system where the page's ink becomes the fill: a
 /// [DabblerColors.textPrimary] panel carrying [DabblerColors.surfaceCard] text
 /// at [DabblerType.caption1], [DabblerRadius.sm] corners, `6px 9px` padding,
-/// capped at 220 wide, **no arrow** (`Tooltip.jsx:8`).
+/// capped at 220 wide, **no arrow** (`Tooltip.jsx:8-9`).
 ///
 /// ## Flat
 ///
@@ -76,14 +76,14 @@ class DabblerTooltip extends StatefulWidget {
   /// The control being labelled.
   final Widget child;
 
-  /// Which edge the panel sits on. `top` by default (`Tooltip.jsx:19`).
+  /// Which edge the panel sits on. `top` by default (`Tooltip.jsx:18`).
   final DabblerTooltipPlacement placement;
 
-  /// Hover / focus delay — `delay = 400` (`Tooltip.jsx:20`).
+  /// Hover / focus delay — `delay = 400` (`Tooltip.jsx:19`).
   final Duration delay;
 
   /// Long-press delay — the source's second, longer 450ms timer
-  /// (`Tooltip.jsx:58`).
+  /// (`Tooltip.jsx:57`).
   final Duration touchDelay;
 
   /// 400ms.
@@ -92,11 +92,11 @@ class DabblerTooltip extends StatefulWidget {
   /// 450ms.
   static const Duration defaultTouchDelay = Duration(milliseconds: 450);
 
-  /// `maxWidth: 220` (`Tooltip.jsx:72`). Not on any ramp; transcribed.
+  /// `maxWidth: 220` (`Tooltip.jsx:70`). Not on any ramp; transcribed.
   static const double maxWidth = 220;
 
   /// `calc(100% + var(--space-2))` — the gap between control and panel
-  /// (`Tooltip.jsx:38,44`).
+  /// (`Tooltip.jsx:39,44`).
   static const double gap = DabblerSpacing.space2;
 
   @override
@@ -179,7 +179,7 @@ class _DabblerTooltipState extends State<DabblerTooltip> {
 
     final Widget panel = Container(
       constraints: const BoxConstraints(maxWidth: DabblerTooltip.maxWidth),
-      // `padding: '6px 9px'` (`Tooltip.jsx:74`) — `--space-2` / `--space-3`.
+      // `padding: '6px 9px'` (`Tooltip.jsx:73`) — `--space-2` / `--space-3`.
       padding: const EdgeInsets.symmetric(
         vertical: DabblerSpacing.space2,
         horizontal: DabblerSpacing.space3,
@@ -202,7 +202,7 @@ class _DabblerTooltipState extends State<DabblerTooltip> {
       child: OverlayPortal(
         controller: _controller,
         overlayChildBuilder: (BuildContext context) => Positioned(
-          // `pointerEvents: 'none'` (`Tooltip.jsx:75`) — the panel never
+          // `pointerEvents: 'none'` (`Tooltip.jsx:74`) — the panel never
           // intercepts the gesture that is keeping it open.
           child: IgnorePointer(
             child: CompositedTransformFollower(
@@ -215,7 +215,7 @@ class _DabblerTooltipState extends State<DabblerTooltip> {
               // tight incoming constraint — without this the panel painted at
               // the size of the whole overlay. The shrink-wrapping [Align]
               // loosens them so the panel sizes to its text, capped at
-              // [DabblerTooltip.maxWidth] (`Tooltip.jsx:72`).
+              // [DabblerTooltip.maxWidth] (`Tooltip.jsx:70`).
               child: Align(
                 alignment: AlignmentDirectional.topStart,
                 widthFactor: 1,

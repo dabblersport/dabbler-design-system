@@ -39,7 +39,7 @@ void main() {
             )
             .first,
       );
-      expect(track, const Size(48, 28), reason: 'Toggle.jsx:17');
+      expect(track, const Size(48, 28), reason: 'Toggle.jsx:14');
       expect(DabblerToggle.trackWidth, DabblerSpacing.space11);
       expect(DabblerToggle.knobSize, DabblerSizing.iconMd);
 

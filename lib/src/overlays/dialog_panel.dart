@@ -57,7 +57,7 @@ class _Panel extends StatelessWidget {
       column.add(
         Text(
           title!,
-          // `.t-title-3`, `--color-text-primary` (Dialog.jsx:83).
+          // `.t-title-3`, `--color-text-primary` (Dialog.jsx:86).
           style: DabblerType.title3
               .resolveForDirection(direction)
               .copyWith(color: colors.textPrimary),
@@ -69,7 +69,7 @@ class _Panel extends StatelessWidget {
       column.add(
         Text(
           description!,
-          // `.t-body`, `--color-text-secondary` (Dialog.jsx:85).
+          // `.t-body`, `--color-text-secondary` (Dialog.jsx:88).
           style: DabblerType.body
               .resolveForDirection(direction)
               .copyWith(color: colors.textSecondary),
@@ -104,7 +104,7 @@ class _Panel extends StatelessWidget {
         // `maxHeight: calc(100dvh - var(--space-11))`, Dialog.jsx:73.
         maxHeight: viewportHeight - DabblerSpacing.space11,
       ),
-      // `width: '100%'` with the max width above (Dialog.jsx:72): the panel
+      // `width: '100%'` with the max width above (Dialog.jsx:75): the panel
       // fills the gutter-inset width until it reaches its cap.
       child: SizedBox(
         width: double.infinity,
@@ -112,7 +112,7 @@ class _Panel extends StatelessWidget {
           key: DabblerDialog.panelKey,
           decoration: BoxDecoration(
             // `--surface-card` fill with the `--outline-card` 1px hairline,
-            // `--radius-xl` (Dialog.jsx:75-78).
+            // `--radius-xl` (Dialog.jsx:78-80).
             color: colors.surfaceCard,
             borderRadius: DabblerRadius.xlAll,
             border: Border.all(
@@ -126,7 +126,7 @@ class _Panel extends StatelessWidget {
             borderRadius: DabblerRadius.xlAll,
             child: SingleChildScrollView(
               // `overflowY: auto` — the panel scrolls internally rather than
-              // pushing past the viewport cap (Dialog.jsx:74).
+              // pushing past the viewport cap (Dialog.jsx:77).
               padding: const EdgeInsets.all(DabblerSpacing.space8),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -142,11 +142,11 @@ class _Panel extends StatelessWidget {
 }
 
 /// The action row: `justify-content: flex-end` with a `--space-3` gap, which
-/// stacks to a full-width column below 360px (`Dialog.jsx:88-94`).
+/// stacks to a full-width column below 360px (`Dialog.jsx:92-97`).
 ///
 /// `flex-end` is the *end* of the reading direction, so [MainAxisAlignment.end]
 /// mirrors under RTL on its own — which is the source's stated RTL behaviour
-/// (`Dialog.prompt.md:62-64`) and the reason no `left`/`right` appears here.
+/// (`Dialog.prompt.md:62-64`, unverified: file not mirrored) and the reason no `left`/`right` appears here.
 class _Actions extends StatelessWidget {
   const _Actions({
     required this.stack,
@@ -210,7 +210,7 @@ class _Actions extends StatelessWidget {
       return Column(
         key: DabblerDialog.actionsKey,
         mainAxisSize: MainAxisSize.min,
-        // `fullWidth` on both buttons when stacked, Dialog.jsx:98 and :101.
+        // `fullWidth` on both buttons when stacked, Dialog.jsx:100 and :104.
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: spaced,
       );

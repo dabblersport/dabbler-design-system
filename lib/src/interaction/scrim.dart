@@ -9,11 +9,11 @@ import '../tokens/dabbler_motion.dart';
 /// ink at 45% in light, ink-950 at 65% in dark
 /// (`tokens/colors.css:157` and `:203`). `guidelines/colors.html:147` states
 /// the rule this primitive exists to enforce — *"overlays consume this, never
-/// their own opacity"*. Sheet (`Sheet.prompt.md:34`), Dialog
-/// (`Dialog.prompt.md:34`) and the mobile Menu all name the same token, so
+/// their own opacity"*. Sheet (`Sheet.prompt.md:34` (unverified: file not mirrored)), Dialog
+/// (`Dialog.prompt.md:34` (unverified: file not mirrored)) and the mobile Menu all name the same token, so
 /// there is one scrim, not three.
 ///
-/// The scrim is **the elevation**. `Dialog.prompt.md:37` is explicit that
+/// The scrim is **the elevation**. `Dialog.prompt.md:37` (unverified: file not mirrored) is explicit that
 /// separation "comes from the scrim and the hairline, not elevation", which is
 /// how a flat system with no shadows still reads as layered.
 ///
@@ -23,7 +23,7 @@ import '../tokens/dabbler_motion.dart';
 /// [DabblerMotion.base] (120ms) with [DabblerMotion.easeOut] — the source's
 /// `dbl-fade` keyframe, `animation: dbl-fade var(--motion-base) var(--ease-out)`
 /// (`components/foundations/overlay.jsx:32`), and the same motion
-/// `Dialog.prompt.md:70` gives the panel. Under reduced motion the source sets
+/// `Dialog.prompt.md:70` (unverified: file not mirrored) gives the panel. Under reduced motion the source sets
 /// `.dbl-fade{animation:none}` (`overlay.jsx:39`), so the scrim here appears
 /// and disappears instantly.
 ///
@@ -39,7 +39,7 @@ import '../tokens/dabbler_motion.dart';
 /// whatever is beneath it. When [onDismiss] is set the scrim absorbs them and
 /// a press anywhere on it dismisses, which is the source's "scrim click
 /// (pointerdown on the scrim itself) closes when `dismissible`"
-/// (`Dialog.prompt.md:48`).
+/// (`Dialog.prompt.md:48` (unverified: file not mirrored)).
 ///
 /// ## Accessibility
 ///

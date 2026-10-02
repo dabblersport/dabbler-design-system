@@ -4,11 +4,11 @@ import '../tokens/dabbler_type.dart';
 import 'picker_field.dart';
 
 /// A date span — the port of `DateField`'s `[Date | null, Date | null]`
-/// (`DateField.d.ts:5`).
+/// (`DateField.d.ts:5` (unverified: file not mirrored)).
 ///
 /// Flutter's own `DateTimeRange` cannot express it: both of its ends are
 /// non-null, and the source's whole range interaction depends on a half-open
-/// span existing between the first tap and the second (`DateField.jsx:109-115`
+/// span existing between the first tap and the second (`DateField.jsx:91-98`; quote from `DateField.d.ts:8`, unverified: file not mirrored
 /// — *"first tap sets the start, second the end"*).
 @immutable
 class DabblerDateSpan {
@@ -77,14 +77,14 @@ class DabblerDateSpan {
 abstract final class DabblerDateFormat {
   const DabblerDateFormat._();
 
-  /// The single-value placeholder — `DateField.jsx:36`.
+  /// The single-value placeholder — `DateField.jsx:35`.
   static const String placeholder = 'DD/MM/YYYY';
 
-  /// The en-dash-joined range placeholder — `DateField.jsx:36`.
+  /// The en-dash-joined range placeholder — `DateField.jsx:35`.
   static const String rangePlaceholder = 'DD/MM/YYYY – DD/MM/YYYY';
 
   /// The separator a formatted range is joined with — `' – '`, an en dash
-  /// (U+2013) with a space on each side (`DateField.jsx:45`).
+  /// (U+2013) with a space on each side (`DateField.jsx:41`).
   static const String rangeJoiner = ' – ';
 
   /// The two-digit-year pivot. `DateField.jsx:20` — `2000 + Number(m[3])`,
@@ -106,7 +106,7 @@ abstract final class DabblerDateFormat {
 
   /// A span as `DD/MM/YYYY – DD/MM/YYYY`, dropping an unset end.
   ///
-  /// `DateField.jsx:44-46` — `[fmt(a), fmt(b)].filter(Boolean).join(' – ')`,
+  /// `DateField.jsx:40-42` — `[fmt(a), fmt(b)].filter(Boolean).join(' – ')`,
   /// so a half-chosen range renders as the start alone with no dangling dash.
   static String formatSpan(DabblerDateSpan span) => <String>[
         format(span.start),
@@ -120,7 +120,7 @@ abstract final class DabblerDateFormat {
   /// or two digits, the same separator class, then two to four digits.
   ///
   /// Returns null for anything else, which is what makes the field's *revert*
-  /// behaviour possible: `DateField.jsx:56` and `:70` restore the displayed
+  /// behaviour possible: `DateField.jsx:65` and `:71` restore the displayed
   /// value rather than clearing it when a parse fails.
   ///
   /// A parse that rolls over — `32/01/2026` — is rejected rather than silently
@@ -152,7 +152,7 @@ abstract final class DabblerDateFormat {
   }
 
   /// A typed range — two dates around an en dash, an em dash or a spaced
-  /// hyphen. `DateField.jsx:52` splits on `/[–—]|(?:\s-\s)/`.
+  /// hyphen. `DateField.jsx:57` splits on `/[–—]|(?:\s-\s)/`.
   ///
   /// The spaced hyphen must stay spaced, or `05-09-2026` would split into
   /// nonsense before [parse] ever saw it.
@@ -168,7 +168,7 @@ abstract final class DabblerDateFormat {
 
   /// Whether [date] sits inside `min`/`max`, both inclusive.
   ///
-  /// `DateField.jsx:58` — `(!min || d >= min) && (!max || d <= max)`.
+  /// `DateField.jsx:53` — `(!min || d >= min) && (!max || d <= max)`.
   static bool inBounds(DateTime date, {DateTime? min, DateTime? max}) =>
       (min == null || !date.isBefore(min)) &&
       (max == null || !date.isAfter(max));
@@ -229,7 +229,7 @@ abstract final class DabblerDateFormat {
 /// [minimum] and [maximum] are enforced on the typed path here
 /// (`DateField.jsx:59-72` — an out-of-bounds parse reverts rather than
 /// commits). The picked path is enforced by whoever owns the picker, which is
-/// the source's arrangement too (`DateField.jsx:100`).
+/// the source's arrangement too (`DateField.jsx:91-93`).
 class DabblerDateField extends StatefulWidget {
   /// A single date.
   const DabblerDateField({
@@ -252,7 +252,7 @@ class DabblerDateField extends StatefulWidget {
 
   /// A date range: `DD/MM/YYYY – DD/MM/YYYY`.
   ///
-  /// `DateField.d.ts:8` — *"Two-date selection: first tap sets the start, the
+  /// `DateField.d.ts:8` (unverified: file not mirrored) — *"Two-date selection: first tap sets the start, the
   /// second the end."* Split from the default constructor rather than made a
   /// `range` boolean over a dynamically-typed `value`, because Dart has no
   /// `Date | [Date, Date]` and a caller should not have to cast.
@@ -274,7 +274,7 @@ class DabblerDateField extends StatefulWidget {
         value = null,
         onChanged = null;
 
-  /// `icon="calendar"` — `DateField.jsx:120`.
+  /// `icon="calendar"` — `DateField.jsx:114`.
   static const String iconName = 'calendar';
 
   /// Whether this is the range form.
@@ -313,7 +313,7 @@ class DabblerDateField extends StatefulWidget {
 
   /// The empty-state text. Defaults to [DabblerDateFormat.placeholder], or
   /// [DabblerDateFormat.rangePlaceholder] in the range form
-  /// (`DateField.jsx:36`).
+  /// (`DateField.jsx:35`).
   final String? placeholder;
 
   /// Whether the caller's picker surface is open.
@@ -362,7 +362,7 @@ class _DabblerDateFieldState extends State<DabblerDateField> {
         max: widget.maximum,
       );
 
-  /// `commitText` — `DateField.jsx:60-73`.
+  /// `commitText` — `DateField.jsx:55-72`.
   void _commit(String raw) {
     if (raw.trim().isEmpty) {
       if (widget.range) {

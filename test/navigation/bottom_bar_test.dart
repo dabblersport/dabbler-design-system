@@ -161,13 +161,13 @@ void main() {
       final List<DabblerIcon> glyphs =
           tester.widgetList<DabblerIcon>(find.byType(DabblerIcon)).toList();
 
-      // The four destinations are `size={24}` (`NavigationBottomBar.jsx:158`),
+      // The four destinations are `size={24}` (`NavigationBottomBar.jsx:167`),
       // which is `--icon-md` and on the 18/24/30 ramp.
       for (final DabblerIcon icon in glyphs.take(glyphs.length - 1)) {
         expect(icon.size, DabblerSizing.iconMd);
       }
 
-      // The action is `size={26}` (`NavigationBottomBar.jsx:194`) — OFF that
+      // The action is `size={26}` (`NavigationBottomBar.jsx:193`) — OFF that
       // ramp, and transcribed literally, because 24 visibly under-fills the 56
       // disc. This test previously asserted 24 for every glyph, which is what
       // pinned the action to the ramp instead of to the drawing.
@@ -604,7 +604,7 @@ void main() {
       // to transient overlays rather than to Dialog alone, so the create menu
       // carries it; and the action inherits `FAB`'s own existing documented
       // shadow exception. The source draws both
-      // (`NavigationBottomBar.jsx:90,184`).
+      // (`NavigationBottomBar.jsx:93,184`).
       //
       // This test previously asserted that NOTHING in the bar was elevated,
       // which is what pinned the blanket-flatness reading that dropped two
