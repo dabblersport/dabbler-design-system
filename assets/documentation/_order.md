@@ -66,6 +66,7 @@ The first thing on most screens, and the reason it comes first here.
 - [TopBar](components/top-bar.md) — the app's identity row: wordmark, trailing actions, account
   avatar.
 - [BottomBar](components/bottom-bar.md) — the primary destination switcher, plus the create action.
+- [TabBar](components/tab-bar.md) — the four-slot icon bar for top-level sections.
 - [Tabs](components/tabs.md) — switching between peer views of one screen.
 
 ### 2 · Content containers — holding what you show
@@ -97,6 +98,11 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [ChecklistPanel](components/checklist-panel.md) — the task rows inside a panel.
 - [MemberListPanel](components/member-list-panel.md) — people rows with an add or remove button.
 - [MutualsCard](components/mutuals-card.md) — avatars beside a line of context.
+- [CardPoll](components/card-poll.md) — a poll result with bars and a vote count.
+- [CardRoom](components/card-room.md) — a room with its participant avatars.
+- [CardActiveRoom](components/card-active-room.md) — a live room with its speaker and join action.
+- [MiniPlayer](components/mini-player.md) — the collapsed room player.
+- [SpeakerGrid](components/speaker-grid.md) — the room's speakers in three columns.
 
 ### 3 · Identity and status — who or what a piece of content is
 
