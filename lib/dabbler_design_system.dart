@@ -142,6 +142,8 @@ export 'src/messaging/message_thread.dart';
 export 'src/messaging/messaging_atoms.dart';
 export 'src/messaging/messaging_foundations.dart';
 export 'src/messaging/messaging_parts.dart';
+export 'src/messaging/messaging_parts_gallery.dart';
+export 'src/messaging/messaging_shared_object_card.dart';
 export 'src/navigation/navigation_gallery.dart';
 export 'src/rooms/mini_player.dart';
 export 'src/rooms/rooms_gallery.dart';

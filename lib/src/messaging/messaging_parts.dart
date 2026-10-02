@@ -1,19 +1,24 @@
+/// The shared messaging parts: the reply reference, the reaction row, the
+/// reaction picker and the in-thread notice. The shared-object card lives in
+/// `messaging_shared_object_card.dart` (re-exported here) to keep both files
+/// under the 500-line ceiling.
+///
+/// Source: live Claude Design project 4286affa-bf50-4ff6-9576-917f76a93ca1
+/// (Dabbler Design System), files `components/messaging/*.jsx` and
+/// `*.prompt.md`, read via DesignSync get_file on 2026-10-02 and transcribed to
+/// a local mirror by the coordinator.
+library;
+
 import 'package:flutter/widgets.dart';
 
-import '../controls/button.dart';
-import '../controls/chip.dart';
 import '../feedback/banner.dart';
 import '../foundations/icon.dart';
-import '../foundations/sport_icon.dart';
-import '../foundations/sports.dart';
-import '../surfaces/avatar.dart';
-import '../surfaces/badge.dart';
-import '../surfaces/icon_tile.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
-import '../tokens/dabbler_palette.dart';
 import '../tokens/dabbler_type.dart';
 import 'messaging_foundations.dart';
+
+export 'messaging_shared_object_card.dart';
 
 TextStyle _t(BuildContext c, DabblerTypeStyle s) =>
     s.resolveForDirection(Directionality.of(c));
@@ -32,11 +37,22 @@ enum DabblerReplyVariant {
 
 /// MessageReplyReference — the quoted message.
 ///
-/// `MessageReplyReference.jsx`: a 2px inline-start rule (brand, or on-brand in
-/// an outgoing bubble), the sender in `caption-2` at weight 700 in the rule
-/// colour, and the quoted text (or an attachment label with a gallery glyph) in
-/// `caption-1`, clamped to two lines. The `composer` variant sits on the sunken
-/// fill with a 45px cancel button.
+/// Source: `components/messaging/MessageReplyReference.jsx`.
+///
+/// | Source | Dart |
+/// |---|---|
+/// | `borderInlineStart: 2px solid rule` | start rule, [ruleWidth] |
+/// | rule `--color-brand-primary` / `--color-on-brand` | `brandPrimary` / `onBrand` |
+/// | body `--muted` / `--color-on-brand` | `textSecondary` (D-003(a)) / `onBrand` |
+/// | `paddingInlineStart: --space-3`, `paddingBlock: --space-1` | 9 / 3 |
+/// | composer: `--surface-sunken`, `--radius-md`, `paddingInlineEnd: --space-3` | `surfaceSunken`, 9px radius, end 9 |
+/// | `gap: --space-3` text ↔ cancel | [cancelGap] 9 |
+/// | cancel `marginInlineEnd: -space-2` | end padding shrunk by 6 (no negative padding in Flutter) |
+/// | cancel `marginBlock: -space-2` | **not ported**: the 45px target keeps its full height, so the row is 12px taller than live |
+/// | sender `.t-caption-2` 700, rule colour, unclamped | caption2 w700 |
+/// | body `.t-caption-1` `.dbl-clamp-2` | caption1, 2 lines, ellipsis |
+/// | attachment `gallery` 13px + `--space-1` gap | `gallery` 13 + 3 |
+/// | cancel `close-circle` 18, `--muted` glyph | iconSm, `textTertiary` (the `--muted` light value) |
 class DabblerMessageReplyReference extends StatelessWidget {
   /// A reply reference.
   const DabblerMessageReplyReference({
@@ -61,7 +77,7 @@ class DabblerMessageReplyReference extends StatelessWidget {
   /// Where it is drawn.
   final DabblerReplyVariant variant;
 
-  /// Shows the cancel button when set (composer).
+  /// Shows the cancel button when set.
   final VoidCallback? onCancel;
 
   /// The cancel button's accessible name.
@@ -70,6 +86,15 @@ class DabblerMessageReplyReference extends StatelessWidget {
   /// The rule width — `2px`.
   static const double ruleWidth = 2;
 
+  /// The text ↔ cancel gap — `gap: var(--space-3)`.
+  static const double cancelGap = DabblerSpacing.space3;
+
+  /// The attachment glyph — `size={13}`.
+  static const double attachmentGlyph = 13;
+
+  /// The cancel's negative inline-end margin — `calc(var(--space-2) * -1)`.
+  static const double cancelPull = DabblerSpacing.space2;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -77,18 +102,28 @@ class DabblerMessageReplyReference extends StatelessWidget {
     final bool composer = variant == DabblerReplyVariant.composer;
     final Color rule = onBrand ? colors.onBrand : colors.brandPrimary;
     final Color body = onBrand ? colors.onBrand : colors.textSecondary;
-    return DecoratedBox(
+    final double baseEnd = composer ? DabblerSpacing.space3 : 0;
+    final double end = onCancel == null
+        ? baseEnd
+        : (baseEnd - cancelPull).clamp(0, baseEnd).toDouble();
+    final TextStyle bodyStyle = _t(
+      context,
+      DabblerType.caption1,
+    ).copyWith(color: body);
+
+    final Widget box = DecoratedBox(
       decoration: BoxDecoration(
         color: composer ? colors.surfaceSunken : null,
-        borderRadius: composer ? DabblerRadius.mdAll : null,
         border: BorderDirectional(
           start: BorderSide(color: rule, width: ruleWidth),
         ),
       ),
       child: Padding(
         padding: EdgeInsetsDirectional.only(
-          start: DabblerSpacing.space3,
-          end: composer ? DabblerSpacing.space3 : 0,
+          // A CSS border sits outside the padding; a painted Flutter border
+          // does not, so the 2px rule is added to the 9px start padding.
+          start: ruleWidth + DabblerSpacing.space3,
+          end: end,
           top: DabblerSpacing.space1,
           bottom: DabblerSpacing.space1,
         ),
@@ -101,40 +136,47 @@ class DabblerMessageReplyReference extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     sender,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: _t(context, DabblerType.caption2)
-                        .copyWith(fontWeight: FontWeight.w700, color: rule),
+                    style: _t(
+                      context,
+                      DabblerType.caption2,
+                    ).copyWith(fontWeight: FontWeight.w700, color: rule),
                   ),
                   if (attachmentLabel != null)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        DabblerIcon('gallery', size: 13, color: body),
-                        const SizedBox(width: DabblerSpacing.space1),
-                        Flexible(
-                          child: Text(
-                            attachmentLabel!,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: _t(context, DabblerType.caption1)
-                                .copyWith(color: body),
+                    Text.rich(
+                      TextSpan(
+                        children: <InlineSpan>[
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                end: DabblerSpacing.space1,
+                              ),
+                              child: DabblerIcon(
+                                'gallery',
+                                size: attachmentGlyph,
+                                color: body,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                          TextSpan(text: attachmentLabel),
+                        ],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: bodyStyle,
                     )
                   else
                     Text(
                       content ?? '',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: _t(context, DabblerType.caption1)
-                          .copyWith(color: body),
+                      style: bodyStyle,
                     ),
                 ],
               ),
             ),
-            if (onCancel != null)
+            if (onCancel != null) ...<Widget>[
+              const SizedBox(width: cancelGap),
               DabblerMessagingTap(
                 onTap: onCancel,
                 label: cancelLabel,
@@ -146,15 +188,21 @@ class DabblerMessageReplyReference extends StatelessWidget {
                     child: DabblerIcon(
                       'close-circle',
                       size: DabblerSizing.iconSm,
-                      color: colors.textSecondary,
+                      color: colors.textTertiary,
                     ),
                   ),
                 ),
               ),
+            ],
           ],
         ),
       ),
     );
+    // A one-sided border cannot take a radius in Flutter; clipping the box to
+    // the radius curves the rule the way the browser does.
+    return composer
+        ? ClipRRect(borderRadius: DabblerRadius.mdAll, child: box)
+        : box;
   }
 }
 
@@ -180,10 +228,19 @@ class DabblerMessageReaction {
 
 /// ReactionGroup — the reaction tallies under a message.
 ///
-/// `ReactionGroup.jsx`: 24px pills (13px glyph + `caption-2` count at weight
-/// 700) inside 45px buttons so the touch target clears the floor without the
-/// pill growing; `mine` pills are brand-tinted with a brand outline and a bold
-/// glyph; an optional add button.
+/// Source: `components/messaging/ReactionGroup.jsx`.
+///
+/// | Source | Dart |
+/// |---|---|
+/// | row `flexWrap`, `gap: --space-1` | `Wrap` spacing and runSpacing 3 |
+/// | target `min --touch-target-min` | 45 × 45 minimum |
+/// | pill `height: --icon-md`, `paddingInline: --space-2`, pill radius | [pillHeight] 24, 6 |
+/// | mine fill `color-mix(brand 12%, --surface-card)` | brand at [mineAlpha] over `surfaceCard` |
+/// | border `1px` brand / `--outline-card` | `brandPrimary` / `borderDefault` |
+/// | ink brand / `--ink-soft` | `brandPrimary` / `textSecondary` (light `#404040` = `--ink-soft`) |
+/// | glyph 13, bold when mine; count `.t-caption-2` 700 | [glyphSize], caption2 w700 |
+/// | `aria-label="{label} · {count}"`, `aria-pressed` | semantics label, `selected` |
+/// | add: 24 round, `--muted` glyph `emoji-happy` | 24 circle, `textTertiary` glyph |
 class DabblerReactionGroup extends StatelessWidget {
   /// A reaction row.
   const DabblerReactionGroup({
@@ -215,28 +272,37 @@ class DabblerReactionGroup extends StatelessWidget {
   /// The `mine` fill — brand at 12% over the card.
   static const double mineAlpha = 0.12;
 
+  /// The accessible name of a tally — `"{label} · {count}"`.
+  static String labelFor(DabblerMessageReaction r) =>
+      '${DabblerReactions.byKey(r.key).label} · ${r.count}';
+
   @override
   Widget build(BuildContext context) {
     if (reactions.isEmpty && onAdd == null) return const SizedBox.shrink();
     final DabblerColors colors = DabblerColors.of(context);
-    Widget target(Widget pill, {required VoidCallback? tap, String? label, bool? pressed}) =>
-        DabblerMessagingTap(
-          onTap: tap,
-          label: label,
-          selected: pressed,
-          ringRadius: DabblerRadius.pillAll,
-          scale: false,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: DabblerSizing.touchTargetMin,
-              minHeight: DabblerSizing.touchTargetMin,
-            ),
-            child: Center(child: pill),
-          ),
-        );
+    Widget target(
+      Widget pill, {
+      required VoidCallback? tap,
+      String? label,
+      bool? pressed,
+    }) => DabblerMessagingTap(
+      onTap: tap,
+      label: label,
+      selected: pressed,
+      ringRadius: DabblerRadius.pillAll,
+      scale: false,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minWidth: DabblerSizing.touchTargetMin,
+          minHeight: DabblerSizing.touchTargetMin,
+        ),
+        child: Center(widthFactor: 1, heightFactor: 1, child: pill),
+      ),
+    );
 
     return Wrap(
       spacing: DabblerSpacing.space1,
+      runSpacing: DabblerSpacing.space1,
       children: <Widget>[
         for (final DabblerMessageReaction r in reactions)
           target(
@@ -257,7 +323,7 @@ class DabblerReactionGroup extends StatelessWidget {
               child: SizedBox(
                 height: pillHeight,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                     horizontal: DabblerSpacing.space2,
                   ),
                   child: Row(
@@ -269,15 +335,18 @@ class DabblerReactionGroup extends StatelessWidget {
                             ? DabblerIconWeight.bold
                             : DabblerIconWeight.linear,
                         size: glyphSize,
-                        color: r.mine ? colors.brandPrimary : DabblerPalette.inkSoft,
+                        color: r.mine
+                            ? colors.brandPrimary
+                            : colors.textSecondary,
                       ),
                       const SizedBox(width: DabblerSpacing.space1),
                       Text(
                         '${r.count}',
                         style: _t(context, DabblerType.caption2).copyWith(
                           fontWeight: FontWeight.w700,
-                          color:
-                              r.mine ? colors.brandPrimary : DabblerPalette.inkSoft,
+                          color: r.mine
+                              ? colors.brandPrimary
+                              : colors.textSecondary,
                         ),
                       ),
                     ],
@@ -286,7 +355,7 @@ class DabblerReactionGroup extends StatelessWidget {
               ),
             ),
             tap: onToggle == null ? null : () => onToggle!(r.key),
-            label: '${DabblerReactions.byKey(r.key).label} · ${r.count}',
+            label: labelFor(r),
             pressed: r.mine,
           ),
         if (onAdd != null)
@@ -307,7 +376,7 @@ class DabblerReactionGroup extends StatelessWidget {
                   child: DabblerIcon(
                     'emoji-happy',
                     size: glyphSize,
-                    color: colors.textSecondary,
+                    color: colors.textTertiary,
                   ),
                 ),
               ),
@@ -322,9 +391,17 @@ class DabblerReactionGroup extends StatelessWidget {
 
 /// ReactionPicker — the six reactions in one pill, to choose from.
 ///
-/// `ReactionPicker.jsx`: a card pill with a hairline, 6px padding, six 45px
-/// round buttons with a 19px glyph; an active reaction fills with the brand
-/// colour and a bold on-brand glyph.
+/// Source: `components/messaging/ReactionPicker.jsx`.
+///
+/// | Source | Dart |
+/// |---|---|
+/// | `role="group"`, `aria-label={groupLabel}` | container semantics, [groupLabel] |
+/// | `padding: --space-2`, `gap: --space-1` | 6 / 3 |
+/// | `--surface-card`, `1px --outline-card`, pill radius | `surfaceCard`, `borderDefault` |
+/// | six 45px round buttons, `dbl-press` | 45 × 45, press scale |
+/// | active fill brand, on-brand bold glyph | `brandPrimary`, `onBrand` |
+/// | idle `--ink-soft` linear glyph, 19px | `textSecondary`, [glyphSize] |
+/// | `aria-pressed`, `aria-label={r.label}` | `selected`, label |
 class DabblerReactionPicker extends StatelessWidget {
   /// A picker.
   const DabblerReactionPicker({
@@ -351,6 +428,7 @@ class DabblerReactionPicker extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     return Semantics(
       container: true,
+      explicitChildNodes: true,
       label: groupLabel,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -362,40 +440,21 @@ class DabblerReactionPicker extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(DabblerSpacing.space2),
+          // CSS content-box: the 1px border sits outside the 6px padding.
+          padding: const EdgeInsets.all(
+            DabblerSpacing.space2 + DabblerSizing.borderDefault,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              for (final DabblerReactionDef r in DabblerReactions.all) ...<Widget>[
+              for (final DabblerReactionDef r
+                  in DabblerReactions.all) ...<Widget>[
                 if (r != DabblerReactions.all.first)
                   const SizedBox(width: DabblerSpacing.space1),
-                Builder(
-                  builder: (BuildContext context) {
-                    final bool on = active.contains(r.key);
-                    return DabblerMessagingTap(
-                      onTap: onPick == null ? null : () => onPick!(r.key),
-                      label: r.label,
-                      selected: on,
-                      ringRadius: DabblerRadius.pillAll,
-                      child: Container(
-                        width: DabblerSizing.touchTargetMin,
-                        height: DabblerSizing.touchTargetMin,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: on ? colors.brandPrimary : const Color.fromARGB(0, 0, 0, 0),
-                        ),
-                        child: DabblerIcon(
-                          r.icon,
-                          weight: on
-                              ? DabblerIconWeight.bold
-                              : DabblerIconWeight.linear,
-                          size: glyphSize,
-                          color: on ? colors.onBrand : DabblerPalette.inkSoft,
-                        ),
-                      ),
-                    );
-                  },
+                _PickerButton(
+                  def: r,
+                  on: active.contains(r.key),
+                  onTap: onPick == null ? null : () => onPick!(r.key),
                 ),
               ],
             ],
@@ -406,293 +465,35 @@ class DabblerReactionPicker extends StatelessWidget {
   }
 }
 
-/// A line of meta (glyph + text) on a [DabblerSharedObjectCard].
-@immutable
-class DabblerSharedMeta {
-  /// A meta line.
-  const DabblerSharedMeta({required this.icon, required this.text});
+class _PickerButton extends StatelessWidget {
+  const _PickerButton({required this.def, required this.on, this.onTap});
 
-  /// The Iconsax glyph (drawn bold, 14px, brand).
-  final String icon;
-
-  /// The text.
-  final String text;
-}
-
-/// What a [DabblerSharedObjectCard] shares.
-enum DabblerSharedKind {
-  /// A game, with a sport tile, title and status badge.
-  game,
-
-  /// A venue, with a photo slot on top.
-  venue,
-
-  /// A player, with an avatar.
-  player,
-}
-
-/// SharedObjectCard — a game, venue or player shared inside a conversation.
-///
-/// `SharedObjectCard.jsx` (design system 1.2.0): a pastel ground per kind from
-/// the decorative tile tokens (game and venue `info`, player `accent`), a
-/// hairline, the large radius and 12 padding. A game shows a 36px sport tile,
-/// the title, a status badge, meta lines and an optional primary call to
-/// action; a player an avatar, name and subtitle with chips; a venue a 120px
-/// photo slot above its text. The photo is an injected widget.
-class DabblerSharedObjectCard extends StatelessWidget {
-  /// A shared object.
-  const DabblerSharedObjectCard({
-    super.key,
-    this.kind = DabblerSharedKind.game,
-    required this.title,
-    this.subtitle,
-    this.sport,
-    this.seed,
-    this.meta = const <DabblerSharedMeta>[],
-    this.status,
-    this.statusLabel,
-    this.chips = const <String>[],
-    this.photo,
-    this.cta,
-    this.onPress,
-    this.footnote,
-  });
-
-  /// Game, venue or player.
-  final DabblerSharedKind kind;
-
-  /// The name.
-  final String title;
-
-  /// The line under the name.
-  final String? subtitle;
-
-  /// The sport of a game.
-  final DabblerSport? sport;
-
-  /// The avatar seed of a player; defaults to [title].
-  final String? seed;
-
-  /// Meta lines.
-  final List<DabblerSharedMeta> meta;
-
-  /// The game's activity status.
-  final DabblerActivityStatus? status;
-
-  /// Overrides the status label.
-  final String? statusLabel;
-
-  /// Chips under a player or venue.
-  final List<String> chips;
-
-  /// The venue photo, supplied by the caller (120px tall).
-  final Widget? photo;
-
-  /// The call-to-action label.
-  final String? cta;
-
-  /// Called by the call to action.
-  final VoidCallback? onPress;
-
-  /// A footnote under a game's meta.
-  final String? footnote;
-
-  /// The photo height — `height: 120`.
-  static const double photoHeight = 120;
-
-  /// The surface of [kind] — `PASTEL`.
-  static Color surfaceFor(DabblerColors colors, DabblerSharedKind kind) =>
-      switch (kind) {
-        DabblerSharedKind.player => DabblerColors.tileAccent.surface,
-        _ => DabblerColors.tileInfo.surface,
-      };
-
-  /// The chip fill of [kind] — `PASTEL`.
-  static Color chipFor(DabblerColors colors, DabblerSharedKind kind) =>
-      switch (kind) {
-        DabblerSharedKind.game => DabblerColors.tileAccent.surface,
-        DabblerSharedKind.player => DabblerColors.tileInfo.surface,
-        DabblerSharedKind.venue => colors.surfaceCard,
-      };
+  final DabblerReactionDef def;
+  final bool on;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final Widget metaLines = meta.isEmpty
-        ? const SizedBox.shrink()
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              for (int i = 0; i < meta.length; i++)
-                Padding(
-                  padding: EdgeInsets.only(top: i == 0 ? 0 : DabblerSpacing.space2),
-                  child: Row(
-                    children: <Widget>[
-                      DabblerIcon(
-                        meta[i].icon,
-                        weight: DabblerIconWeight.bold,
-                        size: 14,
-                        color: colors.brandPrimary,
-                      ),
-                      const SizedBox(width: DabblerSpacing.space2),
-                      Expanded(
-                        child: Text(
-                          meta[i].text,
-                          style: _t(context, DabblerType.footnote)
-                              .copyWith(color: DabblerPalette.inkSoft),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          );
-    final Widget action = cta == null
-        ? const SizedBox.shrink()
-        : DabblerButton(
-            label: cta!,
-            size: DabblerButtonSize.small,
-            fullWidth: true,
-            onPressed: onPress,
-          );
-    final Widget chipRow = chips.isEmpty
-        ? const SizedBox.shrink()
-        : Wrap(
-            spacing: DabblerSpacing.space2,
-            runSpacing: DabblerSpacing.space2,
-            children: <Widget>[
-              for (final String c in chips)
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: chipFor(colors, kind),
-                    borderRadius: DabblerRadius.pillAll,
-                  ),
-                  child: DabblerChip(label: c),
-                ),
-            ],
-          );
-    Widget gap(Widget w, bool show) => show
-        ? Padding(
-            padding: const EdgeInsets.only(top: DabblerSpacing.space3),
-            child: w,
-          )
-        : const SizedBox.shrink();
-
-    final Widget titles = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: _t(context, DabblerType.subheadline)
-              .copyWith(fontWeight: FontWeight.w700, color: colors.textPrimary),
-        ),
-        if (subtitle != null)
-          Text(
-            subtitle!,
-            style: _t(context, DabblerType.caption1)
-                .copyWith(color: colors.textSecondary),
-          ),
-      ],
-    );
-
-    final Widget inner = switch (kind) {
-      DabblerSharedKind.player => Padding(
-          padding: const EdgeInsets.all(DabblerSpacing.space4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  DabblerAvatar(seed: seed ?? title, size: DabblerAvatarSize.md),
-                  const SizedBox(width: DabblerSpacing.space4),
-                  Expanded(child: titles),
-                ],
-              ),
-              gap(chipRow, chips.isNotEmpty),
-              gap(metaLines, meta.isNotEmpty),
-              gap(action, cta != null),
-            ],
-          ),
-        ),
-      DabblerSharedKind.venue => Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(height: photoHeight, child: photo ?? const SizedBox.shrink()),
-            Padding(
-              padding: const EdgeInsets.all(DabblerSpacing.space4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  titles,
-                  gap(chipRow, chips.isNotEmpty),
-                  gap(metaLines, meta.isNotEmpty),
-                  gap(action, cta != null),
-                ],
-              ),
-            ),
-          ],
-        ),
-      DabblerSharedKind.game => Padding(
-          padding: const EdgeInsets.all(DabblerSpacing.space4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  DabblerIconTile(
-                    DabblerSportIcon(
-                      sport ?? DabblerSport.football,
-                      weight: DabblerIconWeight.bold,
-                      size: 20,
-                      color: colors.brandPrimary,
-                    ),
-                    size: 36,
-                  ),
-                  const SizedBox(width: DabblerSpacing.space3),
-                  Expanded(child: titles),
-                  if (status != null) ...<Widget>[
-                    const SizedBox(width: DabblerSpacing.space3),
-                    DabblerBadge(
-                      label: statusLabel ?? status!.label,
-                      status: status!.tone == null
-                          ? DabblerBadge.neutralStatusOf(colors)
-                          : colors.status(status!.tone!),
-                    ),
-                  ],
-                ],
-              ),
-              gap(metaLines, meta.isNotEmpty),
-              gap(
-                Text(
-                  footnote ?? '',
-                  style: _t(context, DabblerType.caption1)
-                      .copyWith(color: colors.textSecondary),
-                ),
-                footnote != null,
-              ),
-              gap(action, cta != null),
-            ],
-          ),
-        ),
-    };
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: surfaceFor(colors, kind),
-        borderRadius: DabblerRadius.lgAll,
-        border: Border.all(
-          color: colors.borderDefault,
-          width: DabblerSizing.borderDefault,
+    return DabblerMessagingTap(
+      onTap: onTap,
+      label: def.label,
+      selected: on,
+      ringRadius: DabblerRadius.pillAll,
+      child: Container(
+        width: DabblerSizing.touchTargetMin,
+        height: DabblerSizing.touchTargetMin,
+        alignment: Alignment.center,
+        decoration: on
+            ? BoxDecoration(shape: BoxShape.circle, color: colors.brandPrimary)
+            : null,
+        child: DabblerIcon(
+          def.icon,
+          weight: on ? DabblerIconWeight.bold : DabblerIconWeight.linear,
+          size: DabblerReactionPicker.glyphSize,
+          color: on ? colors.onBrand : colors.textSecondary,
         ),
       ),
-      child: ClipRRect(borderRadius: DabblerRadius.lgAll, child: inner),
     );
   }
 }
@@ -717,8 +518,15 @@ enum DabblerNoticeTone {
 
 /// ConversationNotice — an important update inside a thread, a `Banner`.
 ///
-/// `ConversationNotice.jsx`: composes the banner (`critical` maps to `error`)
-/// with an optional centred caption timestamp beneath.
+/// Source: `components/messaging/ConversationNotice.jsx`.
+///
+/// | Source | Dart |
+/// |---|---|
+/// | `paddingInline: --space-2` | 6 each side |
+/// | column `gap: SPACING.metaGap` | [DabblerMessagingSpacing.metaGap] 3 |
+/// | `Banner tone={critical ? 'error' : tone}` | [bannerToneFor] |
+/// | `action={{label, onPress}}` only when `actionLabel` | [DabblerBannerAction] |
+/// | timestamp `.t-caption-1`, `--muted`, `alignSelf: center` | caption1, `textSecondary` (D-003(a)), centred |
 class DabblerConversationNotice extends StatelessWidget {
   /// A notice.
   const DabblerConversationNotice({
@@ -760,17 +568,19 @@ class DabblerConversationNotice extends StatelessWidget {
         DabblerNoticeTone.success => DabblerBannerTone.success,
         DabblerNoticeTone.warning => DabblerBannerTone.warning,
         DabblerNoticeTone.error ||
-        DabblerNoticeTone.critical =>
-          DabblerBannerTone.error,
+        DabblerNoticeTone.critical => DabblerBannerTone.error,
       };
 
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: DabblerSpacing.space2),
+      padding: const EdgeInsetsDirectional.symmetric(
+        horizontal: DabblerSpacing.space2,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           DabblerBanner(
             tone: bannerToneFor(tone),
@@ -783,10 +593,14 @@ class DabblerConversationNotice extends StatelessWidget {
           ),
           if (timestamp != null) ...<Widget>[
             const SizedBox(height: DabblerMessagingSpacing.metaGap),
-            Text(
-              timestamp!,
-              style: _t(context, DabblerType.caption1)
-                  .copyWith(color: colors.textSecondary),
+            Center(
+              child: Text(
+                timestamp!,
+                style: _t(
+                  context,
+                  DabblerType.caption1,
+                ).copyWith(color: colors.textSecondary),
+              ),
             ),
           ],
         ],
