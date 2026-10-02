@@ -137,6 +137,8 @@ export 'src/navigation/tab_bar_gallery.dart';
 export 'src/navigation/top_bar.dart';
 export 'src/messaging/chat_composer.dart';
 export 'src/messaging/chat_composer_gallery.dart';
+export 'src/messaging/conversation_header.dart';
+export 'src/messaging/conversation_header_gallery.dart';
 export 'src/messaging/conversation_row.dart';
 export 'src/messaging/conversation_row_gallery.dart';
 export 'src/messaging/message.dart';
