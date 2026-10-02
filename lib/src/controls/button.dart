@@ -39,9 +39,7 @@ enum DabblerButtonTone {
   /// `--color-accent` fill, `--color-on-accent` label.
   secondary,
 
-  /// `--accent-indigo` fill, `--surface-card` label.
-  ///
-  /// **A known defect pending `DECISIONS.md` D-004** — see
+  /// `--accent-indigo` fill, `--surface-card` label — see
   /// [DabblerButton.accentFill].
   accent,
 
@@ -302,23 +300,15 @@ class DabblerButton extends StatefulWidget {
   /// black.
   static const double pressDarken = 0.12;
 
-  /// The fill for [DabblerButtonTone.accent].
+  /// The fill for [DabblerButtonTone.accent] — `--accent-indigo`, `#5C50E6`.
   ///
-  /// ## A KNOWN DEFECT pending `DECISIONS.md` D-004
-  ///
-  /// `Button.jsx:30` paints this tone `var(--accent-indigo)` (`#5C50E6`), a
-  /// token declared only in `fig-tokens.css` and never in `tokens/colors.css`.
-  /// `cxo` ruled (D-004) that the omission is real and is fixed in the CSS
-  /// first: the token gets declared, is transcribed to
-  /// `DabblerPalette.accentIndigo`, and only then does this call site change.
-  /// Until that sequence completes, `accent` resolves to
-  /// [DabblerPalette.socialInfo] (`--social-info`, `#6366F1`), the nearest
-  /// declared indigo — the same stand-in, for the same reason, as
-  /// [DabblerAvatar]'s `indigo` badge and [DabblerFab]'s `default` tone.
-  ///
-  /// **That stand-in is a defect, not a close-enough approximation.** Do not
-  /// treat this line as settled and do not copy the pattern.
-  static const Color accentFill = DabblerPalette.socialInfo;
+  /// `Button.jsx:30` paints this tone `var(--accent-indigo)`. It is
+  /// [DabblerPalette.accentIndigo], the same role [DabblerFab]'s `default` tone
+  /// and [DabblerAvatar]'s `indigo` badge use. White on it measures 5.61:1;
+  /// the former `--social-info` (`#6366F1`) stand-in measured 4.47:1 and failed
+  /// AA. The reference's `tokens/colors.css` still does not declare the token
+  /// (it is in `fig-tokens.css`) — a design-source gap, not a package one.
+  static const Color accentFill = DabblerPalette.accentIndigo;
 
   /// The fill for [tone], resolved against [colors].
   static Color backgroundFor(DabblerColors colors, DabblerButtonTone tone) =>

@@ -155,6 +155,60 @@ void main() {
     });
   });
 
+  group('tinted — the source\'s free `color` prop (IconTile.d.ts)', () {
+    testWidgets('fill is the colour at 10% and stroke at 28% over the card', (
+      WidgetTester tester,
+    ) async {
+      final DabblerColors colors = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      final Color tint = colors.success.base;
+      await tester.pumpWidget(
+        _host(DabblerIconTile.tinted(const SizedBox(), color: tint)),
+      );
+      final DabblerSurface box = _box(tester);
+      expect(box.fill, Color.alphaBlend(tint.withValues(alpha: 0.10), colors.surfaceCard));
+      expect(box.borderColor,
+          Color.alphaBlend(tint.withValues(alpha: 0.28), colors.surfaceCard));
+      expect(DabblerSurface.tintFillAlpha, 0.10);
+      expect(DabblerSurface.tintBorderAlpha, 0.28);
+      expect(box.borderWidth, isNull, reason: 'the variant\'s 1px hairline stays');
+      expect(box.radius, DabblerRadius.lg);
+    });
+
+    testWidgets('the glyph takes the tint', (WidgetTester tester) async {
+      final DabblerColors colors = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      final Color tint = colors.info.base;
+      await tester.pumpWidget(
+        _host(DabblerIconTile.tinted(const Icon(Icons.add), color: tint)),
+      );
+      expect(
+        IconTheme.of(tester.element(find.byIcon(Icons.add))).color,
+        tint,
+      );
+    });
+
+    testWidgets('enum tones are unchanged by the new constructor', (
+      WidgetTester tester,
+    ) async {
+      final DabblerColors colors = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      await tester.pumpWidget(
+        _host(const DabblerIconTile.named('game', tone: DabblerIconTileTone.amber)),
+      );
+      final DabblerSurface box = _box(tester);
+      expect(box.fill, DabblerIconTile.fillFor(colors, DabblerIconTileTone.amber));
+      expect(box.borderWidth, 0);
+      expect(box.borderColor, isNull);
+    });
+  });
+
   group('AC1 — the source\'s values', () {
     testWidgets('the tile is 45x45 — measurements.html:113', (
       WidgetTester tester,

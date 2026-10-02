@@ -19,8 +19,8 @@ enum DabblerTicketHeader {
   /// the active theme.
   brand,
 
-  /// `--accent-indigo` / `--neutral-white`. **The source default**, and a known
-  /// defect here — see [DabblerCardTicket.indigoFill].
+  /// `--accent-indigo` / `--neutral-white`. **The source default.** See
+  /// [DabblerCardTicket.indigoFill].
   indigo,
 
   /// `--tile-amber-surface` / `--tile-amber-ink`.
@@ -149,11 +149,10 @@ class DabblerTicketAction {
 /// inside the existing `media` slot, with no second card, no change to
 /// [DabblerCard] and no layout height consumed.
 ///
-/// ## `indigo` is a KNOWN DEFECT pending `DECISIONS.md` D-004
+/// ## `indigo` is `--accent-indigo`
 ///
-/// See [indigoFill]. The wording there is deliberately the same as
-/// `lib/src/surfaces/avatar.dart`'s, because it is the same defect at a third
-/// call site and all three move together.
+/// See [indigoFill]: [DabblerPalette.accentIndigo], the same role as
+/// [DabblerFab]'s `default` tone and [DabblerAvatar]'s `indigo` badge.
 class DabblerCardTicket extends StatelessWidget {
   /// A ticket card.
   const DabblerCardTicket({
@@ -200,7 +199,7 @@ class DabblerCardTicket extends StatelessWidget {
   final List<DabblerTicketAction> actions;
 
   /// The strip's colour. Defaults to [DabblerTicketHeader.indigo], the source's
-  /// own default — see [indigoFill] before relying on it.
+  /// own default — see [indigoFill].
   final DabblerTicketHeader header;
 
   /// Makes the whole card tappable — opening the booking.
@@ -295,37 +294,15 @@ class DabblerCardTicket extends StatelessWidget {
   /// The gap between dashes. See [dashLength].
   static const double dashGap = 2;
 
-  /// **A MEASURED, UNCLOSEABLE COLOUR DELTA — the missing `--accent-indigo`.**
+  /// The `indigo` header strip's fill — `--accent-indigo`, `#5C50E6`.
   ///
-  /// The rendered specimen paints this strip `rgb(92, 80, 230)` — `#5C50E6`,
-  /// read off `components/cards/cards.card.html` with `getComputedStyle`. That
-  /// is `--accent-indigo`, which `tokens/colors.css` never declares and which
-  /// [DabblerPalette] therefore has no entry for. This resolves instead to
-  /// [DabblerPalette.socialInfo] (`--social-info`, `#6366F1`), pending
-  /// `DECISIONS.md` D-004.
-  ///
-  /// ## Why the drawn value is NOT written here
-  ///
-  /// It was, briefly, and `test/tokens/dabbler_palette_test.dart` —
-  /// *"no `Color(0x...)` literal outside the palette files"* — correctly
-  /// rejected it. That gate is right and this file is not on its allowlist: a
-  /// colour reaching a pixel from anywhere but the palette is exactly the drift
-  /// it exists to stop, and routing around it would trade one defect for a
-  /// worse one.
-  ///
-  /// So the stand-in stays **and the token gap is reported**. This is the one
-  /// difference on this card that cannot be closed from `lib/src/cards/`: it
-  /// closes when `--accent-indigo` (`#5C50E6`) is declared in
-  /// `tokens/colors.css` and transcribed to `DabblerPalette.accentIndigo`,
-  /// which is `lib/src/tokens/`'s surface, not this one. Then this method
-  /// becomes `=> DabblerPalette.accentIndigo` and the delta is gone.
-  ///
-  /// Until then the strip is `#6366F1` where the design draws `#5C50E6` —
-  /// a ~6% hue shift on the largest flat colour area of the card, visible
-  /// side by side. Do not treat this line as settled, and do not copy it: the
-  /// same gap sits at `lib/src/surfaces/avatar.dart` and
-  /// `lib/src/controls/fab.dart` and all three move together.
-  static Color indigoFill(DabblerColors colors) => DabblerPalette.socialInfo;
+  /// `CardTicket.jsx` paints this strip `var(--accent-indigo)`, which the
+  /// rendered specimen resolves to `rgb(92, 80, 230)`. It is
+  /// [DabblerPalette.accentIndigo]. It was a `--social-info` (`#6366F1`)
+  /// stand-in while the palette had no indigo; the reference's own
+  /// `tokens/colors.css` still does not declare `--accent-indigo` (it lives in
+  /// `fig-tokens.css`), which is a design-source gap, not a package one.
+  static Color indigoFill(DabblerColors colors) => DabblerPalette.accentIndigo;
 
   /// The strip's fill for [header], resolved against [colors].
   static Color headerFillOf(

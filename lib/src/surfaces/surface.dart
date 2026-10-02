@@ -310,6 +310,28 @@ class DabblerSurface extends StatelessWidget {
   /// The source's default radius: `--radius-xl`, 18.
   static const double defaultRadius = DabblerRadius.xl;
 
+  /// The opacity of a free tint's fill — `IconTile.jsx`'s
+  /// `color-mix(in srgb, <color> 10%, white)`.
+  static const double tintFillAlpha = 0.10;
+
+  /// The opacity of a free tint's stroke — `IconTile.jsx`'s
+  /// `color-mix(in srgb, <color> 28%, white)`.
+  static const double tintBorderAlpha = 0.28;
+
+  /// The fill of a surface tinted with a caller-supplied [tint]: [tint] at
+  /// [tintFillAlpha] over [DabblerColors.surfaceCard] (the source mixes over
+  /// `white`, which is the card surface in light and keeps the tile on the
+  /// card in dark).
+  static Color tintedFillOf(DabblerColors colors, Color tint) =>
+      Color.alphaBlend(tint.withValues(alpha: tintFillAlpha), colors.surfaceCard);
+
+  /// The 1px stroke of a surface tinted with [tint]: [tint] at
+  /// [tintBorderAlpha] over [DabblerColors.surfaceCard].
+  static Color tintedBorderOf(DabblerColors colors, Color tint) => Color.alphaBlend(
+        tint.withValues(alpha: tintBorderAlpha),
+        colors.surfaceCard,
+      );
+
   /// The fill of [variant], resolved against [colors].
   ///
   /// Exposed so a component that cannot use a [DabblerSurface] directly — one

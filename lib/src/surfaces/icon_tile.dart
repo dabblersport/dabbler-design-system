@@ -119,6 +119,26 @@ class DabblerIconTile extends StatefulWidget {
     this.onTap,
     this.semanticLabel,
   }) : name = null,
+       color = null,
+       weight = DabblerIconWeight.linear;
+
+  /// A tile tinted with a free [color] — the source's `color` prop
+  /// (`IconTile.d.ts`: *"Tint (fill/stroke/icon). Default:
+  /// var(--color-brand-primary)"*). The fill, the stroke and the glyph all
+  /// take [color]: the fill is [color] at 10% and the stroke at 28% over the
+  /// card surface ([DabblerSurface.tintedFillOf] / [DabblerSurface.tintedBorderOf]).
+  ///
+  /// The [tone] enum and the token-only callers are unchanged; pass a role from
+  /// [DabblerColors] — a raw `Color(0x…)` is still refused by the palette gate.
+  const DabblerIconTile.tinted(
+    this.icon, {
+    super.key,
+    required Color this.color,
+    this.size,
+    this.onTap,
+    this.semanticLabel,
+  }) : name = null,
+       tone = DabblerIconTileTone.brand,
        weight = DabblerIconWeight.linear;
 
   /// A tile around the Iconsax glyph [name] — the common case, and the one the
@@ -135,13 +155,18 @@ class DabblerIconTile extends StatefulWidget {
     this.size,
     this.onTap,
     this.semanticLabel,
-  }) : icon = null;
+  }) : icon = null,
+       color = null;
 
   /// The glyph widget, when built with the default constructor.
   final Widget? icon;
 
   /// The kebab-case Iconsax name, when built with [DabblerIconTile.named].
   final String? name;
+
+  /// A caller-supplied tint, when built with [DabblerIconTile.tinted]; it
+  /// overrides [tone].
+  final Color? color;
 
   /// The weight of [name]. Ignored by the default constructor.
   final DabblerIconWeight weight;
@@ -228,7 +253,8 @@ class _DabblerIconTileState extends State<DabblerIconTile> {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final Color ink = DabblerIconTile.inkFor(colors, widget.tone);
+    final Color? tint = widget.color;
+    final Color ink = tint ?? DabblerIconTile.inkFor(colors, widget.tone);
     final double side = widget.size ?? DabblerSizing.touchTargetMin;
 
     final Widget glyph = widget.name != null
@@ -240,10 +266,17 @@ class _DabblerIconTileState extends State<DabblerIconTile> {
       radius: DabblerRadius.lg,
       // Null for the brand tone, which is what leaves DS-500's own step in
       // place; a decorative tone overrides both and drops the hairline.
-      fill: widget.tone == DabblerIconTileTone.brand
+      fill: tint != null
+          ? DabblerSurface.tintedFillOf(colors, tint)
+          : widget.tone == DabblerIconTileTone.brand
+              ? null
+              : DabblerIconTile.fillFor(colors, widget.tone),
+      borderColor: tint != null
+          ? DabblerSurface.tintedBorderOf(colors, tint)
+          : null,
+      borderWidth: tint != null || widget.tone == DabblerIconTileTone.brand
           ? null
-          : DabblerIconTile.fillFor(colors, widget.tone),
-      borderWidth: widget.tone == DabblerIconTileTone.brand ? null : 0,
+          : 0,
       width: side,
       height: side,
       center: true,

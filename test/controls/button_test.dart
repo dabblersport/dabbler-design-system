@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/controls/button_gallery.dart';
@@ -113,6 +114,30 @@ void main() {
           reason: 'legacy tone name `ghost` must not be ported');
       expect(source.contains('TONE_ALIASES'), isFalse);
       expect(source.contains('@Deprecated'), isFalse);
+    });
+
+    test('the accent tone is --accent-indigo (#5C50E6), not --social-info', () {
+      expect(DabblerButton.accentFill, DabblerPalette.accentIndigo);
+      expect(DabblerButton.accentFill, const Color(0xFF5C50E6));
+      expect(DabblerButton.accentFill, isNot(DabblerPalette.socialInfo));
+      // White on the fill must clear AA body contrast (5.61:1); the old
+      // --social-info stand-in measured 4.47:1 and did not.
+      double lum(Color c) {
+        double ch(double v) => v <= 0.03928
+            ? v / 12.92
+            : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+        return 0.2126 * ch(c.r) + 0.7152 * ch(c.g) + 0.0722 * ch(c.b);
+      }
+
+      double ratio(Color a, Color b) {
+        final double la = lum(a), lb = lum(b);
+        return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+      }
+
+      expect(ratio(DabblerPalette.paper, DabblerButton.accentFill),
+          greaterThanOrEqualTo(4.5));
+      expect(ratio(DabblerPalette.paper, DabblerPalette.socialInfo),
+          lessThan(4.5));
     });
 
     testWidgets('paints each tone from the source TONES map', (

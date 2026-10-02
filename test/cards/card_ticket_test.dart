@@ -151,13 +151,17 @@ void main() {
       );
     });
 
-    test('indigo is the D-004 stand-in, not --accent-indigo', () {
+    test('indigo is --accent-indigo (#5C50E6), not the --social-info stand-in',
+        () {
       final DabblerColors colors = _colors();
-      // The documented defect: --accent-indigo (#5C50E6) is not declared in
-      // tokens/colors.css, so --social-info stands in until D-004 lands it.
       expect(
         DabblerCardTicket.headerFillOf(DabblerTicketHeader.indigo, colors),
-        DabblerPalette.socialInfo,
+        DabblerPalette.accentIndigo,
+      );
+      expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
+      expect(
+        DabblerCardTicket.headerFillOf(DabblerTicketHeader.indigo, colors),
+        isNot(DabblerPalette.socialInfo),
       );
       expect(
         DabblerCardTicket.headerInkOf(DabblerTicketHeader.indigo, colors),
