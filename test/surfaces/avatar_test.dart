@@ -784,6 +784,39 @@ void main() {
       }
     });
   });
+
+  testWidgets('the +N glyphs are not covered by the last avatar, LTR and RTL', (
+    WidgetTester tester,
+  ) async {
+    for (final TextDirection d in TextDirection.values) {
+      await tester.pumpWidget(
+        _host(
+          const DabblerAvatarGroup(
+            people: <String>['Alen Rahman', 'Bushra Riaz', 'Carlos Alvarez'],
+            overflow: 42,
+          ),
+          textDirection: d,
+        ),
+      );
+      final Rect text = tester.getRect(find.text('+42'));
+      for (final Element e in find.byType(DabblerAvatar).evaluate()) {
+        // each avatar plus its 2px ring
+        final Rect a =
+            (e.renderObject! as RenderBox).localToGlobal(Offset.zero) &
+            (e.renderObject! as RenderBox).size;
+        expect(
+          text.overlaps(a.inflate(2)),
+          isFalse,
+          reason: '$d: the "+" glyph box must not sit under an avatar',
+        );
+      }
+      expect(
+        tester.widget<Text>(find.text('+42')).textDirection,
+        TextDirection.ltr,
+        reason: 'a RTL paragraph would draw "42+"',
+      );
+    }
+  });
 }
 
 /// Pairs a painter with its description so a failure names what differed.

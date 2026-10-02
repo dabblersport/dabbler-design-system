@@ -136,7 +136,7 @@ class DabblerChip extends StatefulWidget {
   /// `leadingIcon?: React.ReactNode` — *"Optional leading icon node (18px)"*.
   final Widget? leadingIcon;
 
-  /// `padding: '9px 15px'` (`Chip.jsx:31`), vertical component —
+  /// `padding: '9px 15px'` (`Chip.jsx:28`), vertical component —
   /// [DabblerSpacing.space3].
   static const double verticalPadding = DabblerSpacing.space3;
 
@@ -144,10 +144,10 @@ class DabblerChip extends StatefulWidget {
   static const double horizontalPadding = DabblerSpacing.space5;
 
   /// The gap between [leadingIcon] and [label] — `gap: var(--icon-gap)`
-  /// (`Chip.jsx:30`), which is [DabblerSpacing.iconGap] (6).
+  /// (`Chip.jsx:27`), which is [DabblerSpacing.iconGap] (6).
   static const double iconGap = DabblerSpacing.iconGap;
 
-  /// The corner: `radius="var(--radius-pill)"` (`Chip.jsx:24`), confirmed by
+  /// The corner: `radius="var(--radius-pill)"` (`Chip.jsx:18`), confirmed by
   /// `guidelines/measurements.html:76`, which lists `Chip` among the
   /// `--radius-pill` users.
   ///
@@ -160,7 +160,7 @@ class DabblerChip extends StatefulWidget {
   static const double radius = DabblerRadius.pill;
 
   /// The label's type step: `fontSize: 15, lineHeight: '20px', fontWeight: 500`
-  /// (`Chip.jsx:31-32`).
+  /// (`Chip.jsx:28-29`).
   ///
   /// That is [DabblerType.subheadline]'s metrics (15/20) at
   /// [DabblerType.medium] rather than its own Regular, so the step is reused
@@ -199,11 +199,12 @@ class DabblerChip extends StatefulWidget {
     DabblerColors colors,
     TextDirection direction, {
     required bool selected,
-  }) =>
-      labelStyle.resolveForDirection(direction).copyWith(
-            fontWeight: DabblerType.medium,
-            color: labelColorFor(colors, selected: selected),
-          );
+  }) => labelStyle
+      .resolveForDirection(direction)
+      .copyWith(
+        fontWeight: DabblerType.medium,
+        color: labelColorFor(colors, selected: selected),
+      );
 
   @override
   State<DabblerChip> createState() => _DabblerChipState();
@@ -244,8 +245,10 @@ class _DabblerChipState extends State<DabblerChip> {
             height: DabblerSizing.iconSm,
             child: IconTheme.merge(
               data: IconThemeData(
-                color: DabblerChip.iconColorFor(colors,
-                    selected: widget.selected),
+                color: DabblerChip.iconColorFor(
+                  colors,
+                  selected: widget.selected,
+                ),
                 size: DabblerSizing.iconSm,
               ),
               child: Center(child: widget.leadingIcon),
@@ -255,8 +258,11 @@ class _DabblerChipState extends State<DabblerChip> {
         ],
         Text(
           widget.label,
-          style: DabblerChip.labelStyleFor(colors, direction,
-              selected: widget.selected),
+          style: DabblerChip.labelStyleFor(
+            colors,
+            direction,
+            selected: widget.selected,
+          ),
           maxLines: 1,
           softWrap: false,
         ),
@@ -270,7 +276,7 @@ class _DabblerChipState extends State<DabblerChip> {
       radius: DabblerChip.radius,
       // The selected step is borderless, and the source keeps a *transparent*
       // border on it rather than dropping it (`borderColor: 'transparent'`,
-      // `Chip.jsx:26`). Keeping it transparent rather than absent is what makes
+      // `Chip.jsx:20`). Keeping it transparent rather than absent is what makes
       // the two states the same height: without this, selecting a chip would
       // shrink it by 2px and shift the whole rail.
       borderColor: widget.selected ? Colors.transparent : null,

@@ -10,8 +10,7 @@ const double hostWidth = 320;
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 Widget _host(
   Widget child, {
@@ -82,11 +81,9 @@ void main() {
           // MaterialApp cross-fades a ThemeData change through AnimatedTheme,
           // so one frame still carries the previous theme's colour.
           await tester.pumpAndSettle();
-          expect(
-            _ruleColors(tester),
-            <Color>[_colors(theme: theme, brightness: brightness).bgTertiary],
-            reason: '$theme/$brightness',
-          );
+          expect(_ruleColors(tester), <Color>[
+            _colors(theme: theme, brightness: brightness).bgTertiary,
+          ], reason: '$theme/$brightness');
         }
       }
     });
@@ -125,7 +122,7 @@ void main() {
         ),
       );
       expect(rule.width, DabblerSizing.borderDefault);
-      // Divider.jsx:25 — `min-height: var(--space-8)`.
+      // Divider.jsx:23 — `min-height: var(--space-8)`.
       expect(rule.height, DabblerSpacing.space8);
     });
 
@@ -220,8 +217,10 @@ void main() {
       WidgetTester tester,
     ) async {
       for (final TextDirection direction in TextDirection.values) {
-        final (double leading, double trailing) =
-            await insets(tester, direction);
+        final (double leading, double trailing) = await insets(
+          tester,
+          direction,
+        );
         expect(leading, DabblerSpacing.cardPadding, reason: '$direction');
         expect(trailing, DabblerSpacing.cardPadding, reason: '$direction');
       }
@@ -297,10 +296,7 @@ void main() {
         ),
         findsNothing,
       );
-      expect(
-        tester.getSemantics(find.text('or')).label,
-        'or',
-      );
+      expect(tester.getSemantics(find.text('or')).label, 'or');
     });
   });
 }

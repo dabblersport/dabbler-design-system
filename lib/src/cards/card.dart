@@ -127,6 +127,13 @@ enum DabblerCardVariant {
 /// therefore 16, as in the live project 4286affa-bf50-4ff6-9576-917f76a93ca1.
 /// (It was `--card-padding` — 18 — until this was compared against the live
 /// source; that alias still exists for surfaces that name it.)
+///
+/// **The two values differ on purpose.** `--card-padding` ([DabblerSpacing.cardPadding],
+/// 18, `tokens/spacing.css`) is the semantic alias on the base-3 grid for
+/// surfaces specified through tokens (panels, sheets, `DabblerSurface` users).
+/// Live `Card.jsx` hard-codes `padding = 16`, the value of every Figma card
+/// export it merges, and says "Figma wins on every value"; the card shell takes
+/// that value. A card that wants the token passes `padding:` explicitly.
 class DabblerCard extends StatelessWidget {
   /// A card on the [variant] shell.
   const DabblerCard({

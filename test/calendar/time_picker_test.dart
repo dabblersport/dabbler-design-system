@@ -13,7 +13,7 @@ import '_host.dart';
 void main() {
   group('DabblerTimeValues — the value arithmetic (AC2)', () {
     test('the hour column is 1..12 and the minute column is twelve steps', () {
-      // `TimePicker.jsx:80-81`.
+      // `TimePicker.jsx:77-78`.
       expect(DabblerTimeValues.hours.length, 12);
       expect(DabblerTimeValues.hours.first, 1);
       expect(DabblerTimeValues.hours.last, 12);
@@ -25,7 +25,7 @@ void main() {
     });
 
     test('the default is 7:00 AM', () {
-      // `TimePicker.jsx:88`.
+      // `TimePicker.jsx:86`.
       expect(
         DabblerTimeValues.defaultValue,
         const TimeOfDay(hour: 7, minute: 0),
@@ -37,7 +37,7 @@ void main() {
     });
 
     test('nearestMinute folds to the closest step', () {
-      // `TimePicker.jsx:93`.
+      // `TimePicker.jsx:91`.
       expect(DabblerTimeValues.nearestMinute(37, 5), 35);
       expect(DabblerTimeValues.nearestMinute(38, 5), 40);
       expect(DabblerTimeValues.nearestMinute(0, 5), 0);
@@ -117,7 +117,7 @@ void main() {
     testWidgets('the rulers carry 12 hours and 12 five-minute steps, tripled', (
       WidgetTester tester,
     ) async {
-      // `TimePicker.jsx:7` — `trackLen = n * 3` cells per ruler.
+      // `TimePicker.jsx:9` — `trackLen = n * 3` cells per ruler.
       await tester.pumpWidget(
         host(const DabblerTimePicker(), width: phoneWidth),
       );
@@ -144,7 +144,7 @@ void main() {
       String textAt(Key column, int i) => tester
           .widget<Text>(find.byKey(DabblerTimePicker.cellKey(column, i)))
           .data!;
-      // Zero-padded (`TimePicker.jsx:68` `padStart(2, '0')`).
+      // Zero-padded (`TimePicker.jsx:59` `padStart(2, '0')`).
       expect(textAt(DabblerTimePicker.hourColumnKey, 12), '01');
       expect(textAt(DabblerTimePicker.hourColumnKey, 23), '12');
       expect(textAt(DabblerTimePicker.minuteColumnKey, 12), '00');
@@ -154,11 +154,11 @@ void main() {
 
   group('DabblerTimePicker — the ruler against TimePicker.jsx', () {
     test('the transcribed constants equal the live values', () {
-      // Live `TimePicker.jsx`: height 64 (:56), pitch 46 (:3), ticks bottom 6 /
-      // height 14 / 1.5px (:58-62), numerals 24 / 18 (:66), opacity
-      // max(.2, 1 - dist*.3) (:62), window top/bottom 4, width pitch+14,
-      // radius 12, 2px (:73-74), pin bottom 8, 2x16 (:77), glide 200ms
-      // cubic-bezier(.2,.8,.2,1) (:14), card radius 18, gap 10, header 20.
+      // Live `TimePicker.jsx`: height 64 (:39), pitch 46 (:3), ticks bottom 6 /
+      // height 14 (:41), 1.5px (:44), numerals 24 / 18 (:57), opacity
+      // max(.2, 1 - dist*.3) (:50), window top/bottom 4, width pitch+14,
+      // radius 12, 2px (:65-66), pin bottom 8, 2x16 (:70), glide 200ms
+      // cubic-bezier(.2,.8,.2,1) (:16), card radius 18, gap 10, header 20.
       expect(DabblerTimePicker.rulerHeight, 64);
       expect(DabblerTimePicker.rulerPitch, 46);
       expect(DabblerTimePicker.tickBottom, 6);
@@ -404,7 +404,7 @@ void main() {
     testWidgets('dragging left by ~two pitches advances two hours', (
       WidgetTester tester,
     ) async {
-      // `TimePicker.jsx:25-27` — `shift = round(-dx / pitch)`.
+      // `TimePicker.jsx:26-27` — `shift = round(-dx / pitch)`.
       TimeOfDay? last;
       await tester.pumpWidget(stateful(onReport: (TimeOfDay t) => last = t));
       await dragBy(tester, find.byKey(DabblerTimePicker.hourColumnKey), -120);
@@ -649,7 +649,7 @@ void main() {
     testWidgets('the unselected meridiem is --muted (textSecondary, D-003a)', (
       WidgetTester tester,
     ) async {
-      // Live `TimePicker.jsx:112` — inactive segment colour `var(--muted)`.
+      // Live `TimePicker.jsx:104` — inactive segment colour `var(--muted)`.
       await tester.pumpWidget(
         host(const DabblerTimePicker(), width: phoneWidth),
       );

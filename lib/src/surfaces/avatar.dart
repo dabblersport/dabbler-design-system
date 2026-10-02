@@ -455,6 +455,16 @@ class _Badge extends StatelessWidget {
 /// painted behind each portrait: every box stays exactly 36px with a full 36px
 /// portrait, centres 26px apart, as in the source.
 ///
+/// ## The `+N` chip, and the one deliberate deviation
+///
+/// Live tucks the chip under the last avatar by the same `-10` margin and pads
+/// its label only `0 8px`, so in live the `+` falls under that avatar and its
+/// ring. Here the chip keeps the live `-10` overlap and `minWidth: 28` /
+/// `0 8px` for its *visible* part, is painted below the avatars (as live's
+/// z-order does), and is widened by 12px (overlap 10 + ring 2) at its leading
+/// edge so the label starts clear of the avatar in both directions. The label is
+/// forced left-to-right so `+42` is not drawn `42+` under RTL.
+///
 /// Laid out with [Stack] and [PositionedDirectional] rather than negative
 /// margins, so it mirrors under RTL — in Arabic the stack runs from the right
 /// and the first person stays on top.
@@ -566,7 +576,7 @@ class _OverflowChip extends StatelessWidget {
         text: labelFor(count),
         style: textStyleFor(context, DabblerColors.of(context)),
       ),
-      textDirection: Directionality.of(context),
+      textDirection: TextDirection.ltr,
       textScaler: MediaQuery.textScalerOf(context),
       maxLines: 1,
     )..layout();
@@ -633,6 +643,9 @@ class _OverflowChip extends StatelessWidget {
     ),
     child: Text(
       labelFor(count),
+      // `+N` is a Western-digit count: in an RTL paragraph the bidi algorithm
+      // would draw `N+`. Forced left-to-right in both directions.
+      textDirection: TextDirection.ltr,
       maxLines: 1,
       softWrap: false,
       overflow: TextOverflow.clip,

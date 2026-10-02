@@ -26,18 +26,18 @@ abstract final class DabblerTimeValues {
 
   /// The hour column, 1 … 12.
   ///
-  /// `TimePicker.jsx:80` — `Array.from({length: 12}, (_, i) => i + 1)`. There
+  /// `TimePicker.jsx:77` — `Array.from({length: 12}, (_, i) => i + 1)`. There
   /// is no `0` and no `24`; the source's hour column is 12-hour and the period
   /// is a separate control, which is also what [DabblerTimeFormat] parses and
   /// prints.
   static const List<int> hours = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-  /// `5` — `TimePicker.jsx:81` builds `i * 5`, twelve steps.
+  /// `5` — `TimePicker.jsx:78` builds `i * 5`, twelve steps.
   static const int defaultMinuteStep = 5;
 
   /// The default value: `7:00 AM`.
   ///
-  /// `TimePicker.jsx:88` — `hour = 7, minute = 0, period = 'AM'`.
+  /// `TimePicker.jsx:86` — `hour = 7, minute = 0, period = 'AM'`.
   static const TimeOfDay defaultValue = TimeOfDay(hour: 7, minute: 0);
 
   /// The minute column at [step] minutes — `0, step, 2·step …` below 60.
@@ -69,7 +69,7 @@ abstract final class DabblerTimeValues {
   /// The value of [step] column nearest [minute], never above it by more than
   /// half a step.
   ///
-  /// `TimePicker.jsx:93` — `MINUTE_STEPS.reduce(…)`, the nearest step, so a
+  /// `TimePicker.jsx:91` — `MINUTE_STEPS.reduce(…)`, the nearest step, so a
   /// `6:37` arriving from a typed field shows `35` under the window rather
   /// than nothing.
   static int nearestMinute(int minute, int step) {
@@ -105,16 +105,16 @@ abstract final class DabblerTimeValues {
 /// | Live (`TimePicker.jsx`) | Dart |
 /// |---|---|
 /// | card `--surface-card`, radius 18, padding 15, gap 10 (`:98`) | [cardRadius], [DabblerSpacing.space5], [cardGap] |
-/// | header `20 / 700` sans, gap 10 (`:99-101`) | [headerFontSize], [headerGap] |
-/// | meridiem pill, `1px --outline-card`, `4px 10px`, `12 / 700`, inactive `--muted` (`:104-112`) | [DabblerColors.textSecondary] for `--muted` (D-003(a)) |
-/// | `Ruler` height 64, pitch 46 (`:5`, `:56`) | [rulerHeight], [rulerPitch] |
-/// | tick strip bottom 6, height 14, `1.5px` ticks every `pitch / 4` (`:58-63`) | [tickBottom], [tickHeight], [tickWidth] |
-/// | numerals display face, 24 selected / 18 other, opacity `max(.2, 1 - dist * .3)` (`:66-70`) | [selectedFontSize], [otherFontSize], [minOpacity], [opacityStep] |
-/// | centre window: top/bottom 4, width `pitch + 14`, radius 12, `2px` brand, shadow `0 2px 8px rgba(0,0,0,.05)` (`:73-76`) | [windowInset], [windowExtra], [windowRadius], [windowBorder] |
-/// | pin: bottom 8, `2 x 16`, radius 1 (`:77-79`) | [pinBottom], [pinWidth], [pinHeight] |
-/// | track glide `200ms cubic-bezier(.2,.8,.2,1)` (`:14`) | [glide], [glideCurve] |
-/// | drag end: `shift = round(-dx / pitch)`, wraps modulo n (`:25-27`) | same |
-/// | hours `1..12`, minutes `i * 5` (`:80-81`), default `7 AM` (`:88`) | [DabblerTimeValues] |
+/// | header `20 / 700` sans, gap 10 (`:95-96`) | [headerFontSize], [headerGap] |
+/// | meridiem pill, `1px --outline-card`, `4px 10px`, `12 / 700`, inactive `--muted` (`:99-104`) | [DabblerColors.textSecondary] for `--muted` (D-003(a)) |
+/// | `Ruler` height 64, pitch 46 (`:3`, `:39`) | [rulerHeight], [rulerPitch] |
+/// | tick strip bottom 6, height 14, `1.5px` ticks every `pitch / 4` (`:41-44`) | [tickBottom], [tickHeight], [tickWidth] |
+/// | numerals display face, 24 selected / 18 other, opacity `max(.2, 1 - dist * .3)` (`:50-57`) | [selectedFontSize], [otherFontSize], [minOpacity], [opacityStep] |
+/// | centre window: top/bottom 4, width `pitch + 14`, radius 12, `2px` brand, shadow `0 2px 8px rgba(0,0,0,.05)` (`:65-68`) | [windowInset], [windowExtra], [windowRadius], [windowBorder] |
+/// | pin: bottom 8, `2 x 16`, radius 1 (`:70-72`) | [pinBottom], [pinWidth], [pinHeight] |
+/// | track glide `200ms cubic-bezier(.2,.8,.2,1)` (`:16`, `:43`) | [glide], [glideCurve] |
+/// | drag end: `shift = round(-dx / pitch)`, wraps modulo n (`:26-27`) | same |
+/// | hours `1..12`, minutes `i * 5` (`:77-78`), default `7 AM` (`:86`) | [DabblerTimeValues] |
 ///
 /// ## Additions beyond the source (accessibility)
 ///
@@ -132,6 +132,13 @@ abstract final class DabblerTimeValues {
 /// Values disabled by [minimum]/[maximum] are never committed (the source's
 /// `TimeField` `inBounds` guard, applied here where the value is chosen) and
 /// are skipped by the keys.
+///
+/// ## The pin runs into the numerals — and so does live
+///
+/// Live `TimePicker.jsx:70` puts the 2x16 pin at `bottom: 8` of the 64px box
+/// (y 40-56) while numerals are centred at y 32 (24px glyphs reach about y 44),
+/// so the pin overlaps the lower edge of the centred numeral. The port keeps
+/// that geometry; it is not a defect of the Dart port.
 ///
 /// ## Remaining documented deviations
 ///
@@ -160,73 +167,73 @@ class DabblerTimePicker extends StatefulWidget {
     this.periodLabel = defaultPeriodLabel,
   }) : assert(minuteStep > 0 && minuteStep <= 60, 'minuteStep must be 1..60');
 
-  /// `border-radius: 18` (`TimePicker.jsx:98`).
+  /// `border-radius: 18` (`TimePicker.jsx:94`).
   static const double cardRadius = DabblerCalendar.cardRadius;
 
-  /// `gap: 10` between the card's rows (`TimePicker.jsx:98`).
+  /// `gap: 10` between the card's rows (`TimePicker.jsx:94`).
   static const double cardGap = 10;
 
-  /// `gap: 10` between the value and the meridiem pill (`:99`).
+  /// `gap: 10` between the value and the meridiem pill (`:95`).
   static const double headerGap = 10;
 
   /// `fontSize: 20` of the header value (`:101`).
   static const double headerFontSize = 20;
 
-  /// `height: 64` of a ruler (`:56`).
+  /// `height: 64` of a ruler (`:39`).
   static const double rulerHeight = 64;
 
   /// `pitch = 46` — the width of one numeral cell (`:3`).
   static const double rulerPitch = 46;
 
-  /// Tick strip `bottom: 6` (`:58`).
+  /// Tick strip `bottom: 6` (`:41`).
   static const double tickBottom = 6;
 
-  /// Tick strip `height: 14` (`:58`).
+  /// Tick strip `height: 14` (`:41`).
   static const double tickHeight = 14;
 
-  /// Tick width `1.5px` (`:62`).
+  /// Tick width `1.5px` (`:44`).
   static const double tickWidth = 1.5;
 
-  /// Numeral size when centred (`:66`).
+  /// Numeral size when centred (`:57`).
   static const double selectedFontSize = 24;
 
-  /// Numeral size when not centred (`:66`).
+  /// Numeral size when not centred (`:57`).
   static const double otherFontSize = 18;
 
-  /// Opacity floor of a non-centre numeral (`:62`).
+  /// Opacity floor of a non-centre numeral (`:50`).
   static const double minOpacity = 0.2;
 
-  /// Opacity lost per cell of distance (`:62`).
+  /// Opacity lost per cell of distance (`:50`).
   static const double opacityStep = 0.3;
 
-  /// Window `top: 4; bottom: 4` (`:73`).
+  /// Window `top: 4; bottom: 4` (`:65`).
   static const double windowInset = 4;
 
-  /// Window width is `pitch + 14` (`:73`).
+  /// Window width is `pitch + 14` (`:65`).
   static const double windowExtra = 14;
 
-  /// Window `borderRadius: 12` (`:74`).
+  /// Window `borderRadius: 12` (`:66`).
   static const double windowRadius = 12;
 
-  /// Window `border: 2px solid brand` (`:74`).
+  /// Window `border: 2px solid brand` (`:66`).
   static const double windowBorder = 2;
 
-  /// Window shadow alpha, `rgba(0,0,0,0.05)` (`:75`).
+  /// Window shadow alpha, `rgba(0,0,0,0.05)` (`:67`).
   static const double windowShadowAlpha = 0.05;
 
-  /// Pin `bottom: 8` (`:77`).
+  /// Pin `bottom: 8` (`:70`).
   static const double pinBottom = 8;
 
-  /// Pin `width: 2` (`:77`).
+  /// Pin `width: 2` (`:70`).
   static const double pinWidth = 2;
 
-  /// Pin `height: 16` (`:77`).
+  /// Pin `height: 16` (`:70`).
   static const double pinHeight = 16;
 
-  /// Track transition `200ms` (`:14`).
+  /// Track transition `200ms` (`:16`, `:43`).
   static const Duration glide = Duration(milliseconds: 200);
 
-  /// Track transition `cubic-bezier(.2,.8,.2,1)` (`:14`).
+  /// Track transition `cubic-bezier(.2,.8,.2,1)` (`:16`, `:43`).
   static const Cubic glideCurve = Cubic(0.2, 0.8, 0.2, 1);
 
   /// The hour column's accessible name.
@@ -395,7 +402,7 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
           // `H:MM AM` is the product's own format in both scripts; under an RTL
           // paragraph the bidi algorithm would draw `PM 6:35`.
           textDirection: TextDirection.ltr,
-          // `fontSize: 20, fontWeight: 700`, sans (`TimePicker.jsx:101`);
+          // `fontSize: 20, fontWeight: 700`, sans (`TimePicker.jsx:96`);
           // Arabic size is Latin less 0.9.
           style: DabblerType.headline
               .resolveForDirection(direction)
@@ -479,13 +486,13 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
                 minHeight: DabblerSizing.touchTargetMin,
                 minWidth: DabblerSizing.touchTargetMin,
               ),
-              // `padding: '4px 10px'` (`TimePicker.jsx:107`).
+              // `padding: '4px 10px'` (`TimePicker.jsx:102`).
               padding: const EdgeInsetsDirectional.symmetric(horizontal: 10),
               alignment: Alignment.center,
               color: on ? colors.brandPrimary : null,
               child: Text(
                 label,
-                // `12 / 700`; inactive `--muted` (`:107-111`).
+                // `12 / 700`; inactive `--muted` (`:102-104`).
                 style: DabblerType.caption1
                     .resolveForDirection(direction)
                     .copyWith(
@@ -525,7 +532,7 @@ class _DabblerTimePickerState extends State<DabblerTimePicker> {
   }
 }
 
-/// The `Ruler` of `TimePicker.jsx:3-77`: a looping strip of numerals under a
+/// The `Ruler` of `TimePicker.jsx:3-75`: a looping strip of numerals under a
 /// fixed centre window, dragged horizontally.
 class _TimeRuler extends StatefulWidget {
   const _TimeRuler({
