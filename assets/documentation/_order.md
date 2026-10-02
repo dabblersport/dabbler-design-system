@@ -106,6 +106,8 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [ConversationContext](components/conversation-context.md) — the activity header pinned above a game conversation.
 - [MiniPlayer](components/mini-player.md) — the collapsed room player.
 - [SpeakerGrid](components/speaker-grid.md) — the room's speakers in three columns.
+- [MessageReplyReference](components/message-reply-reference.md) — the quoted message above a reply.
+- [SharedObjectCard](components/shared-object-card.md) — a game, venue or player shared in a thread.
 
 ### 3 · Identity and status — who or what a piece of content is
 
@@ -132,6 +134,7 @@ lot about the rest.
 - [CodeInput](components/code-input.md) — one-time-code and PIN entry.
 - [InputRow](components/input-row.md) — the settings-list row: leading slot, text, trailing slot.
 - [ChatComposer](components/chat-composer.md) — the message input, with attach, emoji, quick replies and send.
+- [ReactionPicker](components/reaction-picker.md) — the six reactions in one pill, to choose from.
 - [FieldShell](components/field-shell.md) — the internal chrome every text-entry field paints from.
 - [PickerFieldShell](components/picker-field-shell.md) — the internal chrome every
   typed-or-picked field paints from.
@@ -162,6 +165,8 @@ lot about the rest.
 ### 8 · Status and feedback — telling the user what happened
 
 - [Banner](components/banner.md) — a persistent, in-flow message about the screen it's on.
+- [ConversationNotice](components/conversation-notice.md) — a banner inside a message thread.
+- [ReactionGroup](components/reaction-group.md) — the reaction tallies under a message.
 - [Toast](components/toast.md) — a transient, queued notification that survives navigation.
 - [Spinner](components/spinner.md) — the system's only indeterminate loading indicator.
 - [ProgressBar](components/progress-bar.md) — progress with a known end, or a busy bar when there
