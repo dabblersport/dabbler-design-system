@@ -137,4 +137,27 @@ void main() {
       expect(f.lengthSync(), greaterThan(0));
     }
   });
+
+  testWidgets('action target clears the 45 floor (D-039)', (tester) async {
+    // Dabbler/dabbler-docs/DECISIONS.md:13014 (D-032) and :13611 (D-039).
+    await tester.pumpWidget(
+      partsHost(
+        DabblerConversationNotice(
+          tone: DabblerNoticeTone.warning,
+          title: 'Payment required',
+          actionLabel: 'Pay now',
+          onAction: () {},
+          onDismiss: () {},
+        ),
+      ),
+    );
+    expect(
+      tester.getSize(find.byKey(DabblerBanner.actionTargetKey)).height,
+      greaterThanOrEqualTo(45),
+    );
+    final Size dismiss =
+        tester.getSize(find.byKey(DabblerBanner.dismissTargetKey));
+    expect(dismiss.width, greaterThanOrEqualTo(45));
+    expect(dismiss.height, greaterThanOrEqualTo(45));
+  });
 }

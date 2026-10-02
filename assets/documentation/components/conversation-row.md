@@ -60,7 +60,7 @@ Fills and ink: primary ink for the title, secondary ink for preview, read timest
 
 ## Change log
 
-- Added from the live design project (`ConversationRow.jsx`). Deliberate deviations are listed in the class documentation: the preview is plain text, the unread badge keeps the Badge port's own inline padding, and the read and unread preview inks share the secondary text role under D-003(a).
+- Added from the live design project (`ConversationRow.jsx`). Deliberate deviations are listed in the class documentation: the preview is plain text, the unread badge now takes the live 6px inline padding and 24px minimum width, and the read and unread preview inks share the secondary text role under D-003(a).
 
 ## Source
 

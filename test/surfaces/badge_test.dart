@@ -355,6 +355,72 @@ void main() {
     });
   });
 
+  group('ruling cdispatch-5e71152a item 3 — info indigo and precedence', () {
+    testWidgets('decorative info is #5C50E6 under every theme category', (
+      WidgetTester tester,
+    ) async {
+      // Live `tokens/figma/fig-tokens.css:5` — `--accent-indigo:
+      // rgb(92,80,230)`; `Badge.jsx:24` info bg `var(--accent-indigo)`.
+      for (final DabblerTheme theme in DabblerTheme.values) {
+        await tester.pumpWidget(
+          _host(
+            const DabblerBadge(label: 'label', tone: DabblerBadgeTone.info),
+            theme: theme,
+          ),
+        );
+        await tester.pumpAndSettle(); // MaterialApp animates theme changes.
+        expect(
+          _decorationOf(tester).color,
+          const Color(0xFF5C50E6),
+          reason: '$theme',
+        );
+      }
+    });
+
+    test('decorativeIndigo ignores its colors argument', () {
+      final Set<Color> all = <Color>{
+        for (final DabblerTheme t in DabblerTheme.values)
+          for (final Brightness b in Brightness.values)
+            DabblerBadge.decorativeIndigo(_colors(theme: t, brightness: b)),
+      };
+      expect(all, <Color>{const Color(0xFF5C50E6)});
+    });
+
+    testWidgets('status wins over fill; fill wins over tone', (
+      WidgetTester tester,
+    ) async {
+      final DabblerColors colors = _colors();
+      final Color override = colors.success.base;
+      await tester.pumpWidget(
+        _host(
+          DabblerBadge(
+            label: 'label',
+            tone: DabblerBadgeTone.info,
+            status: colors.error,
+            fill: override,
+          ),
+        ),
+      );
+      expect(_decorationOf(tester).color, colors.error.surface);
+
+      await tester.pumpWidget(
+        _host(
+          DabblerBadge(
+            label: 'label',
+            tone: DabblerBadgeTone.info,
+            fill: override,
+          ),
+        ),
+      );
+      expect(_decorationOf(tester).color, override);
+      // The tone's ink still applies under a fill override.
+      expect(
+        _labelStyleOf(tester).color,
+        DabblerBadge.foregroundOf(DabblerBadgeTone.info, colors),
+      );
+    });
+  });
+
   group('live Badge.jsx pins', () {
     testWidgets('padding 4/10, pill, 11/700, line-height 1.5', (
       WidgetTester tester,

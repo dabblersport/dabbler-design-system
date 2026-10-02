@@ -56,10 +56,9 @@ class DabblerConversationState {
 /// | preview `t-footnote`, `dbl-clamp-1` | footnote, one line, ellipsis |
 /// | `--muted` and `--ink-soft` preview ink | both `textSecondary` (D-003(a)) |
 ///
-/// Deviations: the preview is a [String] (the source takes a ReactNode); the
-/// unread badge keeps [DabblerBadge]'s own 10px inline padding because the
-/// Badge port exposes no padding override (the source sets `space-2`, 6px,
-/// and `minWidth: 24`; the 24 floor is honoured). Under D-003(a) the read
+/// Deviations: the preview is a [String] (the source takes a ReactNode). The
+/// unread badge takes live's overrides (`ConversationRow.jsx:65-66`):
+/// `paddingInline` `space-2` (6) and `minWidth: 24`, count centred. Under D-003(a) the read
 /// (`--muted`) and unread (`--ink-soft`) preview inks resolve to the same
 /// `textSecondary` role.
 ///
@@ -284,16 +283,15 @@ class _DabblerConversationRowState extends State<DabblerConversationRow> {
         Expanded(child: previewBody),
         if (unread) ...<Widget>[
           const SizedBox(width: DabblerSpacing.space2),
-          ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: DabblerConversationRow.unreadMinWidth,
-            ),
-            child: DabblerBadge(
-              label: w.countLabel,
-              tone: w.muted
-                  ? DabblerBadgeTone.warning
-                  : DabblerBadgeTone.defaultTone,
-            ),
+          // Live `ConversationRow.jsx:65-66`: `minWidth: 24`,
+          // `justifyContent: center`, `paddingInline: var(--space-2)`.
+          DabblerBadge(
+            label: w.countLabel,
+            tone: w.muted
+                ? DabblerBadgeTone.warning
+                : DabblerBadgeTone.defaultTone,
+            minWidth: DabblerConversationRow.unreadMinWidth,
+            paddingInline: DabblerSpacing.space2,
           ),
         ],
       ],

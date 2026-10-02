@@ -482,4 +482,23 @@ void main() {
       }
     });
   });
+
+  testWidgets('RTL mirrors the title row: title on the right, status on the left',
+      (WidgetTester tester) async {
+    for (final TextDirection dir in TextDirection.values) {
+      await tester.pumpWidget(_host(_specimen(), direction: dir));
+      await tester.pumpAndSettle();
+      final Rect card = tester.getRect(find.byType(DabblerCard));
+      final Rect title = tester.getRect(find.text('Tuesday Padel Doubles'));
+      final Rect status = tester.getRect(find.text('Upcoming'));
+      if (dir == TextDirection.rtl) {
+        expect(title.center.dx, greaterThan(status.center.dx));
+        // bodyPadding's start inset (24) is measured from the right in RTL.
+        expect(card.right - title.right, closeTo(24, 0.6));
+      } else {
+        expect(title.center.dx, lessThan(status.center.dx));
+        expect(title.left - card.left, closeTo(24, 0.6));
+      }
+    }
+  });
 }

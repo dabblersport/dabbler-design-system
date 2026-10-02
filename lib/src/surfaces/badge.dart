@@ -45,8 +45,9 @@ enum DabblerBadgeTone {
   /// [defaultTone] (`Badge.jsx:21`). See the enum doc.
   error,
 
-  /// Indigo — `--accent-indigo` in the source. See
-  /// [DabblerBadge.decorativeIndigo] for why this is an approximation.
+  /// Indigo — `--accent-indigo` (`#5C50E6`, live
+  /// `tokens/figma/fig-tokens.css:5`), via [DabblerBadge.decorativeIndigo].
+  /// Theme-independent: identical under every [DabblerTheme].
   info,
 
   /// `--color-accent`, identical to [primary] in the source
@@ -154,6 +155,11 @@ class DabblerBadge extends StatelessWidget {
   final double? minWidth;
 
   /// Overrides the tone's fill for a decorative badge (not for [status]).
+  ///
+  /// Precedence (`build`, pinned by `test/surfaces/badge_test.dart`):
+  /// `status.surface` > [fill] > `backgroundOf(tone)`. When [status] is set
+  /// [fill] is ignored; when [fill] is set the [tone]'s fill is ignored but
+  /// its ink still applies.
   /// `CardPricing` uses it for the live trial pill's `--purple-700`.
   final Color? fill;
 

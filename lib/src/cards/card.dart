@@ -5,6 +5,7 @@ import '../interaction/press_scale.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
 
 /// The five shells the design source draws its nine content-specific cards on.
 ///
@@ -89,20 +90,21 @@ enum DabblerCardVariant {
 /// stretched to the card's width, so a variant that wants a row simply puts a
 /// [Row] in a slot; this component never imposes a flex direction on content.
 ///
-/// ## Flat, and the press tint that is not ported
+/// ## Flat, with the live press tint
 ///
 /// The chrome is a [DabblerSurface], so the whole flat ruling — opaque fill,
 /// 1px hairline, no shadow, no gradient, no blur — is inherited rather than
 /// restated, and there is no API here through which any of them could return.
 ///
-/// The source darkens the fill while pressed
-/// (`color-mix(in srgb, <bg> 94%, black)`). That is **not** ported. This
-/// package has a system-wide press affordance — [DabblerPressScale], whose own
-/// doc records the design source calling it *"the system's only press
-/// transform"* — and a second, card-only press language would contradict it.
-/// A tappable card therefore scales like every other pressable thing in the
-/// system. The tint is a web-era component-local behaviour that the interaction
-/// layer superseded; see [DabblerMotion.pressScale].
+/// A tappable card darkens its fill while pressed, as live `Card.jsx:37,43`
+/// does: `background: pressed ? color-mix(in srgb, <bg> 94%, black) : <bg>`,
+/// `transition: background 80ms ease`. [pressedFillOf] derives that from the
+/// card's resolved fill (each sRGB channel × 0.94 — exactly a 94% mix with
+/// black; no colour literal), animated over [DabblerMotion.fast] (80ms) with
+/// [DabblerMotion.easeOut], and dropped under reduced motion. The system
+/// press scale ([DabblerPressScale]) still applies on top. It was dropped for
+/// a while as "superseded by the press scale"; ruling cdispatch-5e71152a
+/// item 3 restored it because live proves the tint exists.
 ///
 /// ## Radius: 16 is the card corner, and it is a real step
 ///
@@ -247,6 +249,18 @@ class DabblerCard extends StatelessWidget {
     };
   }
 
+  /// The share of the fill kept while pressed — live `Card.jsx`
+  /// `color-mix(in srgb, <bg> 94%, black)`.
+  static const double pressedMix = 0.94;
+
+  /// [fill] mixed [pressedMix] with black, as live `Card.jsx` paints a
+  /// pressed tappable card. Alpha is kept.
+  static Color pressedFillOf(Color fill) => fill.withValues(
+    red: fill.r * pressedMix,
+    green: fill.g * pressedMix,
+    blue: fill.b * pressedMix,
+  );
+
   /// The fill of [variant], resolved against [colors].
   static Color fillOf(DabblerColors colors, DabblerCardVariant variant) {
     return switch (variant) {
@@ -296,19 +310,23 @@ class DabblerCard extends StatelessWidget {
       Radius.circular(resolvedRadius),
     );
 
-    final Widget surface = DabblerSurface(
+    final Color fill = fillOf(colors, variant);
+    final Widget? content = _content();
+    Widget surfaceWith(Color paint) => DabblerSurface(
       variant: surfaceVariantOf(variant),
-      fill: fillOf(colors, variant),
+      fill: paint,
       borderColor: borderOf(colors, variant),
       borderWidth: borderWidthOf(variant),
       radius: resolvedRadius,
       width: width,
       height: height,
       clipBehavior: clipBehavior,
-      child: _content(),
+      child: content,
     );
 
-    if (!_interactive) return surface;
+    if (!_interactive) return surfaceWith(fill);
+
+    final Widget surface = _CardPressTint(fill: fill, builder: surfaceWith);
 
     return Semantics(
       label: semanticLabel,
@@ -366,6 +384,47 @@ class DabblerCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[media!, body],
+    );
+  }
+}
+
+/// Tracks the pointer and paints [DabblerCard.pressedFillOf] while it is down,
+/// animated over [DabblerMotion.fast] like live `transition: background 80ms`.
+class _CardPressTint extends StatefulWidget {
+  const _CardPressTint({required this.fill, required this.builder});
+
+  final Color fill;
+  final Widget Function(Color fill) builder;
+
+  @override
+  State<_CardPressTint> createState() => _CardPressTintState();
+}
+
+class _CardPressTintState extends State<_CardPressTint> {
+  bool _pressed = false;
+
+  void _set(bool value) {
+    if (_pressed != value) setState(() => _pressed = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Color target = _pressed
+        ? DabblerCard.pressedFillOf(widget.fill)
+        : widget.fill;
+    return Listener(
+      onPointerDown: (_) => _set(true),
+      onPointerUp: (_) => _set(false),
+      onPointerCancel: (_) => _set(false),
+      child: TweenAnimationBuilder<Color?>(
+        tween: ColorTween(end: target),
+        duration: DabblerMotion.reduceMotion(context)
+            ? Duration.zero
+            : DabblerMotion.fast,
+        curve: DabblerMotion.easeOut,
+        builder: (BuildContext context, Color? value, Widget? _) =>
+            widget.builder(value ?? target),
+      ),
     );
   }
 }

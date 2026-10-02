@@ -54,9 +54,9 @@ two shells; read literally, `pricingSelected` is the one that's currently select
 the one slot drawn full-bleed to the card's own corner radius — a cover image or `CardTicket`'s
 coloured header strip both depend on reaching the edge.
 
-**Let a tappable card press with the system's shared scale; don't add a background-darkening
-press effect.** The design source's own web-era pressed-fill darkening isn't ported — this system
-has one press affordance for everything tappable, and a card-specific one would contradict it.
+**A tappable card darkens while pressed, as the live card does.** Its fill mixes 94% with black
+over 80ms (live `Card.jsx`), derived from the card's own resolved fill, and the system's shared
+press scale still applies on top. Don't add a second press effect of your own.
 
 ## Axes
 
@@ -71,7 +71,7 @@ Media (unpadded, full-bleed), header, child, footer — all padded, all optional
 the card's width.
 
 ### Interactivity
-Tappable (`onTap` set — gets the shared press scale and focus ring) or inert.
+Tappable (`onTap` set — gets the pressed-fill tint, the shared press scale and focus ring) or inert.
 
 @figure 2px lib/src/cards/card.dart#borderWidthOf
 @figure 2px lib/src/cards/card.dart#borderWidthOf
@@ -81,14 +81,16 @@ Tappable (`onTap` set — gets the shared press scale and focus ring) or inert.
 
 Fill and border vary by variant — see *Axes* — resolved through the shared colour set. Corner
 radius: 16 (a dedicated card-corner step, not the general 12px radius step used for a tile *inside*
-a card). Padding: 18 (`cardPadding`, not the Figma dump's literal 16 — the semantic spacing token is
-what a card is specified against).
+a card). Padding: 16, the live `Card.jsx` value, as a documented override. The `cardPadding` token (18)
+is deliberately left unchanged because the ticket card still uses it; the two differ on purpose.
 
 ## Change log
 
 - D-018 (cxo) — the card corner is 16, a dedicated step, not
   12; 12 remains the corner of a tile nested inside a card, which is a different thing measuring the
   same as an old, wrong assumption.
+- Ruling cdispatch-5e71152a — the live pressed-fill tint (94% with black, 80ms) is restored on
+  tappable cards; padding 16 retained as a documented override of the 18 token.
 - D-019 (cxo) — the pricing variant names, inverted from an
   earlier reading — `pricingSelected` draws the chosen plan, `pricingUnselected` every other one.
 

@@ -209,6 +209,82 @@ void main() {
     });
   });
 
+  group('retained brand tone pin (ruling cdispatch-5e71152a item 3)', () {
+    // Live `components/surfaces/IconTile.jsx`: fill color-mix(<color> 10%,
+    // white), border color-mix(<color> 28%, white), color default
+    // --color-brand-primary.
+    for (final DabblerTheme theme in <DabblerTheme>[
+      DabblerTheme.main,
+      DabblerTheme.sport,
+    ]) {
+      testWidgets('default fill 10% / stroke 28% of brand under $theme', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(const DabblerIconTile.named('game'), theme: theme),
+        );
+        final DabblerColors colors = DabblerColors.resolve(
+          theme: theme,
+          brightness: Brightness.light,
+        );
+        final DabblerSurface box = _box(tester);
+        expect(
+          box.fill,
+          Color.alphaBlend(
+            colors.brandPrimary.withValues(alpha: 0.10),
+            colors.surfaceCard,
+          ),
+        );
+        expect(
+          box.borderColor,
+          Color.alphaBlend(
+            colors.brandPrimary.withValues(alpha: 0.28),
+            colors.surfaceCard,
+          ),
+        );
+      });
+    }
+
+    testWidgets('the two categories really differ (not a constant)', (
+      WidgetTester tester,
+    ) async {
+      final List<Color?> fills = <Color?>[];
+      for (final DabblerTheme theme in <DabblerTheme>[
+        DabblerTheme.main,
+        DabblerTheme.sport,
+      ]) {
+        await tester.pumpWidget(
+          _host(const DabblerIconTile.named('game'), theme: theme),
+        );
+        fills.add(_box(tester).fill);
+      }
+      expect(fills[0], isNot(fills[1]));
+    });
+
+    testWidgets('an explicit tint wins over the default brand tone', (
+      WidgetTester tester,
+    ) async {
+      final DabblerColors colors = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      final Color tint = colors.success.base;
+      await tester.pumpWidget(
+        _host(DabblerIconTile.tinted(const Icon(Icons.add), color: tint)),
+      );
+      final DabblerSurface box = _box(tester);
+      expect(box.fill, DabblerSurface.tintedFillOf(colors, tint));
+      expect(box.fill, isNot(DabblerSurface.tintedFillOf(colors, colors.brandPrimary)));
+      expect(box.borderColor, DabblerSurface.tintedBorderOf(colors, tint));
+      expect(IconTheme.of(tester.element(find.byIcon(Icons.add))).color, tint);
+      // `.tinted` fixes `tone` to brand; the colour is what is painted.
+      expect(
+        tester.widget<DabblerIconTile>(find.byType(DabblerIconTile)).tone,
+        DabblerIconTileTone.brand,
+      );
+    });
+  });
+
   group('AC1 — the source\'s values', () {
     testWidgets('the tile is 45x45 — measurements.html:113', (
       WidgetTester tester,

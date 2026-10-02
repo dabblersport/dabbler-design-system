@@ -89,17 +89,19 @@ enum DabblerIconTileTone {
 /// [DabblerSurface]'s own default radius is `--radius-xl` (18), so the tile
 /// passes [DabblerRadius.lg] explicitly rather than inheriting it.
 ///
-/// ## Where the port differs from the JSX, and why
+/// ## The brand tone follows live (retained, ruling cdispatch-5e71152a item 3)
 ///
-/// The JSX mixes its fill at **10%** of the tint and its stroke at **28%**.
-/// This port takes the brand tone from [DabblerSurfaceVariant.brandTint]
-/// instead, which is `--glass-icon-tile-fill` / `--glass-icon-tile-stroke` at
-/// their post-FLAT token values (8% in light, 22% in dark, over the card
-/// hairline). The token is the later, authoritative statement of the same
-/// intent — `tokens/glass.css` re-declared these three values when the retired
-/// Liquid Glass layer was flattened, while the component kept its inline
-/// `color-mix` from before — and DS-500 already ported it. Re-deriving 10/28
-/// here would fork the tint and break the one guarantee AC1 asks for.
+/// Live `IconTile.jsx` mixes its fill at **10%** of the tint and its stroke at
+/// **28%** (`color-mix(in srgb, <color> 10% | 28%, white)`), `color`
+/// defaulting to `--color-brand-primary`. The brand tone does exactly that
+/// with the active theme's [DabblerColors.brandPrimary] (it previously used
+/// DS-500's `brandTint` step, 8% over the bare card hairline). A
+/// [DabblerIconTile.tinted] `color` wins over the default brand tone. Pinned
+/// by `test/surfaces/icon_tile_test.dart` under two theme categories.
+///
+/// Outside call sites (grep, 2026-10-02):
+/// `lib/src/messaging/conversation_context_header.dart:41-42` (default and
+/// `.tinted`, size 36) and `lib/src/messaging/messaging_shared_object_card.dart:216`.
 ///
 /// The decorative tones are flat fills with **no** hairline: `--tile-*-surface`
 /// is an opaque decorative colour, not a tint over the card, and the source

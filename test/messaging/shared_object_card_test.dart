@@ -251,4 +251,25 @@ void main() {
       }
     }
   });
+
+  testWidgets('CTA hit box clears the 45 floor (D-039)', (tester) async {
+    // Dabbler/dabbler-docs/DECISIONS.md:13014 (D-032) and :13611 (D-039):
+    // the hit box is not the painted mark; every target clears 45.
+    int taps = 0;
+    await tester.pumpWidget(
+      partsHost(
+        DabblerSharedObjectCard(
+          title: 'Friday 5-a-side',
+          cta: 'View game',
+          onPress: () => taps++,
+        ),
+        width: 268,
+      ),
+    );
+    final Size s = tester.getSize(find.byType(DabblerButton));
+    expect(s.height, greaterThanOrEqualTo(45));
+    expect(s.width, greaterThanOrEqualTo(45));
+    await tester.tap(find.byType(DabblerButton));
+    expect(taps, 1);
+  });
 }
