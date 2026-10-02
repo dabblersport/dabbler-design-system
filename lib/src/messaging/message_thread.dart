@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../tokens/dabbler_colors.dart';
@@ -33,7 +34,27 @@ class DabblerThreadMessage extends DabblerThreadItem {
     this.deliveryState,
     this.reactions = const <DabblerMessageReaction>[],
     this.state = DabblerMessageState.normal,
+    this.editedLabel = 'edited',
+    this.showSender,
+    this.showAvatar,
+    this.onRetry,
+    this.retryLabel = 'Retry',
   });
+
+  /// The `edited` text.
+  final String editedLabel;
+
+  /// Overrides the automatic sender-name rule.
+  final bool? showSender;
+
+  /// Overrides the automatic avatar rule.
+  final bool? showAvatar;
+
+  /// Retry for a failed message (the source forwards every item field).
+  final VoidCallback? onRetry;
+
+  /// The retry text.
+  final String retryLabel;
 
   /// A stable id, compared with the thread's `selectedId`.
   final String? id;
@@ -176,6 +197,26 @@ enum DabblerThreadAnchor {
 /// the thread derives each message's [DabblerGroupPosition], owns the rhythm
 /// (12 between groups, 3 inside one) and the scroll anchoring. A pinned
 /// [header] (the source's `children`) scrolls with the content.
+///
+/// Source: live Claude Design project 4286affa-bf50-4ff6-9576-917f76a93ca1
+/// (Dabbler Design System), files `components/messaging/MessageThread.jsx`
+/// and `MessageThread.prompt.md`, read via DesignSync get_file on 2026-10-02
+/// and transcribed to a local mirror by the coordinator.
+///
+/// | Source | Dart |
+/// |---|---|
+/// | `items` (`kind` omitted, `date`, `unread`, `system`, `notice`, `typing`) | [DabblerThreadItem] subclasses |
+/// | `children` pinned above the rows | [header] |
+/// | `gap: groupGap` (12), message `marginBlockStart: messageGap - groupGap` | 12 above each row, 3 above a non-leading message |
+/// | `paddingInline`/`paddingBlock` 12 | [DabblerMessagingSpacing.timelineInline] / [DabblerMessagingSpacing.timelineBlock] |
+/// | same `direction` and `sender` as a neighbouring message groups | [groupPositionFor] |
+/// | `scrollTop = scrollHeight` / `offsetTop - 72` on `[anchor, items.length]` | jump to the end / [unreadAnchorInset] |
+/// | `.dbl-noscroll`, `scrollbarWidth: none` | `ScrollConfiguration(scrollbars: false)` |
+/// | typing row: start inset 28+6, incoming-shaped bubble, `t-caption-2` `--muted` label | same, label in `textSecondary` (D-003(a)) |
+/// | `selectedId === it.id` → `selected` | [selectedId] |
+///
+/// `unread.offsetTop` is read as the divider's offset within the scrolled
+/// content (timeline padding included).
 class DabblerMessageThread extends StatefulWidget {
   /// A thread.
   const DabblerMessageThread({
@@ -209,6 +250,10 @@ class DabblerMessageThread extends StatefulWidget {
 
   /// Called with the message and the reaction key.
   final void Function(DabblerThreadMessage message, String key)? onReact;
+
+  /// How far above the unread divider the `unread` anchor rests — the
+  /// source's `offsetTop - 72`.
+  static const double unreadAnchorInset = 72;
 
   /// The group position of the message at [index].
   static DabblerGroupPosition groupPositionFor(
@@ -256,8 +301,19 @@ class _DabblerMessageThreadState extends State<DabblerMessageThread> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scroll.hasClients) return;
       final BuildContext? u = _unreadKey.currentContext;
-      if (widget.anchor == DabblerThreadAnchor.unread && u != null) {
-        Scrollable.ensureVisible(u, alignment: 0.1);
+      final ScrollPosition pos = _scroll.position;
+      final RenderObject? r = u?.findRenderObject();
+      if (widget.anchor == DabblerThreadAnchor.unread && r != null) {
+        // `scrollTop = max(0, unread.offsetTop - 72)`.
+        final double top = RenderAbstractViewport.of(
+          r,
+        ).getOffsetToReveal(r, 0).offset;
+        _scroll.jumpTo(
+          (top - DabblerMessageThread.unreadAnchorInset).clamp(
+            0,
+            pos.maxScrollExtent,
+          ),
+        );
       } else {
         _scroll.jumpTo(_scroll.position.maxScrollExtent);
       }
@@ -301,7 +357,8 @@ class _DabblerMessageThreadState extends State<DabblerMessageThread> {
       case DabblerThreadTyping():
         return Padding(
           padding: const EdgeInsetsDirectional.only(
-            start: DabblerMessagingSpacing.avatarGutter +
+            start:
+                DabblerMessagingSpacing.avatarGutter +
                 DabblerMessagingSpacing.avatarGap,
           ),
           child: Row(
@@ -325,7 +382,10 @@ class _DabblerMessageThreadState extends State<DabblerMessageThread> {
                     vertical: DabblerMessagingSpacing.bubbleBlock,
                     horizontal: DabblerMessagingSpacing.bubbleInline,
                   ),
-                  child: DabblerTypingIndicator(names: it.names, dotsOnly: true),
+                  child: DabblerTypingIndicator(
+                    names: it.names,
+                    dotsOnly: true,
+                  ),
                 ),
               ),
               if (it.label != null) ...<Widget>[
@@ -354,6 +414,11 @@ class _DabblerMessageThreadState extends State<DabblerMessageThread> {
           reply: it.reply,
           timestamp: it.timestamp,
           edited: it.edited,
+          editedLabel: it.editedLabel,
+          showSender: it.showSender,
+          showAvatar: it.showAvatar,
+          onRetry: it.onRetry,
+          retryLabel: it.retryLabel,
           deliveryState: it.deliveryState,
           reactions: it.reactions,
           state: selected ? DabblerMessageState.selected : it.state,
@@ -372,8 +437,10 @@ class _DabblerMessageThreadState extends State<DabblerMessageThread> {
     if (i == 0 && widget.header == null) return 0;
     final DabblerThreadItem it = widget.items[i];
     if (it is DabblerThreadMessage) {
-      final DabblerGroupPosition p =
-          DabblerMessageThread.groupPositionFor(widget.items, i);
+      final DabblerGroupPosition p = DabblerMessageThread.groupPositionFor(
+        widget.items,
+        i,
+      );
       if (!DabblerMessage.leads(p)) return DabblerMessagingSpacing.messageGap;
     }
     return DabblerMessagingSpacing.groupGap;
@@ -381,22 +448,26 @@ class _DabblerMessageThreadState extends State<DabblerMessageThread> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      controller: _scroll,
-      padding: const EdgeInsets.symmetric(
-        horizontal: DabblerMessagingSpacing.timelineInline,
-        vertical: DabblerMessagingSpacing.timelineBlock,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          if (widget.header != null) widget.header!,
-          for (int i = 0; i < widget.items.length; i++)
-            Padding(
-              padding: EdgeInsets.only(top: _gapAbove(i)),
-              child: _row(context, i),
-            ),
-        ],
+    // `.dbl-noscroll` / `scrollbarWidth: none`: native scroll, no bar.
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: SingleChildScrollView(
+        controller: _scroll,
+        padding: const EdgeInsets.symmetric(
+          horizontal: DabblerMessagingSpacing.timelineInline,
+          vertical: DabblerMessagingSpacing.timelineBlock,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (widget.header != null) widget.header!,
+            for (int i = 0; i < widget.items.length; i++)
+              Padding(
+                padding: EdgeInsets.only(top: _gapAbove(i)),
+                child: _row(context, i),
+              ),
+          ],
+        ),
       ),
     );
   }

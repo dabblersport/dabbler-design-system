@@ -97,6 +97,9 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [PanelCard](components/panel-card.md) — the framed panel with a header, an inset body and a footer.
 - [ChecklistPanel](components/checklist-panel.md) — the task rows inside a panel.
 - [MemberListPanel](components/member-list-panel.md) — people rows with an add or remove button.
+- [Message](components/message.md) — one message bubble for every ownership, context, content and delivery case.
+- [MessageThread](components/message-thread.md) — the conversation timeline: grouping, rhythm and scroll anchoring.
+- [Messaging foundations](components/messaging-foundations.md) — the chat rhythm and the four semantic maps every messaging component reads.
 - [MutualsCard](components/mutuals-card.md) — avatars beside a line of context.
 - [CardPoll](components/card-poll.md) — a poll result with bars and a vote count.
 - [CardRoom](components/card-room.md) — a room with its participant avatars.

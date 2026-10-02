@@ -4,6 +4,7 @@ import '../foundations/icon.dart';
 import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 import 'messaging_foundations.dart';
 import 'messaging_parts.dart';
@@ -58,7 +59,11 @@ enum DabblerMessageState {
 @immutable
 class DabblerReplySpec {
   /// A reply spec.
-  const DabblerReplySpec({this.sender = '', this.content, this.attachmentLabel});
+  const DabblerReplySpec({
+    this.sender = '',
+    this.content,
+    this.attachmentLabel,
+  });
 
   /// Who wrote the quoted message.
   final String sender;
@@ -74,13 +79,12 @@ class DabblerReplySpec {
 @immutable
 class DabblerMessageAttachment {
   /// An image, supplied by the caller and drawn 232x156 with a 12px corner.
-  const DabblerMessageAttachment.image({required this.child})
-      : isImage = true;
+  const DabblerMessageAttachment.image({required this.child}) : isImage = true;
 
   /// A shared game, venue or player.
   const DabblerMessageAttachment.object(DabblerSharedObjectCard card)
-      : child = card,
-        isImage = false;
+    : child = card,
+      isImage = false;
 
   /// The attachment's widget.
   final Widget child;
@@ -104,6 +108,35 @@ class DabblerMessageAttachment {
 ///
 /// Delivery metadata is outgoing-only, and in `group` context only `sending`
 /// and `failed` surface.
+///
+/// Source: live Claude Design project 4286affa-bf50-4ff6-9576-917f76a93ca1
+/// (Dabbler Design System), files `components/messaging/Message.jsx` and
+/// `Message.prompt.md`, read via DesignSync get_file on 2026-10-02 and
+/// transcribed to a local mirror by the coordinator.
+///
+/// | Source | Dart |
+/// |---|---|
+/// | bubble `padding: 9px 12px` (`bubbleBlock`/`bubbleInline`) | [DabblerMessagingSpacing.bubbleBlock] / [DabblerMessagingSpacing.bubbleInline] |
+/// | bare attachment `padding: var(--space-1)`, transparent, no border | `EdgeInsets.all(3)`, no fill, no border |
+/// | column `maxWidth: '76%'` of the row / `288` bare | [maxWidthFraction] of the full row width / [bareMaxWidth] |
+/// | `--radius-xl` free corners, `--radius-sm` own block-end tail, own block-start `sm` when not leading | [radiusFor] (logical corners) |
+/// | avatar column `28px`, gap `--space-2` | [DabblerMessagingSpacing.avatarGutter] / [DabblerMessagingSpacing.avatarGap] |
+/// | column `gap: --space-1` (sender, bubble, reactions, meta) | 3px before each following child |
+/// | bubble `gap: --space-2` (reply, attachment, content) | [DabblerMessagingSpacing.replyGap] |
+/// | image slot 232x156, `--radius-lg`; shared object 268 wide | [imageSize], [DabblerRadius.lgAll]; [objectWidth] |
+/// | `opacity: 0.7` while sending, `--motion-base` | [sendingOpacity], `AnimatedOpacity` over [DabblerMotion.base] |
+/// | `outline: 2px solid brand`, offset 2 | [selectedOutline] at [selectedOutlineOffset], painted outside layout |
+/// | `scale(--press-scale)` while held, only with `onPress` and not readOnly | [DabblerMessagingTap] |
+/// | meta `t-caption-1`, `--muted`, failure `--color-status-error-strong` | `DabblerType.caption1`, `textSecondary` (D-003(a)), `error.strong` |
+/// | delivery glyph size 14, tone per `DELIVERY` | [deliveryGlyph], [DabblerDeliveryState.colorFor] |
+/// | Retry button, weight 700, `--touch-target-min` | [retryKey] target, 45 min height |
+///
+/// Deviation: the source's Retry button pulls itself into the metadata line
+/// with negative margins (`marginInline: -9px`, `marginBlock: -(45-16)/2`), so
+/// its 45px target overlaps neighbours without growing the line. Flutter has
+/// no negative margin and cannot hit-test outside a box's layout, so the
+/// visual inline position is kept (3px gap, no inline padding) and the line
+/// grows to the 45px target height when Retry shows.
 class DabblerMessage extends StatelessWidget {
   /// A message.
   const DabblerMessage({
@@ -206,6 +239,25 @@ class DabblerMessage extends StatelessWidget {
   /// The selected outline — `2px`.
   static const double selectedOutline = 2;
 
+  /// The selected outline's offset — `var(--focus-ring-offset, 2px)`.
+  static const double selectedOutlineOffset = 2;
+
+  /// Identifies the selected outline's box (for tests and tooling).
+  static const Key selectedOutlineKey = ValueKey<String>('message-selected');
+
+  /// Identifies the retry target.
+  static const Key retryKey = ValueKey<String>('message-retry');
+
+  static BorderRadiusDirectional _grow(BorderRadiusDirectional r, double by) {
+    Radius g(Radius x) => Radius.circular(x.x + by);
+    return BorderRadiusDirectional.only(
+      topStart: g(r.topStart),
+      topEnd: g(r.topEnd),
+      bottomStart: g(r.bottomStart),
+      bottomEnd: g(r.bottomEnd),
+    );
+  }
+
   /// The delivery glyph — `size={14}`.
   static const double deliveryGlyph = 14;
 
@@ -257,56 +309,61 @@ class DabblerMessage extends StatelessWidget {
     final bool failed = deliveryState == DabblerDeliveryState.failed;
     final bool selected = state == DabblerMessageState.selected;
     final bool readOnly = state == DabblerMessageState.readOnly;
-    final bool bare = attachment != null && (content == null || content!.isEmpty);
+    final bool bare =
+        attachment != null && (content == null || content!.isEmpty);
     final bool interactive = onPress != null && !readOnly;
     final Color ink = out ? colors.onBrand : colors.textPrimary;
 
-    final Widget bubbleBody = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        if (reply != null)
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: (attachment != null || (content?.isNotEmpty ?? false))
-                  ? DabblerMessagingSpacing.replyGap
-                  : 0,
+    // The source bubble is a flex column with the default `align-items:
+    // stretch`, so the reply reference spans the bubble's full width.
+    final Widget bubbleBody = IntrinsicWidth(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (reply != null)
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: (attachment != null || (content?.isNotEmpty ?? false))
+                    ? DabblerMessagingSpacing.replyGap
+                    : 0,
+              ),
+              child: DabblerMessageReplyReference(
+                sender: reply!.sender,
+                content: reply!.content,
+                attachmentLabel: reply!.attachmentLabel,
+                variant: out
+                    ? DabblerReplyVariant.onBrand
+                    : DabblerReplyVariant.message,
+              ),
             ),
-            child: DabblerMessageReplyReference(
-              sender: reply!.sender,
-              content: reply!.content,
-              attachmentLabel: reply!.attachmentLabel,
-              variant: out
-                  ? DabblerReplyVariant.onBrand
-                  : DabblerReplyVariant.message,
+          if (attachment != null)
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: (content?.isNotEmpty ?? false)
+                    ? DabblerMessagingSpacing.replyGap
+                    : 0,
+              ),
+              child: attachment!.isImage
+                  ? ClipRRect(
+                      borderRadius: DabblerRadius.lgAll,
+                      child: SizedBox(
+                        width: imageSize.width,
+                        height: imageSize.height,
+                        child: attachment!.child,
+                      ),
+                    )
+                  : SizedBox(width: objectWidth, child: attachment!.child),
             ),
-          ),
-        if (attachment != null)
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: (content?.isNotEmpty ?? false)
-                  ? DabblerMessagingSpacing.replyGap
-                  : 0,
+          if (content != null && content!.isNotEmpty)
+            Text(
+              content!,
+              style: DabblerType.subheadline
+                  .resolveForDirection(dir)
+                  .copyWith(color: ink),
             ),
-            child: attachment!.isImage
-                ? ClipRRect(
-                    borderRadius: DabblerRadius.lgAll,
-                    child: SizedBox(
-                      width: imageSize.width,
-                      height: imageSize.height,
-                      child: attachment!.child,
-                    ),
-                  )
-                : SizedBox(width: objectWidth, child: attachment!.child),
-          ),
-        if (content != null && content!.isNotEmpty)
-          Text(
-            content!,
-            style: DabblerType.subheadline
-                .resolveForDirection(dir)
-                .copyWith(color: ink),
-          ),
-      ],
+        ],
+      ),
     );
 
     Widget bubble = DecoratedBox(
@@ -314,8 +371,8 @@ class DabblerMessage extends StatelessWidget {
         color: bare
             ? null
             : out
-                ? colors.brandPrimary
-                : colors.surfaceCard,
+            ? colors.brandPrimary
+            : colors.surfaceCard,
         borderRadius: radiusFor(outgoing: out, position: groupPosition),
         border: (out || bare)
             ? null
@@ -335,45 +392,75 @@ class DabblerMessage extends StatelessWidget {
       ),
     );
     if (selected) {
-      bubble = DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: radiusFor(outgoing: out, position: groupPosition),
-          border: Border.all(color: colors.brandPrimary, width: selectedOutline),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(DabblerSpacing.space1 - 1),
-          child: bubble,
-        ),
+      // CSS `outline` takes no layout space: draw the 2px ring outside the
+      // bubble at the 2px offset, its corners grown by the same outset.
+      const double outset = selectedOutlineOffset + selectedOutline;
+      bubble = Stack(
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          bubble,
+          Positioned(
+            left: -outset,
+            top: -outset,
+            right: -outset,
+            bottom: -outset,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                key: selectedOutlineKey,
+                decoration: BoxDecoration(
+                  borderRadius: _grow(
+                    radiusFor(outgoing: out, position: groupPosition),
+                    outset,
+                  ),
+                  border: Border.all(
+                    color: colors.brandPrimary,
+                    width: selectedOutline,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
-    if (deliveryState == DabblerDeliveryState.sending) {
-      bubble = Opacity(opacity: sendingOpacity, child: bubble);
-    }
+    bubble = AnimatedOpacity(
+      opacity: deliveryState == DabblerDeliveryState.sending
+          ? sendingOpacity
+          : 1,
+      duration: DabblerMotion.reduceMotion(buildContext)
+          ? Duration.zero
+          : DabblerMotion.base,
+      curve: DabblerMotion.easeOut,
+      child: bubble,
+    );
     if (interactive) {
       bubble = DabblerMessagingTap(
         onTap: onPress,
         label: content,
-        ringRadius: radiusFor(outgoing: out, position: groupPosition)
-            .resolve(dir),
+        ringRadius: radiusFor(
+          outgoing: out,
+          position: groupPosition,
+        ).resolve(dir),
         child: bubble,
       );
     }
 
     final DabblerDeliveryState? d = deliveryState;
-    final bool showDelivery = out &&
+    final bool showDelivery =
+        out &&
         d != null &&
         (context == DabblerMessageContext.direct ||
             d == DabblerDeliveryState.sending ||
             failed);
-    final bool withMeta = trails(groupPosition) &&
-        (timestamp != null || showDelivery || edited);
+    final bool withMeta =
+        trails(groupPosition) && (timestamp != null || showDelivery || edited);
     final Color metaColor = failed ? colors.error.strong : colors.textSecondary;
-    final TextStyle caption1 =
-        DabblerType.caption1.resolveForDirection(dir);
+    final TextStyle caption1 = DabblerType.caption1.resolveForDirection(dir);
 
     final Widget column = Column(
-      crossAxisAlignment:
-          out ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: out
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (withSender && sender != null)
@@ -381,6 +468,7 @@ class DabblerMessage extends StatelessWidget {
             padding: const EdgeInsets.only(
               left: DabblerSpacing.space1,
               right: DabblerSpacing.space1,
+              bottom: DabblerMessagingSpacing.senderGap,
             ),
             child: Text(
               sender!,
@@ -393,7 +481,11 @@ class DabblerMessage extends StatelessWidget {
         bubble,
         if (reactions.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: DabblerSpacing.space1),
+            padding: const EdgeInsets.only(
+              left: DabblerSpacing.space1,
+              right: DabblerSpacing.space1,
+              top: DabblerMessagingSpacing.metaGap,
+            ),
             child: DabblerReactionGroup(
               reactions: reactions,
               onToggle: onReact,
@@ -413,8 +505,10 @@ class DabblerMessage extends StatelessWidget {
                   Text(timestamp!, style: caption1.copyWith(color: metaColor)),
                 if (edited) ...<Widget>[
                   const SizedBox(width: DabblerSpacing.space1),
-                  Text('· $editedLabel',
-                      style: caption1.copyWith(color: metaColor)),
+                  Text(
+                    '· $editedLabel',
+                    style: caption1.copyWith(color: metaColor),
+                  ),
                 ],
                 if (showDelivery) ...<Widget>[
                   const SizedBox(width: DabblerSpacing.space1),
@@ -429,8 +523,10 @@ class DabblerMessage extends StatelessWidget {
                     ),
                   ),
                 ],
-                if (failed && onRetry != null)
+                if (failed && onRetry != null) ...<Widget>[
+                  const SizedBox(width: DabblerSpacing.space1),
                   DabblerMessagingTap(
+                    key: retryKey,
                     onTap: onRetry,
                     label: retryLabel,
                     scale: false,
@@ -438,22 +534,19 @@ class DabblerMessage extends StatelessWidget {
                       constraints: const BoxConstraints(
                         minHeight: DabblerSizing.touchTargetMin,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: DabblerSpacing.space3,
-                        ),
-                        child: Center(
-                          child: Text(
-                            retryLabel,
-                            style: caption1.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: colors.error.strong,
-                            ),
+                      child: Center(
+                        widthFactor: 1,
+                        child: Text(
+                          retryLabel,
+                          style: caption1.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: colors.error.strong,
                           ),
                         ),
                       ),
                     ),
                   ),
+                ],
               ],
             ),
           ),
@@ -463,17 +556,14 @@ class DabblerMessage extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext c, BoxConstraints box) {
         final double avail = box.maxWidth.isFinite ? box.maxWidth : 400;
-        final double gutter = (!out && group)
-            ? DabblerMessagingSpacing.avatarGutter +
-                DabblerMessagingSpacing.avatarGap
-            : 0;
-        final double maxW = bare
-            ? bareMaxWidth
-            : (avail - gutter) * maxWidthFraction;
+        // `maxWidth: '76%'` on a flex item resolves against the row's full
+        // width, avatar gutter included.
+        final double maxW = bare ? bareMaxWidth : avail * maxWidthFraction;
         return Row(
           crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment:
-              out ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: out
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
           children: <Widget>[
             if (!out && group) ...<Widget>[
               SizedBox(
@@ -487,9 +577,11 @@ class DabblerMessage extends StatelessWidget {
               ),
               const SizedBox(width: DabblerMessagingSpacing.avatarGap),
             ],
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxW),
-              child: column,
+            Flexible(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxW),
+                child: column,
+              ),
             ),
           ],
         );
