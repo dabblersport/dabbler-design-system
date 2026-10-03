@@ -46,6 +46,125 @@ abstract final class DabblerMotion {
   /// that value itself and must not be normalised onto this one.
   static const double pressScale = 0.98;
 
+  // --- App roles (zero-literal pass) ---------------------------------------
+  //
+  // Everything below is an **app role**, not a design-source transcription:
+  // `tokens/spacing.css` declares only [fast]/[base]/[slow] and [easeOut].
+  // Each entry names what the consuming app uses a duration for, so the app
+  // writes a name and never `Duration(...)`. Values are the app's own measured
+  // timings (dabbler-code `lib/`, 2026-10-03), with near misses folded onto one
+  // role per purpose; each fold is named in the entry's dartdoc.
+  //
+  // Visual roles honour reduced motion through [durationOf]; the non-visual
+  // groups (toast lifetime, auto-advance, debounce, timeout, polling, delay)
+  // are timing, not animation, and must NOT be zeroed.
+
+  /// App role: an in-place content swap — `AnimatedSwitcher` /
+  /// `AnimatedContainer` changing state, 300ms. The app's 350ms switcher
+  /// folds here.
+  static const Duration contentSwap = Duration(milliseconds: 300);
+
+  /// App role: programmatic scroll, page or indicator travel — `animateTo`,
+  /// `animateToPage`, a carousel indicator growing, 400ms.
+  static const Duration scrollTo = Duration(milliseconds: 400);
+
+  /// App role: a dragged surface springing back to rest — mapped onto [slow]
+  /// (200ms). The app's 220ms carousel snap-back folds here.
+  static const Duration snapBack = slow;
+
+  /// App role: the default page-route transition (fade / shared axis), 300ms.
+  /// The app's 320ms route folds here.
+  static const Duration pageTransition = Duration(milliseconds: 300);
+
+  /// App role: a directional (slide) page-route transition, 350ms.
+  static const Duration pageTransitionSlide = Duration(milliseconds: 350);
+
+  /// App role: a modal / bottom-sheet page route rising, 400ms.
+  static const Duration pageTransitionModal = Duration(milliseconds: 400);
+
+  /// App role: a large hero or cover cross-fade (landing carousel), 500ms.
+  /// The app's 550ms game-detail header folds here.
+  static const Duration heroCrossfade = Duration(milliseconds: 500);
+
+  /// App role: a whole screen's staggered entrance controller, 800ms.
+  static const Duration screenEntrance = Duration(milliseconds: 800);
+
+  /// App role: one cycle of a looping ambient animation, 1200ms.
+  static const Duration ambientLoop = Duration(milliseconds: 1200);
+
+  /// App role: a one-word acknowledgement toast lifetime ("Copied"), 1s.
+  static const Duration toastBrief = Duration(seconds: 1);
+
+  /// App role: the default toast / snackbar lifetime, 2s.
+  static const Duration toastShort = Duration(seconds: 2);
+
+  /// App role: a toast carrying a sentence or an action, 3s.
+  static const Duration toastLong = Duration(seconds: 3);
+
+  /// App role: an in-content gallery paging itself (venue photos), 3s.
+  static const Duration autoAdvance = Duration(seconds: 3);
+
+  /// App role: a full-screen hero paging itself (landing), 5s.
+  static const Duration autoAdvanceHero = Duration(seconds: 5);
+
+  /// App role (non-visual): search-as-you-type debounce, 350ms. The app's
+  /// 300ms and 400ms search debounces fold here.
+  static const Duration debounceSearch = Duration(milliseconds: 350);
+
+  /// App role (non-visual): debounce before a remote validity check
+  /// (username availability), 500ms.
+  static const Duration debounceValidation = Duration(milliseconds: 500);
+
+  /// App role (non-visual): debounce before fetching suggestions, 800ms.
+  static const Duration debounceSuggestion = Duration(milliseconds: 800);
+
+  /// App role (non-visual): a quick request the UI waits on (feed page,
+  /// location fix), 5s. The app's 6s GPS timeout folds here.
+  static const Duration timeoutShort = Duration(seconds: 5);
+
+  /// App role (non-visual): a network request's ceiling, 10s. The app's 8s
+  /// onboarding timeout folds here.
+  static const Duration timeoutNetwork = Duration(seconds: 10);
+
+  /// App role (non-visual): background polling interval, 30s.
+  static const Duration pollInterval = Duration(seconds: 30);
+
+  /// App role (non-visual): yield a frame / let a tick settle, 100ms. The
+  /// app's 50ms and 150ms waits fold here.
+  static const Duration delayFrame = Duration(milliseconds: 100);
+
+  /// App role (non-visual): wait for a route or keyboard to settle before
+  /// acting, 300ms. The app's 200ms and 250ms waits fold here.
+  static const Duration delaySettle = Duration(milliseconds: 300);
+
+  /// App role (non-visual): first retry back-off, 500ms.
+  static const Duration delayRetry = Duration(milliseconds: 500);
+
+  /// App role (non-visual): second retry back-off, 1s.
+  static const Duration delayRetryLong = Duration(seconds: 1);
+
+  /// App role (non-visual): last retry back-off, 2s.
+  static const Duration delayRetryMax = Duration(seconds: 2);
+
+  /// App role: emphasised deceleration, an element arriving — the app's
+  /// `Curves.easeOutCubic`. Only [easeOut] is the design source's curve.
+  static const Curve emphasizedDecelerate = Curves.easeOutCubic;
+
+  /// App role: emphasised acceleration, an element leaving — the app's
+  /// `Curves.easeInCubic`.
+  static const Curve emphasizedAccelerate = Curves.easeInCubic;
+
+  /// App role: symmetric travel between two resting states (a scroll) — the
+  /// app's `Curves.easeInOut`.
+  static const Curve standardInOut = Curves.easeInOut;
+
+  /// [duration] for an **animation**, honouring reduced motion:
+  /// [Duration.zero] when the platform asks for reduced motion, else
+  /// [duration]. For visual roles only — never a toast lifetime, debounce,
+  /// timeout, poll or delay.
+  static Duration durationOf(BuildContext context, Duration duration) =>
+      reduceMotion(context) ? Duration.zero : duration;
+
   /// Whether the platform has asked for reduced motion.
   ///
   /// The design source drops every animation under

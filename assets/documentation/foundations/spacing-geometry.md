@@ -49,6 +49,7 @@ when both share one corner — which is the actual bug the dedicated card step e
 @specimen spacing-geometry/radius
 @specimen spacing-geometry/sizing
 @specimen spacing-geometry/elevation
+@specimen spacing-geometry/app-roles
 
 ## Using it
 
@@ -90,6 +91,12 @@ Touch-target minimum (45), two border widths (hairline 0.5, default 1), three ic
 
 ### Elevation
 None, except the one reserved Dialog shadow.
+
+### App roles
+Named sizes and layout extents for what the app draws (icon roles, tiles, illustrations, skeleton
+bars, hero and preview heights, list insets and bar clearances), each a step or a sum of steps.
+`DabblerInsets` holds the named paddings, `DabblerGap` the spacer, and `DabblerRadius` the top-only
+sheet corners.
 
 @figure 3 lib/src/tokens/dabbler_geometry.dart#space1
 @figure 6 lib/src/tokens/dabbler_geometry.dart#space2
