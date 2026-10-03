@@ -62,6 +62,7 @@ class DabblerCommentRow extends StatelessWidget {
     this.body = '',
     this.bodySpan,
     this.attachment,
+    this.attachments,
     this.likes = 0,
     this.showLike = true,
     this.liked = false,
@@ -108,6 +109,15 @@ class DabblerCommentRow extends StatelessWidget {
 
   /// An attached image or GIF under the body, clipped to the large corner.
   final Widget? attachment;
+
+  /// Several attachments under the body (DS gaps 6, item 14), laid out in a
+  /// [Wrap] that runs from the start edge with [DabblerSpacing.space2]
+  /// between items and between runs, each clipped to the large corner like
+  /// [attachment]. When both are given, [attachment] comes first. Sized by
+  /// the caller. **Design frame missing:** `Post.dc.html` draws no media in
+  /// a reply; the 6px gap is the system's `iconGap` step, the tightest that
+  /// still separates two thumbnails' hairlines.
+  final List<Widget>? attachments;
 
   /// The like count.
   final int likes;
@@ -307,6 +317,7 @@ class DabblerCommentRow extends StatelessWidget {
       ],
     );
 
+    final List<Widget> media = <Widget>[?attachment, ...?attachments];
     final bool drawDivider = divider ?? !nested;
     final Widget content = DecoratedBox(
       decoration: BoxDecoration(
@@ -349,15 +360,28 @@ class DabblerCommentRow extends StatelessWidget {
                   header,
                   const SizedBox(height: DabblerSpacing.space1),
                   bodyText,
-                  if (attachment != null) ...<Widget>[
+                  if (media.isNotEmpty) ...<Widget>[
                     const SizedBox(height: DabblerSpacing.space3),
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: ClipRRect(
-                        borderRadius: DabblerRadius.lgAll,
-                        child: attachment,
+                    if (media.length == 1)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: ClipRRect(
+                          borderRadius: DabblerRadius.lgAll,
+                          child: media.single,
+                        ),
+                      )
+                    else
+                      Wrap(
+                        spacing: DabblerSpacing.space2,
+                        runSpacing: DabblerSpacing.space2,
+                        children: <Widget>[
+                          for (final Widget m in media)
+                            ClipRRect(
+                              borderRadius: DabblerRadius.lgAll,
+                              child: m,
+                            ),
+                        ],
                       ),
-                    ),
                   ],
                   actions,
                 ],

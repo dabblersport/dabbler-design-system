@@ -151,10 +151,26 @@ class DabblerReplyComposerAction {
     required this.label,
     required this.onTap,
     this.active = false,
-  });
+  }) : text = null;
 
-  /// The Iconsax glyph name.
+  /// A text attach button — a pill reading [label] (e.g. `GIF`), which is
+  /// also its accessible name (DS gaps 6, item 14). **Design frame
+  /// missing:** `Post.dc.html` draws only icon actions (`:330-336`); the pill
+  /// borrows the input's pill radius (`:338`), `caption1` semibold, a
+  /// `borderDefault`-wide hairline and text in the glyphs' tint, `space3`
+  /// inline padding and the 45px target.
+  const DabblerReplyComposerAction.text({
+    required this.label,
+    required this.onTap,
+    this.active = false,
+  }) : icon = '',
+       text = label;
+
+  /// The Iconsax glyph name. Empty for a [DabblerReplyComposerAction.text].
   final String icon;
+
+  /// The pill's visible text; null for an icon action.
+  final String? text;
 
   /// The accessible name, localised.
   final String label;
@@ -209,16 +225,27 @@ class _DabblerReplyComposerState extends State<DabblerReplyComposer> {
     if (_ready) widget.onSend(_controller.text);
   }
 
+  /// [width] null: the 45px square; else the child's width, floored at 45.
   Widget _target({
     required String label,
     required VoidCallback? onTap,
     required Widget child,
+    double? width,
   }) {
-    final Widget box = SizedBox(
-      width: DabblerReplyComposer.sendSize,
-      height: DabblerReplyComposer.sendSize,
-      child: Center(child: child),
-    );
+    final Widget box = width == null
+        ? SizedBox(
+            width: DabblerReplyComposer.sendSize,
+            height: DabblerReplyComposer.sendSize,
+            child: Center(child: child),
+          )
+        : ConstrainedBox(
+            constraints: const BoxConstraints(
+              minWidth: DabblerReplyComposer.sendSize,
+              minHeight: DabblerReplyComposer.sendSize,
+              maxHeight: DabblerReplyComposer.sendSize,
+            ),
+            child: Center(widthFactor: 1, child: child),
+          );
     if (onTap == null) {
       return Semantics(
         button: true,
@@ -241,6 +268,25 @@ class _DabblerReplyComposerState extends State<DabblerReplyComposer> {
       ),
     );
   }
+
+  Widget _textPill(String text, Color ink, TextDirection dir) => Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: DabblerSpacing.space3,
+      vertical: DabblerSpacing.space1,
+    ),
+    decoration: BoxDecoration(
+      borderRadius: DabblerRadius.pillAll,
+      border: Border.all(color: ink, width: DabblerSizing.borderDefault),
+    ),
+    child: Text(
+      text,
+      maxLines: 1,
+      softWrap: false,
+      style: DabblerType.caption1
+          .resolveForDirection(dir)
+          .copyWith(color: ink, fontWeight: DabblerType.semibold),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -385,17 +431,24 @@ class _DabblerReplyComposerState extends State<DabblerReplyComposer> {
           _target(
             label: a.label,
             onTap: live ? a.onTap : null,
-            child: DabblerIcon(
-              a.icon,
-              size: DabblerReplyComposer.attachGlyphSize,
-              weight: a.active
-                  ? DabblerIconWeight.bold
-                  : DabblerIconWeight.linear,
-              color: !live
-                  ? colors.textTertiary
-                  : a.active
-                  ? colors.brandPrimary
-                  : colors.textSecondary,
+            width: a.text == null ? null : 0,
+            child: Builder(
+              builder: (_) {
+                final Color ink = !live
+                    ? colors.textTertiary
+                    : a.active
+                    ? colors.brandPrimary
+                    : colors.textSecondary;
+                if (a.text != null) return _textPill(a.text!, ink, dir);
+                return DabblerIcon(
+                  a.icon,
+                  size: DabblerReplyComposer.attachGlyphSize,
+                  weight: a.active
+                      ? DabblerIconWeight.bold
+                      : DabblerIconWeight.linear,
+                  color: ink,
+                );
+              },
             ),
           ),
         if (widget.attachActions.isNotEmpty)

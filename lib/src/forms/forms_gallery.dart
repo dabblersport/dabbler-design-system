@@ -732,6 +732,14 @@ Widget _rows(BuildContext context) => _sections(<Widget>[
             const SizedBox(height: DabblerSpacing.space3),
             DabblerInputRow(title: 'Everyone', selected: true, onTap: () {}),
             const SizedBox(height: DabblerSpacing.space3),
+            DabblerInputRow(flat: true, title: 'Marina', onTap: () {}),
+            DabblerInputRow(
+              flat: true,
+              title: 'Al Quoz',
+              selected: true,
+              onTap: () {},
+            ),
+            const SizedBox(height: DabblerSpacing.space3),
             DabblerInputRow.toggle(
               title: 'Show activity',
               checked: true,
