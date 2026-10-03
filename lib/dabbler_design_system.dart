@@ -103,6 +103,7 @@ export 'src/forms/code_input.dart';
 export 'src/forms/date_field.dart';
 export 'src/forms/highlighted_text.dart';
 export 'src/forms/input_row.dart';
+export 'src/forms/input_row_parts.dart';
 export 'src/forms/picker_field.dart' hide DabblerPickerFieldShell;
 export 'src/forms/radio.dart';
 export 'src/forms/search_field.dart';

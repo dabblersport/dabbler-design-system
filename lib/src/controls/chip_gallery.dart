@@ -16,6 +16,7 @@ library;
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../foundations/vibes.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -28,16 +29,15 @@ const List<GalleryEntry> chipGalleryEntries = <GalleryEntry>[
     page: 'components/chip',
     group: GalleryPurpose.actions,
     title: 'Chip — selection & filtering',
-    description: 'A filter row: static chips, plus two interactive sport chips '
+    description:
+        'A filter row: static chips, plus two interactive sport chips '
         'with an 18px leading icon. Tap one to move the selection.',
     builder: _chips,
   ),
 ];
 
-Widget _chips(BuildContext context) => const GallerySpecimen(
-  label: 'filter row',
-  child: _FilterRow(),
-);
+Widget _chips(BuildContext context) =>
+    const GallerySpecimen(label: 'filter row', child: _FilterRow());
 
 class _FilterRow extends StatefulWidget {
   const _FilterRow();
@@ -67,6 +67,15 @@ class _FilterRowState extends State<_FilterRow> {
         selected: _sport == 'padel',
         onTap: () => setState(() => _sport = 'padel'),
         leadingIcon: const DabblerIcon('activity', size: DabblerSizing.iconSm),
+      ),
+      DabblerChip(label: 'Sara', onRemove: () {}),
+      DabblerChip(label: 'Calm', vibe: DabblerVibe.calm, onTap: () {}),
+      DabblerChip(
+        label: 'Energetic',
+        vibe: DabblerVibe.energetic,
+        selected: true,
+        onTap: () {},
+        onLongPress: () {},
       ),
     ],
   );

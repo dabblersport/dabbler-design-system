@@ -11,7 +11,6 @@ import 'highlighted_text.dart';
 import 'input_row_parts.dart';
 import 'toggle.dart';
 
-export 'input_row_parts.dart';
 
 /// InputRow — the settings / content row.
 ///
