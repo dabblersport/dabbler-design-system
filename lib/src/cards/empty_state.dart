@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../controls/button.dart';
 import '../foundations/icon.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -19,6 +20,18 @@ enum DabblerEmptyStateSize {
   /// no frame, `min-height: 60dvh`, title at `.t-title-3` and copy capped at
   /// 320px. For a whole empty screen.
   page,
+}
+
+/// The tone of an empty state's icon well.
+enum DabblerEmptyStateTone {
+  /// The neutral well — `--surface-page` fill, `--faint` hairline, `--subtle`
+  /// ink. The default, and the only tone before KAN-412.
+  neutral,
+
+  /// The error well — [DabblerColors.error] `surface` fill and hairline,
+  /// `strong` ink. Set by [DabblerEmptyState.error]; the region did not load,
+  /// which must not look like "nothing here" (bound 1 of the class doc).
+  error,
 }
 
 /// EmptyState — the "nothing here yet" state for a section, a list, or a whole
@@ -116,7 +129,31 @@ class DabblerEmptyState extends StatelessWidget {
     this.text,
     this.size = DabblerEmptyStateSize.inline,
     this.action,
-  });
+  }) : tone = DabblerEmptyStateTone.neutral,
+       onRetry = null,
+       retryLabel = null;
+
+  /// The error page — "the request did not load", KAN-412 item 5.
+  ///
+  /// An error-toned well ([DabblerEmptyStateTone.error]: the status error
+  /// `surface` and `strong` roles), [title], [text] and, when [onRetry] is
+  /// given, one secondary [DabblerButton] labelled [retryLabel]. Defaults to
+  /// [DabblerEmptyStateSize.page] and the `danger` glyph.
+  ///
+  /// **No design frame exists for this.** The design files carry an error
+  /// `Banner` (`Auth and Onboarding.dc.html:447,484`) and no error EmptyState;
+  /// this variant reuses the neutral layout and swaps only the well's roles.
+  const DabblerEmptyState.error({
+    super.key,
+    this.icon = 'danger',
+    required String this.title,
+    this.text,
+    this.size = DabblerEmptyStateSize.page,
+    this.onRetry,
+    this.retryLabel = 'Try again',
+  }) : tone = DabblerEmptyStateTone.error,
+       iconWidget = null,
+       action = null;
 
   /// The kebab-case Iconsax name shown in the 45×45 well — see
   /// [DabblerIconRegistry] for the vocabulary. Null, with [iconWidget] also
@@ -146,6 +183,16 @@ class DabblerEmptyState extends StatelessWidget {
   /// The single optional action, usually a button. At most one — see the class
   /// doc.
   final Widget? action;
+
+  /// The well's tone. [DabblerEmptyStateTone.neutral] except on
+  /// [DabblerEmptyState.error].
+  final DabblerEmptyStateTone tone;
+
+  /// The retry handler on [DabblerEmptyState.error]. Null draws no button.
+  final VoidCallback? onRetry;
+
+  /// The retry button's label on [DabblerEmptyState.error].
+  final String? retryLabel;
 
   /// The icon well's side — `width: 45, height: 45`.
   ///
@@ -283,7 +330,16 @@ class DabblerEmptyState extends StatelessWidget {
       );
     }
 
-    if (action != null) add(action!, space: gap + actionGap);
+    final Widget? act =
+        action ??
+        (onRetry == null
+            ? null
+            : DabblerButton(
+                label: retryLabel ?? '',
+                tone: DabblerButtonTone.secondary,
+                onPressed: onRetry,
+              ));
+    if (act != null) add(act, space: gap + actionGap);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -299,28 +355,28 @@ class DabblerEmptyState extends StatelessWidget {
   /// [DabblerColors.bgPrimary], [DabblerColors.bgTertiary] and
   /// [DabblerColors.textTertiary] respectively, which is why no literal
   /// appears here.
+  ///
+  /// On [DabblerEmptyStateTone.error] the three become
+  /// [DabblerColors.error]'s `surface` (fill and hairline) and `strong` (ink).
   Widget _well(DabblerColors colors) {
+    final bool error = tone == DabblerEmptyStateTone.error;
+    final Color fill = error ? colors.error.surface : colors.bgPrimary;
+    final Color line = error ? colors.error.surface : colors.bgTertiary;
+    final Color ink = error ? colors.error.strong : colors.textTertiary;
     return Container(
       width: wellSide,
       height: wellSide,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: colors.bgPrimary,
+        color: fill,
         borderRadius: const BorderRadius.all(Radius.circular(wellRadius)),
-        border: Border.all(
-          color: colors.bgTertiary,
-          width: DabblerSizing.borderDefault,
-        ),
+        border: Border.all(color: line, width: DabblerSizing.borderDefault),
       ),
       child: IconTheme.merge(
-        data: IconThemeData(color: colors.textTertiary),
+        data: IconThemeData(color: ink),
         child:
             iconWidget ??
-            DabblerIcon(
-              icon!,
-              size: DabblerSizing.iconMd,
-              color: colors.textTertiary,
-            ),
+            DabblerIcon(icon!, size: DabblerSizing.iconMd, color: ink),
       ),
     );
   }

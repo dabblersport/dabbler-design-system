@@ -96,8 +96,8 @@ const List<GalleryEntry> cardsGalleryEntries = <GalleryEntry>[
     id: 'empty-state',
     page: 'components/empty-state',
     group: GalleryPurpose.statusAndFeedback,
-    title: 'EmptyState — inline and page',
-    description: 'Both sizes, with and without an action.',
+    title: 'EmptyState — inline, page and error',
+    description: 'Both sizes, with and without an action, and the error page.',
     builder: _emptyStates,
   ),
 ];
@@ -334,5 +334,15 @@ Widget _emptyStates(BuildContext context) => const GalleryStack(
         size: DabblerEmptyStateSize.page,
       ),
     ),
+    GallerySpecimen(
+      label: 'error',
+      child: DabblerEmptyState.error(
+        title: 'Something went wrong',
+        text: 'Check your connection and try again.',
+        onRetry: _noop,
+      ),
+    ),
   ],
 );
+
+void _noop() {}

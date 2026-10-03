@@ -59,6 +59,13 @@ as one empty section among others rather than taking over the screen.
 ### Action
 Zero or one.
 
+### Tone
+`neutral` (the default) or `error`, which only `DabblerEmptyState.error` sets: the well takes the
+status error `surface` fill and hairline and `strong` ink, and an optional `onRetry` draws one
+secondary `Button` (label `retryLabel`, default "Try again"). It defaults to `page`. Use it where
+the region did not load — "no results" and "the request failed" must not look alike. No design
+frame exists for it; the design files carry only an error `Banner`.
+
 @figure 45 lib/src/cards/empty_state.dart#wellSide
 
 
