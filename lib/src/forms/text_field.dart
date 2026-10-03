@@ -10,6 +10,8 @@ import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'field_shell.dart';
 
+part 'text_field_parts.dart';
+
 /// The five shapes a [DabblerTextField] takes.
 ///
 /// `components/forms/TextField.d.ts:3` (unverified: file not mirrored) — *"standard · search · password ·
@@ -116,6 +118,9 @@ class DabblerTextField extends StatefulWidget {
     this.keyboardType,
     this.textInputAction,
     this.autofillHints,
+    this.clearable = false,
+    this.onCleared,
+    this.clearLabel = defaultClearLabel,
   }) : assert(
          controller == null || initialValue == null,
          'give a controller or an initialValue, not both',
@@ -128,6 +133,13 @@ class DabblerTextField extends StatefulWidget {
   /// `search-normal` — the leading glyph of the `search` variant
   /// (`TextField.prompt.md`).
   static const String searchIconName = 'search-normal';
+
+  /// `close-circle` — the inline clear glyph of the `search` variant
+  /// (`Search.dc.html:171`), at `--icon-sm` (18).
+  static const String clearIconName = 'close-circle';
+
+  /// The clear button's default semantics label. Pass [clearLabel] to localise.
+  static const String defaultClearLabel = 'Clear';
 
   /// `eye` / `eye-slash` — the password visibility toggle's two glyphs.
   static const String revealIconName = 'eye';
@@ -220,6 +232,22 @@ class DabblerTextField extends StatefulWidget {
   /// Autofill hints, e.g. `AutofillHints.password`.
   final Iterable<String>? autofillHints;
 
+  /// Whether the [DabblerTextFieldVariant.search] variant shows an inline
+  /// clear button while it holds text. Ignored by every other variant.
+  ///
+  /// The button is a 45×45 target at the inline end (left in RTL), a
+  /// `close-circle` at `--icon-sm` in the tertiary (`--muted`) role, and is
+  /// absent while the field is empty or disabled. Tapping it empties the
+  /// controller, fires [onChanged] with `''` and [onCleared], and keeps focus.
+  /// Works with an external [controller] and without.
+  final bool clearable;
+
+  /// Called after the clear button empties the field.
+  final VoidCallback? onCleared;
+
+  /// The clear button's semantics label — localisable.
+  final String clearLabel;
+
   /// The corner radius of [variant] — `TextField.jsx:5-9`.
   static double radiusOf(DabblerTextFieldVariant variant) =>
       variant == DabblerTextFieldVariant.multiline
@@ -235,6 +263,7 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
   FocusNode? _ownedFocusNode;
   bool _focused = false;
   bool _reveal = false;
+  bool _hasText = false;
 
   TextEditingController get _controller =>
       widget.controller ??
@@ -247,11 +276,20 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
   void initState() {
     super.initState();
     _focusNode.addListener(_handleFocusChange);
+    _controller.addListener(_handleTextChange);
+    _hasText = _controller.text.isNotEmpty;
   }
 
   @override
   void didUpdateWidget(DabblerTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      (oldWidget.controller ?? _ownedController)?.removeListener(
+        _handleTextChange,
+      );
+      _controller.addListener(_handleTextChange);
+      _hasText = _controller.text.isNotEmpty;
+    }
     if (widget.focusNode != oldWidget.focusNode) {
       (oldWidget.focusNode ?? _ownedFocusNode)?.removeListener(
         _handleFocusChange,
@@ -264,6 +302,7 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
   @override
   void dispose() {
     _focusNode.removeListener(_handleFocusChange);
+    _controller.removeListener(_handleTextChange);
     _ownedFocusNode?.dispose();
     _ownedController?.dispose();
     super.dispose();
@@ -274,6 +313,22 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
       return;
     }
     setState(() => _focused = _focusNode.hasFocus);
+  }
+
+  void _handleTextChange() {
+    final bool hasText = _controller.text.isNotEmpty;
+    if (!mounted || hasText == _hasText) {
+      return;
+    }
+    setState(() => _hasText = hasText);
+  }
+
+  /// Empties the field and keeps (or takes) focus, so the keyboard stays up.
+  void _clear() {
+    _controller.clear();
+    widget.onChanged?.call('');
+    widget.onCleared?.call();
+    _focusNode.requestFocus();
   }
 
   @override
@@ -289,6 +344,11 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
 
     final bool multiline = widget.variant == DabblerTextFieldVariant.multiline;
     final bool password = widget.variant == DabblerTextFieldVariant.password;
+    final bool showClear =
+        widget.variant == DabblerTextFieldVariant.search &&
+        widget.clearable &&
+        _hasText &&
+        !disabled;
 
     // `TextField.jsx:105-110` — the input's own type is `.t-body`'s metrics,
     // 16/21, which is exactly [DabblerType.body].
@@ -316,7 +376,17 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
       // -1)`: Flutter forbids a negative [Padding], so the shell's trailing
       // inset is reduced by the same 6 instead. The toggle's 45px target then
       // ends 6 from the box edge, as it does in the source.
-      innerPadding: password
+      // The clear button follows the same inset, with no block padding: its
+      // 45px target already fills the box's 45px minimum height, so the box
+      // does not grow when the button appears.
+      innerPadding: showClear
+          ? const EdgeInsetsDirectional.fromSTEB(
+              DabblerSpacing.space4,
+              0,
+              DabblerSpacing.space2,
+              0,
+            )
+          : password
           ? const EdgeInsetsDirectional.fromSTEB(
               DabblerSpacing.space4,
               DabblerSpacing.space3,
@@ -393,67 +463,14 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
             color: colors.textSecondary,
             onPressed: () => setState(() => _reveal = !_reveal),
           )
+        else if (showClear)
+          _ClearButton(
+            label: widget.clearLabel,
+            color: colors.textTertiary,
+            onPressed: _clear,
+          )
         else if (widget.suffixIcon != null)
           _iconSlot(widget.suffixIcon!, colors.textSecondary),
-      ],
-    );
-  }
-
-  Widget _buildSelect(
-    DabblerColors colors,
-    TextDirection direction,
-    bool disabled,
-    double radius,
-  ) {
-    final String? shown = widget.value;
-    final bool filled = shown != null && shown.isNotEmpty;
-
-    return DabblerFieldShell(
-      label: widget.label,
-      helperText: widget.helperText,
-      errorText: widget.errorText,
-      // `focused={focused || open}` — an open picker holds the field's focus
-      // state even though focus itself has moved into the popup.
-      focused: _focused || widget.open,
-      focusRingVisible: _focused,
-      disabled: disabled,
-      radius: radius,
-      onTap: widget.onPressed,
-      semanticsLabel: widget.label,
-      expanded: widget.open,
-      children: <Widget>[
-        if (widget.prefixIcon != null)
-          _iconSlot(widget.prefixIcon!, colors.brandPrimary),
-        Expanded(
-          child: Text(
-            filled ? shown : (widget.placeholder ?? ''),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: DabblerType.body
-                .resolveForDirection(direction)
-                .copyWith(
-                  // D-003(a): the unfilled placeholder is text and takes
-                  // [DabblerColors.textSecondary]. The disabled value keeps
-                  // the tertiary role — WCAG 1.4.3 exempts an inactive
-                  // user-interface component.
-                  color: disabled
-                      ? colors.textTertiary
-                      : (filled ? colors.textPrimary : colors.textSecondary),
-                ),
-          ),
-        ),
-        AnimatedRotation(
-          turns: widget.open ? 0.5 : 0,
-          duration: DabblerMotion.reduceMotion(context)
-              ? Duration.zero
-              : DabblerMotion.base,
-          curve: DabblerMotion.easeOut,
-          child: DabblerIcon(
-            DabblerTextField.selectArrowName,
-            size: DabblerSizing.iconSm,
-            color: colors.textSecondary,
-          ),
-        ),
       ],
     );
   }
@@ -469,46 +486,4 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
       child: Center(child: icon),
     ),
   );
-}
-
-/// The password visibility toggle — a 45×45 target, which
-/// `fields.card.html:99` (unverified: file not mirrored) calls out explicitly.
-class _PasswordToggle extends StatelessWidget {
-  const _PasswordToggle({
-    required this.revealed,
-    required this.enabled,
-    required this.color,
-    required this.onPressed,
-  });
-
-  final bool revealed;
-  final bool enabled;
-  final Color color;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: revealed ? 'Hide password' : 'Show password',
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: enabled ? onPressed : null,
-        child: SizedBox(
-          width: DabblerSizing.touchTargetMin,
-          height: DabblerSizing.touchTargetMin,
-          child: Center(
-            child: DabblerIcon(
-              revealed
-                  ? DabblerTextField.concealIconName
-                  : DabblerTextField.revealIconName,
-              size: DabblerSizing.iconMd,
-              color: color,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
