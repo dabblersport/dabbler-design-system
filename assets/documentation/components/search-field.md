@@ -60,7 +60,7 @@ The button sits at the inline end — the right in left-to-right layouts, the le
 The leading search glyph mirrors to the opposite side.
 
 ### Loading
-`loading: true` puts an 18px brand `Spinner` in the clear button's 45px slot while a query is in
+`loading: true` puts a small brand `Spinner` (`sm`) in the clear button's slot while a query is in
 flight. The field stays editable and the text does not move when the spinner comes and goes.
 
 ## Tokens used
