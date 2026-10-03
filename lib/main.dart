@@ -54,6 +54,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...directionGalleryEntries,
   ...dividerGalleryEntries,
   ...fabGalleryEntries,
+  ...fadeGalleryEntries,
   ...feedGalleryEntries,
   ...formsGalleryEntries,
   ...foundationsGalleryEntries,
@@ -86,4 +87,5 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...toastGalleryEntries,
   ...tooltipGalleryEntries,
   ...typeGalleryEntries,
+  ...vibesGalleryEntries,
 ];
