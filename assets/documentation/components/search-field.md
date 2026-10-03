@@ -29,6 +29,11 @@ Empty, holding a query, and disabled — see `search_gallery.dart`'s *SearchFiel
 
 ## Using it
 
+**Set `loading` while results are on their way, and only then.** The spinner replaces the clear
+button, so a field left loading cannot be cleared. `autofocus` opens a dedicated search screen on
+the keyboard; `validator`, `autovalidateMode`, `onSaved` and `suffixText` behave as they do on
+`TextField`.
+
 **Pass the localised word as `clearLabel`.** The button is an icon with no visible text, so its
 semantics label is all a screen reader has. The package ships the English default and no other
 strings.
@@ -54,6 +59,10 @@ entirely with `clearable: false`.
 The button sits at the inline end — the right in left-to-right layouts, the left in right-to-left.
 The leading search glyph mirrors to the opposite side.
 
+### Loading
+`loading: true` puts an 18px brand `Spinner` in the clear button's 45px slot while a query is in
+flight. The field stays editable and the text does not move when the spinner comes and goes.
+
 ## Tokens used
 
 Clear glyph: `close-circle` at `iconSm` (18), in `textTertiary` — the design's `--muted`. Target:
@@ -66,6 +75,10 @@ and placeholder — is `TextField`'s.
   `TextField` gains `clearable` (off by default, so existing search fields are unchanged); the
   `select` build and the two trailing buttons moved to `text_field_parts.dart` to hold the
   500-line rule.
+
+- Alpha DS gaps 6 — adds `autofocus`, `loading` and the forwarded `validator`,
+  `autovalidateMode`, `onSaved` and `suffixText`. `TextField` gains `autofocus` and `loading`
+  (both off by default).
 
 ## Source
 

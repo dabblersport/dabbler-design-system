@@ -3,6 +3,7 @@ import 'package:flutter/material.dart'
 import 'package:flutter/services.dart' show TextInputAction, TextInputType;
 import 'package:flutter/widgets.dart';
 
+import '../feedback/spinner.dart';
 import '../foundations/icon.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
@@ -126,6 +127,8 @@ class DabblerTextField extends StatefulWidget {
     this.onSaved,
     this.autovalidateMode,
     this.suffixText,
+    this.autofocus = false,
+    this.loading = false,
   }) : assert(
          controller == null || initialValue == null,
          'give a controller or an initialValue, not both',
@@ -277,6 +280,18 @@ class DabblerTextField extends StatefulWidget {
   /// the password toggle, clear button or [suffixIcon]; ignored by
   /// [DabblerTextFieldVariant.select].
   final String? suffixText;
+
+  /// Whether the field takes focus when first built, as
+  /// `TextField.autofocus` does. Default `false`.
+  final bool autofocus;
+
+  /// Shows a small [DabblerSpinner] (`sm`, 18px, brand tone) in a 45×45 slot
+  /// at the inline end — left in RTL — while a result is pending, e.g. a
+  /// search request in flight. It **replaces** the clear button and
+  /// [suffixIcon] while `true` (the password toggle is kept); the field stays
+  /// editable. The slot is the clear button's size, so toggling it never
+  /// moves the text. Ignored by [DabblerTextFieldVariant.select].
+  final bool loading;
 
   /// The corner radius of [variant] — `TextField.jsx:5-9`.
   static double radiusOf(DabblerTextFieldVariant variant) =>
