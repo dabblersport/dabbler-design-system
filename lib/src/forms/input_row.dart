@@ -7,6 +7,10 @@ import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import 'highlighted_text.dart';
+import 'input_row_parts.dart';
+import 'toggle.dart';
+
 
 /// InputRow — the settings / content row.
 ///
@@ -144,7 +148,64 @@ class DabblerInputRow extends StatelessWidget {
     this.onTap,
     this.enabled = true,
     this.semanticLabel,
-  });
+    this.titleSpan,
+    this.titleBadge,
+    this.verified = false,
+    this.value,
+    this.tone = DabblerInputRowTone.standard,
+    this.selected,
+    this.trailingChips,
+  }) : assert(
+         title == null || titleSpan == null,
+         'Pass title or titleSpan, not both.',
+       );
+
+  /// The info-button + toggle pattern (Settings rows with an explainer):
+  /// `[info-circle] [DabblerToggle]` in the trailing slot. DS gaps 5, item 5.
+  ///
+  /// The row itself is not tappable — the toggle and the info button are two
+  /// separate controls with their own semantics, so a screen reader reaches
+  /// both. [onInfo] null drops the info button and leaves a plain toggle row.
+  factory DabblerInputRow.toggle({
+    Key? key,
+    String? title,
+    InlineSpan? titleSpan,
+    String? subtitle,
+    Widget? leading,
+    required bool checked,
+    ValueChanged<bool>? onChanged,
+    bool disabled = false,
+    VoidCallback? onInfo,
+    String infoSemanticLabel = DabblerInputRowInfoButton.defaultSemanticLabel,
+    String? toggleSemanticLabel,
+    DabblerInputRowTone tone = DabblerInputRowTone.standard,
+  }) {
+    return DabblerInputRow(
+      key: key,
+      title: title,
+      titleSpan: titleSpan,
+      subtitle: subtitle,
+      leading: leading,
+      tone: tone,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (onInfo != null)
+            DabblerInputRowInfoButton(
+              onPressed: onInfo,
+              semanticLabel: infoSemanticLabel,
+            ),
+          DabblerToggle(
+            checked: checked,
+            onChanged: onChanged,
+            disabled: disabled,
+            semanticLabel:
+                toggleSemanticLabel ?? title ?? titleSpan?.toPlainText(),
+          ),
+        ],
+      ),
+    );
+  }
 
   /// `borderRadius: 16` (`InputRow.jsx:32`), transcribed literally. **Token
   /// conflict:** the radius ramp has no 16 — it steps 12 → 18. See the class
@@ -155,10 +216,7 @@ class DabblerInputRow extends StatelessWidget {
   /// **Token conflict:** neither 14 nor 16 is a [DabblerSpacing] step.
   /// Directional so it mirrors in RTL.
   static const EdgeInsetsDirectional defaultPadding =
-      EdgeInsetsDirectional.symmetric(
-    vertical: 14,
-    horizontal: 16,
-  );
+      EdgeInsetsDirectional.symmetric(vertical: 14, horizontal: 16);
 
   /// `lineHeight: '22.5px'` on the title (`InputRow.jsx:41-42`).
   static const double titleLeading = 22.5;
@@ -203,17 +261,123 @@ class DabblerInputRow extends StatelessWidget {
   /// the [ExcludeSemantics] in [build].
   final String? semanticLabel;
 
+  /// A rich first line, the alternative to [title] — e.g. a search result
+  /// with the matched run highlighted ([highlightSpan] builds exactly the
+  /// [DabblerHighlightedText] treatment). The row's [titleStyleFor] and
+  /// colour are the span's inherited base, so a plain child [TextSpan] reads
+  /// like [title]. The accessible name is the span's plain text.
+  final InlineSpan? titleSpan;
+
+  /// A widget drawn right after the first line (inline-end), e.g. a badge.
+  /// Takes precedence over [verified].
+  final Widget? titleBadge;
+
+  /// Draws the `verify` mark (bold, [DabblerColors.brandPrimary]) after the
+  /// first line, labelled [verifiedSemanticLabel] for assistive technology.
+  ///
+  /// `Profiles.dc.html:94` draws `Icon name="verify" size="14" type="bold"`.
+  /// **Deviation:** 14 is not an icon step; the mark takes
+  /// [DabblerSizing.iconSm] (18), the nearest.
+  final bool verified;
+
+  /// A value shown before the trailing chevron/control — the Settings
+  /// "summarised destination" (`Settings.dc.html:259-260`: 14/19, `--muted`,
+  /// one line, max 150 wide, ellipsis). When [onTap] is set and [trailing]
+  /// is null, a [DabblerChevron] follows it.
+  ///
+  /// **Deviation:** 14px has no ramp step, so the value takes
+  /// [DabblerType.footnote] (13); `--muted` text maps to
+  /// [DabblerColors.textSecondary] under D-003.
+  final String? value;
+
+  /// [DabblerInputRowTone.destructive] colours title, subtitle, the leading
+  /// glyph (through [IconTheme]) and the chevron with the error role's
+  /// `strong` step, and sets the title semibold — `Settings.dc.html:240-253`
+  /// (`--color-status-error-strong`, `font-weight:600`).
+  ///
+  /// **Deviation:** the design keeps the subtitle `--muted`; the DS gaps 5
+  /// brief asks for it in the error colour too, and that is what this does.
+  final DabblerInputRowTone tone;
+
+  /// Option-list selection. Null (default) is not an option row: no tick and
+  /// no selected flag. `true` draws the bold `tick-circle` in
+  /// [DabblerColors.brandPrimary] trailing (`Settings.dc.html:186`, and the
+  /// `DabblerMenu` precedent) and marks the node selected; `false` marks it
+  /// unselected with no tick.
+  final bool? selected;
+
+  /// Chips laid out on ONE line in the trailing area. They never wrap: the
+  /// strip scrolls horizontally inside the space it is given (up to half the
+  /// row), so a narrow width clips/scrolls rather than overflowing. The
+  /// scroll follows the ambient direction, so RTL starts at the right.
+  final List<Widget>? trailingChips;
+
+  /// The default accessible name of the [verified] mark.
+  static const String verifiedSemanticLabel = 'Verified';
+
+  /// The [verified] glyph.
+  static const String verifiedIconName = 'verify';
+
+  /// The [selected] glyph.
+  static const String selectedIconName = 'tick-circle';
+
+  /// `max-width:150px` on the value (`Settings.dc.html:260`).
+  static const double valueMaxWidth = 150;
+
+  /// The span [DabblerHighlightedText] would draw for [text] with every
+  /// [query] match highlighted (semibold on the brand tint), with no base
+  /// style of its own so it inherits the row's title style.
+  static TextSpan highlightSpan(
+    String text,
+    String query,
+    DabblerColors colors,
+  ) {
+    final List<TextRange> ranges = DabblerHighlightedText.matchRanges(
+      text,
+      query,
+    );
+    if (ranges.isEmpty) {
+      return TextSpan(text: text);
+    }
+    final TextStyle match = TextStyle(
+      color: colors.brandPrimary,
+      fontWeight: DabblerHighlightedText.matchWeight,
+      background: Paint()
+        ..color = Color.alphaBlend(
+          colors.brandPrimary.withValues(
+            alpha: DabblerHighlightedText.tintAlpha,
+          ),
+          colors.surfaceCard,
+        ),
+    );
+    final List<InlineSpan> children = <InlineSpan>[];
+    int at = 0;
+    for (final TextRange range in ranges) {
+      if (range.start > at) {
+        children.add(TextSpan(text: text.substring(at, range.start)));
+      }
+      children.add(
+        TextSpan(text: text.substring(range.start, range.end), style: match),
+      );
+      at = range.end;
+    }
+    if (at < text.length) {
+      children.add(TextSpan(text: text.substring(at)));
+    }
+    return TextSpan(children: children);
+  }
+
   /// [title]'s style — [DabblerType.subheadline], unmodified.
-  static TextStyle titleStyleFor(TextDirection direction) =>
-      DabblerType.subheadline
-          .resolveForDirection(direction)
-          .copyWith(height: titleLeading / DabblerType.subheadline.fontSize);
+  static TextStyle titleStyleFor(TextDirection direction) => DabblerType
+      .subheadline
+      .resolveForDirection(direction)
+      .copyWith(height: titleLeading / DabblerType.subheadline.fontSize);
 
   /// [subtitle]'s style — [DabblerType.footnote], unmodified.
-  static TextStyle subtitleStyleFor(TextDirection direction) =>
-      DabblerType.footnote
-          .resolveForDirection(direction)
-          .copyWith(height: subtitleLeading / DabblerType.footnote.fontSize);
+  static TextStyle subtitleStyleFor(TextDirection direction) => DabblerType
+      .footnote
+      .resolveForDirection(direction)
+      .copyWith(height: subtitleLeading / DabblerType.footnote.fontSize);
 
   @override
   Widget build(BuildContext context) {
@@ -221,6 +385,44 @@ class DabblerInputRow extends StatelessWidget {
     final TextDirection direction = Directionality.of(context);
     final bool tappable = onTap != null;
     final bool interactive = tappable && enabled;
+    final bool destructive = tone == DabblerInputRowTone.destructive;
+    final Color? danger = destructive ? colors.error.strong : null;
+
+    Widget? firstLine;
+    if (title != null || titleSpan != null) {
+      final TextStyle style = titleStyleFor(direction).copyWith(
+        color: danger ?? colors.textPrimary,
+        fontWeight: destructive ? DabblerType.semibold : null,
+      );
+      firstLine = titleSpan != null
+          ? Text.rich(
+              TextSpan(style: style, children: <InlineSpan>[titleSpan!]),
+            )
+          : Text(title!, style: style);
+      final Widget? badge =
+          titleBadge ??
+          (verified
+              ? DabblerIcon(
+                  verifiedIconName,
+                  weight: DabblerIconWeight.bold,
+                  size: DabblerSizing.iconSm,
+                  color: colors.brandPrimary,
+                  semanticLabel: verifiedSemanticLabel,
+                )
+              : null);
+      if (badge != null) {
+        firstLine = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Flexible(child: firstLine),
+            const SizedBox(width: DabblerSpacing.iconGap),
+            badge,
+          ],
+        );
+      }
+    }
+
+    final Widget? trailingSlot = _trailingSlot(colors, direction, danger);
 
     Widget row = DabblerSurface(
       variant: DabblerSurfaceVariant.sunken,
@@ -234,7 +436,12 @@ class DabblerInputRow extends StatelessWidget {
         child: Row(
           children: <Widget>[
             if (leading != null) ...<Widget>[
-              leading!,
+              danger == null
+                  ? leading!
+                  : IconTheme.merge(
+                      data: IconThemeData(color: danger),
+                      child: leading!,
+                    ),
               const SizedBox(width: slotGap),
             ],
             Expanded(
@@ -249,28 +456,26 @@ class DabblerInputRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    if (title != null)
-                      Text(
-                        title!,
-                        style: titleStyleFor(direction).copyWith(
-                          color: colors.textPrimary,
-                        ),
-                      ),
+                    ?firstLine,
                     if (subtitle != null)
                       Text(
                         subtitle!,
                         // D-003: the source's `--subtle` is not a text colour.
-                        style: subtitleStyleFor(direction).copyWith(
-                          color: colors.textSecondary,
-                        ),
+                        style: subtitleStyleFor(
+                          direction,
+                        ).copyWith(color: danger ?? colors.textSecondary),
                       ),
                   ],
                 ),
               ),
             ),
-            if (trailing != null) ...<Widget>[
+            if (trailingChips != null && trailingChips!.isNotEmpty) ...<Widget>[
               const SizedBox(width: slotGap),
-              trailing!,
+              Flexible(child: DabblerInputRowChipStrip(chips: trailingChips!)),
+            ],
+            if (trailingSlot != null) ...<Widget>[
+              const SizedBox(width: slotGap),
+              trailingSlot,
             ],
           ],
         ),
@@ -278,18 +483,19 @@ class DabblerInputRow extends StatelessWidget {
     );
 
     if (!tappable) {
-      return row;
+      if (selected == null) {
+        return row;
+      }
+      return Semantics(container: true, selected: selected, child: row);
     }
 
-    row = DabblerPressScale.gesture(
-      enabled: interactive,
-      child: row,
-    );
+    row = DabblerPressScale.gesture(enabled: interactive, child: row);
 
     return Semantics(
       container: true,
       button: true,
       enabled: enabled,
+      selected: selected,
       label: semanticLabel,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -305,6 +511,68 @@ class DabblerInputRow extends StatelessWidget {
       ),
     );
   }
+
+  /// value → trailing (or the implied chevron) → selected tick.
+  Widget? _trailingSlot(
+    DabblerColors colors,
+    TextDirection direction,
+    Color? danger,
+  ) {
+    final Widget? end =
+        trailing ??
+        (value != null && onTap != null ? DabblerChevron(color: danger) : null);
+    final List<Widget> parts = <Widget>[
+      if (value != null)
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: valueMaxWidth),
+          child: Text(
+            value!,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: DabblerType.footnote
+                .resolveForDirection(direction)
+                .copyWith(color: danger ?? colors.textSecondary),
+          ),
+        ),
+      if (end != null)
+        danger != null && end is DabblerChevron && end.color == null
+            ? DabblerChevron(color: danger)
+            : end,
+      if (selected ?? false)
+        DabblerIcon(
+          selectedIconName,
+          weight: DabblerIconWeight.bold,
+          size: DabblerSizing.iconSm,
+          color: colors.brandPrimary,
+        ),
+    ];
+    if (parts.isEmpty) {
+      return null;
+    }
+    if (parts.length == 1 && value == null) {
+      return parts.single;
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (int i = 0; i < parts.length; i++) ...<Widget>[
+          if (i > 0) const SizedBox(width: DabblerSpacing.iconGap),
+          if (i == 0 && value != null) Flexible(child: parts[i]) else parts[i],
+        ],
+      ],
+    );
+  }
+}
+
+/// The row's colour treatment.
+enum DabblerInputRowTone {
+  /// Ink title, secondary subtitle — the default.
+  standard,
+
+  /// Error-strong title (semibold), subtitle, leading glyph and chevron —
+  /// "Sign out" / "Delete account" (`Settings.dc.html:980-998`).
+  destructive,
 }
 
 /// Chevron — the kit's trailing disclosure glyph.

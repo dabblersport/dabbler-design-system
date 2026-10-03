@@ -62,6 +62,20 @@ minimum, renders at natural pill height).
 
 @figure 45px D-032
 
+### Long press
+`onLongPress` on an interactive chip, also exposed as a long-press accessibility action.
+
+### Remove
+`onRemove` draws a trailing `close-circle` glyph with its own hit target and its own button node,
+labelled `Remove <label>` unless `removeSemanticLabel` says otherwise. A tap on it never reaches
+`onTap`. Deviation: the remove target is as tall as the pill, not the full touch-target minimum,
+and absorbs the trailing padding.
+
+### Vibe
+`vibe` tints the chip from `DabblerVibe.resolve`: the vibe's surface and border unselected, its
+selected surface and selected border when selected, with the label in the vibe's ink. No new colour
+values.
+
 
 ## Tokens used
 

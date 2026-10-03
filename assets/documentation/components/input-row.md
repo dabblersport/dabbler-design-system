@@ -86,7 +86,42 @@ Tappable (`onTap` set — gets press scale and focus ring) or inert (`onTap` nul
 ### Trailing slot
 A `DabblerChevron` (disclosure), a control like `Toggle`, or a badge — any widget.
 
+### Rich title and badge
+`titleSpan` is the alternative to `title` for a highlighted search match;
+`DabblerInputRow.highlightSpan` builds the same treatment `DabblerHighlightedText` draws, and the
+row announces the span's plain text. `titleBadge` (any widget) or `verified` (the bold `verify`
+mark in the brand colour, labelled for assistive technology) sits right after the title.
+
+### Value
+`value` is the summarised destination from Settings: a single line in the secondary text colour,
+capped in width and ellipsised, drawn before the chevron. A tappable row with a value and no
+`trailing` gets the chevron for free.
+
+@figure 150 lib/src/forms/input_row.dart#valueMaxWidth
+
+### Tone
+`DabblerInputRowTone.destructive` puts the title (semibold), the subtitle, the leading glyph and the
+chevron in the error role's strong step — Sign out and Delete account.
+
+### Selection
+`selected` null is an ordinary row. `true` draws the bold `tick-circle` in the brand colour and
+marks the node selected; `false` marks it unselected with no tick — for option lists.
+
+### Info and toggle
+`DabblerInputRow.toggle` composes an optional info button and a `DabblerToggle` in the trailing
+slot. They stay two separate controls, each with its own accessible name; the row itself is not
+tappable.
+
+### Trailing chips
+`trailingChips` lays chips on one line that never wraps. When the row is too narrow, the strip
+scrolls inside its share of the row instead of overflowing, and under right-to-left it starts at
+the right edge.
+
 ## Tokens used
+
+Destructive tone: the error role's strong step. Value: the footnote style at `textSecondary`
+(Deviation: the design's value is one step larger than any ramp entry, so it takes the nearest).
+Verified mark: the small icon step (Deviation: the design draws it smaller than any icon step).
 
 Title: the subheadline type style, unmodified. Subtitle: the footnote type style at `textSecondary`.
 Chevron: currently `textSecondary`, overridable per instance — **ruled to become `textTertiary`,
