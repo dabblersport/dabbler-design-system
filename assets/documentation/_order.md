@@ -127,6 +127,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 ### 3 · Identity and status — who or what a piece of content is
 
 - [Avatar](components/avatar.md) — a person's circular, deterministically generated portrait.
+- [ProviderMark](components/provider-mark.md) — the vendors' own Google and Apple sign-in marks, unmodified.
 - [Badge](components/badge.md) — the pill that labels a row, a card or a tab.
 - [Rating](components/rating.md) — a score, shown or collected.
 - [HeroIcon](components/hero-icon.md) — the large round glyph that heads a success or empty screen.

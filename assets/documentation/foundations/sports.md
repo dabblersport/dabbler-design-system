@@ -58,13 +58,15 @@ image.
 references the consuming app resolves, not bundled assets — a missing, slow or undeclared asset
 must show a token-derived solid colour, never an empty or white area.
 
-**Background artwork is not bundled, for any sport.** The design project's eleven
-`<sport>-main-background.png` files could not be read through DesignSync (the transfer truncates at
-256 KiB and each file decodes to a cut 196,608-byte prefix), so no PNG is committed rather than a
-corrupt one; and the design has no artwork at all for handball, squash, baseball, rugby or hockey.
-The registry is ready regardless: an app declares files at `assets/images/sports/<sport>-main-background.png`
-and registers them, and a missing file degrades to nothing painted so the fallback paint beneath
-shows.
+**The eleven `main` background files are bundled.** The design project's
+`<sport>-main-background.png` files are bundled in this package at `assets/images/sports/` and
+pre-registered in `defaultMainArtwork` with this package as owner, so an app gets the artwork with no
+registration call. They were fetched from the design project as complete files (the earlier
+DesignSync route truncated them), checked to decode fully, and are the original artwork unmodified.
+This supersedes the earlier "never bundled" ruling for these eleven sports (CEO instruction,
+2026-10-04). The design has no artwork at all for handball, squash, baseball, rugby or hockey, nor for
+golf or table tennis: for those an app declares a file at the same path convention and registers it,
+and a missing file degrades to nothing painted so the fallback paint beneath shows.
 
 **Do not treat `matchDay` as a softer version of `main` today.** It's structurally present but
 entirely unpopulated — requesting it returns nothing. If a screen needs match-day-specific artwork
@@ -92,9 +94,9 @@ through the same registry.
   drift in the design source's own written description, corrected against what it actually draws.
 - D-009 (cxo) — no sport glyph set exists yet; rules the
   icon-alone prohibition above and specifies what a real set needs to be before it ships.
-- D-010 (cxo) — sport background artwork is never bundled into this
-  package, and rules the fallback-paint and never-sole-carrier requirements above.
-- KAN-411 — handball, squash, baseball, rugby and hockey added; backgrounds not bundled (see
+- D-010 (cxo) — rules the fallback-paint and never-sole-carrier requirements above; its
+  never-bundled clause is superseded for the eleven main files (see above).
+- KAN-411 — handball, squash, baseball, rugby and hockey added; no background artwork exists for them (see
   *Using it*).
 - D-034 (cxo) — rules the Foundations page template this page
   follows.

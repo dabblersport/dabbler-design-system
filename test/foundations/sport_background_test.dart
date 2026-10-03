@@ -54,8 +54,8 @@ void main() {
             DabblerSportBackgroundRegistry.resolve(sport);
         expect(artwork, isNotNull, reason: entry.key);
         expect(artwork!.assetPath, entry.value, reason: entry.key);
-        // This package ships no artwork — the consuming app owns the assets.
-        expect(artwork.package, isNull, reason: entry.key);
+        // The package bundles the eleven main artwork files.
+        expect(artwork.package, 'dabbler_design_system', reason: entry.key);
       }
     });
 
@@ -246,7 +246,10 @@ void main() {
         for (final MapEntry<DabblerSport, DabblerSportArtwork> e
             in DabblerSportBackgroundRegistry.defaultMainArtwork.entries) {
           expect(
-            DabblerSportBackgroundRegistry.conventionalMainArtwork(e.key),
+            DabblerSportBackgroundRegistry.conventionalMainArtwork(
+              e.key,
+              package: DabblerSportBackgroundRegistry.assetPackage,
+            ),
             e.value,
           );
         }
@@ -391,16 +394,13 @@ void main() {
         host(const DabblerSportBackground(DabblerSport.football)),
       );
       final Image image = tester.widget(find.byType(Image));
-      // The asset itself is NOT in this package — see DabblerSportArtwork on
-      // why no binaries are bundled and pubspec.yaml is not touched. The
-      // resulting "unable to load asset" is therefore the expected outcome in
-      // this package's own test bundle, and is consumed rather than hidden.
-      // What is under test is the reference the widget builds, not the bytes.
-      final Object? assetLoadFailure = tester.takeException();
-      expect(assetLoadFailure.toString(), contains('Unable to load asset'));
+      // The eleven main files are bundled in this package, so loading must
+      // not fail.
+      expect(tester.takeException(), isNull);
       expect(image.fit, BoxFit.cover);
       expect(image.alignment, Alignment.center);
       expect((image.image as AssetImage).assetName, sourceMainSrc['football']);
+      expect((image.image as AssetImage).package, 'dabbler_design_system');
     });
 
     testWidgets('maybe() returns null exactly where resolve() does', (

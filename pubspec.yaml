@@ -49,6 +49,15 @@ flutter:
     - assets/documentation/foundations/
     - assets/documentation/components/
     - assets/documentation/patterns/
+    # Vendor sign-in marks (DabblerProviderMark): the vendors' official PNG tiles,
+    # unmodified, as resolution-aware assets (base = 1x, 2.0x/, 3.0x/, 4.0x/).
+    # Each directory is named because Flutter does not recurse. The Apple licence
+    # ships beside them as APPLE_LICENSE.rtf.
+    - assets/images/sports/
+    - assets/provider_marks/
+    - assets/provider_marks/2.0x/
+    - assets/provider_marks/3.0x/
+    - assets/provider_marks/4.0x/
 
   # KAN-254 / DS-103b — the four faces DabblerType names, vendored as local
   # binaries. No `google_fonts` runtime dependency (AC1): a design system that
