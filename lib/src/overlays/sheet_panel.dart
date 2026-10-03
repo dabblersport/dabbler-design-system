@@ -24,8 +24,9 @@ class _DabblerSheetState extends State<DabblerSheet> {
   bool _dragging = false;
 
   static List<double> _sorted(List<double> detents) {
-    final List<double> copy =
-        detents.isEmpty ? <double>[0.5] : List<double>.of(detents);
+    final List<double> copy = detents.isEmpty
+        ? <double>[0.5]
+        : List<double>.of(detents);
     copy.sort();
     return copy;
   }
@@ -190,7 +191,9 @@ class _DabblerSheetState extends State<DabblerSheet> {
         ),
         // Top corners only when modal (`Sheet.jsx:89`).
         borderRadius: modal
-            ? const BorderRadius.vertical(top: Radius.circular(DabblerRadius.xl))
+            ? const BorderRadius.vertical(
+                top: Radius.circular(DabblerRadius.xl),
+              )
             : DabblerRadius.xlAll,
       ),
       child: Column(
@@ -202,9 +205,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
             child: SingleChildScrollView(
               padding: EdgeInsetsDirectional.fromSTEB(
                 DabblerSpacing.space6,
-                widget.dragHandle || widget.title != null
-                    ? 0
-                    : DabblerSpacing.space6,
+                widget.dragHandle || _hasTitle ? 0 : DabblerSpacing.space6,
                 DabblerSpacing.space6,
                 DabblerSpacing.space6,
               ),
@@ -247,8 +248,8 @@ class _DabblerSheetState extends State<DabblerSheet> {
         container: true,
         scopesRoute: true,
         explicitChildNodes: true,
-        namesRoute: widget.title != null,
-        label: widget.title,
+        namesRoute: _semanticTitle != null,
+        label: _semanticTitle,
         child: clipped,
       ),
     );
@@ -267,10 +268,8 @@ class _DabblerSheetState extends State<DabblerSheet> {
           behavior: HitTestBehavior.opaque,
           onVerticalDragStart: _onDragStart,
           onVerticalDragUpdate: _onDragUpdate,
-          onVerticalDragEnd: (DragEndDetails _) => _onDragEnd(
-            _measuredHeight(viewportHeight),
-            viewportHeight,
-          ),
+          onVerticalDragEnd: (DragEndDetails _) =>
+              _onDragEnd(_measuredHeight(viewportHeight), viewportHeight),
           onVerticalDragCancel: () => setState(() {
             _drag = 0;
             _dragging = false;
@@ -300,7 +299,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
 
     final Widget? close = _canDismiss ? _closeButton(context, colors) : null;
 
-    if (widget.title != null || close != null) {
+    if (_hasTitle || widget.headerAction != null || close != null) {
       rows.add(
         Padding(
           // `padding: 0 var(--space-6) var(--space-4)` (`Sheet.jsx:108`).
@@ -311,17 +310,12 @@ class _DabblerSheetState extends State<DabblerSheet> {
             DabblerSpacing.space4,
           ),
           child: Row(
+            // `gap: 12` between the title and the action
+            // (`Listings.dc.html:286`) — [DabblerSpacing.space4].
+            spacing: widget.headerAction == null ? 0 : DabblerSpacing.space4,
             children: <Widget>[
-              Expanded(
-                child: widget.title == null
-                    ? const SizedBox.shrink()
-                    : Text(
-                        widget.title!,
-                        style: DabblerType.title3
-                            .resolveForDirection(Directionality.of(context))
-                            .copyWith(color: colors.textPrimary),
-                      ),
-              ),
+              Expanded(child: _titleContent(context, colors)),
+              ?widget.headerAction,
               ?close,
             ],
           ),
@@ -333,6 +327,31 @@ class _DabblerSheetState extends State<DabblerSheet> {
       return const SizedBox.shrink();
     }
     return Column(mainAxisSize: MainAxisSize.min, children: rows);
+  }
+
+  bool get _hasTitle =>
+      widget.title != null ||
+      widget.titleSpan != null ||
+      widget.titleWidget != null;
+
+  /// The route's accessible name: [DabblerSheet.title], else the plain text
+  /// of [DabblerSheet.titleSpan].
+  String? get _semanticTitle => widget.title ?? widget.titleSpan?.toPlainText();
+
+  Widget _titleContent(BuildContext context, DabblerColors colors) {
+    if (widget.titleWidget != null) {
+      return widget.titleWidget!;
+    }
+    final TextStyle style = DabblerType.title3
+        .resolveForDirection(Directionality.of(context))
+        .copyWith(color: colors.textPrimary);
+    if (widget.titleSpan != null) {
+      return Text.rich(widget.titleSpan!, style: style);
+    }
+    if (widget.title != null) {
+      return Text(widget.title!, style: style);
+    }
+    return const SizedBox.shrink();
   }
 
   double _measuredHeight(double viewportHeight) {

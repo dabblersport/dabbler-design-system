@@ -46,6 +46,11 @@ Resting with attach buttons, replying to someone with an attachment and a multi-
 ### State
 Resting, ready, sending and disabled; with or without the reply line, attachments and attach buttons; single or multi-line.
 
+### Text actions
+`DabblerReplyComposerAction.text` puts a short word such as GIF in a pill instead of a glyph; the
+word is also the button's name. Deviation: the Post design draws only glyph actions, so the pill
+borrows the input's pill corner and the glyphs' tint.
+
 ## Direction
 
 Attach buttons lead, send trails, the cancel sits at the end, and the field aligns to the start of the text direction.
@@ -57,6 +62,7 @@ Surfaces: page for the bar, sunken for the field and the idle send button. Ink: 
 ## Change log
 
 - Added from the Post design file (KAN-412 gaps 5).
+- DS gaps 6 — text attach actions.
 
 ## Source
 

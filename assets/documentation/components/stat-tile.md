@@ -32,6 +32,22 @@ Every tone, a bento grid and an interactive tile — see `stat_tile_gallery.dart
 
 **The value's type is a documented display-numeral exception.** `small` draws 26/30 on the title-1 face and `hero` 46/48 on the large-title face; neither size is a ramp step, and the exception is recorded rather than rounded. The `-0.01em` tracking the source applies to the value is not applied: no ramp step declares tracking, so the value keeps the step's zero and the difference is recorded as a design-source change request.
 
+**Turn on `fitValue` wherever the value is data.** A count that grows or a localised number can be
+wider than the tile. By default the value clips, as the source does; with `fitValue: true` it
+scales down to fit instead, never below `minValueScale` (0.6 of its size), and ellipsises past that
+floor rather than losing digits mid-glyph.
+
+**Put a glyph above the value with `icon`.** The Details screen's tiles draw an 18px icon over the
+figure (`Details.dc.html:96-99`). It takes the tile's ink and is decorative — the value and label
+carry the meaning.
+
+**Use `rowExtent: DabblerStatGrid.detailsRowHeight` for the Details grids.** They use 100px rows
+(`Details.dc.html:93`); the default stays 78.
+
+**Deviation:** the design's 4px gap under the icon is off the base-3 grid; it is drawn at 3.
+
+@specimen stat-tile/icon-fit
+
 ## Axes
 
 ### Size
@@ -56,6 +72,10 @@ Corner: the 18px extra-large radius. Fill and ink: the surface, brand, ink, stat
 
 - Added from the live design project, design system 1.2.0 (`StatTile.jsx` with `href` and `trailing`, 1.1.0 DSG-002).
 
+- Alpha DS gaps 6 — adds `icon`, `fitValue` and `minValueScale` to `DabblerStatTile`,
+  `DabblerStatTileValue`, and `rowExtent` with `detailsRowHeight` to `DabblerStatGrid`. All off
+  by default.
+
 ## Source
 
-`lib/src/cards/stat_tile.dart`
+`lib/src/cards/stat_tile.dart`, `lib/src/cards/stat_tile_value.dart`

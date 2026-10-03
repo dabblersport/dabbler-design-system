@@ -483,6 +483,31 @@ Widget _selects(BuildContext context) => _sections(<Widget>[
         ),
       ),
       _field(
+        'grouped, with a sheet title (DS gaps 6)',
+        const DabblerSelect<String>(
+          label: 'sport',
+          sheetTitle: 'Pick a sport',
+          groups: <DabblerSelectGroup<String>>[
+            DabblerSelectGroup<String>(
+              label: 'Racket',
+              options: <DabblerSelectOption<String>>[
+                DabblerSelectOption<String>(value: 'padel', label: 'padel'),
+                DabblerSelectOption<String>(value: 'tennis', label: 'tennis'),
+              ],
+            ),
+            DabblerSelectGroup<String>(
+              label: 'Team',
+              options: <DabblerSelectOption<String>>[
+                DabblerSelectOption<String>(
+                  value: 'football',
+                  label: 'football',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      _field(
         'searchable — filters by label',
         const DabblerSelect<String>(
           label: 'city',
@@ -731,6 +756,14 @@ Widget _rows(BuildContext context) => _sections(<Widget>[
             ),
             const SizedBox(height: DabblerSpacing.space3),
             DabblerInputRow(title: 'Everyone', selected: true, onTap: () {}),
+            const SizedBox(height: DabblerSpacing.space3),
+            DabblerInputRow(flat: true, title: 'Marina', onTap: () {}),
+            DabblerInputRow(
+              flat: true,
+              title: 'Al Quoz',
+              selected: true,
+              onTap: () {},
+            ),
             const SizedBox(height: DabblerSpacing.space3),
             DabblerInputRow.toggle(
               title: 'Show activity',

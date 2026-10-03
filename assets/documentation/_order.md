@@ -97,6 +97,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 
 **Composed cards**
 - [CardEvent](components/card-event.md) — the event card, in three densities.
+- [CardVenue](components/card-venue.md) — a venue in a listing: cover, name, place, tags and price.
 - [CardHouse](components/card-house.md) — a house (a recurring room series) as one row.
 - [CardPricing](components/card-pricing.md) — one subscription plan as a selectable tile.
 - [CardTicket](components/card-ticket.md) — a booking as a ticket, with its own type scale.
@@ -172,6 +173,7 @@ lot about the rest.
 
 - [Button](components/button.md) — the one control for a tappable action, ten tones, three sizes.
 - [TextLink](components/text-link.md) — a brand-coloured link, on its own line or inside a sentence.
+- [OnColorIconButton](components/on-color-icon-button.md) — a round, translucent icon button on a coloured hero.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.
 - [Chip](components/chip.md) — filtering and tagging, tappable or static.

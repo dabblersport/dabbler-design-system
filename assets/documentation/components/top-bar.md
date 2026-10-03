@@ -103,6 +103,19 @@ Trailing actions are icon-only by default. `DabblerNavigationAction.text(label: 
 labelled action as a text-tone `Button` in the same slot. Its label is its accessible name unless
 you pass `semanticLabel`, and without `onPressed` it is drawn disabled.
 
+The titled bar is always titled. An empty or missing title draws an empty title slot beside the
+back button — never the wordmark.
+
+### Scrolled title
+The titled bar's title can wait for the page to scroll, as the profile and article headers do. Pass
+the page's `scrollController` and the title stays hidden until the page has scrolled past
+`titleRevealOffset`, then fades in; scrolling back hides it again. Under reduced motion the change
+is immediate. To fade it yourself, pass `titleOpacity` instead. Either way the title stays in the
+accessibility tree, so the screen keeps its name while the title is not painted.
+
+**Deviation (fade duration):** the design's fade sits between two motion steps; the shorter, `base`,
+is used.
+
 ### Safe area
 Padded for the device status bar by default, or left to the source's literal behaviour when an
 ancestor already handles it.
@@ -145,6 +158,9 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
   shipped.
 
 - Alpha plan decision 1 (orchestrator, D-035) — adds the titled variant and the avatar image URL.
+- Alpha DS gaps 6 — adds the scrolled title (`titleOpacity`, `scrollController`,
+  `titleRevealOffset`) and fixes the titled bar falling back to the wordmark when it had neither a
+  title nor a back action.
 
 ## Source
 

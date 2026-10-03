@@ -196,6 +196,17 @@ Widget _titled(BuildContext context) => GalleryStack(
       ),
     ),
     GallerySpecimen(
+      label: 'Title faded (titleOpacity 0.4) — the scrolled-title start',
+      child: _frame(
+        const DabblerNavigationTopBar.titled(
+          title: 'Lina Haddad',
+          onBack: _noop,
+          titleOpacity: 0.4,
+          safeArea: false,
+        ),
+      ),
+    ),
+    GallerySpecimen(
       label: 'Text action',
       child: _frame(
         const DabblerNavigationTopBar.titled(

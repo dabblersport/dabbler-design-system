@@ -53,6 +53,12 @@ sits in the matching list position.
 then draws inactive with no indicator, and the first tab is the keyboard entry point. When the
 flag is off, a null value still selects the first tab, the same as any value that matches no tab.
 
+**Set `labelFit: DabblerTabsLabelFit.fit` on a segmented strip whose labels can run long.** The
+default still shortens a label that does not fit with an ellipsis. With `fit` nothing is cut off:
+every label shrinks together, no smaller than the footnote size, and if they still do not fit the
+track scrolls sideways and keeps the selected segment in view. This matters most in Arabic, where
+labels often run longer than the English.
+
 ## Axes
 
 ### Variant
@@ -84,6 +90,7 @@ label.
 
 - D-026 (cxo) — confirms the underline-only brand signal is
   correct as built and refuses a competing kit treatment that would triple the signal for one state.
+- DS gaps 6 — `labelFit` (`DabblerTabsLabelFit.ellipsis` default, `.fit`). Additive.
 
 ## Source
 

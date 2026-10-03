@@ -20,7 +20,8 @@ const List<GalleryEntry> tabsGalleryEntries = <GalleryEntry>[
     page: 'components/tabs',
     group: GalleryPurpose.navigation,
     title: 'Tabs — variants',
-    description: 'Underline and segmented, plus the panel that follows the '
+    description:
+        'Underline and segmented, plus the panel that follows the '
         'selected id.',
     builder: _tabs,
   ),
@@ -38,6 +39,22 @@ Widget _tabs(BuildContext context) => const GalleryStack(
         items: _items,
         value: 'past',
         variant: DabblerTabsVariant.segmented,
+      ),
+    ),
+    GallerySpecimen(
+      label: 'segmented, long Arabic labels, labelFit: fit (DS gaps 6)',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: DabblerTabs(
+          items: <DabblerTabItem>[
+            DabblerTabItem(id: 'games', label: 'المباريات القريبة'),
+            DabblerTabItem(id: 'meetups', label: 'لقاءات هذا الأسبوع'),
+            DabblerTabItem(id: 'venues', label: 'الملاعب'),
+          ],
+          value: 'games',
+          variant: DabblerTabsVariant.segmented,
+          labelFit: DabblerTabsLabelFit.fit,
+        ),
       ),
     ),
     GallerySpecimen(

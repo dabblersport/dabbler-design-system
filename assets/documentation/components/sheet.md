@@ -54,6 +54,12 @@ the panel actually moves.
 close button here is a deliberate addition beyond the source, which relies on the pointer alone on
 the web — this system doesn't assume every user will discover an edge-drag gesture.
 
+**Put a sheet-level action such as Reset in the header, not the footer.** `headerAction` sits at the
+inline end of the title row, before the close button when there is one, so it lands on the left in
+Arabic. The Listings filter sheets use a small neutral Button reading *Reset* there. A title that
+needs a count or a second colour takes `titleSpan`; a fully custom one takes `titleWidget`. The
+sheet's accessible name still comes from `title`, or from the span's plain text.
+
 ## Axes
 
 ### Presentation
@@ -80,6 +86,9 @@ referenced here.
 
 - KAN-412 W1 — `DabblerSheetDetent.content` and `contentMaxFraction`. Additive; the default sizing
   is unchanged.
+- DS gaps 6 — `titleSpan`, `titleWidget` and `headerAction` on `DabblerSheet`, and the same three
+  (`headerActionBuilder` for the action) on `showDabblerSheet`. Additive; the plain title row is
+  unchanged.
 
 ## Source
 

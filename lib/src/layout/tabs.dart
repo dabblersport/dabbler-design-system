@@ -7,6 +7,9 @@ import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import 'tabs_label_fit.dart';
+
+export 'tabs_label_fit.dart';
 
 /// The two treatments a [DabblerTabs] can take, transcribed from the `variant`
 /// union in `components/layout/Tabs.d.ts`.
@@ -141,6 +144,17 @@ class DabblerTabItem {
 /// along the same inline-start axis; and the arrow keys swap, so
 /// [LogicalKeyboardKey.arrowLeft] advances under RTL. That is the source's own
 /// rule (`Tabs.jsx:64-69`, `Tabs.prompt.md` — *RTL behaviour*).
+///
+/// ## Long segmented labels (DS gaps 6, item 8)
+///
+/// A segmented strip splits its width evenly, so a long label — routinely an
+/// Arabic one — used to ellipsise. [labelFit] set to
+/// [DabblerTabsLabelFit.fit] never truncates: all labels scale down together
+/// to a [DabblerType.footnote] floor, and below that the track scrolls
+/// horizontally with the active segment kept in view. The default stays
+/// [DabblerTabsLabelFit.ellipsis] so existing strips render exactly as before.
+/// `test/layout/tabs_label_fit_test.dart` reproduces the truncation with a
+/// narrow Arabic strip before asserting the fix, in both directions.
 class DabblerTabs extends StatefulWidget {
   /// Creates a tab strip.
   const DabblerTabs({
@@ -153,7 +167,15 @@ class DabblerTabs extends StatefulWidget {
     this.fullWidth = false,
     this.label,
     this.allowNoSelection = false,
+    this.labelFit = DabblerTabsLabelFit.ellipsis,
   });
+
+  /// What a [DabblerTabsVariant.segmented] strip does with labels too long
+  /// for their segment. The default, [DabblerTabsLabelFit.ellipsis], is the
+  /// previous behaviour; [DabblerTabsLabelFit.fit] never truncates (scale
+  /// down to a [DabblerType.footnote] floor, then scroll). Ignored by the
+  /// underline variant.
+  final DabblerTabsLabelFit labelFit;
 
   /// Lets a null [value] mean **no tab is selected**: every tab draws
   /// inactive, no indicator is shown, and [DabblerTabItem.id]s are reported as
@@ -227,8 +249,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
     if (widget.value == null && widget.allowNoSelection) {
       return -1;
     }
-    final int found =
-        widget.items.indexWhere((DabblerTabItem i) => i.id == widget.value);
+    final int found = widget.items.indexWhere(
+      (DabblerTabItem i) => i.id == widget.value,
+    );
     // `Math.max(0, findIndex(...))` — Tabs.jsx:31.
     return found < 0 ? 0 : found;
   }
@@ -237,8 +260,14 @@ class _DabblerTabsState extends State<DabblerTabs> {
 
   /// Segmented tabs are always full width (`Tabs.prompt.md` — *Responsive*),
   /// and the source never scrolls them.
-  bool get _fullWidth => widget.fullWidth || _segmented;
-  bool get _scrollable => widget.scrollable && !_segmented;
+  bool get _fullWidth => (widget.fullWidth || _segmented) && !_fitScroll;
+  bool get _scrollable => (widget.scrollable && !_segmented) || _fitScroll;
+
+  /// [DabblerTabsLabelFit.fit]'s resolved label scale and scroll fallback,
+  /// set by the [LayoutBuilder] in [build] before the tabs are built.
+  double _fitScale = 1;
+  bool _fitScroll = false;
+  bool get _fitting => _segmented && widget.labelFit == DabblerTabsLabelFit.fit;
 
   @override
   void initState() {
@@ -328,8 +357,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
 
     final double dx = tab.localToGlobal(Offset.zero, ancestor: strip).dx;
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
-    final double start =
-        rtl ? strip.size.width - (dx + tab.size.width) : dx;
+    final double start = rtl ? strip.size.width - (dx + tab.size.width) : dx;
     final double size = tab.size.width;
 
     if (_start != start || _size != size) {
@@ -391,10 +419,12 @@ class _DabblerTabsState extends State<DabblerTabs> {
     }
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
     // The source swaps the keys, not the order: ArrowLeft advances in RTL.
-    final LogicalKeyboardKey forward =
-        rtl ? LogicalKeyboardKey.arrowLeft : LogicalKeyboardKey.arrowRight;
-    final LogicalKeyboardKey back =
-        rtl ? LogicalKeyboardKey.arrowRight : LogicalKeyboardKey.arrowLeft;
+    final LogicalKeyboardKey forward = rtl
+        ? LogicalKeyboardKey.arrowLeft
+        : LogicalKeyboardKey.arrowRight;
+    final LogicalKeyboardKey back = rtl
+        ? LogicalKeyboardKey.arrowRight
+        : LogicalKeyboardKey.arrowLeft;
 
     if (event.logicalKey == forward) {
       _move(1);
@@ -461,6 +491,34 @@ class _DabblerTabsState extends State<DabblerTabs> {
       }
     });
 
+    if (!_fitting) {
+      _fitScale = 1;
+      _fitScroll = false;
+      return _strip(context, colors, direction, active);
+    }
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final DabblerTabsFitResult fit = dabblerTabsFit(
+          labels: <String>[
+            for (final DabblerTabItem item in widget.items) item.label,
+          ],
+          width: constraints.maxWidth,
+          direction: direction,
+          textScaler: MediaQuery.textScalerOf(context),
+        );
+        _fitScale = fit.scale;
+        _fitScroll = fit.scroll;
+        return _strip(context, colors, direction, active);
+      },
+    );
+  }
+
+  Widget _strip(
+    BuildContext context,
+    DabblerColors colors,
+    TextDirection direction,
+    int active,
+  ) {
     final List<Widget> tabs = <Widget>[
       for (int i = 0; i < widget.items.length; i++)
         _buildTab(
@@ -532,7 +590,15 @@ class _DabblerTabsState extends State<DabblerTabs> {
         color: colors.surfaceSunken,
         borderRadius: DabblerRadius.pillAll,
       ),
-      child: strip,
+      // [DabblerTabsLabelFit.fit]'s last resort: the segments keep their
+      // natural width and the track scrolls rather than truncating.
+      child: _fitScroll
+          ? SingleChildScrollView(
+              controller: _scroll,
+              scrollDirection: Axis.horizontal,
+              child: strip,
+            )
+          : strip,
     );
   }
 
@@ -598,13 +664,17 @@ class _DabblerTabsState extends State<DabblerTabs> {
   /// here rather than borrowed from a token that happens to equal it.
   static const double _indicatorHeight = 2;
 
+  /// The unscaled label size, for [DabblerTabsLabelFit.fit].
+  static double? _baseLabelSize(TextDirection direction) =>
+      DabblerType.subheadline.resolveForDirection(direction).fontSize;
+
   Widget _label(String text, TextStyle style) => Text(
-        text,
-        style: style,
-        softWrap: false,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
-      );
+    text,
+    style: style,
+    softWrap: false,
+    overflow: TextOverflow.ellipsis,
+    maxLines: 1,
+  );
 
   Widget _buildTab(
     BuildContext context, {
@@ -624,6 +694,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
         .copyWith(
           color: foreground,
           fontWeight: active ? DabblerType.medium : DabblerType.regular,
+          fontSize: _fitting && _baseLabelSize(direction) != null
+              ? _baseLabelSize(direction)! * _fitScale
+              : null,
         );
 
     final Widget content = Row(
@@ -692,8 +765,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
           widthFactor: _fullWidth ? null : 1,
           child: DabblerFocusRing(
             focusNode: _nodes[index],
-            borderRadius:
-                _segmented ? DabblerRadius.pillAll : BorderRadius.zero,
+            borderRadius: _segmented
+                ? DabblerRadius.pillAll
+                : BorderRadius.zero,
             child: body,
           ),
         ),

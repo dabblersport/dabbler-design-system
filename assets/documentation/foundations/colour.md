@@ -125,6 +125,12 @@ value: `base` (the bare indicator), `surface` (tint background), `strong` (statu
 `surface` and on a neutral card), `solid` (the fill that carries white text). A status is passed as
 this set, never as a single `Color` — see the Badge and Banner pages for where it is consumed.
 
+For the common case — status ink on its own tint — take the named pair rather than assembling it:
+`colors.statusTint(DabblerStatusTone.success)` (or `.tint` on a status) is the `surface` fill with
+the `strong` ink, the same surface-and-ink shape tags and tiles use. It introduces no colour. A test
+measures the ink against the fill in every theme and brightness and holds it to the AA body-text
+threshold; read the figure from that test, not from this page.
+
 ### Other
 `spotlight` (the single attention accent — never a status), `scrim` (the wash behind every
 overlay).
@@ -149,6 +155,7 @@ overlay).
   measured figure into prose.
 - D-040 (cxo) — confirms this page's specimen has shipped and
   ships this page.
+- Alpha DS gaps 6 — adds the named status tint pair (`statusTint`, `DabblerStatusColor.tint`).
 
 ## Source
 

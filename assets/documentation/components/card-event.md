@@ -56,6 +56,21 @@ overlay geometry, that's a ruling to revisit, not a drawing to re-transcribe.
 overlay step exists to reach for instead. Sport identity on Medium and Small comes from the title
 and a label, not from the cover.
 
+**Use the listing slots for a game in a list: `progress`, `price` and `action`.** All three
+densities take them. Pass a `DabblerCardEventPlayers` for the "9 of 10 players in" bar and its
+status note, a `DabblerCardEventPrice` for the amount and its unit, and
+`DabblerCardEventListing.joinButton` for Join — it is a full-width `Button`, so `loading` shows its
+spinner and `disabled` greys it for a full or past game. Progress and price share a row, price at
+the inline end; Join sits under them. A card with none of the three renders exactly as before.
+
+**The note's words carry the status, not its colour.** The bar and note take a status tone
+(`warning` for almost full, `error` for full), but "1 spot left" must say so in text.
+
+**Deviation:** the design draws the price at 22/27 bold in the sans face (`Listings.dc.html:251`).
+The ramp's 22 step is the display face, so the price takes the headline step (17) at bold.
+
+@specimen card-event/listing
+
 ## Axes
 
 ### Density (the size Axis)
@@ -95,7 +110,12 @@ Overlay well fill: the card surface colour.
 - D-022 (cxo) — the sport-icon overlay belongs to Large only;
   Medium and Small do not get a smaller version of it.
 
+- Alpha DS gaps 6 — adds the `progress`, `price` and `action` listing slots to all three
+  densities, with `DabblerCardEventPlayers`, `DabblerCardEventPrice` and
+  `DabblerCardEventListing` (`Listings.dc.html:242-259`). Large's own `footer` still renders,
+  under the slots.
+
 ## Source
 
 `lib/src/cards/card_event_large.dart`, `lib/src/cards/card_event_medium.dart`,
-`lib/src/cards/card_event_small.dart`
+`lib/src/cards/card_event_small.dart`, `lib/src/cards/card_event_listing.dart`

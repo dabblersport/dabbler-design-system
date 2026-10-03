@@ -117,6 +117,18 @@ tappable.
 scrolls inside its share of the row instead of overflowing, and under right-to-left it starts at
 the right edge.
 
+### Flat
+`flat: true` drops the card: no sunken fill, no corner and no inline padding, so the row runs to
+its parent's gutter. It is the row for picker lists inside sheets and pages — the location
+picker in the Listings design. A hairline in the faint divider colour runs under each flat row;
+`showDivider: false` drops it on the last row or where the list draws its own separators. Type,
+slots, tone, selection and the minimum height are the boxed row's.
+
+### Chevron direction
+The chevron is the design's bare open chevron. Under right-to-left it swaps to the glyph that is
+its exact pixel mirror rather than flipping, and a test re-renders the pair so the two cannot
+drift apart.
+
 ## Tokens used
 
 Destructive tone: the error role's strong step. Value: the footnote style at `textSecondary`
@@ -138,6 +150,10 @@ shared tokens and primitives every other tappable surface reads.
   chevron (D-027) versus the subtitle (D-003), and rules the shipped paint a real defect: the
   chevron must move to `textTertiary` to restore the weight difference the drawing gives it against
   the subtitle. Not yet shipped.
+
+- DS gaps 6 — `flat` and `showDivider` added. The chevron's glyphs corrected to the bare
+  chevron and its measured mirror; the previous pair drew a boxed chevron in one direction and a
+  shafted arrow in the other.
 
 ## Source
 

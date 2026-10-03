@@ -49,6 +49,17 @@ Widget _searchFields(BuildContext context) => const GalleryStack(
       ),
     ),
     GallerySpecimen(
+      label: 'loading — spinner in place of clear',
+      child: SizedBox(
+        width: _width,
+        child: DabblerSearchField(
+          placeholder: 'Search people, games, posts',
+          initialValue: 'dabbler',
+          loading: true,
+        ),
+      ),
+    ),
+    GallerySpecimen(
       label: 'with a query — clear at the inline end',
       child: SizedBox(
         width: _width,

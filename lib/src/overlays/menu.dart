@@ -104,19 +104,36 @@ class DabblerMenuEntry {
     this.selected = false,
     this.trailing,
     this.onSelect,
-  }) : isSeparator = false;
+  }) : isSeparator = false,
+       isHeading = false;
 
   /// A hairline rule between groups — `{ separator: true }` in the source.
   const DabblerMenuEntry.separator({this.id})
-      : label = '',
-        icon = null,
-        iconTone = null,
-        tone = DabblerMenuItemTone.defaultTone,
-        disabled = true,
-        selected = false,
-        trailing = null,
-        onSelect = null,
-        isSeparator = true;
+    : label = '',
+      icon = null,
+      iconTone = null,
+      tone = DabblerMenuItemTone.defaultTone,
+      disabled = true,
+      selected = false,
+      trailing = null,
+      onSelect = null,
+      isSeparator = true,
+      isHeading = false;
+
+  /// A non-selectable group header — DS gaps 6 (item 9), for
+  /// `DabblerSelect`'s option groups. Drawn by [DabblerMenuHeading]: never
+  /// focused, skipped by the arrows and type-ahead, and announced as a
+  /// heading rather than an item.
+  const DabblerMenuEntry.heading({required this.label, this.id})
+    : icon = null,
+      iconTone = null,
+      tone = DabblerMenuItemTone.defaultTone,
+      disabled = true,
+      selected = false,
+      trailing = null,
+      onSelect = null,
+      isSeparator = false,
+      isHeading = true;
 
   /// The row's text. `.t-subheadline`, sentence case.
   final String label;
@@ -153,8 +170,11 @@ class DabblerMenuEntry {
   /// Whether this entry draws a [DabblerMenuSeparator] instead of a row.
   final bool isSeparator;
 
+  /// Whether this entry draws a [DabblerMenuHeading] instead of a row.
+  final bool isHeading;
+
   /// Whether the arrow keys, type-ahead and Enter may land on this entry.
-  bool get isActivatable => !isSeparator && !disabled;
+  bool get isActivatable => !isSeparator && !isHeading && !disabled;
 
   @override
   bool operator ==(Object other) =>
@@ -169,15 +189,30 @@ class DabblerMenuEntry {
           other.selected == selected &&
           other.trailing == trailing &&
           other.onSelect == onSelect &&
-          other.isSeparator == isSeparator;
+          other.isSeparator == isSeparator &&
+          other.isHeading == isHeading;
 
   @override
-  int get hashCode => Object.hash(label, id, icon, iconTone, tone, disabled,
-      selected, trailing, onSelect, isSeparator);
+  int get hashCode => Object.hash(
+    label,
+    id,
+    icon,
+    iconTone,
+    tone,
+    disabled,
+    selected,
+    trailing,
+    onSelect,
+    isSeparator,
+    isHeading,
+  );
 
   @override
-  String toString() =>
-      isSeparator ? 'DabblerMenuEntry.separator()' : 'DabblerMenuEntry($label)';
+  String toString() => isSeparator
+      ? 'DabblerMenuEntry.separator()'
+      : isHeading
+      ? 'DabblerMenuEntry.heading($label)'
+      : 'DabblerMenuEntry($label)';
 }
 
 /// Where the popover landed, and which placement that actually is.
@@ -273,7 +308,13 @@ class DabblerMenu extends StatefulWidget {
     this.fullWidth = false,
     this.closeOnSelect = true,
     this.role = DabblerMenuRole.menu,
+    this.sheetTitle,
   });
+
+  /// The title of the sheet the menu becomes below [sheetBreakpoint], when it
+  /// should differ from [label] — DS gaps 6 (item 9). Null keeps [label] as
+  /// the title, which is the previous behaviour. Unused by the popover.
+  final String? sheetTitle;
 
   /// `max-width: 479px` — the viewport width at or below which the menu is a
   /// sheet (`Menu.jsx:39`). 480 is the first width that stays a popover.
@@ -408,9 +449,11 @@ class DabblerMenu extends StatefulWidget {
     double gap = anchorGap,
     double margin = viewportMargin,
   }) {
-    final bool wantsTop = placement == DabblerMenuPlacement.topStart ||
+    final bool wantsTop =
+        placement == DabblerMenuPlacement.topStart ||
         placement == DabblerMenuPlacement.topEnd;
-    final bool wantsEnd = placement == DabblerMenuPlacement.bottomEnd ||
+    final bool wantsEnd =
+        placement == DabblerMenuPlacement.bottomEnd ||
         placement == DabblerMenuPlacement.topEnd;
 
     // --- Block axis ---
@@ -418,8 +461,9 @@ class DabblerMenu extends StatefulWidget {
     final double above = anchor.top - gap - childSize.height;
     final bool belowFits = below + childSize.height <= viewport.height - margin;
     final bool aboveFits = above >= margin;
-    final bool flipBlock =
-        wantsTop ? (!aboveFits && belowFits) : (!belowFits && aboveFits);
+    final bool flipBlock = wantsTop
+        ? (!aboveFits && belowFits)
+        : (!belowFits && aboveFits);
     final bool onTop = wantsTop != flipBlock;
     double y = onTop ? above : below;
 
@@ -427,10 +471,12 @@ class DabblerMenu extends StatefulWidget {
     final bool rtl = textDirection == TextDirection.rtl;
     // Aligning the popover's inline-start edge with the trigger's means the
     // left edges in LTR and the right edges in RTL.
-    final double startAligned =
-        rtl ? anchor.right - childSize.width : anchor.left;
-    final double endAligned =
-        rtl ? anchor.left : anchor.right - childSize.width;
+    final double startAligned = rtl
+        ? anchor.right - childSize.width
+        : anchor.left;
+    final double endAligned = rtl
+        ? anchor.left
+        : anchor.right - childSize.width;
     bool overflows(double x) =>
         x < margin || x + childSize.width > viewport.width - margin;
 
@@ -458,11 +504,11 @@ class DabblerMenu extends StatefulWidget {
       offset: Offset(x, y),
       placement: onTop
           ? (resolvedEnd
-              ? DabblerMenuPlacement.topEnd
-              : DabblerMenuPlacement.topStart)
+                ? DabblerMenuPlacement.topEnd
+                : DabblerMenuPlacement.topStart)
           : (resolvedEnd
-              ? DabblerMenuPlacement.bottomEnd
-              : DabblerMenuPlacement.bottomStart),
+                ? DabblerMenuPlacement.bottomEnd
+                : DabblerMenuPlacement.bottomStart),
     );
   }
 
@@ -521,7 +567,8 @@ class _DabblerMenuState extends State<DabblerMenu> {
       return;
     }
     final SchedulerPhase phase = SchedulerBinding.instance.schedulerPhase;
-    final bool duringFrame = phase == SchedulerPhase.persistentCallbacks ||
+    final bool duringFrame =
+        phase == SchedulerPhase.persistentCallbacks ||
         phase == SchedulerPhase.midFrameMicrotasks;
     if (!duringFrame) {
       _apply();
@@ -584,9 +631,8 @@ class _DabblerMenuState extends State<DabblerMenu> {
         _anchorKey.currentContext?.findRenderObject() as RenderBox?;
     // The overlay's own box, not the builder context's: the overlay child has
     // not been laid out when this first runs, so its render object is null.
-    final RenderBox? overlay = Overlay.of(overlayContext)
-        .context
-        .findRenderObject() as RenderBox?;
+    final RenderBox? overlay =
+        Overlay.of(overlayContext).context.findRenderObject() as RenderBox?;
     if (anchor == null || overlay == null || !anchor.hasSize) {
       return null;
     }
@@ -619,7 +665,7 @@ class _DabblerMenuState extends State<DabblerMenu> {
         final Widget content = asSheet
             ? DabblerSheet(
                 onClose: _close,
-                title: widget.label,
+                title: widget.sheetTitle ?? widget.label,
                 detents: DabblerMenu.sheetDetents,
                 child: _list(inSheet: true),
               )
@@ -666,8 +712,7 @@ class _DabblerMenuState extends State<DabblerMenu> {
             // toggle, which `onClick` would not do.
             final Offset? down = _triggerDownAt;
             _triggerDownAt = null;
-            if (down == null ||
-                (event.position - down).distance > kTouchSlop) {
+            if (down == null || (event.position - down).distance > kTouchSlop) {
               return;
             }
             if (!widget.openOnTriggerTap) {
@@ -914,9 +959,9 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
   }
 
   List<int> get _activatable => <int>[
-        for (int i = 0; i < widget.items.length; i++)
-          if (widget.items[i].isActivatable) i,
-      ];
+    for (int i = 0; i < widget.items.length; i++)
+      if (widget.items[i].isActivatable) i,
+  ];
 
   void _setActive(int index, {bool focus = true}) {
     if (index < 0 || index >= widget.items.length) {
@@ -1025,6 +1070,11 @@ class _DabblerMenuListState extends State<DabblerMenuList> {
       for (int i = 0; i < widget.items.length; i++)
         if (widget.items[i].isSeparator)
           DabblerMenuSeparator(key: ValueKey<String>('sep-${_keyOf(i)}'))
+        else if (widget.items[i].isHeading)
+          DabblerMenuHeading(
+            key: ValueKey<String>('head-${_keyOf(i)}'),
+            label: widget.items[i].label,
+          )
         else
           DabblerMenuItem(
             key: ValueKey<String>(_keyOf(i)),
@@ -1283,10 +1333,7 @@ class DabblerMenuItem extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: disabled ? null : onSelect,
-        child: DabblerPressScale.gesture(
-          enabled: !disabled,
-          child: filled,
-        ),
+        child: DabblerPressScale.gesture(enabled: !disabled, child: filled),
       ),
     );
 
@@ -1301,9 +1348,7 @@ class DabblerMenuItem extends StatelessWidget {
         DabblerMenuRole.listbox => SemanticsRole.listItem,
       },
       child: MouseRegion(
-        cursor: disabled
-            ? SystemMouseCursors.basic
-            : SystemMouseCursors.click,
+        cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
         onEnter: disabled || onHover == null
             ? null
             : (PointerEnterEvent _) => onHover!(),
@@ -1318,11 +1363,7 @@ class DabblerMenuItem extends StatelessWidget {
   Widget _leading(DabblerColors colors, Color foreground) {
     final DabblerMenuIconTone? tone = iconTone;
     if (tone == null) {
-      return DabblerIcon(
-        icon!,
-        size: DabblerSizing.iconSm,
-        color: foreground,
-      );
+      return DabblerIcon(icon!, size: DabblerSizing.iconSm, color: foreground);
     }
     final Color tint = toneColorOf(tone, colors);
     return SizedBox(
@@ -1335,11 +1376,7 @@ class DabblerMenuItem extends StatelessWidget {
           borderRadius: DabblerRadius.mdAll,
         ),
         child: Center(
-          child: DabblerIcon(
-            icon!,
-            size: DabblerSizing.iconSm,
-            color: tint,
-          ),
+          child: DabblerIcon(icon!, size: DabblerSizing.iconSm, color: tint),
         ),
       ),
     );
@@ -1366,6 +1403,49 @@ class DabblerMenuSeparator extends StatelessWidget {
       child: SizedBox(
         height: DabblerSizing.borderDefault,
         child: ColoredBox(color: colors.bgTertiary),
+      ),
+    );
+  }
+}
+
+/// A group header inside a [DabblerMenuList] — DS gaps 6 (item 9).
+///
+/// The Listings filter sheets head each option group with
+/// `font-size:13px; line-height:18px; font-weight:600; color:var(--muted)`
+/// (`Listings.dc.html:293`): [DabblerType.footnote] (13) at
+/// [DabblerType.semibold] in [DabblerColors.textSecondary]. Inline padding is
+/// the item row's own [DabblerSpacing.space3] so the header aligns with the
+/// labels beneath it; it is not focusable and is announced as a heading.
+class DabblerMenuHeading extends StatelessWidget {
+  /// Creates a group header.
+  const DabblerMenuHeading({super.key, required this.label});
+
+  /// The group's name.
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    return Semantics(
+      header: true,
+      label: label,
+      excludeSemantics: true,
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(
+          DabblerSpacing.space3,
+          DabblerSpacing.space3,
+          DabblerSpacing.space3,
+          DabblerSpacing.space1,
+        ),
+        child: Text(
+          label,
+          style: DabblerType.footnote
+              .resolveForDirection(Directionality.of(context))
+              .copyWith(
+                color: colors.textSecondary,
+                fontWeight: DabblerType.semibold,
+              ),
+        ),
       ),
     );
   }

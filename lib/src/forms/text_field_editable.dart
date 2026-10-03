@@ -24,11 +24,13 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
 
     final bool multiline = widget.variant == DabblerTextFieldVariant.multiline;
     final bool password = widget.variant == DabblerTextFieldVariant.password;
+    final bool showLoading = widget.loading && !password;
     final bool showClear =
         widget.variant == DabblerTextFieldVariant.search &&
         widget.clearable &&
         _hasText &&
-        !disabled;
+        !disabled &&
+        !showLoading;
 
     // `TextField.jsx:105-110` — the input's own type is `.t-body`'s metrics,
     // 16/21, which is exactly [DabblerType.body].
@@ -60,7 +62,7 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
       // The clear button follows the same inset, with no block padding: its
       // 45px target already fills the box's 45px minimum height, so the box
       // does not grow when the button appears.
-      innerPadding: showClear
+      innerPadding: showClear || showLoading
           ? const EdgeInsetsDirectional.fromSTEB(
               DabblerSpacing.space4,
               0,
@@ -89,6 +91,7 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
             child: TextField(
               controller: _controller,
               focusNode: _focusNode,
+              autofocus: widget.autofocus,
               enabled: widget.enabled,
               style: textStyle,
               cursorColor: colors.brandPrimary,
@@ -147,6 +150,8 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
             color: colors.textSecondary,
             onPressed: _toggleReveal,
           )
+        else if (showLoading)
+          const _LoadingSlot()
         else if (showClear)
           _ClearButton(
             label: widget.clearLabel,

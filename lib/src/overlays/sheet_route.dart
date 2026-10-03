@@ -31,6 +31,9 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     this.detents = const <double>[0.5],
     this.dragHandle = true,
     this.title,
+    this.titleSpan,
+    this.titleWidget,
+    this.headerActionBuilder,
     this.footerBuilder,
     this.dismissible = true,
     this.closeLabel = DabblerSheet.defaultCloseLabel,
@@ -57,6 +60,15 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
 
   /// See [DabblerSheet.title].
   final String? title;
+
+  /// See [DabblerSheet.titleSpan].
+  final InlineSpan? titleSpan;
+
+  /// See [DabblerSheet.titleWidget].
+  final Widget? titleWidget;
+
+  /// Builds the trailing header action. See [DabblerSheet.headerAction].
+  final WidgetBuilder? headerActionBuilder;
 
   /// Builds the pinned footer. See [DabblerSheet.footer].
   final WidgetBuilder? footerBuilder;
@@ -95,6 +107,9 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
       detents: detents,
       dragHandle: dragHandle,
       title: title,
+      titleSpan: titleSpan,
+      titleWidget: titleWidget,
+      headerAction: headerActionBuilder?.call(context),
       footer: footerBuilder?.call(context),
       dismissible: dismissible,
       closeLabel: closeLabel,
@@ -118,8 +133,8 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     return SlideTransition(
       position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
           .animate(
-        CurvedAnimation(parent: animation, curve: DabblerMotion.easeOut),
-      ),
+            CurvedAnimation(parent: animation, curve: DabblerMotion.easeOut),
+          ),
       child: child,
     );
   }
@@ -137,12 +152,19 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
 ///   builder: (BuildContext context) => const _FilterBody(),
 /// );
 /// ```
+///
+/// A filters sheet with a trailing *Reset* action (`Listings.dc.html:286-289`)
+/// passes `headerActionBuilder`; the builder runs in the route's context, so
+/// the action can pop or reset as it needs.
 Future<T?> showDabblerSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
   List<double> detents = const <double>[0.5],
   bool dragHandle = true,
   String? title,
+  InlineSpan? titleSpan,
+  Widget? titleWidget,
+  WidgetBuilder? headerActionBuilder,
   WidgetBuilder? footerBuilder,
   bool dismissible = true,
   String closeLabel = DabblerSheet.defaultCloseLabel,
@@ -156,6 +178,9 @@ Future<T?> showDabblerSheet<T>({
       detents: detents,
       dragHandle: dragHandle,
       title: title,
+      titleSpan: titleSpan,
+      titleWidget: titleWidget,
+      headerActionBuilder: headerActionBuilder,
       footerBuilder: footerBuilder,
       dismissible: dismissible,
       closeLabel: closeLabel,

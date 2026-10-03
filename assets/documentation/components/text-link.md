@@ -38,6 +38,11 @@ span's style on its own; give it the same style and only its colour and underlin
 **Keep inline labels short.** An inline link is one unbreakable piece and does not wrap across a
 line end.
 
+**A section-header link ("Manage", "See all") is the standalone shape without the underline.**
+Pass `underline: false` and the footnote step at the weight the design draws. `trailingIcon` adds an
+optional glyph after the label in the link's colour, mirrored in right-to-left; it is decorative and
+adds nothing to the link's name.
+
 **Pass `onPressed: null` to disable it, not a no-op.** It then reads in the tertiary text role and
 is announced as disabled.
 
@@ -69,6 +74,7 @@ at medium weight. Target: `touchTargetMin` (45). Focus ring: the shared ring at 
 ## Change log
 
 - Alpha DS gaps 5 — adds this component.
+- Alpha DS gaps 6 — adds `underline` (on by default) and `trailingIcon` for the lone section link.
 
 ## Source
 
