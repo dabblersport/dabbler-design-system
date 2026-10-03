@@ -20,7 +20,7 @@ enum DabblerSportIconOutcome {
   /// [DabblerSportIconRegistry] → *Open blocker*.
   fallback,
 
-  /// The `sport` string is not one of the thirteen. Warned once, and the
+  /// The `sport` string is not one of the known sports. Warned once, and the
   /// generic `game` glyph is drawn.
   ///
   /// Only reachable through [DabblerSportIconRegistry.resolveKey]; the
@@ -59,8 +59,7 @@ class DabblerSportGlyph {
   /// The builder for [weight], falling back to [linear] when [bold] is absent.
   Widget Function(BuildContext context, double size, Color color) builderFor(
     DabblerIconWeight weight,
-  ) =>
-      weight == DabblerIconWeight.bold ? (bold ?? linear) : linear;
+  ) => weight == DabblerIconWeight.bold ? (bold ?? linear) : linear;
 
   /// Whether this entry actually carries the requested weight.
   bool hasWeight(DabblerIconWeight weight) =>
@@ -112,7 +111,8 @@ class DabblerSportIconResolution {
   bool get hasGlyph => glyph != null;
 
   @override
-  String toString() => 'DabblerSportIconResolution($requestedKey -> '
+  String toString() =>
+      'DabblerSportIconResolution($requestedKey -> '
       '${hasGlyph ? 'registered glyph' : 'Iconsax "$iconsaxName"'}, '
       '${weight.name}, ${outcome.name})';
 }
@@ -235,6 +235,14 @@ abstract final class DabblerSportIconRegistry {
     DabblerSport.tennis: 'ticket-2',
     DabblerSport.badminton: 'ticket-2',
     DabblerSport.tableTennis: 'ticket-2',
+    // KAN-411 additions — not in the design source's FALLBACKS. Chosen by the
+    // source's own grouping rationale: team/ball games take `game`, racket
+    // sports take `ticket-2`. (D-009: still never icon-only.)
+    DabblerSport.handball: 'game',
+    DabblerSport.baseball: 'game',
+    DabblerSport.rugby: 'game',
+    DabblerSport.hockey: 'game',
+    DabblerSport.squash: 'ticket-2',
   };
 
   /// What an unrecognised sport string draws.
@@ -313,9 +321,9 @@ abstract final class DabblerSportIconRegistry {
     _warnOnce(
       'fallback:${sport.key}',
       '[Dabbler DS] SportIcon "${sport.key}" has no licensed glyph yet — '
-      'falling back to Iconsax "$fallbackName". Register the commissioned set '
-      'with DabblerSportIconRegistry.registerSportIcons() to resolve every '
-      'sport. See SportIcon.prompt.md -> Blocker.',
+          'falling back to Iconsax "$fallbackName". Register the commissioned set '
+          'with DabblerSportIconRegistry.registerSportIcons() to resolve every '
+          'sport. See SportIcon.prompt.md -> Blocker.',
     );
 
     return DabblerSportIconResolution(
@@ -345,7 +353,7 @@ abstract final class DabblerSportIconRegistry {
     _warnOnce(
       'unknown:$key',
       '[Dabbler DS] SportIcon: unknown sport "$key". Supported: '
-      '${kDabblerSports.map((DabblerSport s) => s.key).join(', ')}.',
+          '${kDabblerSports.map((DabblerSport s) => s.key).join(', ')}.',
     );
 
     return DabblerSportIconResolution(
@@ -462,7 +470,8 @@ class DabblerSportIcon extends StatelessWidget {
     }
 
     final double side = size ?? DabblerSizing.iconMd;
-    final Color tint = color ??
+    final Color tint =
+        color ??
         IconTheme.of(context).color ??
         DabblerColors.of(context).textPrimary;
 

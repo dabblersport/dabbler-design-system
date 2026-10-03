@@ -85,6 +85,8 @@ export 'src/feedback/progress_bar.dart' hide progressSweepOffsetAt;
 export 'src/feedback/progress_bar_gallery.dart';
 export 'src/feedback/skeleton.dart';
 export 'src/feedback/skeleton_gallery.dart';
+export 'src/feedback/ring.dart';
+export 'src/feedback/ring_gallery.dart';
 export 'src/feedback/spinner.dart';
 export 'src/feedback/spinner_gallery.dart';
 export 'src/feedback/toast.dart';

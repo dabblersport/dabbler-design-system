@@ -26,7 +26,8 @@ const List<GalleryEntry> foundationsGalleryEntries = <GalleryEntry>[
     page: 'foundations/icons',
     group: null,
     title: 'Icon — the app vocabulary',
-    description: 'The specimen\'s sixteen names in both weights — linear in '
+    description:
+        'The specimen\'s sixteen names in both weights — linear in '
         'ink, bold in brand — then the three sizes and the full vocabulary.',
     builder: _icons,
   ),
@@ -35,7 +36,8 @@ const List<GalleryEntry> foundationsGalleryEntries = <GalleryEntry>[
     page: 'foundations/sports',
     group: null,
     title: 'SportIcon — every sport',
-    description: 'DabblerSport.values in both weights, each on its documented '
+    description:
+        'DabblerSport.values in both weights, each on its documented '
         'Iconsax fallback until the licensed set is registered.',
     builder: _sportIcons,
   ),
@@ -44,17 +46,33 @@ const List<GalleryEntry> foundationsGalleryEntries = <GalleryEntry>[
     page: 'foundations/sports',
     group: null,
     title: 'SportBackground — every variant',
-    description: 'The 160×284 artwork frame per sport. Nothing is registered '
-        'in this package, so every frame is the "not registered" state.',
+    description:
+        'The 160×284 artwork frame per sport. No PNG is bundled in '
+        'this package — and none exists in the design for handball, squash, '
+        'baseball, rugby or hockey — so each frame is the "not registered" or '
+        'missing-asset state.',
     builder: _sportBackgrounds,
   ),
 ];
 
 /// `const NAMES = [...]` from the specimen, in its order.
 const List<String> _specimenNames = <String>[
-  'home-2', 'search-normal', 'add-circle', 'user', 'people',
-  'notification-bing', 'calendar', 'location', 'game', 'cup', 'clock', 'star',
-  'heart', 'sms', 'setting-2', 'filter',
+  'home-2',
+  'search-normal',
+  'add-circle',
+  'user',
+  'people',
+  'notification-bing',
+  'calendar',
+  'location',
+  'game',
+  'cup',
+  'clock',
+  'star',
+  'heart',
+  'sms',
+  'setting-2',
+  'filter',
 ];
 
 Widget _icons(BuildContext context) {
