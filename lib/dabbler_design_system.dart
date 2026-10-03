@@ -115,6 +115,8 @@ export 'src/feed/reply_composer.dart';
 export 'src/feed/thread_gallery.dart';
 export 'src/media/image.dart';
 export 'src/media/image_gallery.dart';
+export 'src/media/provider_mark.dart';
+export 'src/media/provider_mark_gallery.dart';
 export 'src/forms/checkbox.dart';
 export 'src/forms/code_input.dart';
 export 'src/forms/date_field.dart';
