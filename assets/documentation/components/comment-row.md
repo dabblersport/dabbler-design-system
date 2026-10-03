@@ -51,6 +51,12 @@ Top-level or nested, at any depth.
 ### State
 Liked or not, with or without the replies toggle, more action, attachment and divider.
 
+### Several attachments
+`attachments` lays several media items out in a wrap under the body that runs from the start edge,
+each clipped to the large corner; a single `attachment` still works and comes first. Deviation: the
+Post design draws no media in a reply, so the gap is the tightest step that keeps two hairlines
+apart.
+
 ## Direction
 
 Every inset is logical. The avatar leads, the more action trails, and the depth indent grows from the start edge.
@@ -62,6 +68,7 @@ Ink: primary for the name, secondary for handle, time, body and Reply, tertiary 
 ## Change log
 
 - Added from the Post design file (KAN-412 gaps 5).
+- DS gaps 6 — several attachments in one row.
 
 ## Source
 

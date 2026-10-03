@@ -189,6 +189,7 @@ Widget _composers(BuildContext context) => GalleryStack(
               onTap: _noop,
               active: true,
             ),
+            DabblerReplyComposerAction.text(label: 'GIF', onTap: _noop),
           ],
         ),
       ),
@@ -245,6 +246,13 @@ Widget _chips(BuildContext context) => GalleryStack(
           const DabblerAttachmentChip(
             icon: 'location',
             label: 'Al Quoz Pond Park',
+            onRemove: _noop,
+          ),
+          DabblerAttachmentChip(
+            thumbnail: _media(context),
+            semanticLabel: 'Landscape photo',
+            size: const Size(80, 60),
+            borderRadius: DabblerRadius.mdAll,
             onRemove: _noop,
           ),
         ],

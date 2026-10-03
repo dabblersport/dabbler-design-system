@@ -456,11 +456,11 @@ void main() {
   });
 
   group('Chevron', () {
-    testWidgets('is arrow-right at --icon-sm in LTR', (
+    testWidgets('is the bare chevron arrow-right-3 at --icon-sm in LTR', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(_host(const DabblerChevron()));
-      expect(DabblerChevron.iconNameFor(TextDirection.ltr), 'arrow-right');
+      expect(DabblerChevron.iconNameFor(TextDirection.ltr), 'arrow-right-3');
       expect(DabblerChevron.size, DabblerSizing.iconSm);
       expect(DabblerChevron.size, 18);
       expect(tester.takeException(), isNull);
@@ -472,7 +472,7 @@ void main() {
       await tester.pumpWidget(
         _host(const DabblerChevron(), direction: TextDirection.rtl),
       );
-      expect(DabblerChevron.iconNameFor(TextDirection.rtl), 'arrow-left');
+      expect(DabblerChevron.iconNameFor(TextDirection.rtl), 'arrow-left-2');
       expect(
         find.descendant(
           of: find.byType(DabblerChevron),

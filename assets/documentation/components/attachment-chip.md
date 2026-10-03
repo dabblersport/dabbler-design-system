@@ -46,6 +46,11 @@ Thumbnail or pill.
 ### State
 With or without the remove button and a tap.
 
+### Shape
+`size` gives a thumbnail an exact non-square box, and `aspectRatio` widens it from the thumbnail
+height instead. `borderRadius` takes another radius token for a smaller tile; the large corner stays
+the default.
+
 ## Direction
 
 The remove button sits at the end corner and mirrors under right-to-left; the pill's icon leads.
@@ -57,6 +62,7 @@ Surfaces: sunken behind a thumbnail, card for the pill. Overlay: the scrim role 
 ## Change log
 
 - Added from the Post design file (KAN-412 gaps 5).
+- DS gaps 6 — non-square thumbnails and a radius override.
 
 ## Source
 

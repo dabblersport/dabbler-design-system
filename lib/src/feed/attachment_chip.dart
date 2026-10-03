@@ -53,10 +53,18 @@ class DabblerAttachmentChip extends StatelessWidget {
     this.onTap,
     this.removeLabel = 'Remove attachment',
     this.thumbnailSize = defaultThumbnailSize,
+    this.size,
+    this.aspectRatio,
+    this.borderRadius,
   }) : assert(
          thumbnail != null || label != null,
          'give a thumbnail or a label',
-       );
+       ),
+       assert(
+         size == null || aspectRatio == null,
+         'give size or aspectRatio, not both',
+       ),
+       assert(aspectRatio == null || aspectRatio > 0, 'aspectRatio > 0');
 
   /// The photo or GIF preview (a [DabblerImage], say). With it the chip is a
   /// square tile; without it, a pill of [icon] and [label].
@@ -81,8 +89,26 @@ class DabblerAttachmentChip extends StatelessWidget {
   /// The remove button's accessible name, localised.
   final String removeLabel;
 
-  /// The thumbnail's side.
+  /// The thumbnail's side — or, with [aspectRatio], its height.
   final double thumbnailSize;
+
+  /// A non-square thumbnail's exact box, e.g. `Size(80, 60)` or
+  /// `Size(200, 150)` (DS gaps 6, item 14). Wins over [thumbnailSize].
+  /// Ignored by the pill.
+  final Size? size;
+
+  /// width / height of a non-square thumbnail whose height is
+  /// [thumbnailSize] — `4 / 3` at 60 is 80x60. Ignored by the pill.
+  final double? aspectRatio;
+
+  /// The thumbnail's corners. Null is [DabblerRadius.lgAll] (`:541`); pass
+  /// another radius token (e.g. [DabblerRadius.mdAll]) for a smaller tile.
+  final BorderRadius? borderRadius;
+
+  /// The thumbnail box this chip draws: [size], else [thumbnailSize] tall at
+  /// [aspectRatio], else the [thumbnailSize] square.
+  Size get thumbnailBox =>
+      size ?? Size(thumbnailSize * (aspectRatio ?? 1), thumbnailSize);
 
   /// Thumbnail side — `96x96` (`:541`).
   static const double defaultThumbnailSize = 96;
@@ -117,27 +143,29 @@ class DabblerAttachmentChip extends StatelessWidget {
     final TextDirection dir = Directionality.of(context);
 
     if (thumbnail != null) {
+      final Size box = thumbnailBox;
+      final BorderRadius radius = borderRadius ?? DabblerRadius.lgAll;
       final Widget tile = DabblerFeedTappable(
         onTap: onTap,
         semanticLabel: semanticLabel ?? label,
         excludeChildSemantics: true,
-        borderRadius: DabblerRadius.lgAll,
+        borderRadius: radius,
         child: Semantics(
           label: onTap == null ? (semanticLabel ?? label) : null,
           image: true,
           child: Container(
-            width: thumbnailSize,
-            height: thumbnailSize,
+            width: box.width,
+            height: box.height,
             clipBehavior: Clip.antiAlias,
             foregroundDecoration: BoxDecoration(
-              borderRadius: DabblerRadius.lgAll,
+              borderRadius: radius,
               border: Border.all(
                 color: colors.borderDefault,
                 width: DabblerSizing.borderDefault,
               ),
             ),
             decoration: BoxDecoration(
-              borderRadius: DabblerRadius.lgAll,
+              borderRadius: radius,
               color: colors.surfaceSunken,
             ),
             child: ExcludeSemantics(child: thumbnail),
@@ -145,8 +173,8 @@ class DabblerAttachmentChip extends StatelessWidget {
         ),
       );
       return SizedBox(
-        width: thumbnailSize,
-        height: thumbnailSize,
+        width: box.width,
+        height: box.height,
         child: Stack(
           children: <Widget>[
             tile,
