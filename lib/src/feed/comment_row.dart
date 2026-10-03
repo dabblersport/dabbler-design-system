@@ -63,6 +63,7 @@ class DabblerCommentRow extends StatelessWidget {
     this.bodySpan,
     this.attachment,
     this.likes = 0,
+    this.showLike = true,
     this.liked = false,
     this.depth = 0,
     this.divider,
@@ -110,6 +111,10 @@ class DabblerCommentRow extends StatelessWidget {
 
   /// The like count.
   final int likes;
+
+  /// Whether the like action is drawn. Default true; a thread whose comments
+  /// carry no like data passes false so no inert heart shows.
+  final bool showLike;
 
   /// Whether the viewer liked the reply (bold, error-coloured heart).
   final bool liked;
@@ -278,15 +283,16 @@ class DabblerCommentRow extends StatelessWidget {
 
     final Widget actions = Row(
       children: <Widget>[
-        DabblerFeedAction(
-          icon: 'heart',
-          count: likes,
-          iconSize: actionGlyphSize,
-          weight: liked ? DabblerIconWeight.bold : DabblerIconWeight.linear,
-          color: liked ? colors.error.base : null,
-          onTap: onLike,
-          semanticLabel: likeLabel,
-        ),
+        if (showLike)
+          DabblerFeedAction(
+            icon: 'heart',
+            count: likes,
+            iconSize: actionGlyphSize,
+            weight: liked ? DabblerIconWeight.bold : DabblerIconWeight.linear,
+            color: liked ? colors.error.base : null,
+            onTap: onLike,
+            semanticLabel: likeLabel,
+          ),
         if (onReply != null)
           _textAction(replyLabel, colors.textSecondary, onReply!, actionStyle),
         if (repliesLabel != null && onViewReplies != null) ...<Widget>[
