@@ -32,6 +32,13 @@ import 'text_field.dart';
 ///   none.
 /// * Its semantics label is [clearLabel]; pass the localised word, as the
 ///   package carries no strings of its own beyond the English default.
+///
+/// ## Loading, focus and forms
+///
+/// [loading] swaps the clear button for an 18px brand spinner in the same
+/// 45×45 slot while a query is in flight; [autofocus] opens the screen on the
+/// keyboard; [validator], [autovalidateMode], [onSaved] and [suffixText] are
+/// forwarded unchanged to [DabblerTextField].
 class DabblerSearchField extends StatelessWidget {
   /// Creates a search field.
   const DabblerSearchField({
@@ -50,6 +57,12 @@ class DabblerSearchField extends StatelessWidget {
     this.focusNode,
     this.keyboardType,
     this.textInputAction = TextInputAction.search,
+    this.autofocus = false,
+    this.loading = false,
+    this.validator,
+    this.autovalidateMode,
+    this.onSaved,
+    this.suffixText,
   });
 
   /// The text being edited; see [DabblerTextField.controller].
@@ -94,6 +107,29 @@ class DabblerSearchField extends StatelessWidget {
   /// The action key. Defaults to [TextInputAction.search].
   final TextInputAction textInputAction;
 
+  /// Whether the field takes focus when first built — a search screen that
+  /// opens straight onto the keyboard. Default `false`.
+  final bool autofocus;
+
+  /// While `true`, a small brand spinner takes the inline-end slot in place
+  /// of the clear button (a query in flight). The field stays editable. See
+  /// [DabblerTextField.loading].
+  final bool loading;
+
+  /// Forwarded to [DabblerTextField.validator] — registers the field in an
+  /// enclosing [Form].
+  final FormFieldValidator<String>? validator;
+
+  /// Forwarded to [DabblerTextField.autovalidateMode].
+  final AutovalidateMode? autovalidateMode;
+
+  /// Forwarded to [DabblerTextField.onSaved].
+  final FormFieldSetter<String>? onSaved;
+
+  /// Forwarded to [DabblerTextField.suffixText] — short trailing text such as
+  /// a result count.
+  final String? suffixText;
+
   @override
   Widget build(BuildContext context) {
     return DabblerTextField(
@@ -112,6 +148,12 @@ class DabblerSearchField extends StatelessWidget {
       focusNode: focusNode,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
+      autofocus: autofocus,
+      loading: loading,
+      validator: validator,
+      autovalidateMode: autovalidateMode,
+      onSaved: onSaved,
+      suffixText: suffixText,
     );
   }
 }

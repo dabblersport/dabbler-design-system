@@ -7,8 +7,10 @@ import '../interaction/press_scale.dart';
 import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 
+part 'top_bar_title.dart';
 part 'top_bar_unread_dot.dart';
 
 /// One trailing action in a [DabblerNavigationTopBar].
@@ -159,7 +161,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.avatarImageUrl,
   })  : title = null,
         onBack = null,
-        backLabel = defaultBackLabel;
+        backLabel = defaultBackLabel,
+        _titled = false,
+        titleOpacity = 1,
+        scrollController = null,
+        titleRevealOffset = defaultTitleRevealOffset;
 
   /// The titled variant: a back button, a title and trailing actions — the
   /// inner-screen header of the design files `Settings.dc.html` (`isInner`
@@ -169,6 +175,17 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// The back glyph is `arrow-circle-left` in LTR and `arrow-circle-right` in
   /// RTL, so it always points toward the reading start. [title] may be null
   /// (the Article header shows its title only once the page has scrolled).
+  ///
+  /// This constructor **always** draws the titled variant — a null or empty
+  /// [title] with no [onBack] is still a titled bar with an empty title slot,
+  /// never the wordmark.
+  ///
+  /// **Scroll-fade.** [titleOpacity] fades the title directly (a caller
+  /// scrubbing it from its own scroll position). [scrollController] instead
+  /// reveals it — opacity 0 until the controller's offset passes
+  /// [titleRevealOffset], then [titleOpacity] — animated over
+  /// [DabblerMotion.base], immediate under reduced motion
+  /// (`Profiles.dc.html:57, 815-822, 932`).
   const DabblerNavigationTopBar.titled({
     super.key,
     this.title,
@@ -177,7 +194,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.actions = const <DabblerNavigationAction>[],
     this.border = false,
     this.safeArea = true,
-  })  : avatarSeed = defaultAvatarSeed,
+    this.titleOpacity = 1,
+    this.scrollController,
+    this.titleRevealOffset = defaultTitleRevealOffset,
+  })  : _titled = true,
+        avatarSeed = defaultAvatarSeed,
         avatarBadge = null,
         onAvatarPressed = null,
         avatarLabel = 'Account',
@@ -206,8 +227,26 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// when it fails.
   final String? avatarImageUrl;
 
-  /// Whether this bar is the titled (back + title) variant.
-  bool get isTitled => title != null || onBack != null;
+  /// Whether this bar is the titled (back + title) variant — true for every
+  /// bar built by [DabblerNavigationTopBar.titled], whatever its [title].
+  bool get isTitled => _titled;
+
+  final bool _titled;
+
+  /// The title's opacity, 0–1. Default 1 (always shown). Titled variant only.
+  final double titleOpacity;
+
+  /// When given, the title is hidden until this controller has scrolled past
+  /// [titleRevealOffset], then fades in. Titled variant only.
+  final ScrollController? scrollController;
+
+  /// The scroll offset past which [scrollController] reveals the title.
+  final double titleRevealOffset;
+
+  /// [titleRevealOffset]'s default — the `18` floor of
+  /// `Math.max(el.offsetHeight - 52, 18)` (`Profiles.dc.html:818`),
+  /// [DabblerSpacing.space6].
+  static const double defaultTitleRevealOffset = DabblerSpacing.space6;
 
   /// Diameter of the titled variant's back button — `40x40` in
   /// `Settings.dc.html` and `Article.dc.html`, inside a 45px hit box.
@@ -541,11 +580,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
         Expanded(
           child: Semantics(
             header: true,
-            child: Text(
-              title ?? '',
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.ellipsis,
+            child: _TopBarTitle(
+              text: title ?? '',
+              opacity: titleOpacity,
+              controller: scrollController,
+              revealOffset: titleRevealOffset,
               // `font-size:16px;line-height:21px;font-weight:600;color:var(--ink)`
               // — the body step at semibold (weight override only).
               style: DabblerType.body

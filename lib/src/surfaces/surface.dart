@@ -229,6 +229,32 @@ class DabblerSurface extends StatelessWidget {
           clipBehavior: clipBehavior,
         );
 
+  /// The brand tint as a **full-bleed page section** — the profile hero band
+  /// behind the avatar, name and stats (`Profiles.dc.html:70`, `:933-934`):
+  /// [DabblerSurfaceVariant.brandTint]'s fill with **no radius, no hairline
+  /// and no clip**, so it runs edge to edge and meets the bar above it.
+  ///
+  /// **Deviation (strength).** The design mixes the brand at 14% into white;
+  /// the system's one brand tint ([brandTintFill]) is 8% light / 22% dark.
+  /// The existing tint is used — no new colour is introduced for one band.
+  const DabblerSurface.brandTintBleed({
+    Key? key,
+    Widget? child,
+    EdgeInsetsGeometry? padding,
+    double? width,
+    double? height,
+  }) : this(
+          key: key,
+          child: child,
+          variant: DabblerSurfaceVariant.brandTint,
+          radius: 0,
+          borderWidth: 0,
+          padding: padding,
+          width: width,
+          height: height,
+          clipBehavior: Clip.none,
+        );
+
   /// The solid brand fill of a selected control —
   /// [DabblerSurfaceVariant.selected].
   const DabblerSurface.selected({

@@ -52,10 +52,20 @@ built on), `sunken` (a fill step with no hairline — separation comes from the 
 `grey` (the neutral inset panel, also borderless), `brandTint` (opaque brand tint with the card
 hairline), `selected` (solid brand fill, no border).
 
+`DabblerSurface.brandTintBleed` is the brand tint as a full-bleed page section: no radius, no
+hairline, no clip, so a profile hero band runs edge to edge.
+
+**Deviation (bleed strength):** the design's hero band is a stronger brand mix than the system's
+one brand tint. The existing tint is used; no colour is added for one band.
+
 ## Tokens used
 
 Fill varies by variant — the card surface, the sunken/grey fill steps, the brand tint, or a solid
 brand fill for `selected`. Hairline: `borderDefault`, present on `card` and `brandTint` only.
+
+## Change log
+
+- Alpha DS gaps 6 — adds `brandTintBleed`.
 
 ## Source
 

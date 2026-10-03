@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -53,6 +54,30 @@ import '../tokens/dabbler_type.dart';
 /// **Limitation.** A [WidgetSpan] is one unbreakable box, so an inline label
 /// does not wrap across a line end; keep inline labels short.
 ///
+/// ## A lone section link ("Manage", "See all")
+///
+/// `Profiles.dc.html:153` draws a section-header "Manage" as `13px/18px`,
+/// weight 600, `--color-brand-primary`, **no underline**, alone at the end
+/// of the row; `Home Feed.dc.html:102` does the same for "See all" at weight
+/// 400. That is this widget, standalone, with `underline: false` and
+/// `style:` the footnote step (13/18) at the weight drawn. [trailingIcon]
+/// optionally adds a glyph after the label (a chevron or arrow), at
+/// [DabblerSizing.iconSm] in the link's colour, [DabblerSpacing.space1] from
+/// the text, mirrored in RTL so it always points along the reading
+/// direction. Neither design frame draws the glyph; it is optional and off by
+/// default.
+///
+/// ```dart
+/// DabblerTextLink(
+///   label: 'Manage',
+///   underline: false,
+///   style: DabblerType.footnote.resolveForDirection(dir)
+///       .copyWith(fontWeight: DabblerType.semibold),
+///   trailingIcon: 'arrow-right-3',
+///   onPressed: openManage,
+/// )
+/// ```
+///
 /// ## Colours
 ///
 /// Enabled: [DabblerColors.brandPrimary], underlined in the same colour.
@@ -88,6 +113,8 @@ class DabblerTextLink extends StatelessWidget {
     this.semanticsLabel,
     this.focusNode,
     this.autofocus = false,
+    this.underline = true,
+    this.trailingIcon,
   });
 
   /// `text-underline-offset: 2px` (`Auth and Onboarding.dc.html:129`) has no
@@ -138,6 +165,14 @@ class DabblerTextLink extends StatelessWidget {
   /// Focuses the link on mount.
   final bool autofocus;
 
+  /// Whether the label is underlined. Default `true` (the auth links); pass
+  /// `false` for a section-header link such as "Manage".
+  final bool underline;
+
+  /// An optional glyph after the label (standalone only; ignored inline),
+  /// mirrored in RTL. Decorative — it adds nothing to the accessible name.
+  final String? trailingIcon;
+
   /// The resolved text style for [colors] and [direction].
   TextStyle resolveStyle(
     BuildContext context,
@@ -155,7 +190,7 @@ class DabblerTextLink extends StatelessWidget {
         : colors.brandPrimary;
     return base.copyWith(
       color: color,
-      decoration: decoration,
+      decoration: underline ? decoration : TextDecoration.none,
       decorationColor: color,
     );
   }
@@ -172,6 +207,22 @@ class DabblerTextLink extends StatelessWidget {
       maxLines: inline ? 1 : null,
       softWrap: !inline,
     );
+    final String? glyph = trailingIcon;
+    if (!inline && glyph != null) {
+      text = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Flexible(child: text),
+          const SizedBox(width: DabblerSpacing.space1),
+          DabblerIcon(
+            glyph,
+            size: DabblerSizing.iconSm,
+            color: enabled ? colors.brandPrimary : colors.textTertiary,
+            mirrorInRtl: true,
+          ),
+        ],
+      );
+    }
     if (!inline) {
       text = ConstrainedBox(
         constraints: const BoxConstraints(

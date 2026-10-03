@@ -157,3 +157,17 @@ class _ClearButton extends StatelessWidget {
     );
   }
 }
+
+/// [DabblerTextField.loading]'s trailing slot — a `sm` [DabblerSpinner] in
+/// the brand tone, centred in the clear button's 45×45 box so swapping one for
+/// the other never shifts the text. The spinner is its own live region.
+class _LoadingSlot extends StatelessWidget {
+  const _LoadingSlot();
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(
+    width: DabblerSizing.touchTargetMin,
+    height: DabblerSizing.touchTargetMin,
+    child: Center(child: DabblerSpinner(size: DabblerSpinnerSize.sm)),
+  );
+}

@@ -64,6 +64,18 @@ Widget _links(BuildContext context) => GalleryStack(
       label: 'standalone — 45px target',
       child: DabblerTextLink(label: 'Log in', onPressed: () {}),
     ),
+    GallerySpecimen(
+      label: 'section link — "Manage", no underline, trailing arrow',
+      child: DabblerTextLink(
+        label: 'Manage',
+        underline: false,
+        trailingIcon: 'arrow-right-3',
+        style: DabblerType.footnote
+            .resolveForDirection(Directionality.of(context))
+            .copyWith(fontWeight: DabblerType.semibold),
+        onPressed: () {},
+      ),
+    ),
     const GallerySpecimen(
       label: 'disabled',
       child: DabblerTextLink(label: 'Log in'),

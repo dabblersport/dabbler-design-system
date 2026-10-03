@@ -40,6 +40,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...ratingGalleryEntries,
   ...bannerGalleryEntries,
   ...buttonGalleryEntries,
+  ...onColorIconButtonGalleryEntries,
   ...calendarGalleryEntries,
   ...calendarYearGalleryEntries,
   ...calendarStatusGalleryEntries,
