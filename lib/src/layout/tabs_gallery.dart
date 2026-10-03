@@ -41,6 +41,10 @@ Widget _tabs(BuildContext context) => const GalleryStack(
       ),
     ),
     GallerySpecimen(
+      label: 'nothing selected (allowNoSelection, null value)',
+      child: DabblerTabs(items: _items, allowNoSelection: true),
+    ),
+    GallerySpecimen(
       label: 'panel',
       child: DabblerTabPanel(
         id: 'upcoming',

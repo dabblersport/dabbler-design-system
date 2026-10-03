@@ -127,6 +127,7 @@ export 'src/gallery/gallery_specimen.dart';
 export 'src/gallery/gallery_theme_scope.dart';
 export 'src/gallery/gallery_theme_switcher.dart';
 export 'src/foundations/icon.dart';
+export 'src/foundations/icon_mirror.dart';
 export 'src/foundations/sport_background.dart';
 export 'src/foundations/sport_icon.dart';
 export 'src/foundations/sports.dart';

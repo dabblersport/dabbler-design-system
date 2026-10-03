@@ -49,6 +49,10 @@ case draws content tabs as though they were mutually exclusive settings.
 shows.** The panel that renders is whichever one's `id` equals the current value, not whichever one
 sits in the matching list position.
 
+**To show no tab as selected, set `allowNoSelection: true` and pass a null `value`.** Every tab
+then draws inactive with no indicator, and the first tab is the keyboard entry point. When the
+flag is off, a null value still selects the first tab, the same as any value that matches no tab.
+
 ## Axes
 
 ### Variant
