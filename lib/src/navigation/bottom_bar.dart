@@ -178,24 +178,36 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   /// (`NavigationBottomBar.jsx:23-28`).
   static const List<DabblerNavigationItem> defaultItems =
       <DabblerNavigationItem>[
-    DabblerNavigationItem(id: 'home', icon: 'home-2', label: 'Home'),
-    DabblerNavigationItem(
-        id: 'explore', icon: 'search-normal', label: 'Explore'),
-    DabblerNavigationItem(id: 'games', icon: 'game', label: 'Games'),
-    DabblerNavigationItem(id: 'you', icon: 'user', label: 'You'),
-  ];
+        DabblerNavigationItem(id: 'home', icon: 'home-2', label: 'Home'),
+        DabblerNavigationItem(
+          id: 'explore',
+          icon: 'search-normal',
+          label: 'Explore',
+        ),
+        DabblerNavigationItem(id: 'games', icon: 'game', label: 'Games'),
+        DabblerNavigationItem(id: 'you', icon: 'user', label: 'You'),
+      ];
 
   /// Create post / Create game / Create meetup — the source's `CREATE_ITEMS`
   /// (`NavigationBottomBar.jsx:30-34`).
   static const List<DabblerNavigationCreateItem> defaultCreateItems =
       <DabblerNavigationCreateItem>[
-    DabblerNavigationCreateItem(
-        id: 'post', icon: 'edit-2', label: 'Create post'),
-    DabblerNavigationCreateItem(
-        id: 'game', icon: 'game', label: 'Create game'),
-    DabblerNavigationCreateItem(
-        id: 'meetup', icon: 'people', label: 'Create meetup'),
-  ];
+        DabblerNavigationCreateItem(
+          id: 'post',
+          icon: 'edit-2',
+          label: 'Create post',
+        ),
+        DabblerNavigationCreateItem(
+          id: 'game',
+          icon: 'game',
+          label: 'Create game',
+        ),
+        DabblerNavigationCreateItem(
+          id: 'meetup',
+          icon: 'people',
+          label: 'Create meetup',
+        ),
+      ];
 
   /// The destinations, in visual order.
   final List<DabblerNavigationItem> items;
@@ -385,10 +397,12 @@ class _DabblerNavigationBottomBarState
       return KeyEventResult.ignored;
     }
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
-    final LogicalKeyboardKey forward =
-        rtl ? LogicalKeyboardKey.arrowLeft : LogicalKeyboardKey.arrowRight;
-    final LogicalKeyboardKey back =
-        rtl ? LogicalKeyboardKey.arrowRight : LogicalKeyboardKey.arrowLeft;
+    final LogicalKeyboardKey forward = rtl
+        ? LogicalKeyboardKey.arrowLeft
+        : LogicalKeyboardKey.arrowRight;
+    final LogicalKeyboardKey back = rtl
+        ? LogicalKeyboardKey.arrowRight
+        : LogicalKeyboardKey.arrowLeft;
 
     if (event.logicalKey == forward) {
       _move(1);
@@ -427,8 +441,9 @@ class _DabblerNavigationBottomBarState
     final Widget row = Row(
       // `alignItems: open ? 'flex-end' : 'center'` — so the card grows upward
       // from the action's baseline (`NavigationBottomBar.jsx:76`).
-      crossAxisAlignment:
-          open ? CrossAxisAlignment.end : CrossAxisAlignment.center,
+      crossAxisAlignment: open
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       // `gap: 12` — `--space-4`.
       spacing: DabblerSpacing.space4,
@@ -474,7 +489,14 @@ class _DabblerNavigationBottomBarState
           spacing: DabblerSpacing.space2,
           children: <Widget>[
             for (int i = 0; i < widget.items.length; i++)
-              Flexible(child: _item(colors, index: i, active: i == active)),
+              // Only the active item flexes: it takes whatever the fixed
+              // 44px inactive squares leave. Sharing the space equally capped
+              // an active chip (padding + icon + label) at a third of the
+              // pill, so its label collapsed to nothing and overflowed.
+              if (i == active)
+                Flexible(child: _item(colors, index: i, active: true))
+              else
+                _item(colors, index: i, active: false),
           ],
         ),
       ),
@@ -500,16 +522,26 @@ class _DabblerNavigationBottomBarState
       color: active ? colors.brandPrimary : colors.borderDefault,
     );
 
+    // Width is the content's own: an inactive item is its icon at the 44px
+    // minimum (a square), an active one grows by `padding: '0 18px'`
+    // (`--space-6`) around icon + label. It is NOT a `width: null <-> 44`
+    // tween: `AnimatedContainer` cannot interpolate between finite and
+    // unbounded constraints (an assertion in debug, a collapsed item in
+    // release), which broke the first tap. The fill and padding still fade; the
+    // width follows the content at once (an `AnimatedSize` here overflows the
+    // label row for a frame while it shrinks).
     final Widget body = AnimatedContainer(
       duration: duration,
       curve: DabblerMotion.easeOut,
-      height: DabblerNavigationBottomBar.itemSize,
-      // Inactive is a square of exactly the target size; active grows by
-      // `padding: '0 18px'` (`--space-6`) around icon + label.
-      width: active ? null : DabblerNavigationBottomBar.itemSize,
+      constraints: const BoxConstraints(
+        minWidth: DabblerNavigationBottomBar.itemSize,
+        minHeight: DabblerNavigationBottomBar.itemSize,
+        maxHeight: DabblerNavigationBottomBar.itemSize,
+      ),
       padding: active
           ? const EdgeInsetsDirectional.symmetric(
-              horizontal: DabblerSpacing.space6)
+              horizontal: DabblerSpacing.space6,
+            )
           : EdgeInsets.zero,
       alignment: Alignment.center,
       decoration: BoxDecoration(
