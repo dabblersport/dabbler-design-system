@@ -27,6 +27,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 
+part 'sheet_detent.dart';
 part 'sheet_panel.dart';
 part 'sheet_route.dart';
 
@@ -107,7 +108,14 @@ class DabblerSheet extends StatefulWidget {
     this.presentation = DabblerSheetPresentation.modal,
     this.closeLabel = defaultCloseLabel,
     this.scrimLabel = defaultScrimLabel,
+    this.detent = DabblerSheetDetent.fractions,
+    this.contentMaxFraction = defaultContentMaxFraction,
   });
+
+  /// The default cap of a [DabblerSheetDetent.content] sheet: 0.8 of the
+  /// viewport. The design's sheets cap at 80% and 78% (`Listings.dc.html`);
+  /// 0.8 is the nearer-the-majority value and 0.78 is passable exactly.
+  static const double defaultContentMaxFraction = 0.8;
 
   /// The default English semantics label for the close affordance. The package
   /// ships no localised strings; a host app passes its own.
@@ -174,6 +182,15 @@ class DabblerSheet extends StatefulWidget {
 
   /// Semantics label handed to [DabblerScrim.dismissLabel].
   final String scrimLabel;
+
+  /// How the height is chosen. [DabblerSheetDetent.fractions] (default) uses
+  /// [detents]; [DabblerSheetDetent.content] sizes to the content.
+  final DabblerSheetDetent detent;
+
+  /// The cap of a [DabblerSheetDetent.content] sheet, as a fraction of the
+  /// viewport (never above [maxHeightFraction]). Unused for
+  /// [DabblerSheetDetent.fractions].
+  final double contentMaxFraction;
 
   @override
   State<DabblerSheet> createState() => _DabblerSheetState();

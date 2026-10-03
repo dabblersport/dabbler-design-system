@@ -22,7 +22,59 @@ const List<GalleryEntry> sheetGalleryEntries = <GalleryEntry>[
     description: 'A half-height sheet, and a two-detent sheet with a footer.',
     builder: _sheets,
   ),
+  GalleryEntry(
+    id: 'sheet/content',
+    page: 'components/sheet',
+    group: GalleryPurpose.presentation,
+    title: 'Sheet — content-sized (trigger)',
+    description:
+        'A short sheet that is only as tall as its content, and a long one '
+        'that stops at the 80% cap and scrolls.',
+    builder: _contentSheets,
+  ),
 ];
+
+Widget _contentSheets(BuildContext context) => GalleryWrap(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'short, content-sized',
+      child: Builder(
+        builder: (BuildContext context) => DabblerButton(
+          label: 'Open short sheet',
+          onPressed: () => showDabblerSheet<void>(
+            context: context,
+            title: 'Sort',
+            detent: DabblerSheetDetent.content,
+            builder: _body,
+          ),
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'tall, capped and scrolling',
+      child: Builder(
+        builder: (BuildContext context) => DabblerButton(
+          label: 'Open tall sheet',
+          onPressed: () => showDabblerSheet<void>(
+            context: context,
+            title: 'Filters',
+            detent: DabblerSheetDetent.content,
+            builder: (BuildContext context) => Column(
+              children: <Widget>[
+                for (int i = 0; i < 30; i++) Text('Option $i'),
+              ],
+            ),
+            footerBuilder: (BuildContext context) => DabblerButton(
+              label: 'Apply',
+              fullWidth: true,
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ),
+      ),
+    ),
+  ],
+);
 
 Widget _sheets(BuildContext context) => GalleryWrap(
   children: <Widget>[

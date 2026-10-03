@@ -35,8 +35,16 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     this.dismissible = true,
     this.closeLabel = DabblerSheet.defaultCloseLabel,
     this.scrimLabel = DabblerSheet.defaultScrimLabel,
+    this.detent = DabblerSheetDetent.fractions,
+    this.contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
     super.settings,
   });
+
+  /// See [DabblerSheet.detent].
+  final DabblerSheetDetent detent;
+
+  /// See [DabblerSheet.contentMaxFraction].
+  final double contentMaxFraction;
 
   /// Builds the scrolling body.
   final WidgetBuilder builder;
@@ -91,6 +99,8 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
       dismissible: dismissible,
       closeLabel: closeLabel,
       scrimLabel: scrimLabel,
+      detent: detent,
+      contentMaxFraction: contentMaxFraction,
       child: builder(context),
     );
   }
@@ -137,6 +147,8 @@ Future<T?> showDabblerSheet<T>({
   bool dismissible = true,
   String closeLabel = DabblerSheet.defaultCloseLabel,
   String scrimLabel = DabblerSheet.defaultScrimLabel,
+  DabblerSheetDetent detent = DabblerSheetDetent.fractions,
+  double contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
 }) {
   return Navigator.of(context, rootNavigator: true).push<T>(
     DabblerSheetRoute<T>(
@@ -148,6 +160,8 @@ Future<T?> showDabblerSheet<T>({
       dismissible: dismissible,
       closeLabel: closeLabel,
       scrimLabel: scrimLabel,
+      detent: detent,
+      contentMaxFraction: contentMaxFraction,
     ),
   );
 }

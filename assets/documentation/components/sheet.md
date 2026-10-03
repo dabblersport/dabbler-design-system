@@ -30,6 +30,14 @@ Multiple detents with a footer, opened from a trigger — see `sheet_gallery.dar
 
 @specimen sheet/detents
 
+Pass `detent: DabblerSheetDetent.content` to size the sheet to its content instead: a short body
+gives a short sheet, and a long one stops at `contentMaxFraction` of the screen (0.8 by default;
+the design's sheets cap at 80% and 78%) and scrolls, with the footer still pinned. The `detents`
+list is ignored in this mode. Dragging the handle down past the dismiss threshold closes it; a
+shorter drag springs back.
+
+@specimen sheet/content
+
 ## Using it
 
 **Reserve `inline` presentation for documentation cards and embedded previews — never for a live
@@ -56,6 +64,9 @@ embedded contexts, never a live modal).
 One or more viewport-height fractions, sorted ascending; the panel snaps to the nearest one on
 release.
 
+### Sizing
+Fixed fractions (`fractions`, the default) or sized to the content up to a cap (`content`).
+
 ### Dismissibility
 Dismissible (Escape, a scrim press, and the close affordance all work) or not.
 
@@ -65,6 +76,11 @@ Panel: opaque card surface fill, a hairline border, top corners at the extra-lar
 shadow — the one reserved elevation shadow belongs to Dialog alone and is deliberately never
 referenced here.
 
+## Change log
+
+- KAN-412 W1 — `DabblerSheetDetent.content` and `contentMaxFraction`. Additive; the default sizing
+  is unchanged.
+
 ## Source
 
-`lib/src/overlays/sheet.dart`
+`lib/src/overlays/sheet.dart`, `lib/src/overlays/sheet_detent.dart`

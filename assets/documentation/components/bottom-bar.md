@@ -37,6 +37,14 @@ the menu is open — the Home Feed treatment.
 
 @specimen bottom-bar/icon-tones
 
+A destination can carry an unread dot (`unread: true`) or a count (`count: 3`, capped at `99+`, and
+winning over the dot) on its icon's top-inline-end corner. Both are the badge component, with a
+card-coloured ring so they read on the brand pill. Pass `badgeLabel` ("3 unread") and it is appended
+to the destination's accessible name — "Inbox, 3 unread" — since the package ships no strings of its
+own. With neither set the bar is unchanged.
+
+@specimen bottom-bar/badges
+
 ## Using it
 
 **Drive `active` and `menuOpen` together or not at all — don't control one and leave the other
@@ -63,6 +71,9 @@ Inactive (icon only, muted) or active (a card chip with icon and label together,
 ### Create menu
 Closed (the pill shows) or open (a card of tiles replaces the pill in flow).
 
+### Indicator
+None (default), an unread dot, or a count pill.
+
 ## Direction
 
 **The keyboard's arrow-key mapping swaps under Arabic, the same semantic-consequence fact `Tabs`
@@ -85,7 +96,10 @@ action: the same size and shadow as `Fab` — see *Change log*.
   its create menu all stay as built; no change from the greeting-stack question that touched TopBar.
 - D-031 (cxo) — the detached create action's shadow inherits
   Fab's existing flatness exception rather than needing one of its own.
+- KAN-412 W1 — per-destination unread dot and count badge (`unread`, `count`, `badgeLabel`).
+  Placement and the ring are this system's: the readable designs draw no bar indicator (the Home
+  Feed file is truncated), so the offsets are not transcribed.
 
 ## Source
 
-`lib/src/navigation/bottom_bar.dart`
+`lib/src/navigation/bottom_bar.dart`, `lib/src/navigation/bottom_bar_badge.dart`

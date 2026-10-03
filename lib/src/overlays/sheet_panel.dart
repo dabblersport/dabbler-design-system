@@ -18,6 +18,8 @@ part of 'sheet.dart';
 class _DabblerSheetState extends State<DabblerSheet> {
   late List<double> _stops = _sorted(widget.detents);
   late int _index = widget.snapTo ?? _stops.length - 1;
+  final GlobalKey _panelKey = GlobalKey();
+  bool get _contentSized => widget.detent == DabblerSheetDetent.content;
   double _drag = 0;
   bool _dragging = false;
 
@@ -61,14 +63,24 @@ class _DabblerSheetState extends State<DabblerSheet> {
   void _onDragEnd(double panelHeight, double viewportHeight) {
     // Where the panel ended up, as a fraction of the viewport — the source's
     // `settled = (h - drag) / vh` (`Sheet.jsx:64`).
-    final double settled =
-        viewportHeight == 0 ? 0 : (panelHeight - _drag) / viewportHeight;
-    if (_canDismiss && settled < _stops.first * DabblerSheet.dismissFraction) {
+    // A content-sized panel has one height, so its fraction is of itself.
+    final double basis = _contentSized ? panelHeight : viewportHeight;
+    final double settled = basis == 0 ? 0 : (panelHeight - _drag) / basis;
+    final double floor = _contentSized ? 1 : _stops.first;
+    if (_canDismiss && settled < floor * DabblerSheet.dismissFraction) {
       setState(() {
         _drag = 0;
         _dragging = false;
       });
       _close();
+      return;
+    }
+    if (_contentSized) {
+      // One height only: a shorter drag springs back.
+      setState(() {
+        _drag = 0;
+        _dragging = false;
+      });
       return;
     }
     int nearest = 0;
@@ -93,10 +105,19 @@ class _DabblerSheetState extends State<DabblerSheet> {
 
     final Size viewport = MediaQuery.sizeOf(context);
     final double fraction = _stops[math.min(_index, _stops.length - 1)];
-    final double height = math.min(
-      viewport.height * fraction,
-      viewport.height * DabblerSheet.maxHeightFraction,
-    );
+    // Content-sized: no fixed height, only a cap (`max-height`, not `height`).
+    final double? height = _contentSized
+        ? null
+        : math.min(
+            viewport.height * fraction,
+            viewport.height * DabblerSheet.maxHeightFraction,
+          );
+    final double? maxHeight = _contentSized
+        ? dabblerSheetContentMaxHeight(
+            viewport.height,
+            widget.contentMaxFraction,
+          )
+        : null;
 
     final bool reduceMotion = DabblerMotion.reduceMotion(context);
     final Widget panel = AnimatedSlide(
@@ -107,6 +128,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
         context,
         modal: true,
         height: height,
+        maxHeight: maxHeight,
         viewportHeight: viewport.height,
       ),
     );
@@ -134,6 +156,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
     BuildContext context, {
     required bool modal,
     required double? height,
+    double? maxHeight,
     double viewportHeight = 0,
   }) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -194,7 +217,11 @@ class _DabblerSheetState extends State<DabblerSheet> {
     );
 
     final Widget sized = ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: DabblerSheet.maxPanelWidth),
+      key: _panelKey,
+      constraints: BoxConstraints(
+        maxWidth: DabblerSheet.maxPanelWidth,
+        maxHeight: maxHeight ?? double.infinity,
+      ),
       child: height == null ? body : SizedBox(height: height, child: body),
     );
 
@@ -308,8 +335,13 @@ class _DabblerSheetState extends State<DabblerSheet> {
     return Column(mainAxisSize: MainAxisSize.min, children: rows);
   }
 
-  double _measuredHeight(double viewportHeight) =>
-      viewportHeight * _stops[math.min(_index, _stops.length - 1)];
+  double _measuredHeight(double viewportHeight) {
+    if (_contentSized) {
+      final RenderObject? box = _panelKey.currentContext?.findRenderObject();
+      return box is RenderBox && box.hasSize ? box.size.height : 0;
+    }
+    return viewportHeight * _stops[math.min(_index, _stops.length - 1)];
+  }
 
   Widget _closeButton(BuildContext context, DabblerColors colors) {
     return Semantics(
