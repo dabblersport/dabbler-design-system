@@ -28,6 +28,7 @@ class DabblerFeedTappable extends StatefulWidget {
     super.key,
     required this.child,
     this.onTap,
+    this.onLongPress,
     this.semanticLabel,
     this.borderRadius = BorderRadius.zero,
     this.excludeChildSemantics = false,
@@ -38,6 +39,10 @@ class DabblerFeedTappable extends StatefulWidget {
 
   /// Invoked on tap or keyboard activation. Null leaves [child] inert.
   final VoidCallback? onTap;
+
+  /// Called on a long press — the reaction picker's seam. Null leaves the
+  /// gesture unclaimed.
+  final VoidCallback? onLongPress;
 
   /// The accessible name. Null lets the descendants' text compose the name.
   final String? semanticLabel;
@@ -75,6 +80,7 @@ class _DabblerFeedTappableState extends State<DabblerFeedTappable> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
+        onLongPress: widget.onLongPress,
         child: DabblerFocusRing.visible(
           visible: _focused,
           borderRadius: widget.borderRadius,
@@ -87,6 +93,7 @@ class _DabblerFeedTappableState extends State<DabblerFeedTappable> {
       container: widget.excludeChildSemantics,
       label: widget.semanticLabel,
       onTap: onTap,
+      onLongPress: widget.onLongPress,
       child: widget.excludeChildSemantics
           ? ExcludeSemantics(child: body)
           : body,
@@ -112,6 +119,7 @@ class DabblerFeedAction extends StatelessWidget {
     this.weight = DabblerIconWeight.linear,
     this.color,
     this.onTap,
+    this.onLongPress,
     this.semanticLabel,
   });
 
@@ -132,6 +140,10 @@ class DabblerFeedAction extends StatelessWidget {
 
   /// Makes the action a button. Null leaves it a plain figure.
   final VoidCallback? onTap;
+
+  /// Called on a long press (the reaction picker). Only a button has one: with
+  /// [onTap] null it is ignored.
+  final VoidCallback? onLongPress;
 
   /// The accessible name; the count is appended when there is one.
   final String? semanticLabel;
@@ -177,6 +189,7 @@ class DabblerFeedAction extends StatelessWidget {
     }
     return DabblerFeedTappable(
       onTap: onTap,
+      onLongPress: onLongPress,
       semanticLabel: composedLabel,
       excludeChildSemantics: true,
       borderRadius: DabblerRadius.pillAll,

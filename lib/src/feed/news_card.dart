@@ -71,6 +71,7 @@ class DabblerNewsCard extends StatelessWidget {
     this.liked = false,
     this.onTap,
     this.onLike,
+    this.onLikeLongPress,
     this.onComment,
     this.divider = true,
     this.likeLabel = 'Like',
@@ -111,6 +112,10 @@ class DabblerNewsCard extends StatelessWidget {
 
   /// Toggles the like.
   final VoidCallback? onLike;
+
+  /// Called when the like action is long-pressed — open the reaction picker
+  /// from here. Null leaves the long press unclaimed.
+  final VoidCallback? onLikeLongPress;
 
   /// Opens the comments.
   final VoidCallback? onComment;
@@ -175,6 +180,7 @@ class DabblerNewsCard extends StatelessWidget {
           weight: liked ? DabblerIconWeight.bold : DabblerIconWeight.linear,
           color: liked ? colors.error.base : null,
           onTap: onLike,
+          onLongPress: onLikeLongPress,
           semanticLabel: likeLabel,
         ),
         DabblerFeedAction(
