@@ -6,6 +6,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_palette.dart';
 import '../tokens/dabbler_type.dart';
+import 'stat_tile_value.dart';
 
 /// The grid footprint and value type scale of a [DabblerStatTile].
 ///
@@ -130,6 +131,9 @@ class DabblerStatTile extends StatefulWidget {
     this.link = false,
     this.trailing,
     this.semanticLabel,
+    this.icon,
+    this.fitValue = false,
+    this.minValueScale = DabblerStatTileValue.defaultMinScale,
   });
 
   /// The large display-font figure.
@@ -187,6 +191,23 @@ class DabblerStatTile extends StatefulWidget {
 
   /// Pinned to the inline-end top corner — usually a chevron.
   final Widget? trailing;
+
+  /// A glyph above the value — `Details.dc.html:96-99` draws an 18px linear
+  /// icon in the tile's ink over the figure. Typically a [DabblerIcon] at
+  /// [DabblerSizing.iconSm]; it inherits the tile's foreground through
+  /// [IconTheme] and is decorative (excluded from semantics — the value and
+  /// label carry the meaning). Null, the default, draws nothing.
+  final Widget? icon;
+
+  /// Scale a too-wide value down to fit instead of clipping it, never below
+  /// [minValueScale] — see [DabblerStatTileValue]. Off by default so existing
+  /// tiles render exactly as before; turn it on wherever the figure is data
+  /// (a count that may grow, a localised number).
+  final bool fitValue;
+
+  /// The floor [fitValue] shrinks to, as a fraction of the value's size.
+  /// Defaults to [DabblerStatTileValue.defaultMinScale] (0.6).
+  final double minValueScale;
 
   /// The accessible name; defaults to value, label and sub together.
   final String? semanticLabel;
@@ -323,15 +344,39 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          widget.value,
-          maxLines: 1,
-          overflow: TextOverflow.clip,
-          style: DabblerStatTile.valueStyleFor(
-            size,
-            direction,
-          ).copyWith(color: fg),
-        ),
+        if (widget.icon != null)
+          Padding(
+            // `gap: 4` in the design's column (`Details.dc.html:95`) is off
+            // the base-3 grid. Deviation: the nearest step, `--space-1` (3).
+            padding: const EdgeInsetsDirectional.only(
+              bottom: DabblerSpacing.space1,
+            ),
+            child: ExcludeSemantics(
+              child: IconTheme.merge(
+                data: IconThemeData(color: fg, size: DabblerSizing.iconSm),
+                child: widget.icon!,
+              ),
+            ),
+          ),
+        if (widget.fitValue)
+          DabblerStatTileValue(
+            widget.value,
+            minScale: widget.minValueScale,
+            style: DabblerStatTile.valueStyleFor(
+              size,
+              direction,
+            ).copyWith(color: fg),
+          )
+        else
+          Text(
+            widget.value,
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            style: DabblerStatTile.valueStyleFor(
+              size,
+              direction,
+            ).copyWith(color: fg),
+          ),
         Text(
           widget.label,
           maxLines: 1,
@@ -502,7 +547,11 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
 /// previous tile. Only [DabblerStatTile] children are accepted.
 class DabblerStatGrid extends StatelessWidget {
   /// A bento grid of [children].
-  const DabblerStatGrid({super.key, required this.children});
+  const DabblerStatGrid({
+    super.key,
+    required this.children,
+    this.rowExtent = rowHeight,
+  });
 
   /// The tiles.
   final List<DabblerStatTile> children;
@@ -510,8 +559,17 @@ class DabblerStatGrid extends StatelessWidget {
   /// Columns — `repeat(6, 1fr)`.
   static const int columns = 6;
 
-  /// Row height — `gridAutoRows: '78px'`.
+  /// The default row height — `gridAutoRows: '78px'`.
   static const double rowHeight = 78;
+
+  /// This grid's row height. Defaults to [rowHeight] (78); the Details
+  /// screen's tiles use [detailsRowHeight] (`Details.dc.html:93`). Named
+  /// `rowExtent` because the static [rowHeight] is already public API.
+  final double rowExtent;
+
+  /// `grid-auto-rows: 100px` — the Details screen's stat grids
+  /// (`Details.dc.html:93, 257, 399`).
+  static const double detailsRowHeight = 100;
 
   /// Gap between cells — `gap: 9`.
   static const double gap = DabblerSpacing.space3;
@@ -577,7 +635,7 @@ class DabblerStatGrid extends StatelessWidget {
     ]);
     final double height = layout.rows == 0
         ? 0
-        : layout.rows * rowHeight + (layout.rows - 1) * gap;
+        : layout.rows * rowExtent + (layout.rows - 1) * gap;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints box) {
         final double cell = (box.maxWidth - (columns - 1) * gap) / columns;
@@ -589,12 +647,12 @@ class DabblerStatGrid extends StatelessWidget {
               for (int i = 0; i < children.length; i++)
                 PositionedDirectional(
                   start: layout.origins[i].$1 * (cell + gap),
-                  top: layout.origins[i].$2 * (rowHeight + gap),
+                  top: layout.origins[i].$2 * (rowExtent + gap),
                   width:
                       children[i].effectiveSpan * cell +
                       (children[i].effectiveSpan - 1) * gap,
                   height:
-                      children[i].effectiveRows * rowHeight +
+                      children[i].effectiveRows * rowExtent +
                       (children[i].effectiveRows - 1) * gap,
                   child: children[i],
                 ),

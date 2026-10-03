@@ -4,6 +4,7 @@ import '../foundations/sports.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import 'card.dart';
+import 'card_event_listing.dart';
 import 'card_event_large.dart';
 
 /// CardEventSmall — the densest event row: a small cover thumbnail, the title,
@@ -72,6 +73,9 @@ class DabblerCardEventSmall extends StatelessWidget {
     this.enabled = true,
     this.semanticLabel,
     this.width,
+    this.progress,
+    this.price,
+    this.action,
   });
 
   /// The event's title. Truncated to [titleMaxLines] line with an ellipsis.
@@ -102,6 +106,16 @@ class DabblerCardEventSmall extends StatelessWidget {
 
   /// Fixed width. Null sizes to the incoming constraints.
   final double? width;
+
+  /// The player-progress slot — typically a [DabblerCardEventPlayers].
+  /// Laid out by [DabblerCardEventListing.compose]; null draws nothing.
+  final Widget? progress;
+
+  /// The price slot — typically a [DabblerCardEventPrice].
+  final Widget? price;
+
+  /// The action slot — typically [DabblerCardEventListing.joinButton].
+  final Widget? action;
 
   /// The leading thumbnail's side — **48**, ruled by D-006
   /// ([DabblerCardEventGeometry.smallThumbSide]). See the class doc for why
@@ -136,6 +150,11 @@ class DabblerCardEventSmall extends StatelessWidget {
       onTap: onTap,
       enabled: enabled,
       semanticLabel: semanticLabel,
+      footer: DabblerCardEventListing.compose(
+        progress: progress,
+        price: price,
+        action: action,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,

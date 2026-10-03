@@ -7,6 +7,7 @@ import '../interaction/press_scale.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import 'calendar_day_status.dart';
 
 part 'calendar_year_picker.dart';
 
@@ -355,6 +356,8 @@ class DabblerCalendar extends StatelessWidget {
     this.nextMonthLabel = defaultNextMonthLabel,
     this.yearPicker = false,
     this.yearPickerSpan = defaultYearPickerSpan,
+    this.dayStatus,
+    this.dayStatusLabels,
   });
 
   /// `Confirm` — `Calendar.jsx:69`.
@@ -516,6 +519,18 @@ class DabblerCalendar extends StatelessWidget {
   /// Years either side of [month] the built-in picker lists when [minimum] /
   /// [maximum] do not bound it.
   final int yearPickerSpan;
+
+  /// Per-day availability — see [DabblerCalendarDayStatus]. Called for every
+  /// in-month day; outside days are never marked. Null, the default, draws
+  /// the grid exactly as before. Selection visuals are unchanged: a selected
+  /// day keeps its brand pill and its mark turns [DabblerColors.onBrand].
+  /// A day's status does not change whether it is selectable — bound that
+  /// with [minimum]/[maximum] or ignore the pick in [onSelect].
+  final DabblerCalendarDayStatus Function(DateTime day)? dayStatus;
+
+  /// Localised semantics suffixes for [dayStatus], keyed by status. Missing
+  /// keys fall back to [DabblerCalendarDayStatusStyle.defaultLabels].
+  final Map<DabblerCalendarDayStatus, String>? dayStatusLabels;
 
   /// Default [yearPickerSpan].
   static const int defaultYearPickerSpan = 50;
@@ -854,6 +869,29 @@ class DabblerCalendar extends StatelessWidget {
         ? colors.textSecondary
         : colors.textPrimary;
 
+    final DabblerCalendarDayStatus status = cell.outside || dayStatus == null
+        ? DabblerCalendarDayStatus.none
+        : dayStatus!(cell.date);
+    final Color? markColor = DabblerCalendarDayStatusStyle.colorFor(
+      colors,
+      status,
+      selected: on,
+    );
+    final String dayText = DabblerType.toWesternDigits('${cell.date.day}');
+    final Widget number = Text(
+      dayText,
+      // `fontSize: 13, fontWeight: on ? 700 : 500` (`Calendar.jsx:56`) —
+      // `.t-footnote` at bold or medium.
+      style: DabblerType.footnote
+          .resolveForDirection(direction)
+          .copyWith(
+            color: foreground,
+            fontWeight: on ? DabblerType.bold : DabblerType.medium,
+            decoration: status == DabblerCalendarDayStatus.full
+                ? TextDecoration.lineThrough
+                : null,
+          ),
+    );
     final Widget pill = Container(
       // `height: 39` (`Calendar.jsx:53`) — the painted pill.
       height: cellPillHeight,
@@ -862,17 +900,25 @@ class DabblerCalendar extends StatelessWidget {
         color: on ? colors.brandPrimary : null,
         borderRadius: DabblerRadius.pillAll,
       ),
-      child: Text(
-        DabblerType.toWesternDigits('${cell.date.day}'),
-        // `fontSize: 13, fontWeight: on ? 700 : 500` (`Calendar.jsx:56`) —
-        // `.t-footnote` at bold or medium.
-        style: DabblerType.footnote
-            .resolveForDirection(direction)
-            .copyWith(
-              color: foreground,
-              fontWeight: on ? DabblerType.bold : DabblerType.medium,
+      child: markColor == null
+          ? number
+          : Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                number,
+                Positioned(
+                  bottom: DabblerCalendarDayStatusStyle.markInset,
+                  child: DabblerCalendarDayStatusMark(
+                    status: status,
+                    color: markColor,
+                  ),
+                ),
+              ],
             ),
-      ),
+    );
+    final String? statusLabel = DabblerCalendarDayStatusStyle.labelFor(
+      status,
+      dayStatusLabels,
     );
     // The row pitch stays [DabblerSizing.touchTargetMin] (AC4) while the pill
     // is drawn at the live 39: the 3px each side is hit area, not paint.
@@ -895,12 +941,17 @@ class DabblerCalendar extends StatelessWidget {
       key: DabblerCalendar.dayKey(cell.date),
       button: true,
       selected: on,
+      label: statusLabel == null ? null : '$dayText, $statusLabel',
       child: DabblerFocusRing(
         borderRadius: DabblerRadius.pillAll,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onSelect == null ? null : () => onSelect!(cell.date),
-          child: DabblerPressScale.gesture(child: square),
+          child: DabblerPressScale.gesture(
+            child: statusLabel == null
+                ? square
+                : ExcludeSemantics(child: square),
+          ),
         ),
       ),
     );

@@ -82,6 +82,19 @@ built only from existing tokens and the calendar's own cell geometry.
 
 @specimen calendar/year-picker
 
+**Show availability with `dayStatus`.** It is called for each day of the month and returns
+`available`, `limited`, `full` or `none`. Each maps to an existing status tone — success, warning,
+error — and to a shape under the number, so colour is never the only cue: a filled dot for
+available, a ring for limited, and a short bar with the number struck through for full. Screen
+readers hear the day followed by its status ("12, Fully booked"); pass the localised words as
+`dayStatusLabels`. A selected day keeps its brand pill, and its mark turns white on it. The status
+does not stop a day being picked — bound that with `minimum`/`maximum` or ignore it in `onSelect`.
+
+**Deviation:** no design file draws per-day availability; the Details screen embeds the plain
+calendar (`Details.dc.html:580`). The marks are built only from existing status and spacing tokens.
+
+@specimen calendar/day-status
+
 **Build the action row out of `Button`, not a Calendar-specific action widget.** There used to be
 one — `DabblerCalendarTextAction`, a stand-in for a `Button` `text` tone that did not exist
 yet — and it is gone: the tone shipped and the row now uses it directly. Cancel is `text`,
@@ -132,6 +145,9 @@ contrast).
   contiguous grid of peer targets where overlapping hit boxes would select the wrong date. **Not yet
   shipped** — cells currently grow to the full 45px floor.
 
+- Alpha DS gaps 6 — adds `dayStatus` and `dayStatusLabels`, with `DabblerCalendarDayStatus`,
+  `DabblerCalendarDayStatusStyle` and `DabblerCalendarDayStatusMark`. Off by default.
+
 ## Source
 
-`lib/src/calendar/calendar.dart`
+`lib/src/calendar/calendar.dart`, `lib/src/calendar/calendar_day_status.dart`
