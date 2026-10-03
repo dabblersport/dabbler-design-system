@@ -70,6 +70,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...roomCardsGalleryEntries,
   ...roomsGalleryEntries,
   ...progressBarGalleryEntries,
+  ...ringGalleryEntries,
   ...sectionGalleryEntries,
   ...sheetGalleryEntries,
   ...skeletonGalleryEntries,

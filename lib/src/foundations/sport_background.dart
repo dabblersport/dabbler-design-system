@@ -92,8 +92,8 @@ class DabblerSportArtwork {
 /// ## The whole of AC2, in one sentence
 ///
 /// A lookup returns the artwork if it is registered and **`null` if it is
-/// not** — for `golf`, for `table-tennis`, and for every one of the thirteen
-/// sports at [DabblerSportBackgroundVariant.matchDay]. It never substitutes
+/// not** — for `golf`, for `table-tennis`, for the five KAN-411 additions, and
+/// for every sport at [DabblerSportBackgroundVariant.matchDay]. It never substitutes
 /// another sport's artwork, never substitutes another variant's, and **never
 /// throws**.
 ///
@@ -120,6 +120,31 @@ class DabblerSportArtwork {
 /// upload filenames, which are capitalised, inconsistent (`Vollyball.png`) and
 /// an artefact of how the files were uploaded rather than a deployment
 /// convention.
+///
+/// ## Assets are not bundled — and why (KAN-411 item 7)
+///
+/// **No PNG ships in this package, for any sport.** Specifically for the
+/// eleven existing names and the five added sports:
+///
+/// * The design project's
+///   `assets/sports/{badminton,basketball,cricket,cycling,football,gym,padel,running,swimming,tennis,volleyball}-main-background.png`
+///   could not be obtained: DesignSync `get_file` truncates at 256 KiB and each
+///   file decoded to a truncated 196,608-byte prefix, so the PNGs are cut. A
+///   corrupt PNG is worse than none and none was committed.
+/// * **No PNG exists in the design for handball, squash, baseball, rugby or
+///   hockey.** They are in [DabblerSport] (and [mainUnpopulated]) for
+///   coverage; their artwork is a design deliverable.
+///
+/// The registry is nonetheless ready for all of them: the path convention is
+/// [assetDirectory] + `<key>-main-background.png`
+/// ([conventionalMainArtwork]); [registerConventionalMainArtwork] registers it
+/// for any set of sports once an app has declared the files; and a missing or
+/// undeclared asset degrades without throwing into the tree: the underlying
+/// `Image` reports the load failure through `FlutterError.onError` and paints
+/// nothing, so the token-derived fallback paint D-010(1) requires — drawn by
+/// the host beneath the background — is what the user sees. (Unchanged
+/// behaviour: no `errorBuilder` was added, so a misconfigured path is still
+/// loud in debug logs.)
 ///
 /// ## Composition — never treat this artwork
 ///
@@ -172,11 +197,70 @@ abstract final class DabblerSportBackgroundRegistry {
     DabblerSport.gym,
   ];
 
-  /// The two sports with no `main` artwork — the card's `MAIN_MISSING`.
+  /// The sports with no `main` artwork registered by default: the card's
+  /// `MAIN_MISSING` (`golf`, `table-tennis`) plus the five KAN-411 additions,
+  /// which the design has no artwork for at all.
+  ///
+  /// [mainPopulated] and this list together cover every [DabblerSport].
   static const List<DabblerSport> mainUnpopulated = <DabblerSport>[
     DabblerSport.golf,
     DabblerSport.tableTennis,
+    DabblerSport.handball,
+    DabblerSport.squash,
+    DabblerSport.baseball,
+    DabblerSport.rugby,
+    DabblerSport.hockey,
   ];
+
+  /// The KAN-411 additions that have no artwork in the design project.
+  static const List<DabblerSport> addedWithoutArtwork = <DabblerSport>[
+    DabblerSport.handball,
+    DabblerSport.squash,
+    DabblerSport.baseball,
+    DabblerSport.rugby,
+    DabblerSport.hockey,
+  ];
+
+  /// The conventional `main` artwork reference for [sport]:
+  /// `assets/images/sports/<key>-main-background.png`.
+  ///
+  /// This is the path an app ships a file at for **any** sport, including the
+  /// seven not pre-registered in [defaultMainArtwork] (`golf`, `table-tennis`
+  /// and the five KAN-411 additions). A path is not a binary — nothing is
+  /// bundled — so this only builds the reference; see
+  /// [registerConventionalMainArtwork] to register it, and
+  /// [DabblerSportBackground] for what happens when the file is not there.
+  static DabblerSportArtwork conventionalMainArtwork(
+    DabblerSport sport, {
+    String? package,
+  }) => DabblerSportArtwork.asset(
+    '$assetDirectory/${sport.key}-main-background.png',
+    package: package,
+  );
+
+  /// Registers [conventionalMainArtwork] for each of [sports] (default: the
+  /// five KAN-411 additions), at [DabblerSportBackgroundVariant.main].
+  ///
+  /// Call this from the app **only once the PNGs are declared in the app's
+  /// `pubspec.yaml`**; registering a path whose file is absent is safe — the
+  /// widget degrades — but it makes [resolve] stop returning `null`, so a
+  /// screen's own "no artwork" branch would no longer be taken.
+  static void registerConventionalMainArtwork([
+    Iterable<DabblerSport> sports = addedWithoutArtwork,
+    String? package,
+  ]) {
+    registerSportBackgrounds(
+      <DabblerSport, Map<DabblerSportBackgroundVariant, DabblerSportArtwork>>{
+        for (final DabblerSport sport in sports)
+          sport: <DabblerSportBackgroundVariant, DabblerSportArtwork>{
+            DabblerSportBackgroundVariant.main: conventionalMainArtwork(
+              sport,
+              package: package,
+            ),
+          },
+      },
+    );
+  }
 
   /// The canonical `main` asset paths, transcribed from `MAIN_SRC`
   /// (`sport-backgrounds.card.html:31-41` (unverified: file not mirrored)).

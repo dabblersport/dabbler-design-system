@@ -187,6 +187,8 @@ lot about the rest.
   system has.
 - [SystemMessage](components/system-message.md) — product-generated activity in a conversation, never a bubble.
 - [TypingIndicator](components/typing-indicator.md) — three dots, with or without a name line, while someone types.
+- [Ring](components/ring.md) — a gauge drawn as a ring: a tick countdown or a completion arc, with a
+  centre slot.
 
 ### 9 · Structure — the one thing that separates, and nothing else
 

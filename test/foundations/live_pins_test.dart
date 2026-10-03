@@ -58,21 +58,25 @@ void main() {
   });
 
   test('SportIcon.jsx SPORTS list and FALLBACKS map', () {
-    expect(kDabblerSports.map((DabblerSport s) => s.key).toList(), <String>[
-      'football',
-      'padel',
-      'tennis',
-      'basketball',
-      'volleyball',
-      'cricket',
-      'running',
-      'swimming',
-      'cycling',
-      'badminton',
-      'golf',
-      'table-tennis',
-      'gym',
-    ]);
+    // The first thirteen are the design source's; KAN-411 appends five.
+    expect(
+      kDabblerSports.map((DabblerSport s) => s.key).take(13).toList(),
+      <String>[
+        'football',
+        'padel',
+        'tennis',
+        'basketball',
+        'volleyball',
+        'cricket',
+        'running',
+        'swimming',
+        'cycling',
+        'badminton',
+        'golf',
+        'table-tennis',
+        'gym',
+      ],
+    );
     const Map<String, String> live = <String, String>{
       'football': 'game',
       'basketball': 'game',
@@ -88,10 +92,26 @@ void main() {
       'badminton': 'ticket-2',
       'table-tennis': 'ticket-2',
     };
-    for (final DabblerSport s in DabblerSport.values) {
+    for (final DabblerSport s in DabblerSport.values.take(13)) {
       expect(DabblerSportIconRegistry.fallbacks[s], live[s.key], reason: s.key);
     }
-    expect(DabblerSportIconRegistry.fallbacks, hasLength(13));
+    // KAN-411 additions are not in the source's FALLBACKS; they follow its
+    // grouping (team/ball games -> game, racket sports -> ticket-2).
+    const Map<String, String> added = <String, String>{
+      'handball': 'game',
+      'baseball': 'game',
+      'rugby': 'game',
+      'hockey': 'game',
+      'squash': 'ticket-2',
+    };
+    for (final MapEntry<String, String> e in added.entries) {
+      expect(
+        DabblerSportIconRegistry.fallbacks[DabblerSport.fromKey(e.key)!],
+        e.value,
+        reason: e.key,
+      );
+    }
+    expect(DabblerSportIconRegistry.fallbacks, hasLength(18));
   });
 
   test('SportIcon never resolves blank: every sport and an unknown key', () {

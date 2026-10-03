@@ -5,7 +5,18 @@
 /// `components/foundations/icons-system.card.html:155` (unverified: file not mirrored), which calls that array
 /// *"the current, complete `SPORTS` list"*.
 ///
-/// ## Thirteen, not twelve
+/// ## Eighteen: thirteen from the source, five added by KAN-411
+///
+/// The first thirteen entries are the design source's. `handball`, `squash`,
+/// `baseball`, `rugby` and `hockey` were added by KAN-411 item 7 for sport
+/// coverage; the design source has **no** `SPORTS`, `FALLBACKS` or background
+/// entry for them, so their Iconsax fallbacks and background paths are this
+/// package's decision (see `DabblerSportIconRegistry.fallbacks`). The package
+/// carries no per-sport display labels or Arabic strings — `DabblerSport` is
+/// identity only — so there is no label table to extend; a screen supplies the
+/// visible label D-009 requires.
+///
+/// ### Thirteen, not twelve
 ///
 /// The source disagrees with itself about the count, and this file follows the
 /// **code**, not the prose. `SportIcon.jsx`'s `SPORTS` array and its
@@ -71,7 +82,26 @@ enum DabblerSport {
   tableTennis('table-tennis'),
 
   /// `gym`.
-  gym('gym');
+  gym('gym'),
+
+  // The five below are KAN-411 item 7 additions. They are NOT in the design
+  // source's `SPORTS` array (which stops at `gym`): they are appended after it
+  // so the source order above is untouched.
+
+  /// `handball`. Added by KAN-411; no design-source entry.
+  handball('handball'),
+
+  /// `squash`. Added by KAN-411; no design-source entry.
+  squash('squash'),
+
+  /// `baseball`. Added by KAN-411; no design-source entry.
+  baseball('baseball'),
+
+  /// `rugby`. Added by KAN-411; no design-source entry.
+  rugby('rugby'),
+
+  /// `hockey`. Added by KAN-411; no design-source entry.
+  hockey('hockey');
 
   const DabblerSport(this.key);
 
@@ -95,7 +125,8 @@ enum DabblerSport {
   }
 }
 
-/// The thirteen sports, in the design source's own order.
+/// Every sport: the thirteen of the design source in its own order, then the
+/// five KAN-411 additions (handball, squash, baseball, rugby, hockey).
 ///
 /// A named alias for [DabblerSport.values]. It exists because the source
 /// exports `SPORTS` as the thing screens iterate, and a reader arriving from

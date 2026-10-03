@@ -32,6 +32,15 @@ void main() {
   /// MAIN_MISSING, transcribed from the specimen card.
   const List<String> sourceMainMissing = <String>['golf', 'table-tennis'];
 
+  /// KAN-411 item 7 — in DabblerSport, no artwork in the design project.
+  const List<String> addedSports = <String>[
+    'handball',
+    'squash',
+    'baseball',
+    'rugby',
+    'hockey',
+  ];
+
   group('AC2 — main is populated for the eleven bundled sports', () {
     test('exactly eleven sports have main artwork', () {
       expect(sourceMainSrc, hasLength(11));
@@ -50,15 +59,11 @@ void main() {
       }
     });
 
-    test('populated + unpopulated together account for all thirteen sports',
-        () {
-      expect(
-        <DabblerSport>{
-          ...DabblerSportBackgroundRegistry.mainPopulated,
-          ...DabblerSportBackgroundRegistry.mainUnpopulated,
-        },
-        kDabblerSports.toSet(),
-      );
+    test('populated + unpopulated together account for every sport', () {
+      expect(<DabblerSport>{
+        ...DabblerSportBackgroundRegistry.mainPopulated,
+        ...DabblerSportBackgroundRegistry.mainUnpopulated,
+      }, kDabblerSports.toSet());
     });
   });
 
@@ -66,12 +71,15 @@ void main() {
     test('golf and table-tennis main artwork is null', () {
       for (final String key in sourceMainMissing) {
         final DabblerSport sport = DabblerSport.fromKey(key)!;
-        expect(DabblerSportBackgroundRegistry.resolve(sport), isNull,
-            reason: key);
+        expect(
+          DabblerSportBackgroundRegistry.resolve(sport),
+          isNull,
+          reason: key,
+        );
       }
     });
 
-    test('matchDay is null for every one of the thirteen sports', () {
+    test('matchDay is null for every sport', () {
       for (final DabblerSport sport in kDabblerSports) {
         expect(
           DabblerSportBackgroundRegistry.resolve(
@@ -85,8 +93,10 @@ void main() {
     });
 
     test('matchDay does not fall back to main, even where main exists', () {
-      expect(DabblerSportBackgroundRegistry.resolve(DabblerSport.football),
-          isNotNull);
+      expect(
+        DabblerSportBackgroundRegistry.resolve(DabblerSport.football),
+        isNotNull,
+      );
       expect(
         DabblerSportBackgroundRegistry.resolve(
           DabblerSport.football,
@@ -132,8 +142,10 @@ void main() {
 
     test('an unknown sport key returns null rather than throwing', () {
       expect(DabblerSportBackgroundRegistry.resolveKey('quidditch'), isNull);
-      expect(() => DabblerSportBackgroundRegistry.resolveKey(''),
-          returnsNormally);
+      expect(
+        () => DabblerSportBackgroundRegistry.resolveKey(''),
+        returnsNormally,
+      );
     });
 
     test('a miss warns once per sport/variant pair', () {
@@ -148,20 +160,23 @@ void main() {
   });
 
   group('registration merges without restructuring', () {
-    const DabblerSportArtwork matchDayArt =
-        DabblerSportArtwork.asset('assets/images/sports/golf-matchday.png');
+    const DabblerSportArtwork matchDayArt = DabblerSportArtwork.asset(
+      'assets/images/sports/golf-matchday.png',
+    );
 
     test('Batch 2 can add matchDay without disturbing main', () {
       DabblerSportBackgroundRegistry.registerSportBackgrounds(
         <DabblerSport, Map<DabblerSportBackgroundVariant, DabblerSportArtwork>>{
           DabblerSport.football:
               <DabblerSportBackgroundVariant, DabblerSportArtwork>{
-            DabblerSportBackgroundVariant.matchDay: matchDayArt,
-          },
+                DabblerSportBackgroundVariant.matchDay: matchDayArt,
+              },
         },
       );
       expect(
-        DabblerSportBackgroundRegistry.resolve(DabblerSport.football)!.assetPath,
+        DabblerSportBackgroundRegistry.resolve(
+          DabblerSport.football,
+        )!.assetPath,
         sourceMainSrc['football'],
       );
       expect(
@@ -178,50 +193,203 @@ void main() {
         <DabblerSport, Map<DabblerSportBackgroundVariant, DabblerSportArtwork>>{
           DabblerSport.golf:
               <DabblerSportBackgroundVariant, DabblerSportArtwork>{
-            DabblerSportBackgroundVariant.main: matchDayArt,
-          },
+                DabblerSportBackgroundVariant.main: matchDayArt,
+              },
         },
       );
-      expect(DabblerSportBackgroundRegistry.resolve(DabblerSport.golf),
-          matchDayArt);
+      expect(
+        DabblerSportBackgroundRegistry.resolve(DabblerSport.golf),
+        matchDayArt,
+      );
     });
 
     test('a null set is a no-op', () {
       DabblerSportBackgroundRegistry.registerSportBackgrounds(null);
       expect(DabblerSportBackgroundRegistry.resolve(DabblerSport.golf), isNull);
-      expect(DabblerSportBackgroundRegistry.resolve(DabblerSport.football),
-          isNotNull);
+      expect(
+        DabblerSportBackgroundRegistry.resolve(DabblerSport.football),
+        isNotNull,
+      );
+    });
+  });
+
+  group('KAN-411 item 7 — path for the new sports and the existing names', () {
+    test('the five added sports resolve to null (no design artwork)', () {
+      for (final String key in addedSports) {
+        final DabblerSport sport = DabblerSport.fromKey(key)!;
+        expect(
+          DabblerSportBackgroundRegistry.resolve(sport),
+          isNull,
+          reason: key,
+        );
+        expect(DabblerSportBackgroundRegistry.mainUnpopulated, contains(sport));
+      }
+      expect(
+        DabblerSportBackgroundRegistry.addedWithoutArtwork,
+        addedSports.map((String k) => DabblerSport.fromKey(k)),
+      );
+    });
+
+    test(
+      'conventionalMainArtwork follows the convention for all 18 sports',
+      () {
+        for (final DabblerSport sport in kDabblerSports) {
+          expect(
+            DabblerSportBackgroundRegistry.conventionalMainArtwork(
+              sport,
+            ).assetPath,
+            'assets/images/sports/${sport.key}-main-background.png',
+            reason: sport.key,
+          );
+        }
+        // …and it agrees with every pre-registered default.
+        for (final MapEntry<DabblerSport, DabblerSportArtwork> e
+            in DabblerSportBackgroundRegistry.defaultMainArtwork.entries) {
+          expect(
+            DabblerSportBackgroundRegistry.conventionalMainArtwork(e.key),
+            e.value,
+          );
+        }
+        expect(
+          DabblerSportBackgroundRegistry.conventionalMainArtwork(
+            DabblerSport.rugby,
+            package: 'p',
+          ).package,
+          'p',
+        );
+      },
+    );
+
+    test(
+      'registerConventionalMainArtwork defaults to the five added sports',
+      () {
+        DabblerSportBackgroundRegistry.registerConventionalMainArtwork();
+        for (final String key in addedSports) {
+          expect(
+            DabblerSportBackgroundRegistry.resolve(
+              DabblerSport.fromKey(key)!,
+            )!.assetPath,
+            'assets/images/sports/$key-main-background.png',
+            reason: key,
+          );
+        }
+        // Existing behaviour untouched: golf is still null, football unchanged.
+        expect(
+          DabblerSportBackgroundRegistry.resolve(DabblerSport.golf),
+          isNull,
+        );
+        expect(
+          DabblerSportBackgroundRegistry.resolve(
+            DabblerSport.football,
+          )!.assetPath,
+          sourceMainSrc['football'],
+        );
+      },
+    );
+
+    test('registerConventionalMainArtwork accepts an explicit set', () {
+      DabblerSportBackgroundRegistry.registerConventionalMainArtwork(
+        <DabblerSport>[DabblerSport.golf],
+      );
+      expect(
+        DabblerSportBackgroundRegistry.resolve(DabblerSport.golf),
+        isNotNull,
+      );
+      expect(
+        DabblerSportBackgroundRegistry.resolve(DabblerSport.rugby),
+        isNull,
+      );
+    });
+
+    testWidgets('a registered-but-missing asset degrades: no throw into the '
+        'tree, host fallback paint still visible', (WidgetTester tester) async {
+      DabblerSportBackgroundRegistry.registerConventionalMainArtwork();
+      const Key paint = Key('fallback-paint');
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.rtl,
+          child: SizedBox(
+            width: 200,
+            height: 300,
+            child: Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                ColoredBox(key: paint, color: Color(0xFF123456)),
+                DabblerSportBackground(DabblerSport.rugby),
+              ],
+            ),
+          ),
+        ),
+      );
+      // The asset is not bundled: the load failure is reported, not thrown
+      // into the widget tree, and the fallback paint beneath stays on screen.
+      expect(
+        tester.takeException().toString(),
+        contains('Unable to load asset'),
+      );
+      expect(find.byKey(paint), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+    });
+
+    testWidgets('an unregistered new sport renders nothing and the fallback '
+        'paint remains', (WidgetTester tester) async {
+      const Key paint = Key('fallback-paint');
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: Stack(
+            children: <Widget>[
+              SizedBox(key: paint, width: 10, height: 10),
+              DabblerSportBackground(DabblerSport.handball),
+            ],
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.byType(Image), findsNothing);
+      expect(find.byKey(paint), findsOneWidget);
+      expect(DabblerSportBackground.maybe(DabblerSport.squash), isNull);
     });
   });
 
   group('DabblerSportBackground widget', () {
-    Widget host(Widget child) =>
-        MaterialApp(home: Scaffold(body: SizedBox(width: 300, height: 500, child: child)));
+    Widget host(Widget child) => MaterialApp(
+      home: Scaffold(body: SizedBox(width: 300, height: 500, child: child)),
+    );
 
-    testWidgets('renders nothing for an unpopulated sport, without throwing',
-        (WidgetTester tester) async {
-      await tester
-          .pumpWidget(host(const DabblerSportBackground(DabblerSport.golf)));
+    testWidgets('renders nothing for an unpopulated sport, without throwing', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(const DabblerSportBackground(DabblerSport.golf)),
+      );
       expect(tester.takeException(), isNull);
       expect(find.byType(Image), findsNothing);
     });
 
-    testWidgets('renders nothing for matchDay on every sport',
-        (WidgetTester tester) async {
+    testWidgets('renders nothing for matchDay on every sport', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerSport sport in kDabblerSports) {
-        await tester.pumpWidget(host(DabblerSportBackground(
-          sport,
-          variant: DabblerSportBackgroundVariant.matchDay,
-        )));
+        await tester.pumpWidget(
+          host(
+            DabblerSportBackground(
+              sport,
+              variant: DabblerSportBackgroundVariant.matchDay,
+            ),
+          ),
+        );
         expect(tester.takeException(), isNull, reason: sport.key);
         expect(find.byType(Image), findsNothing, reason: sport.key);
       }
     });
 
-    testWidgets('builds an Image for a populated sport with cover fit',
-        (WidgetTester tester) async {
+    testWidgets('builds an Image for a populated sport with cover fit', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-          host(const DabblerSportBackground(DabblerSport.football)));
+        host(const DabblerSportBackground(DabblerSport.football)),
+      );
       final Image image = tester.widget(find.byType(Image));
       // The asset itself is NOT in this package — see DabblerSportArtwork on
       // why no binaries are bundled and pubspec.yaml is not touched. The
@@ -232,14 +400,12 @@ void main() {
       expect(assetLoadFailure.toString(), contains('Unable to load asset'));
       expect(image.fit, BoxFit.cover);
       expect(image.alignment, Alignment.center);
-      expect(
-        (image.image as AssetImage).assetName,
-        sourceMainSrc['football'],
-      );
+      expect((image.image as AssetImage).assetName, sourceMainSrc['football']);
     });
 
-    testWidgets('maybe() returns null exactly where resolve() does',
-        (WidgetTester tester) async {
+    testWidgets('maybe() returns null exactly where resolve() does', (
+      WidgetTester tester,
+    ) async {
       expect(DabblerSportBackground.maybe(DabblerSport.golf), isNull);
       expect(
         DabblerSportBackground.maybe(
