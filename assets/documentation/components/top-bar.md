@@ -66,12 +66,20 @@ count, mirrored under Arabic.
 
 @specimen top-bar/unread
 
+The titled variant — a back button, a title and trailing actions, with an optional bottom rule — is
+the inner-screen header of the Settings and Article designs. The back glyph points to the reading
+start, so it is `arrow-circle-right` under Arabic.
+
+@specimen top-bar/titled
+
 ## Using it
 
-**Never add a title, back action, alignment or surface variant to this component.** The design
-source is explicit that none exist and that adding one means reinventing a different header, not
-extending this one. A screen that needs any of those composes `Section` + `Button` + `Icon` +
-`Avatar` instead — nothing about the wordmark bar itself is meant to carry them.
+**Use `DabblerNavigationTopBar.titled` for an inner screen, never a hand-built header.** It carries
+the back button, the title and trailing actions the Settings and Article designs draw; the wordmark
+bar itself still takes no title, alignment or surface variant.
+
+**Pass `avatarImageUrl` when the user has a photo.** The seed portrait stands in while it loads,
+when it is empty and when it fails.
 
 **Each trailing action needs its own accessible label; the action is icon-only and has no other
 name.** Pass `label` for every `DabblerNavigationAction` — it's the sole source of the announced
@@ -106,6 +114,12 @@ yet checked against the gallery's direction switcher.*
 
 ## Tokens used
 
+Titled variant: back button `surfaceCard` fill with a `borderDefault` hairline, 40px inside a 45px
+target, glyph 20; title on the `body` step at semibold in `textPrimary`; the bottom rule is
+`bgTertiary`. The design's 40px trailing buttons take the bar's own 34×45 action targets (nearest
+existing geometry), and its 6/18/12 padding takes the bar's 62 height and 16 inline padding.
+
+
 Trailing action glyphs: `linear` weight, sized within their hit box. Account avatar: the shared
 `Avatar` component, unmodified. No shadow, no surface fill of its own beyond the screen background.
 
@@ -118,6 +132,8 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
   above (shipped).
 - D-039 (cxo) — rules `barHeight` becomes a hard 62. Not yet
   shipped.
+
+- Alpha plan decision 1 (orchestrator, D-035) — adds the titled variant and the avatar image URL.
 
 ## Source
 

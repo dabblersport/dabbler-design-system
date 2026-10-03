@@ -186,6 +186,7 @@ class DabblerActivityRow extends StatelessWidget {
     this.live = false,
     this.liveLabel = 'Live',
     this.sportLabel,
+    this.thumbnail,
     this.onTap,
   });
 
@@ -231,6 +232,13 @@ class DabblerActivityRow extends StatelessWidget {
 
   /// The sport badge's text; omitted when null.
   final String? sportLabel;
+
+  /// An optional cover or thumbnail, drawn at the end of the row in a 40px
+  /// rounded box (the media component, or any widget that fills its box).
+  final Widget? thumbnail;
+
+  /// Size of the [thumbnail] box.
+  static const double thumbnailSide = 40;
 
   /// Opens the activity. Null leaves the row inert.
   final VoidCallback? onTap;
@@ -426,6 +434,20 @@ class DabblerActivityRow extends StatelessWidget {
             DabblerBadge(
               label: sportLabel!,
               status: DabblerBadge.neutralStatusOf(colors),
+            ),
+          ],
+          if (thumbnail != null) ...<Widget>[
+            const SizedBox(width: DabblerSpacing.space4),
+            ClipRRect(
+              borderRadius: DabblerRadius.mdAll,
+              child: SizedBox(
+                width: thumbnailSide,
+                height: thumbnailSide,
+                child: ColoredBox(
+                  color: colors.surfaceSunken,
+                  child: thumbnail,
+                ),
+              ),
             ),
           ],
         ],

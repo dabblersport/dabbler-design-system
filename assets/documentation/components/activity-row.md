@@ -26,6 +26,10 @@ A group with a filled action and a Live badge, a system tile with an outlined ac
 
 @specimen activity-row
 
+A `thumbnail` widget draws a 40px rounded cover at the end of the row.
+
+@specimen activity-row/thumbnail
+
 ## Using it
 
 **Pass the leading widget, not a kind.** A small avatar for a person, an avatar group for several people, a system tile for anything that is not a person.

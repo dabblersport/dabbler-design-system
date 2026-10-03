@@ -26,6 +26,12 @@ A default post with a hashtag run, a liked and vibed post without a divider, and
 
 @specimen post-row
 
+The optional slots: an author photo and an author tap, media under the body, the repost action, a
+reaction summary under the actions, a kind badge at the end of the author line and the author-only
+view count.
+
+@specimen post-row/slots
+
 ## Using it
 
 **Give it the post's facts, already formatted.** Name, time, place and distance are strings; likes and replies are integers, drawn with Western digits in either direction.
@@ -38,6 +44,8 @@ A default post with a hashtag run, a liked and vibed post without a divider, and
 
 **The sport pill takes a glyph slot, not an emoji.** The design shows an emoji beside the sport name; the system is icons only, so the slot is a widget and is empty by default.
 
+**Fill the optional slots from your data; the row decides nothing.** Pass `imageUrl` for the author's photo, `onAuthorTap` to open the author, `media` for the post's photos, `onRepost` only when the post can be reposted, `reactions` for the chips, `kindBadge` for a kind or origin and `views` only when the viewer is the author.
+
 **Where it departs from the design.**
 
 - The distance pill is the shared Badge: 4px block padding, bold, with a hairline, where the design is 2/8, regular and border-less.
@@ -45,6 +53,9 @@ A default post with a hashtag run, a liked and vibed post without a divider, and
 - The avatar and the sport pill link to other screens in the design; neither reaches 45px without changing the layout, so they are not exposed.
 - The liked and vibed inks are inferred, because the script that computes them was cut off in the fetched file.
 - 5px gaps take the 6px step, and 8px and 11px paddings take 9 and 12.
+- The avatar's author target is the avatar's own 36px width (the design's link target), taller below it; the name is a second target.
+- With a repost action and no share callback, the inert share glyph is not drawn: the actions plus more would not fit a 360px row at the 45px touch floor. Passing both share and repost needs a wider row.
+- The repost action, the reaction summary, the kind badge and the view count are not in the Home Feed markup; they reuse the row's own action, chip and badge parts so the feed keeps those behaviours.
 
 ## Axes
 
