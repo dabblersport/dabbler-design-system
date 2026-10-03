@@ -40,7 +40,49 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
         'open, and in RTL. Tap create to open the menu.',
     builder: _bottomBar,
   ),
+  GalleryEntry(
+    id: 'bottom-bar/icon-tones',
+    page: 'components/bottom-bar',
+    group: GalleryPurpose.navigation,
+    title: 'Navigation — bottom bar, toned create menu',
+    description: 'createItems with iconTone info / success / accent, and the '
+        'action held upright (rotateActionOnOpen: false), as the Home Feed '
+        'design draws it (DSG-NEW-001).',
+    builder: _bottomBarTones,
+  ),
 ];
+
+Widget _bottomBarTones(BuildContext context) => const GallerySpecimen(
+      label: 'Home Feed create menu',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationBottomBar(
+          safeArea: false,
+          defaultMenuOpen: true,
+          rotateActionOnOpen: false,
+          createItems: <DabblerNavigationCreateItem>[
+            DabblerNavigationCreateItem(
+              id: 'post',
+              icon: 'edit-2',
+              label: 'Create post',
+              iconTone: DabblerNavigationIconTone.info,
+            ),
+            DabblerNavigationCreateItem(
+              id: 'game',
+              icon: 'game',
+              label: 'Create game',
+              iconTone: DabblerNavigationIconTone.success,
+            ),
+            DabblerNavigationCreateItem(
+              id: 'meetup',
+              icon: 'people',
+              label: 'Create meetup',
+              iconTone: DabblerNavigationIconTone.accent,
+            ),
+          ],
+        ),
+      ),
+    );
 
 Widget _topBar(BuildContext context) => const GalleryStack(
       children: <Widget>[

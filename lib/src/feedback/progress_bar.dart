@@ -39,6 +39,12 @@ enum DabblerProgressBarTone {
 
   /// [DabblerStatusColor.base] of `info`.
   info,
+
+  /// For a bar sitting **on a brand-filled surface** (DSG-NEW-002, the
+  /// Notifications waitlist card). Fill is [DabblerColors.onBrand]; the track
+  /// is that same role at [DabblerProgressBar.onBrandTrackOpacity] instead of
+  /// [DabblerColors.bgTertiary], which would read as a grey slab on brand.
+  onBrand,
 }
 
 /// ProgressBar — progress with a known end, or a busy bar when the end is not
@@ -110,8 +116,8 @@ class DabblerProgressBar extends StatefulWidget {
     this.tone = DabblerProgressBarTone.brand,
     this.size = DabblerProgressBarSize.md,
     this.label,
-  })  : value = null,
-        showValue = false;
+  }) : value = null,
+       showValue = false;
 
   /// Progress as a fraction from 0 to 1, clamped. Null means indeterminate.
   final double? value;
@@ -164,11 +170,25 @@ class DabblerProgressBar extends StatefulWidget {
   /// `50%{opacity:.55}` of `dbl-pulse`.
   static const double pulseMinOpacity = 0.55;
 
+  /// The track's opacity over [DabblerColors.onBrand] for
+  /// [DabblerProgressBarTone.onBrand] — `22%`, from the Notifications
+  /// waitlist card's local bar (DSG-NEW-002).
+  static const double onBrandTrackOpacity = 0.22;
+
+  /// The track colour for [tone], resolved off [colors].
+  ///
+  /// Every tone but [DabblerProgressBarTone.onBrand] keeps the flat
+  /// [DabblerColors.bgTertiary] track.
+  static Color trackFor(DabblerProgressBarTone tone, DabblerColors colors) =>
+      tone == DabblerProgressBarTone.onBrand
+      ? colors.onBrand.withValues(alpha: onBrandTrackOpacity)
+      : colors.bgTertiary;
+
   /// The track height for [size].
   static double trackHeightFor(DabblerProgressBarSize size) => switch (size) {
-        DabblerProgressBarSize.sm => trackHeightSm,
-        DabblerProgressBarSize.md => trackHeightMd,
-      };
+    DabblerProgressBarSize.sm => trackHeightSm,
+    DabblerProgressBarSize.md => trackHeightMd,
+  };
 
   /// The clamped [value] as a rounded percentage, 0–100. Null when
   /// indeterminate.
@@ -183,6 +203,7 @@ class DabblerProgressBar extends StatefulWidget {
         DabblerProgressBarTone.warning => colors.warning.base,
         DabblerProgressBarTone.error => colors.error.base,
         DabblerProgressBarTone.info => colors.info.base,
+        DabblerProgressBarTone.onBrand => colors.onBrand,
       };
 
   @override
@@ -202,7 +223,10 @@ class _DabblerProgressBarState extends State<DabblerProgressBar>
   /// Runs the sweep, the pulse, or nothing. Called from [build], because
   /// reduced motion arrives through the [MediaQuery] and the widget can be
   /// rebuilt from determinate to indeterminate and back.
-  void _syncController({required bool indeterminate, required bool reduceMotion}) {
+  void _syncController({
+    required bool indeterminate,
+    required bool reduceMotion,
+  }) {
     if (!indeterminate) {
       if (_controller.isAnimating) _controller.stop();
       return;
@@ -237,10 +261,18 @@ class _DabblerProgressBarState extends State<DabblerProgressBar>
         // own bounds.
         borderRadius: DabblerRadius.pillAll,
         child: ColoredBox(
-          color: colors.bgTertiary,
+          color: DabblerProgressBar.trackFor(widget.tone, colors),
           child: indeterminate
-              ? _sweep(fill: fill, direction: direction, reduceMotion: reduceMotion)
-              : _fill(fill: fill, percent: percent!, reduceMotion: reduceMotion),
+              ? _sweep(
+                  fill: fill,
+                  direction: direction,
+                  reduceMotion: reduceMotion,
+                )
+              : _fill(
+                  fill: fill,
+                  percent: percent!,
+                  reduceMotion: reduceMotion,
+                ),
         ),
       ),
     );
@@ -287,8 +319,11 @@ class _DabblerProgressBarState extends State<DabblerProgressBar>
     // as the label: DabblerType.numeralFeatures disables `anum`, so the digits
     // stay Western Arabic with lining figures under the Arabic face too, which
     // is what `ProgressBar.prompt.md` asks for.
-    final TextStyle caption =
-        DabblerType.caption1.resolveForDirection(direction);
+    final TextStyle caption = DabblerType.caption1.resolveForDirection(
+      direction,
+    );
+    // On a brand fill both inks would vanish; the caption row takes onBrand.
+    final bool onBrand = widget.tone == DabblerProgressBarTone.onBrand;
 
     return Row(
       children: <Widget>[
@@ -297,7 +332,9 @@ class _DabblerProgressBarState extends State<DabblerProgressBar>
               ? const SizedBox.shrink()
               : Text(
                   widget.label!,
-                  style: caption.copyWith(color: colors.textSecondary),
+                  style: caption.copyWith(
+                    color: onBrand ? colors.onBrand : colors.textSecondary,
+                  ),
                 ),
         ),
         if (showsValue) ...<Widget>[
@@ -305,7 +342,9 @@ class _DabblerProgressBarState extends State<DabblerProgressBar>
           const SizedBox(width: DabblerSpacing.space3),
           Text(
             '$percent%',
-            style: caption.copyWith(color: colors.textPrimary),
+            style: caption.copyWith(
+              color: onBrand ? colors.onBrand : colors.textPrimary,
+            ),
           ),
         ],
       ],
@@ -397,4 +436,3 @@ double progressSweepOffsetAt(double t) {
   return DabblerProgressBar.sweepStart +
       (DabblerProgressBar.sweepEnd - DabblerProgressBar.sweepStart) * eased;
 }
-

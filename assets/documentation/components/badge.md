@@ -32,6 +32,12 @@ Every decorative tone and every semantic status — see `badge_gallery.dart`'s *
 
 @specimen badge/tones
 
+`DabblerBadge.dot` is the count-less unread marker: a 7px circle, brand by default or the status
+indicator colour when given a `status`. It has no position of its own, and is silent to a screen
+reader unless given a `semanticLabel`.
+
+@specimen badge/dot
+
 ## Using it
 
 **Never read `tone="error"` as meaning something went wrong, or any other tone name as its literal

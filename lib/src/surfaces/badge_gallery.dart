@@ -24,11 +24,42 @@ const List<GalleryEntry> badgeGalleryEntries = <GalleryEntry>[
     page: 'components/badge',
     group: GalleryPurpose.identityAndStatus,
     title: 'Badge — tones and statuses',
-    description: 'tone — decorative, the kit\'s own non-semantic names. '
+    description:
+        'tone — decorative, the kit\'s own non-semantic names. '
         'status — semantic, overrides tone.',
     builder: _badges,
   ),
+  GalleryEntry(
+    id: 'badge/dot',
+    page: 'components/badge',
+    group: GalleryPurpose.identityAndStatus,
+    title: 'Badge — unread dot',
+    description:
+        'DabblerBadge.dot — a count-less 7px marker; brand by '
+        'default, status base when given a status (DSG-NEW-009).',
+    builder: _dots,
+  ),
 ];
+
+Widget _dots(BuildContext context) {
+  final DabblerColors colors = DabblerColors.of(context);
+  return GalleryWrap(
+    children: <Widget>[
+      const GallerySpecimen(
+        label: 'default (brand)',
+        child: DabblerBadge.dot(semanticLabel: 'Unread'),
+      ),
+      GallerySpecimen(
+        label: 'status: error',
+        child: DabblerBadge.dot(status: colors.error, semanticLabel: 'Unread'),
+      ),
+      GallerySpecimen(
+        label: 'status: success',
+        child: DabblerBadge.dot(status: colors.success),
+      ),
+    ],
+  );
+}
 
 Widget _badges(BuildContext context) => GalleryStack(
   children: <Widget>[
@@ -45,8 +76,13 @@ Widget _badges(BuildContext context) => GalleryStack(
     ),
     GalleryWrap(
       children: <Widget>[
-        for (final (String label, String name, DabblerStatusTone? tone,
-                String? icon) in _statuses)
+        for (final (
+              String label,
+              String name,
+              DabblerStatusTone? tone,
+              String? icon,
+            )
+            in _statuses)
           GallerySpecimen(
             label: name,
             child: Builder(
@@ -78,32 +114,32 @@ const double _statusIconSize = 12;
 /// `<Badge status="…">…</Badge>`, in the specimen's order and wording.
 const List<(String, String, DabblerStatusTone?, String?)> _statuses =
     <(String, String, DabblerStatusTone?, String?)>[
-  ('draft', 'neutral', null, null),
-  ('confirmed', 'success', DabblerStatusTone.success, 'tick-circle'),
-  ('2 spots left', 'warning', DabblerStatusTone.warning, null),
-  ('cancelled', 'error', DabblerStatusTone.error, null),
-  ('waitlist', 'info', DabblerStatusTone.info, null),
-];
+      ('draft', 'neutral', null, null),
+      ('confirmed', 'success', DabblerStatusTone.success, 'tick-circle'),
+      ('2 spots left', 'warning', DabblerStatusTone.warning, null),
+      ('cancelled', 'error', DabblerStatusTone.error, null),
+      ('waitlist', 'info', DabblerStatusTone.info, null),
+    ];
 
 /// One decorative badge, reproducing the specimen's two special cases: `pill`
 /// carries a 6px `currentColor` dot, `withIcon` a bold 12px `star`.
 Widget _decorative(DabblerBadgeTone tone) => switch (tone) {
-      DabblerBadgeTone.pill => DabblerBadge(
-          label: 'live',
-          tone: tone,
-          icon: const _Dot(),
-        ),
-      DabblerBadgeTone.withIcon => DabblerBadge(
-          label: 'withIcon',
-          tone: tone,
-          icon: const DabblerIcon(
-            'star',
-            weight: DabblerIconWeight.bold,
-            size: _statusIconSize,
-          ),
-        ),
-      _ => DabblerBadge(label: tone.name, tone: tone),
-    };
+  DabblerBadgeTone.pill => DabblerBadge(
+    label: 'live',
+    tone: tone,
+    icon: const _Dot(),
+  ),
+  DabblerBadgeTone.withIcon => DabblerBadge(
+    label: 'withIcon',
+    tone: tone,
+    icon: const DabblerIcon(
+      'star',
+      weight: DabblerIconWeight.bold,
+      size: _statusIconSize,
+    ),
+  ),
+  _ => DabblerBadge(label: tone.name, tone: tone),
+};
 
 /// The specimen's inline `live` dot: `width:6, height:6, borderRadius:9999,
 /// background: currentColor` — so it takes the badge's own ink.
@@ -115,14 +151,14 @@ class _Dot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: diameter,
-        height: diameter,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            // `currentColor` — the badge sets the icon theme to its own ink.
-            color: IconTheme.of(context).color,
-            borderRadius: DabblerRadius.pillAll,
-          ),
-        ),
-      );
+    width: diameter,
+    height: diameter,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        // `currentColor` — the badge sets the icon theme to its own ink.
+        color: IconTheme.of(context).color,
+        borderRadius: DabblerRadius.pillAll,
+      ),
+    ),
+  );
 }

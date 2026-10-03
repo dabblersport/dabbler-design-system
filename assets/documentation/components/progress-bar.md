@@ -30,6 +30,11 @@ section.
 
 @specimen progress-bar
 
+The `onBrand` tone is for a bar inside a brand-filled card: the fill is the on-brand ink and the
+track is that same ink at low opacity, with the caption row in on-brand ink too.
+
+@specimen progress-bar/on-brand
+
 ## Using it
 
 **Pass `value` as a 0–1 fraction, never a 0–100 number.** The component clamps into that range but
@@ -52,7 +57,7 @@ just be a colour that doesn't match the token this component actually reads.
 
 ### Tone
 `brand` (the default, re-tints per section theme), `success`, `warning`, `error`, `info` — each the
-bare status indicator colour.
+bare status indicator colour — and `onBrand`, for a bar on a brand fill.
 
 ### Mode
 Determinate (a known fraction) or `.indeterminate` (a busy sweep).

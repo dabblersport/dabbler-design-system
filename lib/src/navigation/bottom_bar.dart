@@ -11,6 +11,8 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 
+part 'bottom_bar_icon_tone.dart';
+
 /// One destination in a [DabblerNavigationBottomBar], transcribed from
 /// `NavigationBottomBarItem` in
 /// `components/navigation/NavigationBottomBar.d.ts:12-19` (unverified: file not mirrored).
@@ -60,6 +62,7 @@ class DabblerNavigationCreateItem {
     required this.id,
     required this.icon,
     required this.label,
+    this.iconTone = DabblerNavigationIconTone.neutral,
   });
 
   /// Stable id, passed to [DabblerNavigationBottomBar.onCreate].
@@ -71,16 +74,20 @@ class DabblerNavigationCreateItem {
   /// Label under the tile. Wraps to two lines if needed.
   final String label;
 
+  /// The glyph plate's fill. Defaults to [DabblerNavigationIconTone.neutral].
+  final DabblerNavigationIconTone iconTone;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is DabblerNavigationCreateItem &&
           other.id == id &&
           other.icon == icon &&
-          other.label == label;
+          other.label == label &&
+          other.iconTone == iconTone;
 
   @override
-  int get hashCode => Object.hash(id, icon, label);
+  int get hashCode => Object.hash(id, icon, label, iconTone);
 
   @override
   String toString() => 'DabblerNavigationCreateItem($id)';
@@ -172,6 +179,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
     this.defaultMenuOpen = false,
     this.onCreate,
     this.safeArea = true,
+    this.rotateActionOnOpen = true,
   });
 
   /// Home / Explore / Games / You — the source's own `ITEMS`
@@ -274,6 +282,12 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   /// Off the base-3 grid and stated here rather than borrowed from a spacing
   /// step that happens to be near it.
   static const double createTileHeight = 62;
+
+  /// Whether the action glyph turns [actionOpenTurns] while the menu is open.
+  /// The Home Feed design pins it upright
+  /// (`[aria-label="Close menu"] > span { transform: rotate(0deg) }`); pass
+  /// false for that. Defaults to true, the component source's 45°.
+  final bool rotateActionOnOpen;
 
   /// Turns of rotation the action makes when the menu opens: 45°
   /// (`NavigationBottomBar.jsx:190`), i.e. an eighth turn, which is what
@@ -600,7 +614,9 @@ class _DabblerNavigationBottomBarState
                   boxShadow: DabblerFab.shadow,
                 ),
                 child: AnimatedRotation(
-                  turns: open ? DabblerNavigationBottomBar.actionOpenTurns : 0,
+                  turns: open && widget.rotateActionOnOpen
+                      ? DabblerNavigationBottomBar.actionOpenTurns
+                      : 0,
                   duration: duration,
                   curve: DabblerMotion.easeOut,
                   child: DabblerIcon(
@@ -719,8 +735,9 @@ class _DabblerNavigationBottomBarState
           height: DabblerNavigationBottomBar.createTileHeight,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            // `--neutral-200` is `--surface-sunken` (`tokens/colors.css:34`).
-            color: colors.surfaceSunken,
+            // `--neutral-200` is `--surface-sunken` (`tokens/colors.css:34`)
+            // by default; per-tile tone per DSG-NEW-001.
+            color: dabblerNavigationIconPlateFor(tile.iconTone, colors),
             borderRadius: DabblerRadius.xlAll,
           ),
           child: DabblerIcon(

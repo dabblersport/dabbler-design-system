@@ -129,7 +129,41 @@ class DabblerBadge extends StatelessWidget {
     this.paddingInline,
     this.minWidth,
     this.fill,
-  });
+  }) : isDot = false,
+       semanticLabel = null;
+
+  /// A count-less unread marker: a bare [dotDiameter] circle (DSG-NEW-009).
+  ///
+  /// Transcribed from the Notifications design's unread row marker — a 7×7
+  /// `--color-brand-primary` circle with no text. The fill is
+  /// [backgroundOf] [tone] (so the default is brand), or
+  /// [DabblerStatusColor.base] of [status] when set — `base` is the bare
+  /// indicator role, which is what a mark carrying no text takes. [status]
+  /// wins over [tone], as on the pill.
+  ///
+  /// The dot has no position of its own: the host places it, so it mirrors
+  /// with whatever directional layout the host uses and never flips itself.
+  ///
+  /// A dot is not text, so it is silent to assistive technology unless
+  /// [semanticLabel] names it (e.g. "Unread").
+  const DabblerBadge.dot({
+    super.key,
+    this.tone = DabblerBadgeTone.defaultTone,
+    this.status,
+    this.semanticLabel,
+  }) : label = '',
+       icon = null,
+       paddingInline = null,
+       minWidth = null,
+       fill = null,
+       isDot = true;
+
+  /// Whether this is the count-less [DabblerBadge.dot] marker.
+  final bool isDot;
+
+  /// The accessible name of a [DabblerBadge.dot]. Null leaves the dot silent.
+  /// Always null on the pill, which is read as its [label].
+  final String? semanticLabel;
 
   /// The pill's text.
   final String label;
@@ -185,6 +219,23 @@ class DabblerBadge extends StatelessWidget {
   /// `0.20`, from `statusHairline` in
   /// `components/foundations/overlay.jsx:169-173`.
   static const double hairlineOpacity = 0.20;
+
+  /// The [DabblerBadge.dot] diameter — `7` (Notifications design, unread row
+  /// marker `width: 7px; height: 7px`).
+  ///
+  /// **Off the 3px spacing ramp, transcribed.** [DabblerSpacing.space2] (`6`)
+  /// is the nearest step; the design's own 7 is kept, as [verticalPadding]
+  /// keeps its 4, rather than snapped. Distinct from the top bar's 9px
+  /// unread dot (`DabblerNavigationUnreadDot.diameter`), which the Home top
+  /// bar draws with a page-coloured ring.
+  static const double dotDiameter = 7;
+
+  /// The fill of a [DabblerBadge.dot] for [tone] or [status].
+  static Color dotColorOf(
+    DabblerBadgeTone tone,
+    DabblerStatusColor? status,
+    DabblerColors colors,
+  ) => status?.base ?? backgroundOf(tone, colors);
 
   /// The badge's text style: 11px **Bold**, leading 1.5.
   ///
@@ -269,6 +320,22 @@ class DabblerBadge extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     final DabblerStatusColor? semantic = status;
+
+    if (isDot) {
+      final Widget dot = SizedBox.square(
+        dimension: dotDiameter,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: dotColorOf(tone, semantic, colors),
+            shape: BoxShape.circle,
+          ),
+        ),
+      );
+      final String? name = semanticLabel;
+      return name == null || name.isEmpty
+          ? ExcludeSemantics(child: dot)
+          : Semantics(label: name, container: true, child: dot);
+    }
 
     final Color background =
         semantic?.surface ?? fill ?? backgroundOf(tone, colors);

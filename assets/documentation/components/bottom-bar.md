@@ -31,6 +31,12 @@ Destinations with an active state and the create menu open — see `navigation_g
 
 @specimen bottom-bar
 
+Each create tile can tint its glyph plate with `iconTone` (`neutral` by default, or `info`,
+`success`, `accent`, `amber`), and `rotateActionOnOpen: false` holds the action glyph upright while
+the menu is open — the Home Feed treatment.
+
+@specimen bottom-bar/icon-tones
+
 ## Using it
 
 **Drive `active` and `menuOpen` together or not at all — don't control one and leave the other
