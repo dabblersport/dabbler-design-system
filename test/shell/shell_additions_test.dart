@@ -182,7 +182,11 @@ void main() {
       final Finder back = find.byWidgetPredicate(
         (Widget w) => w is DabblerIcon && w.name.startsWith('arrow-circle'),
       );
-      expect(t.widget<DabblerIcon>(back).name, 'arrow-circle-right');
+      // The glyph is drawn through DabblerIcon.mirrorInRtl: the widget keeps
+      // the LTR name and the icon swaps to its measured mirror in RTL.
+      final DabblerIcon icon = t.widget<DabblerIcon>(back);
+      expect(icon.name, DabblerNavigationTopBar.backIcon);
+      expect(icon.mirrorInRtl, isTrue);
       expect(
         t.getCenter(back).dx,
         greaterThan(t.getCenter(find.text('الإشعارات')).dx),
