@@ -293,14 +293,10 @@ abstract final class DabblerPalette {
   /// `--tag-pending-surface` — `#FDEDE3`.
   static const Color tagPendingSurface = Color(0xFFFDEDE3);
 
-  /// Transcribes live `--tag-pending-ink` `#B4530E` (live parity, hand-
-  /// transcribed mirror).
-  ///
-  /// **Known defect: 4.40:1 on [tagPendingSurface], below AA 4.5:1.**
-  /// `Dabbler/dabbler-docs/DECISIONS.md:11914-11919` rules the fix (`#A34A08`,
-  /// 5.20:1) a Figma change request, not a code change, and `:11941-11947`
-  /// says the pins must not be edited to match until `colors.css` is
-  /// re-exported. Do not change this value until then.
+  /// Transcribes live `--tag-pending-ink` #B4530E. Known defect: 4.40:1 on
+  /// tagPendingSurface, below AA 4.5. DECISIONS.md:11914-11919 rules the fix
+  /// (#A34A08, 5.20:1) a Figma change request, not a code change. Do not
+  /// change this value until colors.css is re-exported.
   ///
   /// `--tag-pending-ink` — `#B4530E`.
   static const Color tagPendingInk = Color(0xFFB4530E);

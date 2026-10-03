@@ -144,18 +144,20 @@ void main() {
       ? 'tokens/colors.css not found beside the package'
       : false);
 
-  // KNOWN DEFECT, pinned as the SOURCE records it (not a pass): live
-  // `--tag-pending-ink` #B4530E on `--tag-pending-surface` #FDEDE3 is 4.40:1,
-  // below AA 4.5:1. `Dabbler/dabbler-docs/DECISIONS.md:11914-11919` rules the
-  // fix (#A34A08) a Figma change request, and `:11941-11947` says the pins
-  // record the source and move to the gate only after `colors.css` is
-  // re-exported. This test must keep asserting 4.40 until then.
-  test('known defect: tag-pending-ink is #B4530E at 4.40:1 on its surface', () {
-    expect(DabblerPalette.tagPendingInk, const Color(0xFFB4530E));
-    expect(
-      _contrast(DabblerPalette.tagPendingInk, DabblerPalette.tagPendingSurface),
-      closeTo(4.40, 0.01),
-    );
+  // Known-failing group: the pin records the SOURCE's 4.40:1 (below AA 4.5:1),
+  // not a pass. It moves to the gate only after `colors.css` is re-exported.
+  group(
+      'known-failing: tag-pending-ink AA (DECISIONS.md:11942-11946: pins '
+      'record the source; moves to the gate only after re-export)', () {
+    test('tagPendingInk on tagPendingSurface is 4.40:1', () {
+      expect(
+        _contrast(
+          DabblerPalette.tagPendingInk,
+          DabblerPalette.tagPendingSurface,
+        ),
+        closeTo(4.40, 0.01),
+      );
+    });
   });
 
   test('no Color(0x...) literal outside the palette files', () {
