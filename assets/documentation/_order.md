@@ -115,6 +115,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [SharedObjectCard](components/shared-object-card.md) — a game, venue or player shared in a thread.
 - [PostRow](components/post-row.md) — one post in the Home Feed: author, place, body and the like, reply and share actions.
 - [NewsCard](components/news-card.md) — one story in the News tab: media, figures, title and excerpt.
+- [Image](components/image.md) — a network photo in a token-radius frame, with placeholder, error state and optional scrim.
 - [ActivityRow](components/activity-row.md) — one entry in the Active tab: who, what, where, when and an action.
 
 ### 3 · Identity and status — who or what a piece of content is
