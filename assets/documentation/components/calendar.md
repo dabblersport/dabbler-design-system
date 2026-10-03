@@ -71,6 +71,17 @@ start should pass it rather than assume the direction-based guess is correct for
 range.** This widget never treats the set as a span; a composer that wants range behaviour (a start
 and an end) builds that interpretation on top rather than assuming the widget provides it.
 
+**Turn on `yearPicker` to let the year chip jump years.** The chip then swaps the days for a
+grid of years, three to a row, in the day cell's own pill and colours; choosing one reports the
+same month in that year through `onMonthChanged` (pulled inside `minimum`/`maximum`) and returns
+to the days. It is off by default, and it needs `onMonthChanged`. `onYearPressed` still fires when
+the chip is tapped, so a composer can observe it.
+
+**Deviation:** no design file draws the open year list — the chip's caret implies one. The grid is
+built only from existing tokens and the calendar's own cell geometry.
+
+@specimen calendar/year-picker
+
 **Build the action row out of `Button`, not a Calendar-specific action widget.** There used to be
 one — `DabblerCalendarTextAction`, a stand-in for a `Button` `text` tone that did not exist
 yet — and it is gone: the tone shipped and the row now uses it directly. Cancel is `text`,
