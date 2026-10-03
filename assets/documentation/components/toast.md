@@ -49,6 +49,8 @@ different states in the source, and this package keeps that distinction.
 fourth showing while three are already up silently drops the oldest rather than growing the stack
 or blocking the new one.
 
+**Mount one `DabblerToastProvider` at the app root, above the router.** Wrap the router's output in the `builder` of the app widget, so every screen and every route shares one queue, then call `DabblerToastProvider.of(context).show(...)` from anywhere below it. A screen never mounts its own provider; a second provider gives that screen a second queue and stacks toasts on top of each other.
+
 ## Axes
 
 ### Tone

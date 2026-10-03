@@ -112,12 +112,24 @@ class DabblerPostRow extends StatelessWidget {
     this.onComment,
     this.onShare,
     this.onMore,
+    this.imageUrl,
+    this.onAuthorTap,
+    this.authorLabel,
+    this.media,
+    this.onRepost,
+    this.reposts,
+    this.reposted = false,
+    this.reactions,
+    this.kindBadge,
+    this.views,
     this.divider = true,
     this.likeLabel = 'Like',
     this.vibeLabel = 'Vibe',
     this.commentLabel = 'Reply',
     this.shareLabel = 'Share',
     this.moreLabel = 'More options',
+    this.repostLabel = 'Repost',
+    this.viewsLabel = 'Views',
   });
 
   /// The author's name.
@@ -125,6 +137,46 @@ class DabblerPostRow extends StatelessWidget {
 
   /// The avatar seed; falls back to [name].
   final String? seed;
+
+  /// The author's photo. Drawn by [DabblerAvatar] in the same circle; the seed
+  /// portrait stands in while it loads, when it is empty and when it fails.
+  final String? imageUrl;
+
+  /// Called when the author's avatar or name is tapped — open the author's
+  /// profile from here. Null makes both inert. The avatar's tap target is
+  /// 36px wide (the design's own link target), taller below it.
+  final VoidCallback? onAuthorTap;
+
+  /// The accessible name of the author target; falls back to [name].
+  final String? authorLabel;
+
+  /// The post's media (a photo, a carousel), drawn under the body in a rounded
+  /// box clipped to the card radius. The caller sizes it (an aspect ratio or a
+  /// fixed height); the row adds no image dependency.
+  final Widget? media;
+
+  /// Shows the repost action when set; called on tap. The caller decides
+  /// whether this post can be reposted.
+  final VoidCallback? onRepost;
+
+  /// The repost count beside the action; none is drawn when null.
+  final int? reposts;
+
+  /// Whether the viewer has reposted: draws the glyph bold and in the brand
+  /// colour.
+  final bool reposted;
+
+  /// A summary of reactions drawn under the actions (usually a `Wrap` of
+  /// `DabblerChip`s). Null draws nothing.
+  final Widget? reactions;
+
+  /// A kind or origin badge (a `DabblerBadge`) drawn at the end of the author
+  /// line. Null draws nothing.
+  final Widget? kindBadge;
+
+  /// The view count, with an eye glyph after the actions. Null hides it; the
+  /// caller decides who sees it (the post's author, usually).
+  final int? views;
 
   /// The author's role, already localised (the design's `roleLabel`).
   final String? roleLabel;
@@ -198,6 +250,12 @@ class DabblerPostRow extends StatelessWidget {
   /// Accessible name of the more action.
   final String moreLabel;
 
+  /// Accessible name of the repost action.
+  final String repostLabel;
+
+  /// Accessible name of the view count.
+  final String viewsLabel;
+
   /// Meta-row glyph side — `size="13"` (`:300`).
   static const double metaGlyphSize = 13;
 
@@ -237,17 +295,21 @@ class DabblerPostRow extends StatelessWidget {
       DabblerType.subheadline,
     ).copyWith(color: colors.textSecondary);
 
+    final Widget nameText = Text(
+      name,
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.ellipsis,
+      style: t(DabblerType.subheadline).copyWith(color: colors.textPrimary),
+    );
     final Widget header = Row(
       children: <Widget>[
         Flexible(
-          child: Text(
-            name,
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            style: t(
-              DabblerType.subheadline,
-            ).copyWith(color: colors.textPrimary),
+          child: DabblerFeedTappable(
+            onTap: onAuthorTap,
+            semanticLabel: authorLabel ?? name,
+            excludeChildSemantics: true,
+            child: nameText,
           ),
         ),
         if (roleLabel != null) ...<Widget>[
@@ -263,6 +325,11 @@ class DabblerPostRow extends StatelessWidget {
             status: colors.info,
             paddingInline: DabblerSpacing.space3,
           ),
+        ],
+        if (kindBadge != null) ...<Widget>[
+          const Spacer(),
+          const SizedBox(width: DabblerSpacing.space2),
+          kindBadge!,
         ],
       ],
     );
@@ -361,11 +428,32 @@ class DabblerPostRow extends StatelessWidget {
           onTap: onComment,
           semanticLabel: commentLabel,
         ),
-        DabblerFeedAction(
-          icon: 'share',
-          onTap: onShare,
-          semanticLabel: shareLabel,
-        ),
+        if (onRepost != null)
+          DabblerFeedAction(
+            icon: 'refresh',
+            count: reposts,
+            weight: reposted
+                ? DabblerIconWeight.bold
+                : DabblerIconWeight.linear,
+            color: reposted ? colors.brandPrimary : null,
+            onTap: onRepost,
+            semanticLabel: repostLabel,
+          ),
+        // An inert share is not drawn once the row also carries a repost
+        // action: the five actions plus more no longer fit a 360 row at the
+        // 45px touch floor.
+        if (onShare != null || onRepost == null)
+          DabblerFeedAction(
+            icon: 'share',
+            onTap: onShare,
+            semanticLabel: shareLabel,
+          ),
+        if (views != null)
+          DabblerFeedAction(
+            icon: 'eye',
+            count: views,
+            semanticLabel: viewsLabel,
+          ),
         const Spacer(),
         DabblerFeedAction(
           icon: 'more-circle',
@@ -394,7 +482,17 @@ class DabblerPostRow extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            DabblerAvatar(seed: seed ?? name, size: DabblerAvatarSize.sm),
+            DabblerFeedTappable(
+              onTap: onAuthorTap,
+              semanticLabel: authorLabel ?? name,
+              excludeChildSemantics: true,
+              borderRadius: DabblerRadius.pillAll,
+              child: DabblerAvatar(
+                seed: seed ?? name,
+                imageUrl: imageUrl,
+                size: DabblerAvatarSize.sm,
+              ),
+            ),
             const SizedBox(width: avatarGap),
             Expanded(
               child: Column(
@@ -411,11 +509,19 @@ class DabblerPostRow extends StatelessWidget {
                     ),
                     child: bodyText,
                   ),
+                  if (media != null) ...<Widget>[
+                    const SizedBox(height: DabblerSpacing.space3),
+                    ClipRRect(borderRadius: DabblerRadius.lgAll, child: media),
+                  ],
                   if (sport != null) ...<Widget>[
                     const SizedBox(height: DabblerSpacing.space3),
                     sport,
                   ],
                   actions,
+                  if (reactions != null) ...<Widget>[
+                    const SizedBox(height: DabblerSpacing.space2),
+                    reactions!,
+                  ],
                 ],
               ),
             ),

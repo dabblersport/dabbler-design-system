@@ -6,6 +6,7 @@ import '../interaction/press_scale.dart';
 import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_type.dart';
 
 part 'top_bar_unread_dot.dart';
 
@@ -123,7 +124,60 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.leading,
     this.border = false,
     this.safeArea = true,
-  });
+    this.avatarImageUrl,
+  })  : title = null,
+        onBack = null,
+        backLabel = defaultBackLabel;
+
+  /// The titled variant: a back button, a title and trailing actions — the
+  /// inner-screen header of the design files `Settings.dc.html` (`isInner`
+  /// header) and `Article.dc.html` (top bar). There is no wordmark and no
+  /// avatar.
+  ///
+  /// The back glyph is `arrow-circle-left` in LTR and `arrow-circle-right` in
+  /// RTL, so it always points toward the reading start. [title] may be null
+  /// (the Article header shows its title only once the page has scrolled).
+  const DabblerNavigationTopBar.titled({
+    super.key,
+    this.title,
+    this.onBack,
+    this.backLabel = defaultBackLabel,
+    this.actions = const <DabblerNavigationAction>[],
+    this.border = false,
+    this.safeArea = true,
+  })  : avatarSeed = defaultAvatarSeed,
+        avatarBadge = null,
+        onAvatarPressed = null,
+        avatarLabel = 'Account',
+        leading = null,
+        avatarImageUrl = null;
+
+  /// The back button's default accessible name.
+  static const String defaultBackLabel = 'Back';
+
+  /// The titled variant's title; null draws an empty title slot.
+  final String? title;
+
+  /// The titled variant's back action. Null hides the back button.
+  final VoidCallback? onBack;
+
+  /// The back button's accessible name.
+  final String backLabel;
+
+  /// The account avatar's photo. Drawn by [DabblerAvatar] in the same circle;
+  /// the [avatarSeed] portrait stands in while it loads, when it is empty and
+  /// when it fails.
+  final String? avatarImageUrl;
+
+  /// Whether this bar is the titled (back + title) variant.
+  bool get isTitled => title != null || onBack != null;
+
+  /// Diameter of the titled variant's back button — `40x40` in
+  /// `Settings.dc.html` and `Article.dc.html`, inside a 45px hit box.
+  static const double backButtonSide = 40;
+
+  /// The back glyph's size — `size="20"` in both files.
+  static const double backGlyphSize = 20;
 
   /// The export's Multiavatar seed — `text3`'s documented default
   /// (`navigation-system.card.html` — *Anatomy*).
@@ -223,7 +277,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
 
-    final Widget row = Row(
+    final Widget row = isTitled ? _titledRow(context, colors) : Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -279,6 +333,27 @@ class DabblerNavigationTopBar extends StatelessWidget {
       ),
       child: row,
     );
+    if (isTitled && border) {
+      // The inner header's rule is a bottom hairline (`border-bottom:1px solid
+      // var(--faint)`), not the card outline the plain bar's `border` draws.
+      bar = Container(
+        height: barHeight,
+        padding: EdgeInsetsDirectional.only(
+          start: barPadding.start,
+          end: barPadding.end,
+        ),
+        decoration: BoxDecoration(
+          color: colors.bgPrimary,
+          border: Border(
+            bottom: BorderSide(
+              color: colors.bgTertiary,
+              width: DabblerSizing.borderDefault,
+            ),
+          ),
+        ),
+        child: row,
+      );
+    }
 
     if (safeArea) {
       // Zero under an ancestor SafeArea, which has already consumed it.
@@ -340,9 +415,91 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// 36 is under the 45 target floor, so the hit box around it is the floor
   /// while the circle still paints 36. The avatar is only a target at all when
   /// [onAvatarPressed] is given; the export's is decorative.
+  Widget _titledRow(BuildContext context, DabblerColors colors) {
+    final TextDirection dir = Directionality.of(context);
+    final VoidCallback? back = onBack;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        if (back != null) ...<Widget>[
+          Semantics(
+            container: true,
+            button: true,
+            label: backLabel,
+            onTap: back,
+            child: ExcludeSemantics(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: back,
+                child: DabblerFocusRing(
+                  borderRadius: DabblerRadius.pillAll,
+                  child: DabblerPressScale.gesture(
+                    child: SizedBox(
+                      width: DabblerSizing.touchTargetMin,
+                      height: DabblerSizing.touchTargetMin,
+                      child: Center(
+                        child: Container(
+                          width: backButtonSide,
+                          height: backButtonSide,
+                          decoration: BoxDecoration(
+                            // `background:var(--surface-card);
+                            // border:1px solid var(--outline-card)`.
+                            color: colors.surfaceCard,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: colors.borderDefault,
+                              width: DabblerSizing.borderDefault,
+                            ),
+                          ),
+                          child: Center(
+                            child: DabblerIcon(
+                              dir == TextDirection.rtl
+                                  ? 'arrow-circle-right'
+                                  : 'arrow-circle-left',
+                              size: backGlyphSize,
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // `gap:9px` between the header's children.
+          const SizedBox(width: DabblerSpacing.space3),
+        ],
+        Expanded(
+          child: Semantics(
+            header: true,
+            child: Text(
+              title ?? '',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              // `font-size:16px;line-height:21px;font-weight:600;color:var(--ink)`
+              // — the body step at semibold (weight override only).
+              style: DabblerType.body
+                  .resolveForDirection(dir)
+                  .copyWith(
+                    color: colors.textPrimary,
+                    fontWeight: DabblerType.semibold,
+                  ),
+            ),
+          ),
+        ),
+        for (final DabblerNavigationAction action in actions)
+          _action(colors, action),
+      ],
+    );
+  }
+
   Widget _avatar() {
     final Widget avatar = DabblerAvatar(
       seed: avatarSeed,
+      imageUrl: avatarImageUrl,
       size: DabblerAvatarSize.sm,
       badge: avatarBadge,
       // Badge `16x16`, `2px solid var(--neutral-100)` (`NavigationTopBar.jsx:189-196`).

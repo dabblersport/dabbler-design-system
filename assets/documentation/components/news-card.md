@@ -26,6 +26,10 @@ A default story, a liked story without a divider, and an Arabic story in right-t
 
 @specimen news-card
 
+A long press on the like action opens a reaction picker when you pass `onLikeLongPress`; a tap still toggles the like.
+
+@specimen news-card/reaction
+
 ## Using it
 
 **Pass the media as a widget.** Anything that fills its box works; the sunken surface shows behind it and while it loads. The block is 210px high with an 18px corner.
