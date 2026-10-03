@@ -135,6 +135,11 @@ threshold; read the figure from that test, not from this page.
 `spotlight` (the single attention accent — never a status), `scrim` (the wash behind every
 overlay).
 
+The scrim does not vary by theme, so it is also available without a `BuildContext`:
+`DabblerScrimColors.light`, `DabblerScrimColors.dark` and `DabblerScrimColors.colorFor(brightness)` return the same
+values `scrim` resolves to, for a route's `barrierColor`. `DabblerScrimColors.none` is a fully transparent
+barrier.
+
 ## Change log
 
 - D-003 (cxo) — the six failing colour pairings: the light ramp
@@ -156,6 +161,7 @@ overlay).
 - D-040 (cxo) — confirms this page's specimen has shipped and
   ships this page.
 - Alpha DS gaps 6 — adds the named status tint pair (`statusTint`, `DabblerStatusColor.tint`).
+- Alpha final follow-up — adds the context-free scrim (`DabblerScrimColors`, plus `DabblerScrim.colorFor` / `.none` / `.transparent`).
 
 ## Source
 

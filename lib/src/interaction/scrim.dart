@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_motion.dart';
+import '../tokens/dabbler_scrim.dart';
 
 /// Scrim — the one wash behind every overlay.
 ///
@@ -57,6 +58,18 @@ class DabblerScrim extends StatelessWidget {
     this.dismissLabel,
     this.child,
   });
+
+  /// The scrim colour for [brightness], without a [BuildContext] — for a
+  /// route's `barrierColor`. Equal to [DabblerColors.scrim] in every theme;
+  /// see [DabblerScrimColors].
+  static Color colorFor(Brightness brightness) =>
+      DabblerScrimColors.colorFor(brightness);
+
+  /// A fully transparent barrier colour — [DabblerScrimColors.none].
+  static const Color none = DabblerScrimColors.none;
+
+  /// Alias of [none].
+  static const Color transparent = DabblerScrimColors.none;
 
   /// Whether the wash is shown. Toggling it fades.
   final bool visible;
