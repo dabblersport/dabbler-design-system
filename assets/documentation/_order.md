@@ -71,6 +71,8 @@ The first thing on most screens, and the reason it comes first here.
 - [Tabs](components/tabs.md) — switching between peer views of one screen.
 - [TabPager](components/tab-pager.md) — tabs over swipeable pages that keep their scroll
   position.
+- [StepProgress](components/step-progress.md) — the segmented bar that says which step of a flow you are on.
+- [PageDots](components/page-dots.md) — the position dots under a carousel.
 - [ConversationHeader](components/conversation-header.md) — the top bar of a conversation: back, a
   tappable identity, overflow.
 
@@ -124,6 +126,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [Avatar](components/avatar.md) — a person's circular, deterministically generated portrait.
 - [Badge](components/badge.md) — the pill that labels a row, a card or a tab.
 - [Rating](components/rating.md) — a score, shown or collected.
+- [HeroIcon](components/hero-icon.md) — the large round glyph that heads a success or empty screen.
 - [ConversationRow](components/conversation-row.md) — one conversation in the inbox: identity, latest activity, unread and status.
 - [ConversationAvatar](components/conversation-avatar.md) — a conversation's avatar with its kind badge and presence dot.
 
@@ -137,6 +140,8 @@ lot about the rest.
 - [TextField](components/text-field.md) — the flat input, in five shapes.
 - [SearchField](components/search-field.md) — the search input, with a clear button while it holds a query.
 - [HighlightedText](components/highlighted-text.md) — a search result's text with the matched part picked out.
+- [SelectableCard](components/selectable-card.md) — a tappable card that is either chosen or not.
+- [SortControl](components/sort-control.md) — how a view-all list lets the reader change its order.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
@@ -172,6 +177,7 @@ lot about the rest.
 
 - [Dialog](components/dialog.md) — the modal that interrupts to get one decision.
 - [Sheet](components/sheet.md) — the canonical bottom sheet.
+- [SheetList](components/sheet-list.md) — a bounded, scrolling list for the body of a sheet.
 - [Menu](components/menu.md) — the anchored popover for a list of actions or options.
 - [Tooltip](components/tooltip.md) — a short label for a control that carries no visible text.
 
