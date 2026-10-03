@@ -17,6 +17,7 @@ import 'comment_row.dart';
 import 'post_detail.dart';
 import 'post_row.dart';
 import 'reply_composer.dart';
+import 'repost_row.dart';
 
 /// The thread parts' specimens.
 const List<GalleryEntry> threadGalleryEntries = <GalleryEntry>[
@@ -59,6 +60,16 @@ const List<GalleryEntry> threadGalleryEntries = <GalleryEntry>[
         'The full timestamp, the edited marker and the visibility line, in '
         'LTR and RTL.',
     builder: _detail,
+  ),
+  GalleryEntry(
+    id: 'post-row/repost',
+    page: 'components/post-row',
+    group: GalleryPurpose.contentContainers,
+    title: 'RepostRow — a repost with its embedded original',
+    description:
+        'A quote repost, a repost whose original is unavailable, and an '
+        'Arabic repost in RTL.',
+    builder: _reposts,
   ),
 ];
 
@@ -324,6 +335,62 @@ Widget _detail(BuildContext context) => GalleryStack(
               editedLabel: 'معدل',
               visibilityLabel: 'عام',
               visibilityIcon: 'people',
+            ),
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _reposts(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'quote repost',
+      child: _frame(
+        const DabblerRepostRow(
+          name: 'Karim Hassan',
+          repostedLabel: 'Reposted · 1h',
+          quote: 'Who is in? I can bring the bibs.',
+          divider: false,
+          original: DabblerPostRow(
+            name: 'Moataz Mustapha',
+            time: '2h',
+            place: 'Al Quoz Pond Park',
+            body: 'Football night this Sunday. All levels welcome.',
+            likes: 24,
+            replies: 6,
+            divider: false,
+          ),
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'original unavailable',
+      child: _frame(
+        const DabblerRepostRow(
+          name: 'Karim Hassan',
+          repostedLabel: 'Reposted · 1h',
+          unavailableLabel: 'This post is no longer available.',
+          divider: false,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'Arabic, RTL',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: _frame(
+          const DabblerRepostRow(
+            name: 'كريم حسن',
+            repostedLabel: 'أعاد النشر · 1h',
+            divider: false,
+            original: DabblerPostRow(
+              name: 'معتز مصطفى',
+              time: '2h',
+              place: 'حديقة القوز',
+              body: 'مباراة كرة قدم يوم الأحد.',
+              divider: false,
             ),
           ),
         ),

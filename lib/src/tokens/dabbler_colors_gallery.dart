@@ -342,7 +342,11 @@ Widget _surfaces(BuildContext context) {
       const GalleryUsage(
         '`--color-scrim` is ink at 45% in light and `--ink-950` at 65% in '
         'dark. **Overlays consume this and never invent their own opacity** — '
-        'Sheet, Dialog and the mobile Menu all read the same token.',
+        'Sheet, Dialog and the mobile Menu all read the same token. Code with '
+        'no `BuildContext` (a route\'s `barrierColor`) reads the same values '
+        'from `DabblerScrimColors.colorFor(brightness)`; '
+        '`DabblerScrimColors.none` is the '
+        'fully transparent barrier.',
       ),
       if (colors.brightness == Brightness.dark)
         const GalleryUsage(

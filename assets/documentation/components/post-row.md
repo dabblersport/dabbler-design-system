@@ -36,6 +36,10 @@ The open-post detail line: the full timestamp, the edited marker and the visibil
 
 @specimen post-row/detail
 
+A repost, `DabblerRepostRow`: the reposter's header and reposted line, an optional quote, and the original post embedded in a card, or a note when the original is unavailable.
+
+@specimen post-row/repost
+
 ## Using it
 
 **Give it the post's facts, already formatted.** Name, time, place and distance are strings; likes and replies are integers, drawn with Western digits in either direction.
@@ -52,6 +56,8 @@ The open-post detail line: the full timestamp, the edited marker and the visibil
 
 **Pass `detail` on the open post.** It adds the full timestamp, an edited marker and who can see the post above the actions, closed by a hairline. Without it the feed row is unchanged.
 
+**Draw a repost with `DabblerRepostRow`, not a post row.** Pass the reposter's name and an already-formatted reposted line, an optional `quote`, and the original as a `DabblerPostRow` with `divider: false` in the `original` slot. When the original is gone, leave `original` empty and pass `unavailableLabel`. `detail` and `actions` draw under the card.
+
 **Where it departs from the design.**
 
 - The distance pill is the shared Badge: 4px block padding, bold, with a hairline, where the design is 2/8, regular and border-less.
@@ -61,6 +67,7 @@ The open-post detail line: the full timestamp, the edited marker and the visibil
 - 5px gaps take the 6px step, and 8px and 11px paddings take 9 and 12.
 - The avatar's author target is the avatar's own 36px width (the design's link target), taller below it; the name is a second target.
 - With a repost action and no share callback, the inert share glyph is not drawn: the actions plus more would not fit a 360px row at the 45px touch floor. Passing both share and repost needs a wider row.
+- The design files draw no repost row (Profiles only names a Reposts tab), so `DabblerRepostRow` follows the app's shipped repost row, rebuilt from system parts; its reposter avatar is the post row's 36px rather than 48px so the two line up in one feed.
 - The repost action, the reaction summary, the kind badge and the view count are not in the Home Feed markup; they reuse the row's own action, chip and badge parts so the feed keeps those behaviours.
 
 ## Axes
@@ -80,7 +87,8 @@ Ink: primary for the name, secondary for role, time, place, body and counts, ter
 
 - Added from the Home Feed design file.
 - Gained the opt-in open-post detail line from the Post design file (KAN-412 gaps 5).
+- Alpha final follow-up — adds `DabblerRepostRow`.
 
 ## Source
 
-`lib/src/feed/post_row.dart`
+`lib/src/feed/post_row.dart`, `lib/src/feed/repost_row.dart`
