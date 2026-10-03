@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'dabbler_dark_provisional.dart';
 import 'dabbler_palette.dart';
-import 'dabbler_scrim.dart';
 
 /// The seven Dabbler section themes.
 ///
@@ -359,7 +358,9 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
       error: _error(theme, dark),
       info: _info(theme, dark),
       spotlight: DabblerPalette.spotlight500,
-      scrim: DabblerScrimColors.colorFor(brightness),
+      scrim: dark
+          ? DabblerPalette.ink950.withValues(alpha: 0.65)
+          : DabblerPalette.ink.withValues(alpha: 0.45),
     );
   }
 

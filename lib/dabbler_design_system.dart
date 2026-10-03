@@ -110,6 +110,7 @@ export 'src/feed/post_row.dart';
 export 'src/feed/attachment_chip.dart';
 export 'src/feed/comment_row.dart';
 export 'src/feed/post_detail.dart';
+export 'src/feed/repost_row.dart';
 export 'src/feed/reply_composer.dart';
 export 'src/feed/thread_gallery.dart';
 export 'src/media/image.dart';

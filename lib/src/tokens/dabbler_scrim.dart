@@ -12,8 +12,9 @@ import 'dabbler_palette.dart';
 ///
 /// The scrim does **not** vary by [DabblerTheme]: all seven themes share it,
 /// so one value per brightness is the whole token. [DabblerColors.resolve]
-/// reads its scrim from here, so the two can never drift; a test asserts they
-/// are equal for every theme and brightness.
+/// keeps its own literal (the documentation gate reads the figures there);
+/// `test/tokens/dabbler_scrim_test.dart` asserts the two are equal for every
+/// theme and brightness, so they cannot drift.
 ///
 /// These are `static final`, not `const`: they are computed from the palette
 /// with [Color.withValues], which Dart cannot evaluate at compile time, and

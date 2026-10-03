@@ -60,6 +60,8 @@ brand primary by 14%, computed from existing tokens (`DabblerSurface.brandTintBl
 the card surface is white, so it equals the design exactly; dark applies the same rule over the dark
 card surface. No colour is added.
 
+@figure 14% lib/src/surfaces/surface.dart#bleedTintMix
+
 ## Tokens used
 
 Fill varies by variant — the card surface, the sunken/grey fill steps, the brand tint, or a solid
