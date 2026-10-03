@@ -106,6 +106,7 @@ class _SportDemoState extends State<_SportDemo> {
   @override
   Widget build(BuildContext context) => GridView.count(
     crossAxisCount: 4,
+    childAspectRatio: 0.75,
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
     mainAxisSpacing: DabblerSpacing.space3,

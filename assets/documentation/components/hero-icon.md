@@ -13,7 +13,7 @@ Sources  : lib/src/surfaces/hero_icon.dart (class dartdoc)
 ### `DabblerHeroIcon`
 
 HeroIcon is the large round tile holding one glyph at the top of a success, confirmation or
-empty screen. It is the screen-sized sibling of `IconTile`.
+empty screen, the screen-sized sibling of `IconTile`.
 
 It is decorative by default: the screen's title says what happened.
 
