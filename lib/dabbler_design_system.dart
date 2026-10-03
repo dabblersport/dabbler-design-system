@@ -94,6 +94,8 @@ export 'src/feed/feed_atoms.dart';
 export 'src/feed/feed_gallery.dart';
 export 'src/feed/news_card.dart';
 export 'src/feed/post_row.dart';
+export 'src/media/image.dart';
+export 'src/media/image_gallery.dart';
 export 'src/forms/checkbox.dart';
 export 'src/forms/code_input.dart';
 export 'src/forms/date_field.dart';
