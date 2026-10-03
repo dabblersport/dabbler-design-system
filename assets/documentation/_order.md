@@ -172,6 +172,7 @@ lot about the rest.
 
 - [Button](components/button.md) — the one control for a tappable action, ten tones, three sizes.
 - [TextLink](components/text-link.md) — a brand-coloured link, on its own line or inside a sentence.
+- [OnColorIconButton](components/on-color-icon-button.md) — a round, translucent icon button on a coloured hero.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.
 - [Chip](components/chip.md) — filtering and tagging, tappable or static.

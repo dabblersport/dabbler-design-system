@@ -76,6 +76,8 @@ export 'src/cards/stat_tile_gallery.dart';
 export 'src/cards/cards_gallery.dart';
 export 'src/controls/button.dart';
 export 'src/controls/button_gallery.dart';
+export 'src/controls/on_color_icon_button.dart';
+export 'src/controls/on_color_icon_button_gallery.dart';
 export 'src/controls/text_link.dart';
 export 'src/controls/text_link_gallery.dart';
 export 'src/controls/chip.dart';
