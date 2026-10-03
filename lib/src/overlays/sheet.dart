@@ -102,6 +102,9 @@ class DabblerSheet extends StatefulWidget {
     this.snapTo,
     this.dragHandle = true,
     this.title,
+    this.titleSpan,
+    this.titleWidget,
+    this.headerAction,
     this.footer,
     this.child,
     this.dismissible = true,
@@ -162,6 +165,35 @@ class DabblerSheet extends StatefulWidget {
 
   /// The title line, rendered in [DabblerType.title3].
   final String? title;
+
+  /// A rich title, drawn instead of [title] when set — e.g. a count in a
+  /// second colour. Its base style is [DabblerType.title3] in
+  /// [DabblerColors.textPrimary]; spans override from there. The plain text
+  /// of the span ([InlineSpan.toPlainText]) names the route for assistive
+  /// technology when [title] is null.
+  ///
+  /// DS gaps 6 (item 2). Additive: null keeps the [title] line exactly as it
+  /// was.
+  final InlineSpan? titleSpan;
+
+  /// A fully custom title widget, drawn instead of [title] and [titleSpan]
+  /// when set. It takes the title slot's flexible inline extent. Supply
+  /// [title] as well when the widget carries no text of its own, because the
+  /// route's semantics name comes from [title] or [titleSpan] only.
+  final Widget? titleWidget;
+
+  /// A trailing header action, drawn at the inline end of the title row —
+  /// before the close affordance when that is shown.
+  ///
+  /// The Listings filter sheets put a small neutral `Button` reading *Reset*
+  /// there, after a `flex: 1` title and a `gap: 12`
+  /// (`Listings.dc.html:286-289`, repeated at 587-590, 838-841 and the Arabic
+  /// copies at 1155-1158, 1456-1459, 1707-1710). Those sheets have no close
+  /// button; pass `dismissible: false` or rely on the scrim when matching
+  /// them exactly. The action keeps its own semantics (pass a
+  /// `DabblerButton`, which is a named button), and the row is a [Row] in
+  /// the ambient [Directionality], so it sits on the left under RTL.
+  final Widget? headerAction;
 
   /// Pinned footer — actions. Safe-area padded, and separated by a `--faint`
   /// hairline. `Sheet.prompt.md:79` (unverified: file not mirrored) requires actions to live here rather than
