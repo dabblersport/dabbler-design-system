@@ -50,6 +50,7 @@ you; nobody reads all nine in order.
   in the vocabulary.
 - [Sports](foundations/sports.md) — sport identity is carried by icon and background together;
   neither may be the only carrier.
+- [Vibes](foundations/vibes.md) — the 119 post moods as a label and a palette tone; no emoji.
 - [Interaction](foundations/interaction.md) — the one shared focus ring, press scale and overlay
   scrim every interactive thing composes.
 - [Themes and brightness](foundations/themes.md) — fourteen resolved palettes; thirteen roles never
@@ -191,6 +192,7 @@ lot about the rest.
 ### 9 · Structure — the one thing that separates, and nothing else
 
 - [Page](components/page.md) — the screen scaffold: page background, safe area, top bar, body and bottom bar.
+- [Fade](components/fade.md) — the page-colour wash that lets a list run out beneath a bottom bar.
 - [Divider](components/divider.md) — the only line this system draws between things.
 - [DateSeparator](components/date-separator.md) — the day boundary pill in a conversation timeline.
 - [UnreadDivider](components/unread-divider.md) — the brand-coloured "new messages" boundary.
