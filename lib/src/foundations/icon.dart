@@ -3,6 +3,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import 'icon_mirror.dart';
 
 /// The two icon weights the product uses, transcribed from the design source
 /// `components/foundations/Icon.d.ts` and the *Weights* table in
@@ -398,8 +399,14 @@ abstract final class DabblerIconRegistry {
 /// The card is explicit that direction is handled by *"selecting the mirrored
 /// glyph name (`arrow-circle-right` ↔ `-left`), not a CSS transform on the
 /// SVG"*, and that no icon-specific RTL prop exists anywhere in the system.
-/// This widget has none and never mirrors itself; the caller picks the name and
+/// By default this widget never mirrors itself; the caller picks the name and
 /// the surrounding layout does the rest with logical padding.
+///
+/// [mirrorInRtl] is the opt-in for directional glyphs (back/forward arrows,
+/// chevrons): under [TextDirection.rtl] it draws the measured mirrored glyph
+/// from [DabblerIconMirror] when Iconsax has one, and otherwise flips the
+/// glyph horizontally (a documented deviation from the card's no-transform
+/// rule, used only where no mirrored glyph exists). Pass the **LTR** name.
 class DabblerIcon extends StatelessWidget {
   /// Creates an icon for the kebab-case Iconsax [name].
   ///
@@ -412,7 +419,16 @@ class DabblerIcon extends StatelessWidget {
     this.size,
     this.color,
     this.semanticLabel,
+    this.mirrorInRtl = false,
   });
+
+  /// Whether the glyph is directional and must point the other way under
+  /// [TextDirection.rtl]. Default false: nothing changes for existing callers.
+  ///
+  /// When true and the ambient direction is RTL, [name] is swapped for its
+  /// pixel-measured mirror in [DabblerIconMirror] at the same [weight]; a name
+  /// with no mirror in the set is flipped horizontally instead.
+  final bool mirrorInRtl;
 
   /// The kebab-case Iconsax name, exactly as at app.iconsax.io.
   final String name;
@@ -467,8 +483,12 @@ class DabblerIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double side = size ?? DabblerSizing.iconMd;
+    final bool mirror = mirrorInRtl &&
+        Directionality.maybeOf(context) == TextDirection.rtl;
+    final String? mirroredName =
+        mirror ? DabblerIconMirror.pairFor(name, weight) : null;
     final DabblerIconResolution resolution =
-        DabblerIconRegistry.resolve(name, weight: weight);
+        DabblerIconRegistry.resolve(mirroredName ?? name, weight: weight);
     final Color tint = color ??
         IconTheme.of(context).color ??
         DabblerColors.of(context).textPrimary;
@@ -480,9 +500,13 @@ class DabblerIcon extends StatelessWidget {
       _reportMissingInDebug(resolution);
     }
 
-    final Widget glyph = resolution.hasGlyph
+    Widget glyph = resolution.hasGlyph
         ? Icon(resolution.glyph, size: side, color: tint)
         : _MissingGlyph(side: side, color: tint);
+    if (mirror && mirroredName == null) {
+      // No mirrored glyph in the set — flip the drawn one. See [mirrorInRtl].
+      glyph = Transform.flip(flipX: true, child: glyph);
+    }
 
     final Widget box = SizedBox(
       width: side,

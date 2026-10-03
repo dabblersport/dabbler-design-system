@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../controls/button.dart';
 import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
@@ -27,7 +28,34 @@ class DabblerNavigationAction {
     this.weight = DabblerIconWeight.linear,
     this.unread = false,
     this.unreadLabel,
-  });
+  })  : text = false,
+        semanticLabel = null;
+
+  /// A labelled text action — e.g. `Save` — drawn as a text-tone button in
+  /// the bar instead of a glyph.
+  ///
+  /// [label] is the visible text and, unless [semanticLabel] is given, the
+  /// accessible name too. The button's hit box keeps the 45 touch-target
+  /// height; its width is the label's. Lays out with the bar, so under RTL it
+  /// sits at the inline end like the icon actions. Additive: the icon-only
+  /// [DabblerNavigationAction.new] is unchanged.
+  const DabblerNavigationAction.text({
+    required this.label,
+    this.onPressed,
+    this.semanticLabel,
+  })  : text = true,
+        icon = '',
+        weight = DabblerIconWeight.linear,
+        unread = false,
+        unreadLabel = null;
+
+  /// Whether this is the [DabblerNavigationAction.text] variant.
+  final bool text;
+
+  /// The text variant's accessible name when it must differ from the visible
+  /// [label] (e.g. `'Save profile'` for a `Save` button). Ignored by the icon
+  /// variant, whose [label] is already its only name.
+  final String? semanticLabel;
 
   /// Draws the 9px unread dot on the glyph's top-end corner — see
   /// [DabblerNavigationUnreadDot]. The design shows no count, so none exists.
@@ -60,14 +88,18 @@ class DabblerNavigationAction {
           other.onPressed == onPressed &&
           other.weight == weight &&
           other.unread == unread &&
-          other.unreadLabel == unreadLabel;
+          other.unreadLabel == unreadLabel &&
+          other.text == text &&
+          other.semanticLabel == semanticLabel;
 
   @override
-  int get hashCode =>
-      Object.hash(icon, label, onPressed, weight, unread, unreadLabel);
+  int get hashCode => Object.hash(
+      icon, label, onPressed, weight, unread, unreadLabel, text, semanticLabel);
 
   @override
-  String toString() => 'DabblerNavigationAction($icon)';
+  String toString() => text
+      ? 'DabblerNavigationAction.text($label)'
+      : 'DabblerNavigationAction($icon)';
 }
 
 /// The app's identity row at the top of a screen: the Dabbler wordmark at the
@@ -154,6 +186,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
 
   /// The back button's default accessible name.
   static const String defaultBackLabel = 'Back';
+
+  /// The back glyph's LTR name. Drawn with [DabblerIcon.mirrorInRtl], so RTL
+  /// shows `arrow-circle-right` — pointing at the inline start, where the
+  /// button sits and where "back" leads.
+  static const String backIcon = 'arrow-circle-left';
 
   /// The titled variant's title; null draws an empty title slot.
   final String? title;
@@ -369,6 +406,9 @@ class DabblerNavigationTopBar extends StatelessWidget {
   ///
   /// The glyph is 22 in the export; the box around it is the target.
   Widget _action(DabblerColors colors, DabblerNavigationAction action) {
+    if (action.text) {
+      return _textAction(action);
+    }
     final Widget body = SizedBox(
       width: actionTarget.width,
       height: actionTarget.height,
@@ -406,6 +446,30 @@ class DabblerNavigationTopBar extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// A [DabblerNavigationAction.text] action: a [DabblerButtonTone.text]
+  /// button at [DabblerButtonSize.small], whose own focus ring, press scale,
+  /// disabled state and RTL label resolution apply. The button carries the
+  /// semantics; [DabblerNavigationAction.semanticLabel] overrides its name. A
+  /// null callback draws it disabled.
+  Widget _textAction(DabblerNavigationAction action) {
+    final Widget labelled = DabblerButton(
+      label: action.label,
+      semanticLabel: action.semanticLabel,
+      tone: DabblerButtonTone.text,
+      size: DabblerButtonSize.small,
+      // A null callback reads as disabled, matching the icon actions'
+      // `enabled: onPressed != null`.
+      disabled: action.onPressed == null,
+      onPressed: action.onPressed,
+    );
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: DabblerSizing.touchTargetMin,
+      ),
+      child: Center(widthFactor: 1, child: labelled),
     );
   }
 
@@ -452,10 +516,13 @@ class DabblerNavigationTopBar extends StatelessWidget {
                             ),
                           ),
                           child: Center(
+                            // Measured 2026-10-03: `arrow-circle-left` and
+                            // `-right` are true pixel mirrors in
+                            // iconsax_flutter, so RTL draws the start-pointing
+                            // glyph. See [DabblerIconMirror].
                             child: DabblerIcon(
-                              dir == TextDirection.rtl
-                                  ? 'arrow-circle-right'
-                                  : 'arrow-circle-left',
+                              backIcon,
+                              mirrorInRtl: true,
                               size: backGlyphSize,
                               color: colors.textPrimary,
                             ),

@@ -152,13 +152,25 @@ class DabblerTabs extends StatefulWidget {
     this.scrollable = false,
     this.fullWidth = false,
     this.label,
+    this.allowNoSelection = false,
   });
+
+  /// Lets a null [value] mean **no tab is selected**: every tab draws
+  /// inactive, no indicator is shown, and [DabblerTabItem.id]s are reported as
+  /// unselected to assistive technology. The first tab stays the keyboard entry
+  /// point; an arrow key or Home/End from there selects as usual.
+  ///
+  /// Default false, which keeps the source's `Math.max(0, findIndex(...))`
+  /// behaviour (`Tabs.jsx:31`): null, like any unmatched value, selects the
+  /// first tab. A non-null value that matches no item selects the first tab
+  /// either way.
+  final bool allowNoSelection;
 
   /// The tabs, in visual order. `items` in the source, defaulting to empty.
   final List<DabblerTabItem> items;
 
   /// The active [DabblerTabItem.id]. A value matching no item selects the
-  /// first tab.
+  /// first tab — except null under [allowNoSelection], which selects none.
   final String? value;
 
   /// Called with the newly selected id on tap, arrow key, Home or End.
@@ -210,7 +222,11 @@ class _DabblerTabsState extends State<DabblerTabs> {
   /// design value — a floating-point one.
   static const double _scrollEpsilon = 0.01;
 
+  /// -1 when nothing is selected — only ever under [DabblerTabs.allowNoSelection].
   int get _activeIndex {
+    if (widget.value == null && widget.allowNoSelection) {
+      return -1;
+    }
     final int found =
         widget.items.indexWhere((DabblerTabItem i) => i.id == widget.value);
     // `Math.max(0, findIndex(...))` — Tabs.jsx:31.
@@ -265,8 +281,10 @@ class _DabblerTabsState extends State<DabblerTabs> {
       ];
     }
     final int active = _activeIndex;
+    // With nothing selected the first tab is the strip's single tab stop.
+    final int stop = active < 0 ? 0 : active;
     for (int i = 0; i < count; i++) {
-      _nodes[i].skipTraversal = i != active;
+      _nodes[i].skipTraversal = i != stop;
     }
   }
 
@@ -288,6 +306,17 @@ class _DabblerTabsState extends State<DabblerTabs> {
       return;
     }
     final int active = _activeIndex;
+    if (active < 0) {
+      // Nothing selected: no indicator.
+      if (_start != null || _size != null) {
+        setState(() {
+          _start = null;
+          _size = null;
+        });
+      }
+      _measuredIndex = active;
+      return;
+    }
     final RenderBox? strip =
         _stripKey.currentContext?.findRenderObject() as RenderBox?;
     final RenderBox? tab = active < _tabKeys.length
@@ -385,7 +414,13 @@ class _DabblerTabsState extends State<DabblerTabs> {
   /// `(activeIndex + dir + items.length) % items.length`, `Tabs.jsx:55-57`.
   void _move(int direction) {
     final int count = widget.items.length;
-    _select((_activeIndex + direction + count) % count);
+    final int from = _activeIndex;
+    if (from < 0) {
+      // Nothing selected: forward lands on the first tab, back on the last.
+      _select(direction > 0 ? 0 : count - 1);
+      return;
+    }
+    _select((from + direction + count) % count);
   }
 
   /// Selects [index] and moves focus onto it.

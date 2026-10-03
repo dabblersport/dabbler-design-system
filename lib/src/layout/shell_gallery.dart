@@ -195,6 +195,19 @@ Widget _titled(BuildContext context) => GalleryStack(
         ),
       ),
     ),
+    GallerySpecimen(
+      label: 'Text action',
+      child: _frame(
+        const DabblerNavigationTopBar.titled(
+          title: 'Edit profile',
+          onBack: _noop,
+          actions: <DabblerNavigationAction>[
+            DabblerNavigationAction.text(label: 'Save', onPressed: _noop),
+          ],
+          safeArea: false,
+        ),
+      ),
+    ),
   ],
 );
 

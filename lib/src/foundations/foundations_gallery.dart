@@ -126,6 +126,19 @@ Widget _icons(BuildContext context) {
       ),
       GalleryWrap(
         children: <Widget>[
+          for (final TextDirection dir in TextDirection.values)
+            for (final String name in <String>['arrow-circle-left', 'send-2'])
+              GallerySpecimen(
+                label: '$name mirrorInRtl, ${dir.name}',
+                child: Directionality(
+                  textDirection: dir,
+                  child: DabblerIcon(name, mirrorInRtl: true),
+                ),
+              ),
+        ],
+      ),
+      GalleryWrap(
+        children: <Widget>[
           for (final String name in DabblerIconRegistry.vocabulary)
             GallerySpecimen(label: name, child: DabblerIcon(name)),
         ],

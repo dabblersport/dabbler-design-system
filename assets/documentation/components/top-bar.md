@@ -99,6 +99,10 @@ currently a minimum that expands to fit its content. See *Change log*.
 Wordmark plus zero or more trailing actions plus the account avatar — the avatar is always present;
 actions are optional.
 
+Trailing actions are icon-only by default. `DabblerNavigationAction.text(label: 'Save')` draws a
+labelled action as a text-tone `Button` in the same slot. Its label is its accessible name unless
+you pass `semanticLabel`, and without `onPressed` it is drawn disabled.
+
 ### Safe area
 Padded for the device status bar by default, or left to the source's literal behaviour when an
 ancestor already handles it.
@@ -108,6 +112,13 @@ ancestor already handles it.
 **The wordmark never mirrors, even though the rest of the bar does.** The logo and avatar swap
 sides under Arabic like any ordinary flow row — but the wordmark itself stays as drawn, because it's
 text, and text is not a mirrored glyph.
+
+**The titled bar's back glyph points at the inline start in both directions.** It is drawn as
+`arrow-circle-left` with `mirrorInRtl`, so Arabic shows `arrow-circle-right` on the right edge,
+pointing outward to where back leads. A test reads the drawn glyph's pixels in both directions. The
+design's Arabic Settings frame keeps `arrow-circle-left` (`Settings.dc.html:381`), which would point
+toward the content, the forward direction. The bar follows the platform convention and not that
+literal.
 
 *Confirmed by reading `top_bar.dart` directly — its own "RTL" section states this explicitly. Not
 yet checked against the gallery's direction switcher.*

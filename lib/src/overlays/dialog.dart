@@ -44,7 +44,17 @@ class DabblerDialogAction {
     required this.label,
     this.onPressed,
     this.tone,
+    this.loading = false,
   });
+
+  /// Whether this action's work is in flight. The button shows
+  /// [DabblerButton]'s spinner and is inert, and while **any** action of a
+  /// [DabblerDialog] is loading the dialog cannot be dismissed — not by the
+  /// scrim, not by Escape, not by the system back gesture or button (in both
+  /// the [showDabblerDialog] route and an inline `open` host), and not by the
+  /// secondary action's `onClose` fallback. Enter does not re-confirm.
+  /// Default false.
+  final bool loading;
 
   /// The button's label.
   final String label;
@@ -273,8 +283,15 @@ class _DabblerDialogState extends State<DabblerDialog> {
     }
   }
 
+  /// True while any action is loading — the dialog is then not dismissible.
+  bool get _busy =>
+      (widget.primaryAction?.loading ?? false) ||
+      (widget.secondaryAction?.loading ?? false);
+
+  bool get _dismissible => widget.dismissible && !_busy;
+
   void _close() {
-    if (widget.dismissible) {
+    if (_dismissible) {
       widget.onClose?.call();
     }
   }
@@ -294,7 +311,8 @@ class _DabblerDialogState extends State<DabblerDialog> {
       primaryAction: widget.primaryAction,
       secondaryAction: widget.secondaryAction,
       destructive: widget.destructive,
-      onClose: widget.onClose,
+      onClose: _busy ? null : widget.onClose,
+      busy: _busy,
       size: widget.size,
       colors: colors,
       child: widget.child,
@@ -335,7 +353,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
         shortcuts: <ShortcutActivator, Intent>{
           const SingleActivator(LogicalKeyboardKey.escape):
               const DismissIntent(),
-          if (widget.primaryAction != null)
+          if (widget.primaryAction != null && !_busy)
             const SingleActivator(LogicalKeyboardKey.enter):
                 const _ConfirmIntent(),
         },
@@ -377,11 +395,21 @@ class _DabblerDialogState extends State<DabblerDialog> {
       ),
     );
 
+    // While an action is loading the system back is refused too — in the
+    // [showDabblerDialog] route this blocks the route's own pop; inline, it
+    // keeps back from leaving the host page mid-request.
+    return PopScope(
+      canPop: !_busy,
+      child: _stack(trapped),
+    );
+  }
+
+  Widget _stack(Widget trapped) {
     return Stack(
       children: <Widget>[
         Positioned.fill(
           child: DabblerScrim(
-            onDismiss: widget.dismissible ? _close : null,
+            onDismiss: _dismissible ? _close : null,
             dismissLabel: widget.scrimDismissLabel,
           ),
         ),

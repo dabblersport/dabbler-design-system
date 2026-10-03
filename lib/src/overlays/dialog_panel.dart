@@ -23,6 +23,7 @@ class _Panel extends StatelessWidget {
     required this.secondaryAction,
     required this.destructive,
     required this.onClose,
+    required this.busy,
     required this.size,
     required this.colors,
   });
@@ -34,6 +35,7 @@ class _Panel extends StatelessWidget {
   final DabblerDialogAction? secondaryAction;
   final bool destructive;
   final VoidCallback? onClose;
+  final bool busy;
   final DabblerDialogSize size;
   final DabblerColors colors;
 
@@ -93,6 +95,7 @@ class _Panel extends StatelessWidget {
             secondaryAction: secondaryAction,
             destructive: destructive,
             onClose: onClose,
+            busy: busy,
           ),
         ),
       );
@@ -154,8 +157,10 @@ class _Actions extends StatelessWidget {
     required this.secondaryAction,
     required this.destructive,
     required this.onClose,
+    required this.busy,
   });
 
+  final bool busy;
   final bool stack;
   final DabblerDialogAction? primaryAction;
   final DabblerDialogAction? secondaryAction;
@@ -183,7 +188,11 @@ class _Actions extends StatelessWidget {
           tone: DabblerButtonTone.outlined,
           fullWidth: stack,
           // `secondaryAction.onPress || onClose` — Dialog.jsx:102.
+          // While another action is loading the secondary is inert too: it
+          // is the dialog's dismiss path, and the dialog is not dismissible.
+          disabled: busy && !secondaryAction!.loading,
           onPressed: secondaryAction!.onPressed ?? onClose,
+          loading: secondaryAction!.loading,
         ),
       );
     }
@@ -202,6 +211,7 @@ class _Actions extends StatelessWidget {
           tone: _primaryTone,
           fullWidth: stack,
           onPressed: primaryAction!.onPressed,
+          loading: primaryAction!.loading,
         ),
       );
     }
