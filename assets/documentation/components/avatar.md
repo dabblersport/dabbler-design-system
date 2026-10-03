@@ -34,6 +34,11 @@ Every size, every badge tone, and a group — see `avatar_gallery.dart`'s *Avata
 
 @specimen avatar
 
+The image-URL form — `imageUrl` draws a network photo in the same circle, and the seed portrait
+stands in while it loads, when it is empty, and when it fails.
+
+@specimen avatar/image
+
 ## Using it
 
 **Pass a stable seed — a name, handle or user id — never assume the portrait can be styled to match

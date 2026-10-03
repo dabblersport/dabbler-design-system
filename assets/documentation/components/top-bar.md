@@ -61,6 +61,11 @@ Default with trailing actions and the account avatar — see `navigation_gallery
 
 @specimen top-bar
 
+An action with `unread: true` carries the brand unread dot on its glyph's top-end corner — no
+count, mirrored under Arabic.
+
+@specimen top-bar/unread
+
 ## Using it
 
 **Never add a title, back action, alignment or surface variant to this component.** The design

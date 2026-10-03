@@ -68,6 +68,8 @@ The first thing on most screens, and the reason it comes first here.
 - [BottomBar](components/bottom-bar.md) — the primary destination switcher, plus the create action.
 - [TabBar](components/tab-bar.md) — the four-slot icon bar for top-level sections.
 - [Tabs](components/tabs.md) — switching between peer views of one screen.
+- [TabPager](components/tab-pager.md) — tabs over swipeable pages that keep their scroll
+  position.
 - [ConversationHeader](components/conversation-header.md) — the top bar of a conversation: back, a
   tappable identity, overflow.
 
@@ -172,6 +174,7 @@ lot about the rest.
 - [ReactionGroup](components/reaction-group.md) — the reaction tallies under a message.
 - [Toast](components/toast.md) — a transient, queued notification that survives navigation.
 - [Spinner](components/spinner.md) — the system's only indeterminate loading indicator.
+- [Refresh](components/refresh.md) — pull-to-refresh, drawn with the system Spinner.
 - [ProgressBar](components/progress-bar.md) — progress with a known end, or a busy bar when there
   isn't one.
 - [Skeleton](components/skeleton.md) — placeholder geometry for content that hasn't arrived yet.

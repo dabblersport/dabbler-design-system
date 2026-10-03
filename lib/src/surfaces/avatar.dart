@@ -6,6 +6,8 @@ import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_palette.dart';
 import '../tokens/dabbler_type.dart';
 
+part 'avatar_image.dart';
+
 /// The five avatar diameters, from `components/surfaces/Avatar.jsx`:
 /// `const SIZES = { xs: 28, sm: 36, md: 48, lg: 64, xl: 80 }` — what
 /// `Avatar.d.ts` calls *"the file's exact sizes"*. Transcribed literally rather
@@ -271,6 +273,7 @@ class DabblerAvatar extends StatelessWidget {
     this.badgeTone = DabblerAvatarBadgeTone.primary,
     this.ringColor,
     this.badgeSize = badgeDiameter,
+    this.imageUrl,
   });
 
   /// The stable identifying string — a name, handle or user id. **Never
@@ -278,6 +281,11 @@ class DabblerAvatar extends StatelessWidget {
   /// deprecated `initials` alias is not ported: reproducing the name would put
   /// the very word this component abolished into a brand-new API.
   final String? seed;
+
+  /// A network photo drawn in place of the generated portrait, at the same
+  /// geometry. The seed portrait shows while it loads, when it is null or
+  /// empty, and when it fails — see `avatar_image.dart`.
+  final String? imageUrl;
 
   /// The diameter. Defaults to [DabblerAvatarSize.md] (48px).
   final DabblerAvatarSize size;
@@ -337,10 +345,15 @@ class DabblerAvatar extends StatelessWidget {
         color: colors.bgTertiary,
         child: SizedBox.square(
           dimension: d,
-          child: portrait.build(
+          child: _avatarFace(
             context,
-            seed: seed ?? DabblerAvatarSeed.fallback,
-            diameter: d,
+            portrait.build(
+              context,
+              seed: seed ?? DabblerAvatarSeed.fallback,
+              diameter: d,
+            ),
+            imageUrl,
+            d,
           ),
         ),
       ),

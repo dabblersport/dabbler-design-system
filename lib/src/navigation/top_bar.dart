@@ -7,6 +7,8 @@ import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 
+part 'top_bar_unread_dot.dart';
+
 /// One trailing action in a [DabblerNavigationTopBar].
 ///
 /// The source's export carries these as free-form `text1` / `text2` node slots
@@ -22,7 +24,17 @@ class DabblerNavigationAction {
     required this.label,
     this.onPressed,
     this.weight = DabblerIconWeight.linear,
+    this.unread = false,
+    this.unreadLabel,
   });
+
+  /// Draws the 9px unread dot on the glyph's top-end corner — see
+  /// [DabblerNavigationUnreadDot]. The design shows no count, so none exists.
+  final bool unread;
+
+  /// Appended to [label] in the accessible name while [unread], e.g.
+  /// `'new notifications'`. Without it the dot is announced by nothing.
+  final String? unreadLabel;
 
   /// Kebab-case Iconsax name, e.g. `sms`.
   final String icon;
@@ -45,10 +57,13 @@ class DabblerNavigationAction {
           other.icon == icon &&
           other.label == label &&
           other.onPressed == onPressed &&
-          other.weight == weight;
+          other.weight == weight &&
+          other.unread == unread &&
+          other.unreadLabel == unreadLabel;
 
   @override
-  int get hashCode => Object.hash(icon, label, onPressed, weight);
+  int get hashCode =>
+      Object.hash(icon, label, onPressed, weight, unread, unreadLabel);
 
   @override
   String toString() => 'DabblerNavigationAction($icon)';
@@ -283,13 +298,16 @@ class DabblerNavigationTopBar extends StatelessWidget {
       width: actionTarget.width,
       height: actionTarget.height,
       child: Center(
-        child: DabblerIcon(
-          action.icon,
-          weight: action.weight,
-          // `size={22}` — transcribed, see [actionGlyphSize].
-          size: actionGlyphSize,
-          // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary.
-          color: colors.textPrimary,
+        child: DabblerNavigationUnreadDot.wrap(
+          visible: action.unread,
+          child: DabblerIcon(
+            action.icon,
+            weight: action.weight,
+            // `size={22}` — transcribed, see [actionGlyphSize].
+            size: actionGlyphSize,
+            // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary.
+            color: colors.textPrimary,
+          ),
         ),
       ),
     );
@@ -298,7 +316,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
       container: true,
       button: true,
       enabled: action.onPressed != null,
-      label: action.label,
+      label: DabblerNavigationUnreadDot.semanticLabel(action),
       onTap: action.onPressed,
       child: ExcludeSemantics(
         child: GestureDetector(
