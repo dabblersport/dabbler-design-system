@@ -1,4 +1,5 @@
-import 'package:flutter/services.dart' show KeyDownEvent, KeyEvent, LogicalKeyboardKey;
+import 'package:flutter/services.dart'
+    show KeyDownEvent, KeyEvent, LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../overlays/menu.dart';
@@ -38,6 +39,24 @@ class DabblerSelectOption<T> {
   /// Skipped by the arrows and type-ahead, but kept in the list — DS-700's
   /// contract, inherited rather than restated.
   final bool disabled;
+}
+
+/// A named group of [DabblerSelectOption]s — DS gaps 6 (item 9).
+///
+/// The Listings filter sheets list their options under small group labels
+/// (`Listings.dc.html:291-298`). In the option list the [label] is drawn as a
+/// [DabblerMenuHeading]: not selectable, skipped by the arrows and
+/// type-ahead, and announced as a heading.
+@immutable
+class DabblerSelectGroup<T> {
+  /// Creates a group.
+  const DabblerSelectGroup({required this.label, required this.options});
+
+  /// The group header's text.
+  final String label;
+
+  /// The group's options, in order.
+  final List<DabblerSelectOption<T>> options;
 }
 
 /// Select — choosing from a known list of options, single or multiple.
@@ -128,7 +147,7 @@ class DabblerSelect<T> extends StatefulWidget {
   /// A single-value select.
   const DabblerSelect({
     super.key,
-    required this.options,
+    this.options = const <Never>[],
     this.value,
     this.onChanged,
     this.label,
@@ -138,6 +157,8 @@ class DabblerSelect<T> extends StatefulWidget {
     this.enabled = true,
     this.searchable = false,
     this.searchPlaceholder = defaultSearchPlaceholder,
+    this.groups,
+    this.sheetTitle,
   }) : multiple = false,
        values = const <Never>[],
        onChangedAll = null;
@@ -145,7 +166,7 @@ class DabblerSelect<T> extends StatefulWidget {
   /// A multi-value select: the list stays open and chosen rows show a tick.
   const DabblerSelect.multiple({
     super.key,
-    required this.options,
+    this.options = const <Never>[],
     this.values = const <Never>[],
     this.onChangedAll,
     this.label,
@@ -155,6 +176,8 @@ class DabblerSelect<T> extends StatefulWidget {
     this.enabled = true,
     this.searchable = false,
     this.searchPlaceholder = defaultSearchPlaceholder,
+    this.groups,
+    this.sheetTitle,
   }) : multiple = true,
        value = null,
        onChanged = null;
@@ -166,8 +189,26 @@ class DabblerSelect<T> extends StatefulWidget {
   /// (`Select.jsx:75`).
   static const String defaultSearchPlaceholder = 'search';
 
-  /// The rows, in order.
+  /// The ungrouped rows, in order, drawn before any [groups]. Optional since
+  /// DS gaps 6 so a fully grouped select need not pass an empty list.
   final List<DabblerSelectOption<T>> options;
+
+  /// Option groups, drawn after [options], each under a non-selectable
+  /// header. Null (the default) draws [options] exactly as before.
+  final List<DabblerSelectGroup<T>>? groups;
+
+  /// The title of the options sheet the list becomes below
+  /// [DabblerMenu.sheetBreakpoint]. Null keeps [label] as the title, as
+  /// before. The wide-viewport popover has no title, so it ignores this.
+  final String? sheetTitle;
+
+  /// Every option, ungrouped first and then each group's in order.
+  List<DabblerSelectOption<T>> get allOptions => <DabblerSelectOption<T>>[
+    ...options,
+    for (final DabblerSelectGroup<T> group
+        in groups ?? <DabblerSelectGroup<T>>[])
+      ...group.options,
+  ];
 
   /// The chosen value of a single-value select.
   final T? value;
@@ -248,8 +289,9 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
     super.dispose();
   }
 
-  List<T> get _selected =>
-      widget.multiple ? widget.values : <T>[if (widget.value != null) widget.value as T];
+  List<T> get _selected => widget.multiple
+      ? widget.values
+      : <T>[if (widget.value != null) widget.value as T];
 
   bool _isOn(T value) => _selected.contains(value);
 
@@ -302,31 +344,47 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
 
   /// `Select.jsx:43-45` — filtered by label, case-insensitively, only while a
   /// query is typed.
-  List<DabblerSelectOption<T>> get _shown {
+  List<DabblerSelectOption<T>> _filter(List<DabblerSelectOption<T>> list) {
     if (!widget.searchable || _query.isEmpty) {
-      return widget.options;
+      return list;
     }
     final String needle = _query.toLowerCase();
     return <DabblerSelectOption<T>>[
-      for (final DabblerSelectOption<T> option in widget.options)
+      for (final DabblerSelectOption<T> option in list)
         if (option.label.toLowerCase().contains(needle)) option,
     ];
   }
 
+  DabblerMenuEntry _entry(DabblerSelectOption<T> option) => DabblerMenuEntry(
+    label: option.label,
+    id: '${option.value}',
+    icon: option.icon,
+    disabled: option.disabled,
+    selected: _isOn(option.value),
+    onSelect: (DabblerMenuEntry _) => _pick(option),
+  );
+
+  /// The menu rows: ungrouped options, then each group's header followed by
+  /// its options. A group the search filters empty loses its header too.
+  List<DabblerMenuEntry> get _items => <DabblerMenuEntry>[
+    for (final DabblerSelectOption<T> option in _filter(widget.options))
+      _entry(option),
+    for (final DabblerSelectGroup<T> group
+        in widget.groups ?? <DabblerSelectGroup<T>>[])
+      if (_filter(group.options).isNotEmpty) ...<DabblerMenuEntry>[
+        DabblerMenuEntry.heading(
+          label: group.label,
+          id: 'group-${group.label}',
+        ),
+        for (final DabblerSelectOption<T> option in _filter(group.options))
+          _entry(option),
+      ],
+  ];
+
   @override
   Widget build(BuildContext context) {
     final bool disabled = !widget.enabled;
-    final List<DabblerMenuEntry> items = <DabblerMenuEntry>[
-      for (final DabblerSelectOption<T> option in _shown)
-        DabblerMenuEntry(
-          label: option.label,
-          id: '${option.value}',
-          icon: option.icon,
-          disabled: option.disabled,
-          selected: _isOn(option.value),
-          onSelect: (DabblerMenuEntry _) => _pick(option),
-        ),
-    ];
+    final List<DabblerMenuEntry> items = _items;
 
     final Widget field = Focus(
       focusNode: _fieldFocus,
@@ -334,7 +392,7 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
       child: DabblerTextField(
         variant: DabblerTextFieldVariant.select,
         label: widget.label,
-        value: DabblerSelect.displayOf<T>(widget.options, _selected),
+        value: DabblerSelect.displayOf<T>(widget.allOptions, _selected),
         placeholder: widget.placeholder,
         helperText: widget.helperText,
         errorText: widget.errorText,
@@ -359,6 +417,7 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
       // `closeOnSelect={!multiple}` (`Select.jsx:70`).
       closeOnSelect: !widget.multiple,
       label: widget.label,
+      sheetTitle: widget.sheetTitle,
       items: items,
       header: widget.searchable ? _searchHeader() : null,
       trigger: field,

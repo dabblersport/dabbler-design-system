@@ -92,6 +92,26 @@ Widget _sheets(BuildContext context) => GalleryWrap(
       ),
     ),
     GallerySpecimen(
+      label: 'header action — Reset (DS gaps 6)',
+      child: Builder(
+        builder: (BuildContext context) => DabblerButton(
+          label: 'Open filters',
+          onPressed: () => showDabblerSheet<void>(
+            context: context,
+            title: 'Filters',
+            detent: DabblerSheetDetent.content,
+            headerActionBuilder: (BuildContext context) => DabblerButton(
+              label: 'Reset',
+              tone: DabblerButtonTone.neutral,
+              size: DabblerButtonSize.small,
+              onPressed: () {},
+            ),
+            builder: _body,
+          ),
+        ),
+      ),
+    ),
+    GallerySpecimen(
       label: 'two detents, with a footer',
       child: Builder(
         builder: (BuildContext context) => DabblerButton(

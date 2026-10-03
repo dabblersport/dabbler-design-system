@@ -43,6 +43,11 @@ Paint, pointer math and the arrow-key mapping all already invert together so "in
 the direction the fill visually grows — see *Direction*. Anything layered on top of that would
 double-invert it.
 
+**Run the expensive work in `onChangeEnd`, not `onChanged`.** `onChanged` fires on every step of a
+drag; `onChangeEnd` fires once when the finger lifts, and once for every key press or
+screen-reader adjustment, with the value that was committed. The range form reports the ordered
+pair.
+
 ## Axes
 
 ### Mode
@@ -72,6 +77,10 @@ same section. Not yet checked against the gallery's direction switcher.*
 Track: `bgTertiary`. Fill: `brandPrimary`. Thumb: `surfaceCard` fill with a `borderStrong` ring.
 Readout text uses the caption type style. Focus ring and the 45px touch-target minimum per thumb
 are the same shared tokens every other form control reads.
+
+## Change log
+
+- DS gaps 6 — `onChangeEnd` on both constructors. Additive; `onChanged` is unchanged.
 
 ## Source
 

@@ -96,6 +96,7 @@ class DabblerSlider extends StatefulWidget {
     super.key,
     required double this.value,
     this.onChanged,
+    this.onChangeEnd,
     this.min = 0,
     this.max = 100,
     this.step = 1,
@@ -104,10 +105,11 @@ class DabblerSlider extends StatefulWidget {
     this.marks,
     this.disabled = false,
     this.semanticLabel,
-  })  : values = null,
-        onRangeChanged = null,
-        minimumSemanticLabel = defaultMinimumLabel,
-        maximumSemanticLabel = defaultMaximumLabel;
+  }) : values = null,
+       onRangeChanged = null,
+       onRangeChangeEnd = null,
+       minimumSemanticLabel = defaultMinimumLabel,
+       maximumSemanticLabel = defaultMaximumLabel;
 
   /// A two-thumb slider with a filled band between the thumbs —
   /// `range` in the source.
@@ -115,6 +117,7 @@ class DabblerSlider extends StatefulWidget {
     super.key,
     required DabblerSliderRange this.values,
     ValueChanged<DabblerSliderRange>? onChanged,
+    ValueChanged<DabblerSliderRange>? onChangeEnd,
     this.min = 0,
     this.max = 100,
     this.step = 1,
@@ -124,10 +127,12 @@ class DabblerSlider extends StatefulWidget {
     this.disabled = false,
     this.minimumSemanticLabel = defaultMinimumLabel,
     this.maximumSemanticLabel = defaultMaximumLabel,
-  })  : value = null,
-        onChanged = null,
-        onRangeChanged = onChanged,
-        semanticLabel = null;
+  }) : value = null,
+       onChanged = null,
+       onChangeEnd = null,
+       onRangeChanged = onChanged,
+       onRangeChangeEnd = onChangeEnd,
+       semanticLabel = null;
 
   /// The value, on a single-value slider.
   final double? value;
@@ -141,6 +146,23 @@ class DabblerSlider extends StatefulWidget {
   /// Called with the next pair on a [DabblerSlider.range], always ordered low
   /// first — the source sorts the pair before handing it back.
   final ValueChanged<DabblerSliderRange>? onRangeChanged;
+
+  /// Called once when an interaction **commits**: on pointer release (tap up,
+  /// drag end or drag cancel) and after every keyboard or assistive-technology
+  /// adjustment (each key press or increase / decrease action is its own
+  /// commit). It carries the last value [onChanged] reported, or the current
+  /// value when the interaction changed nothing. [onChanged] is unchanged and
+  /// still fires on every step. The place to run a query or save a filter —
+  /// DS gaps 6 (item 3).
+  final ValueChanged<double>? onChangeEnd;
+
+  /// [onChangeEnd] for a [DabblerSlider.range], with the ordered pair.
+  ///
+  /// **Deviation from the brief, deliberate.** The brief named
+  /// `ValueChanged<RangeValues>`; this package's range type is
+  /// [DabblerSliderRange] (Material's [RangeValues] is not imported here), so
+  /// the end callback uses the same type [onRangeChanged] already does.
+  final ValueChanged<DabblerSliderRange>? onRangeChangeEnd;
 
   /// The axis minimum. `min = 0` (`Slider.jsx:14`).
   final double min;
@@ -220,7 +242,9 @@ class DabblerSlider extends StatefulWidget {
     required double max,
     required double step,
   }) {
-    final double snapped = step <= 0 ? value : (value / step).roundToDouble() * step;
+    final double snapped = step <= 0
+        ? value
+        : (value / step).roundToDouble() * step;
     return snapped.clamp(min, max);
   }
 
@@ -233,8 +257,7 @@ class DabblerSlider extends StatefulWidget {
     double value, {
     required double min,
     required double max,
-  }) =>
-      max == min ? 0 : ((value - min) / (max - min)).clamp(0.0, 1.0);
+  }) => max == min ? 0 : ((value - min) / (max - min)).clamp(0.0, 1.0);
 
   @override
   State<DabblerSlider> createState() => _DabblerSliderState();
@@ -246,8 +269,8 @@ class DabblerSliderRange {
   /// Creates a pair. The two values are ordered on construction, because
   /// `commit` in the source sorts before it reports.
   const DabblerSliderRange(double a, double b)
-      : low = a <= b ? a : b,
-        high = a <= b ? b : a;
+    : low = a <= b ? a : b,
+      high = a <= b ? b : a;
 
   /// The lower of the two values.
   final double low;
@@ -273,27 +296,17 @@ enum _Thumb { low, high }
 /// time so RTL inverts the arrow keys without a second shortcut map.
 class _AdjustIntent extends Intent {
   const _AdjustIntent.forward()
-      : steps = 1,
-        absolute = null,
-        directional = true;
+    : steps = 1,
+      absolute = null,
+      directional = true;
   const _AdjustIntent.backward()
-      : steps = -1,
-        absolute = null,
-        directional = true;
-  const _AdjustIntent.up()
-      : steps = 1,
-        absolute = null,
-        directional = false;
-  const _AdjustIntent.down()
-      : steps = -1,
-        absolute = null,
-        directional = false;
-  const _AdjustIntent.page(this.steps)
-      : absolute = null,
-        directional = false;
-  const _AdjustIntent.to(double this.absolute)
-      : steps = 0,
-        directional = false;
+    : steps = -1,
+      absolute = null,
+      directional = true;
+  const _AdjustIntent.up() : steps = 1, absolute = null, directional = false;
+  const _AdjustIntent.down() : steps = -1, absolute = null, directional = false;
+  const _AdjustIntent.page(this.steps) : absolute = null, directional = false;
+  const _AdjustIntent.to(double this.absolute) : steps = 0, directional = false;
 
   /// How many [DabblerSlider.step]s to move, signed.
   final int steps;
@@ -316,6 +329,25 @@ class _DabblerSliderState extends State<DabblerSlider> {
 
   bool get _isRange => widget.values != null;
 
+  /// The last value handed to `onChanged` during the current interaction —
+  /// the parent may not have rebuilt yet, so [widget] can lag behind it.
+  double? _pendingSingle;
+  DabblerSliderRange? _pendingRange;
+
+  /// Fires the end callback with the pending (or current) value and clears it.
+  void _end() {
+    if (!_enabled) {
+      return;
+    }
+    if (_isRange) {
+      widget.onRangeChangeEnd?.call(_pendingRange ?? widget.values!);
+    } else {
+      widget.onChangeEnd?.call(_pendingSingle ?? widget.value!);
+    }
+    _pendingSingle = null;
+    _pendingRange = null;
+  }
+
   bool get _enabled =>
       !widget.disabled &&
       (_isRange ? widget.onRangeChanged != null : widget.onChanged != null);
@@ -334,8 +366,7 @@ class _DabblerSliderState extends State<DabblerSlider> {
   /// string. The default formatter is `String(v)` over the same narrowed
   /// value.
   String _format(double value) {
-    final num narrowed =
-        value == value.roundToDouble() ? value.toInt() : value;
+    final num narrowed = value == value.roundToDouble() ? value.toInt() : value;
     return widget.formatValue?.call(narrowed) ?? '$narrowed';
   }
 
@@ -350,15 +381,19 @@ class _DabblerSliderState extends State<DabblerSlider> {
       step: widget.step,
     );
     if (!_isRange) {
-      if (next != _high) {
+      final double current = _pendingSingle ?? _high;
+      if (next != current) {
+        _pendingSingle = next;
         widget.onChanged!(next);
       }
       return;
     }
+    final DabblerSliderRange base = _pendingRange ?? widget.values!;
     final DabblerSliderRange pair = thumb == _Thumb.low
-        ? DabblerSliderRange(next, _high)
-        : DabblerSliderRange(_low, next);
-    if (pair != widget.values) {
+        ? DabblerSliderRange(next, base.high)
+        : DabblerSliderRange(base.low, next);
+    if (pair != base) {
+      _pendingRange = pair;
       widget.onRangeChanged!(pair);
     }
   }
@@ -390,11 +425,14 @@ class _DabblerSliderState extends State<DabblerSlider> {
     final double current = _valueOf(thumb);
     if (intent.absolute != null) {
       _commit(intent.absolute!, thumb);
+      _end();
       return;
     }
-    final int sign =
-        intent.directional && direction == TextDirection.rtl ? -1 : 1;
+    final int sign = intent.directional && direction == TextDirection.rtl
+        ? -1
+        : 1;
     _commit(current + widget.step * intent.steps * sign, thumb);
+    _end();
   }
 
   @override
@@ -486,6 +524,7 @@ class _DabblerSliderState extends State<DabblerSlider> {
                   _commit(value, _nearest(value));
                 }
               : null,
+          onTapUp: _enabled ? (TapUpDetails _) => _end() : null,
           onHorizontalDragStart: _enabled
               ? (DragStartDetails details) {
                   final double value = _valueAt(
@@ -506,8 +545,18 @@ class _DabblerSliderState extends State<DabblerSlider> {
                   );
                 }
               : null,
-          onHorizontalDragEnd: (DragEndDetails details) => _dragging = null,
-          onHorizontalDragCancel: () => _dragging = null,
+          onHorizontalDragEnd: (DragEndDetails details) {
+            _dragging = null;
+            _end();
+          },
+          // A drag recognizer also cancels when it merely loses the arena
+          // to a tap, without ever starting; only a started drag commits.
+          onHorizontalDragCancel: () {
+            if (_dragging != null) {
+              _dragging = null;
+              _end();
+            }
+          },
           child: SizedBox(
             // `minHeight: var(--touch-target-min)` (`Slider.jsx:130`) — the
             // hit area stays 45 tall at every width.
@@ -534,7 +583,8 @@ class _DabblerSliderState extends State<DabblerSlider> {
                 // thumbs in range mode.
                 PositionedDirectional(
                   start: (_isRange ? lowFraction : 0) * width,
-                  width: (_isRange ? highFraction - lowFraction : highFraction) *
+                  width:
+                      (_isRange ? highFraction - lowFraction : highFraction) *
                       width,
                   top: 0,
                   bottom: 0,
@@ -553,11 +603,12 @@ class _DabblerSliderState extends State<DabblerSlider> {
                 ),
                 ...?widget.marks?.map(
                   (double mark) => PositionedDirectional(
-                    start: DabblerSlider.fractionOf(
-                          mark,
-                          min: widget.min,
-                          max: widget.max,
-                        ) *
+                    start:
+                        DabblerSlider.fractionOf(
+                              mark,
+                              min: widget.min,
+                              max: widget.max,
+                            ) *
                             width -
                         DabblerSlider.markWidth / 2,
                     top: 0,
@@ -620,8 +671,8 @@ class _DabblerSliderState extends State<DabblerSlider> {
         slider: true,
         label: _isRange
             ? (thumb == _Thumb.low
-                ? widget.minimumSemanticLabel
-                : widget.maximumSemanticLabel)
+                  ? widget.minimumSemanticLabel
+                  : widget.maximumSemanticLabel)
             : (widget.semanticLabel ?? widget.label),
         value: _format(value),
         enabled: _enabled,
@@ -643,8 +694,18 @@ class _DabblerSliderState extends State<DabblerSlider> {
             step: widget.step,
           ),
         ),
-        onIncrease: _enabled ? () => _commit(value + widget.step, thumb) : null,
-        onDecrease: _enabled ? () => _commit(value - widget.step, thumb) : null,
+        onIncrease: _enabled
+            ? () {
+                _commit(value + widget.step, thumb);
+                _end();
+              }
+            : null,
+        onDecrease: _enabled
+            ? () {
+                _commit(value - widget.step, thumb);
+                _end();
+              }
+            : null,
         container: true,
         child: ExcludeSemantics(
           // The shortcut map is an ancestor of the focus node rather than a
@@ -666,10 +727,12 @@ class _DabblerSliderState extends State<DabblerSlider> {
                   const _AdjustIntent.page(DabblerSlider.pageStepMultiplier),
               const SingleActivator(LogicalKeyboardKey.pageDown):
                   const _AdjustIntent.page(-DabblerSlider.pageStepMultiplier),
-              const SingleActivator(LogicalKeyboardKey.home):
-                  _AdjustIntent.to(widget.min),
-              const SingleActivator(LogicalKeyboardKey.end):
-                  _AdjustIntent.to(widget.max),
+              const SingleActivator(LogicalKeyboardKey.home): _AdjustIntent.to(
+                widget.min,
+              ),
+              const SingleActivator(LogicalKeyboardKey.end): _AdjustIntent.to(
+                widget.max,
+              ),
             },
             child: Actions(
               actions: <Type, Action<Intent>>{
