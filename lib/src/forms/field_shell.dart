@@ -112,7 +112,14 @@ class DabblerFieldShell extends StatelessWidget {
     this.onTap,
     this.semanticsLabel,
     this.expanded,
+    this.announceError = false,
   });
+
+  /// Whether [errorText] is exposed as a live region, so a screen reader
+  /// announces it when it appears or changes. Set by a validating
+  /// [DabblerTextField]; off by default, which keeps every existing field's
+  /// semantics as they were.
+  final bool announceError;
 
   /// `padding: '9px 12px'` (`TextField.jsx:61`) — `--space-3` block,
   /// `--space-4` inline. Directional so it mirrors in RTL.
@@ -329,13 +336,18 @@ class DabblerFieldShell extends StatelessWidget {
           const SizedBox(height: DabblerSpacing.stackTight),
           Padding(
             padding: messagePadding,
-            child: Text(
-              message,
-              style: DabblerType.footnote.resolveForDirection(direction).copyWith(
-                    color: hasError
-                        ? colors.status(DabblerStatusTone.error).base
-                        : colors.textSecondary,
-                  ),
+            child: Semantics(
+              liveRegion: announceError && hasError,
+              child: Text(
+                message,
+                style: DabblerType.footnote
+                    .resolveForDirection(direction)
+                    .copyWith(
+                      color: hasError
+                          ? colors.status(DabblerStatusTone.error).base
+                          : colors.textSecondary,
+                    ),
+              ),
             ),
           ),
         ],

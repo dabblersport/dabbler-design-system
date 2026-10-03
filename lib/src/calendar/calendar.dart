@@ -8,6 +8,8 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 
+part 'calendar_year_picker.dart';
+
 /// One square of the month grid.
 ///
 /// `Calendar.jsx:21-24` builds `{ n, out }` — a day *number* plus a flag for
@@ -351,6 +353,8 @@ class DabblerCalendar extends StatelessWidget {
     this.cancelLabel = defaultCancelLabel,
     this.previousMonthLabel = defaultPreviousMonthLabel,
     this.nextMonthLabel = defaultNextMonthLabel,
+    this.yearPicker = false,
+    this.yearPickerSpan = defaultYearPickerSpan,
   });
 
   /// `Confirm` — `Calendar.jsx:69`.
@@ -497,8 +501,24 @@ class DabblerCalendar extends StatelessWidget {
   /// interactive.
   final VoidCallback? onMonthPressed;
 
-  /// Fired by the year chip. See [onMonthPressed].
+  /// Fired by the year chip. See [onMonthPressed]. Still fired, as a
+  /// notification, when [yearPicker] opens the built-in list.
   final VoidCallback? onYearPressed;
+
+  /// Opt-in built-in year picker: the year chip swaps the day grid for a
+  /// grid of years ([DabblerCalendarYearGrid]); choosing one reports
+  /// `onMonthChanged(DateTime(year, month.month))` — clamped into
+  /// [minimum]/[maximum] — and returns to the days. Off by default, which keeps
+  /// the chip exactly as before. Needs [onMonthChanged]; without it the chip
+  /// stays inert.
+  final bool yearPicker;
+
+  /// Years either side of [month] the built-in picker lists when [minimum] /
+  /// [maximum] do not bound it.
+  final int yearPickerSpan;
+
+  /// Default [yearPickerSpan].
+  static const int defaultYearPickerSpan = 50;
 
   /// Whether to draw the Confirm / Cancel row. `showActions` —
   /// `Calendar.d.ts:17` (unverified: file not mirrored), default true.
@@ -535,7 +555,15 @@ class DabblerCalendar extends StatelessWidget {
       selected.any((DateTime d) => DabblerCalendarMonth.dayOf(d) == cell.date);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => yearPicker && onMonthChanged != null
+      ? _DabblerCalendarYearHost(calendar: this)
+      : _body(context, onYearPressed, null);
+
+  Widget _body(
+    BuildContext context,
+    VoidCallback? yearPressed,
+    Widget? yearGrid,
+  ) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     final int start =
@@ -561,8 +589,8 @@ class DabblerCalendar extends StatelessWidget {
           // `gap: 12` (`Calendar.jsx:37`) — `--space-4`.
           spacing: DabblerSpacing.space4,
           children: <Widget>[
-            _header(context, colors, direction),
-            _grid(context, colors, direction, start, weeks),
+            _header(context, colors, direction, yearPressed),
+            yearGrid ?? _grid(context, colors, direction, start, weeks),
             if (showActions) _actions(colors, direction),
           ],
         ),
@@ -575,6 +603,7 @@ class DabblerCalendar extends StatelessWidget {
     BuildContext context,
     DabblerColors colors,
     TextDirection direction,
+    VoidCallback? yearPressed,
   ) {
     final List<String> months =
         monthLabels ?? DabblerCalendarMonth.monthAbbreviations;
@@ -615,7 +644,7 @@ class DabblerCalendar extends StatelessWidget {
                   colors: colors,
                   direction: direction,
                   label: DabblerType.toWesternDigits('${month.year}'),
-                  onPressed: onYearPressed,
+                  onPressed: yearPressed,
                 ),
               ),
             ],

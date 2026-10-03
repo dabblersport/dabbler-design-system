@@ -119,7 +119,10 @@ class DabblerCodeInput extends StatefulWidget {
     this.error = false,
     this.enabled = true,
     this.autofocus = false,
-  }) : assert(length > 0, 'a code has at least one digit');
+    this.fullWidth = false,
+    this.maxBoxWidth = defaultMaxBoxWidth,
+  }) : assert(length > 0, 'a code has at least one digit'),
+       assert(maxBoxWidth > 0, 'a box has a positive width');
 
   /// `length = 6` (`CodeInput.jsx:12`, `CodeInput.prompt.md:18` (unverified: file not mirrored)).
   static const int defaultLength = 6;
@@ -154,6 +157,29 @@ class DabblerCodeInput extends StatefulWidget {
   /// bullet the platform uses. The prompt calls the masked rendering *"dots"*
   /// (`CodeInput.prompt.md:22` (unverified: file not mirrored)).
   static const String maskCharacter = '•';
+
+  /// The widest a box grows in [fullWidth] mode — [boxHeight], so a box
+  /// grows to a square and no further.
+  ///
+  /// Deviation: no sizing token names a code box's maximum; the cap is the
+  /// component's own stated height rather than an invented token.
+  static const double defaultMaxBoxWidth = boxHeight;
+
+  /// The width of each box when [count] boxes share [available] width with
+  /// [boxGap] between them, capped at [max]. Public so a layout can predict it.
+  static double fittedBoxWidth(double available, int count, double max) {
+    final double w = (available - boxGap * (count - 1)) / count;
+    return w.clamp(0, max).toDouble();
+  }
+
+  /// Boxes widen to fill the available width (gaps unchanged), up to
+  /// [maxBoxWidth] each; the row is centred when capped. Off by default,
+  /// which keeps the fixed 45-wide boxes. The height never changes. Needs a
+  /// bounded width; under an unbounded one it falls back to [boxWidth].
+  final bool fullWidth;
+
+  /// The cap on a box's width in [fullWidth] mode.
+  final double maxBoxWidth;
 
   /// Number of boxes.
   final int length;
@@ -450,20 +476,44 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
       label: DabblerCodeInput.groupLabel(widget.length),
       child: Directionality(
         textDirection: TextDirection.ltr,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            for (int i = 0; i < widget.length; i++) ...<Widget>[
-              if (i > 0) const SizedBox(width: DabblerCodeInput.boxGap),
-              _buildBox(colors, i, disabled),
-            ],
-          ],
-        ),
+        child: widget.fullWidth
+            ? LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints c) =>
+                    Center(
+                      child: _row(
+                        colors,
+                        disabled,
+                        c.hasBoundedWidth
+                            ? DabblerCodeInput.fittedBoxWidth(
+                                c.maxWidth,
+                                widget.length,
+                                widget.maxBoxWidth,
+                              )
+                            : DabblerCodeInput.boxWidth,
+                      ),
+                    ),
+              )
+            : _row(colors, disabled, DabblerCodeInput.boxWidth),
       ),
     );
   }
 
-  Widget _buildBox(DabblerColors colors, int index, bool disabled) {
+  Widget _row(DabblerColors colors, bool disabled, double boxWidth) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      for (int i = 0; i < widget.length; i++) ...<Widget>[
+        if (i > 0) const SizedBox(width: DabblerCodeInput.boxGap),
+        _buildBox(colors, i, disabled, boxWidth),
+      ],
+    ],
+  );
+
+  Widget _buildBox(
+    DabblerColors colors,
+    int index,
+    bool disabled,
+    double boxWidth,
+  ) {
     final TextStyle style = DabblerCodeInput.digitStyle(TextDirection.ltr)
         .copyWith(
           color: disabled ? colors.textTertiary : colors.textPrimary,
@@ -476,7 +526,7 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
       child: Semantics(
         label: DabblerCodeInput.boxLabel(index),
         child: DabblerSurface(
-          width: DabblerCodeInput.boxWidth,
+          width: boxWidth,
           height: DabblerCodeInput.boxHeight,
           radius: DabblerCodeInput.boxRadius,
           fill: DabblerCodeInput.fillFor(colors, disabled: disabled),
