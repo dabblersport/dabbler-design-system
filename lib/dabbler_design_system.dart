@@ -162,6 +162,7 @@ export 'src/layout/section.dart';
 export 'src/layout/shell_gallery.dart';
 export 'src/layout/section_gallery.dart';
 export 'src/layout/tabs.dart';
+export 'src/layout/tabs_label_fit.dart';
 export 'src/layout/tabs_gallery.dart';
 export 'src/layout/page.dart';
 export 'src/layout/refresh.dart';

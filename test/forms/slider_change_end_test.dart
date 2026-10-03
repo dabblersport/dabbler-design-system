@@ -133,10 +133,7 @@ void main() {
         final SemanticsNode node = tester.getSemantics(
           find.bySemanticsLabel('distance'),
         );
-        tester.binding.pipelineOwner.semanticsOwner!.performAction(
-          node.id,
-          SemanticsAction.increase,
-        );
+        node.owner!.performAction(node.id, SemanticsAction.increase);
         await tester.pump();
         expect(ends, <double>[51]);
         handle.dispose();

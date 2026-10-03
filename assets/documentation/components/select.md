@@ -44,6 +44,11 @@ which only the `.multiple` constructor implements correctly.
 is this component's whole reason for owning a focus node at all — building a custom re-focus
 after using Select would fight behaviour it already has.
 
+**Group a long list under headers with `groups`.** Each group's header is drawn above its options,
+is not selectable, is skipped by the arrow keys and type-ahead, and is announced as a heading. A
+search that filters out every option in a group hides its header too. Below 480px the options open
+in a sheet; `sheetTitle` names that sheet when the field's label is not the right title.
+
 ## Axes
 
 ### Selection mode
@@ -60,6 +65,11 @@ The same rest / focused / filled / error / disabled states `TextField`'s `select
 
 Every colour role Select paints with belongs to `TextField`'s `select` variant (the closed shell)
 or to `Menu` (the open list) — see those two pages.
+
+## Change log
+
+- DS gaps 6 — `groups` (`DabblerSelectGroup`) and `sheetTitle` on both constructors; `options` is
+  now optional. Additive.
 
 ## Source
 
