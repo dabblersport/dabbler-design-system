@@ -86,6 +86,7 @@ to be built from `Card`'s shell underneath. That's why it has its own page below
 sitting beside it as another entry in `Card`'s own variant list.
 
 **Shells**
+- [Text](components/text.md) — a run of words in one ramp step, weight and colour chosen by role.
 - [Card](components/card.md) — the shared shell, five paint variants, used by every specific card
   below.
 - [Surface](components/surface.md) — the flat container primitive everything with a fill and a
@@ -173,6 +174,7 @@ lot about the rest.
 
 - [Button](components/button.md) — the one control for a tappable action, ten tones, three sizes.
 - [TextLink](components/text-link.md) — a brand-coloured link, on its own line or inside a sentence.
+- [Inert](components/inert.md) — dims a block and stops it taking input while it is unavailable.
 - [OnColorIconButton](components/on-color-icon-button.md) — a round, translucent icon button on a coloured hero.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.
@@ -210,6 +212,7 @@ lot about the rest.
 - [Page](components/page.md) — the screen scaffold: page background, safe area, top bar, body and bottom bar.
 - [Fade](components/fade.md) — the page-colour wash that lets a list run out beneath a bottom bar.
 - [Divider](components/divider.md) — the only line this system draws between things.
+- [Gap](components/gap.md) — one spacing step of empty space, the only spacer.
 - [DateSeparator](components/date-separator.md) — the day boundary pill in a conversation timeline.
 - [UnreadDivider](components/unread-divider.md) — the brand-coloured "new messages" boundary.
 

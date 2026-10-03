@@ -37,6 +37,7 @@ read.
 @specimen motion/durations
 @specimen motion/press-scale
 @specimen motion/reduced
+@specimen motion/app-roles
 
 ## Using it
 
@@ -72,6 +73,13 @@ One curve, used everywhere: `cubic-bezier(.2, 0, .2, 1)`.
 ### Press scale
 `0.98` (the system's only press transform), with `Fab`'s own `0.96` as the one named, documented
 exception.
+
+### App roles
+Named durations for what the app times, so it never writes a duration: content swap, scroll, page
+transitions, hero cross-fade, screen entrance, toast lifetimes, auto-advance, debounce, timeouts,
+polling and delays, plus three app curves. They are app roles, not design-source values. Pass an
+animation through `DabblerMotion.durationOf` to honour reduced motion; never pass a lifetime,
+debounce, timeout, poll or delay through it.
 
 ## Source
 

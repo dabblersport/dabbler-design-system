@@ -93,6 +93,22 @@ abstract final class DabblerSpacing {
 
   /// `--icon-gap` — `--space-2` (6).
   static const double iconGap = space2;
+
+  // --- App layout extents (zero-literal pass). App roles, each a step or a
+  // sum of steps; none is a design-source declaration. ---
+
+  /// App role, mapped onto [space8] (24): the bottom inset that closes a
+  /// scrolling list on a screen with **no** floating bar (Home feed tabs).
+  static const double listBottomInset = space8;
+
+  /// App role, `2 × space11` (96): the clearance a list keeps under the
+  /// **floating** bottom navigation bar so its last row is not covered.
+  static const double floatingBarClearance = space11 * 2;
+
+  /// App role, `2 × space11` (96): the clearance a detail screen keeps above
+  /// its sticky bottom action bar. Same value as [floatingBarClearance];
+  /// kept as its own name because the two bars can diverge.
+  static const double stickyActionBarClearance = space11 * 2;
 }
 
 /// The radius ramp — `--radius-*` in `tokens/spacing.css`.
@@ -154,6 +170,22 @@ abstract final class DabblerRadius {
   static const BorderRadius xxlAll = BorderRadius.all(Radius.circular(xxl));
   static const BorderRadius pillAll = BorderRadius.all(Radius.circular(pill));
 
+  /// App role: top-only [xl] corners — a panel rising from the bottom edge
+  /// with the DS sheet's own corner.
+  static const BorderRadius xlTop = BorderRadius.vertical(
+    top: Radius.circular(xl),
+  );
+
+  /// App role: top-only [xxl] corners — the app's composer drawer and modal
+  /// route panel. Replaces `BorderRadius.vertical(top: Radius.circular(…))`.
+  static const BorderRadius xxlTop = BorderRadius.vertical(
+    top: Radius.circular(xxl),
+  );
+
+  /// App role, alias of [xxlTop]: the bottom-drawer top corner the app draws
+  /// (`core/widgets/composer_drawer_kit.dart`, modal routes; 28 → 24).
+  static const BorderRadius topSheet = xxlTop;
+
   /// The seven steps in ascending order, smallest first. [card] (16) sits
   /// between [lg] (12) and [xl] (18) — see D-018.
   static const List<double> ramp = <double>[sm, md, lg, card, xl, xxl, pill];
@@ -180,6 +212,124 @@ abstract final class DabblerSizing {
 
   /// `--icon-lg` — 30px.
   static const double iconLg = 30;
+
+  // --- App roles (zero-literal pass) ----------------------------------------
+  //
+  // Not design-source declarations: each names what the consuming app sizes,
+  // and each is a [DabblerSpacing] step or a sum of steps, so the base-3 grid
+  // holds. The app's near-miss numbers fold onto these (named per entry).
+
+  /// App role, mapped onto `space4` (12): a meta glyph beside caption text
+  /// (location pin, clock). The app's 10, 11 and 13 fold here.
+  static const double iconXs = DabblerSpacing.space4;
+
+  /// App role, mapped onto `space5` (15): an icon inside a chip or an inline
+  /// label. The app's 14 and 16 fold here.
+  static const double iconInline = DabblerSpacing.space5;
+
+  /// App role, mapped onto `space7` (21): a list-row / field leading icon.
+  /// The app's 20 and 22 fold here.
+  static const double iconRow = DabblerSpacing.space7;
+
+  /// App role, mapped onto `space10` (36): a standalone glyph heading an
+  /// empty or notice block, and a small icon tile's extent.
+  static const double iconXl = DabblerSpacing.space10;
+
+  /// App role, mapped onto [touchTargetMin] (45): a medium icon tile / sport
+  /// tile. The app's 44 folds here.
+  static const double tileMd = touchTargetMin;
+
+  /// App role, mapped onto `space11` (48): a large icon tile.
+  static const double tileLg = DabblerSpacing.space11;
+
+  /// App role, `space11 + space2` (54): a drawer's illustration tile. The
+  /// app's 56 folds here.
+  static const double illustrationSm =
+      DabblerSpacing.space11 + DabblerSpacing.space2;
+
+  /// App role, `space11 + space8` (72): an empty-state illustration — the
+  /// same diameter as `DabblerHeroIcon.defaultSize`. The app's 80 folds here.
+  static const double illustrationMd =
+      DabblerSpacing.space11 + DabblerSpacing.space8;
+
+  /// App role, `2 × space11` (96): a completion / celebration illustration.
+  static const double illustrationLg = DabblerSpacing.space11 * 2;
+
+  /// App role, mapped onto `space3` (9): a status / step dot.
+  static const double dot = DabblerSpacing.space3;
+
+  /// App role, mapped onto `space5` (15): a colour swatch chip. The app's 14
+  /// folds here.
+  static const double swatch = DabblerSpacing.space5;
+
+  /// App role, mapped onto `space2` (6): a page indicator bar's thickness.
+  /// The app's 5 folds here.
+  static const double indicatorThickness = DabblerSpacing.space2;
+
+  /// App role, `space11 + space4` (60): a square media thumbnail.
+  static const double thumbnail = DabblerSpacing.space11 + DabblerSpacing.space4;
+
+  /// App role, `space11 + space6` (66): a selectable option tile's height.
+  static const double optionTileHeight =
+      DabblerSpacing.space11 + DabblerSpacing.space6;
+
+  /// App role, `3 × space9` (90): a fixed label column in a key/value row.
+  /// The app's 88 folds here.
+  static const double labelColumnWidth = DabblerSpacing.space9 * 3;
+
+  /// App role, `5 × space11` (240): a detail screen's hero / cover height
+  /// (before the safe-area top is added). The app's 232 folds here.
+  static const double heroCoverHeight = DabblerSpacing.space11 * 5;
+
+  /// App role, `6 × space9` (180): a map or media preview panel's height.
+  /// The app's 200 folds here.
+  static const double mediaPreviewHeight = DabblerSpacing.space9 * 6;
+
+  /// App role, `4 × space9` (120): a compact preview / placeholder panel.
+  static const double mediaPreviewCompactHeight = DabblerSpacing.space9 * 4;
+
+  /// App role, `5 × space9` (150): a horizontal row of media tiles.
+  static const double mediaRowHeight = DabblerSpacing.space9 * 5;
+
+  /// App role, `3 × space11` (144): a section's loading placeholder height.
+  /// The app's 140 folds here.
+  static const double loadingBlockHeight = DabblerSpacing.space11 * 3;
+
+  /// App role, `6 × space9` (180): a horizontal-rail card's width.
+  static const double railCardWidth = DabblerSpacing.space9 * 6;
+
+  /// App role, `2 × space11` (96): a horizontal-rail card's height.
+  static const double railCardHeight = DabblerSpacing.space11 * 2;
+
+  /// App role, mapped onto `space8` (24): a skeleton title bar's height. The
+  /// app's 20 and 28 fold here.
+  static const double skeletonTitleHeight = DabblerSpacing.space8;
+
+  /// App role, mapped onto `space4` (12): a skeleton text line's height —
+  /// equal to `DabblerSkeleton.lineHeight`. The app's 10 and 14 fold here.
+  static const double skeletonLineHeight = DabblerSpacing.space4;
+
+  /// App role, `3 × space9` (90): a skeleton content block's height. The
+  /// app's 70, 80 and 100 fold here.
+  static const double skeletonBlockHeight = DabblerSpacing.space9 * 3;
+
+  /// App role, `4 × space11 + space8` (216): a long skeleton bar (a title).
+  /// The app's 220 folds here.
+  static const double skeletonWidthLong =
+      DabblerSpacing.space11 * 4 + DabblerSpacing.space8;
+
+  /// App role, `3 × space11 + space4` (156): a medium skeleton bar. The app's
+  /// 160 folds here.
+  static const double skeletonWidthMedium =
+      DabblerSpacing.space11 * 3 + DabblerSpacing.space4;
+
+  /// App role, `3 × space11` (144): a short skeleton bar. The app's 140 folds
+  /// here.
+  static const double skeletonWidthShort = DabblerSpacing.space11 * 3;
+
+  /// App role, `2 × space11` (96): a meta skeleton bar. The app's 100 folds
+  /// here.
+  static const double skeletonWidthMeta = DabblerSpacing.space11 * 2;
 }
 
 /// Elevation — and the system's no-shadow law.
