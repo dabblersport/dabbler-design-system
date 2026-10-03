@@ -22,7 +22,7 @@ Colour foundation page.
 
 Direction section REMOVED 2026-09-18 per D-036 — BORDERLINE CALL, flagged to
 team-lead rather than fully confident. DabblerChevron.iconNameFor swaps to a
-different icon NAME per direction (arrow-right/arrow-left) instead of
+different icon NAME per direction (arrow-right-3/arrow-left-2) instead of
 transforming one glyph, specifically to avoid flipping the glyph's optical
 weight. The visual RESULT is still uniform mirroring (the row reverses, the
 chevron points the new direction, its meaning — "this discloses/proceeds" —

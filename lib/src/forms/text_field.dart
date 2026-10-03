@@ -155,8 +155,12 @@ class DabblerTextField extends StatefulWidget {
   /// The glyph shown while the password is revealed.
   static const String concealIconName = 'eye-slash';
 
-  /// `arrow-down` — the `select` shell's trailing glyph, at `--icon-sm` (18).
-  static const String selectArrowName = 'arrow-down';
+  /// The `select` shell's trailing down chevron, at `--icon-sm` (18).
+  ///
+  /// The design names it `arrow-down`, which on iconsax.io is the chevron. In
+  /// `iconsax_flutter` 1.0.1 `arrow-down` draws a shafted arrow; the chevron is
+  /// `arrow-down-1` (measured — see the audit table on `DabblerIconMirror`).
+  static const String selectArrowName = 'arrow-down-1';
 
   /// Which shape the field takes.
   final DabblerTextFieldVariant variant;

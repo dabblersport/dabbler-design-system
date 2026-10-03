@@ -103,6 +103,14 @@ Trailing actions are icon-only by default. `DabblerNavigationAction.text(label: 
 labelled action as a text-tone `Button` in the same slot. Its label is its accessible name unless
 you pass `semanticLabel`, and without `onPressed` it is drawn disabled.
 
+Either kind of action takes `loading: true` while its work is in flight, for example a `Save`
+while saving. A spinner replaces the glyph or the label inside the same hit box. The text action
+keeps its label's width, so the bar does not shift. A loading action ignores taps, keeps its
+accessible name, reads as disabled and announces "Loading". It is not dimmed.
+
+**Deviation (busy state):** Flutter has no `aria-busy`, so the disabled flag plus a "Loading" value
+stands in for it. The spinner uses the medium step, the nearest one to the action glyph.
+
 The titled bar is always titled. An empty or missing title draws an empty title slot beside the
 back button — never the wordmark.
 
@@ -158,6 +166,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
   shipped.
 
 - Alpha plan decision 1 (orchestrator, D-035) — adds the titled variant and the avatar image URL.
+- Alpha W10 — adds `loading` to `DabblerNavigationAction` and `DabblerNavigationAction.text`.
 - Alpha DS gaps 6 — adds the scrolled title (`titleOpacity`, `scrollController`,
   `titleRevealOffset`) and fixes the titled bar falling back to the wordmark when it had neither a
   title nor a back action.

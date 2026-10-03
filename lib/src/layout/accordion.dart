@@ -253,7 +253,9 @@ class _DabblerAccordionItemView extends StatelessWidget {
                         : DabblerMotion.base,
                     curve: DabblerMotion.easeOut,
                     child: DabblerIcon(
-                      'arrow-down',
+                      // The down chevron: `arrow-down` draws a shafted arrow
+                      // in iconsax_flutter 1.0.1 (see `DabblerIconMirror`).
+                      'arrow-down-1',
                       size: DabblerSizing.iconSm,
                       color: colors.textSecondary,
                     ),

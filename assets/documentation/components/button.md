@@ -116,6 +116,12 @@ a side.** Icon and label sit in ordinary flow inside a row with a logical gap, s
 mirrors the same way any unlisted component's does — this is the default, not something Button
 does specially.
 
+**A directional icon can follow the reading direction.** Pass `mirrorIconInRtl: true` (or
+`mirrorInRtl: true` on `DabblerButton.icon`) with the left-to-right name, for example
+`arrow-right-1` for "Next". Under Arabic the button then draws the measured mirror glyph,
+`arrow-left`. It is off by default, so existing buttons do not change. Pick the name from the arrow
+table on the *Icons* foundation page: plain `arrow-right` is not a forward arrow.
+
 *Confirmed by reading `button.dart` directly — no `left`/`right` literal anywhere in the file, and
 padding is direction-aware throughout. NOT rendered-verified: the gallery's direction switcher has
 since shipped (KAN-294), so this claim is now checkable by sight, but nobody has checked it. The
@@ -144,6 +150,7 @@ from the shared press-scale and focus-ring primitives; nothing here defines its 
   KAN-279 (`a90a784`), which also deleted `DabblerCalendarTextAction`, the one-off this tone
   replaces. This page described it as blocked-and-not-shipped until 2026-09-20, which was true
   when written and is not now.
+- Alpha W10 — adds `mirrorIconInRtl` / `mirrorInRtl` for direction-aware icons.
 - D-024 (cxo) — Button's tone-size label scale stays a private
   scale, not three new steps in the shared type ramp.
 

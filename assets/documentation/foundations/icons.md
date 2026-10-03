@@ -88,6 +88,22 @@ back.
 `arrow-left-2` mirrors `arrow-right-3` at linear but `arrow-right` at bold. The full pair table is
 on `DabblerIconMirror` in `icon_mirror.dart`, and a test re-renders every pair.
 
+**Audit of the plain `arrow-*` names.** The same name draws a different shape at
+each weight. At linear, use these names for these jobs:
+
+| Intent | LTR name | Mirror in RTL |
+|---|---|---|
+| Forward or disclosure chevron | `arrow-right-3` | yes, becomes `arrow-left-2` |
+| Back chevron | `arrow-left-2` | yes, becomes `arrow-right-3` |
+| Forward arrow with shaft | `arrow-right-1` | yes, becomes `arrow-left` |
+| Back arrow with shaft | `arrow-left` | yes, becomes `arrow-right-1` |
+| Up chevron, up arrow with shaft | `arrow-up-2`, `arrow-up-3` | no |
+| Down chevron, down arrow with shaft | `arrow-down-1`, `arrow-down` | no |
+
+Plain `arrow-right` draws a chevron inside a square at linear and a circled arrow at bold, so it
+is never the forward chevron. The per-name table of what each glyph draws is on
+`DabblerIconMirror`.
+
 Deviation: the horizontal flip goes against the icon card's "mirror by name, not by transform"
 rule. It is only the fallback for a glyph with no mirror in the set.
 
