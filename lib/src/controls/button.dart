@@ -192,6 +192,7 @@ class DabblerButton extends StatefulWidget {
     this.size = DabblerButtonSize.medium,
     this.icon,
     this.onPressed,
+    this.onLongPress,
     this.disabled = false,
     this.loading = false,
     this.fullWidth = false,
@@ -208,6 +209,7 @@ class DabblerButton extends StatefulWidget {
     this.tone = DabblerButtonTone.icon,
     this.size = DabblerButtonSize.medium,
     this.onPressed,
+    this.onLongPress,
     this.disabled = false,
     this.loading = false,
   }) : label = null,
@@ -239,6 +241,13 @@ class DabblerButton extends StatefulWidget {
   /// two are separate in the source too, and a tone-only specimen button has no
   /// handler while still drawing at full opacity.
   final VoidCallback? onPressed;
+
+  /// Called on a long press. Optional and additive (DS gaps 5, item 7): the
+  /// web source has no long-press, so this is a native-platform affordance —
+  /// e.g. a secondary menu on a post action. Ignored while [disabled] or
+  /// [loading], like [onPressed]. When set, the button's semantics also
+  /// expose a long-press action so assistive technology can reach it.
+  final VoidCallback? onLongPress;
 
   /// Whether the button is disabled: inert, 45% opacity, out of the tab order.
   final bool disabled;
@@ -469,6 +478,11 @@ class _DabblerButtonState extends State<DabblerButton> {
     widget.onPressed?.call();
   }
 
+  void _longPress() {
+    if (_inert) return;
+    widget.onLongPress?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -596,6 +610,7 @@ class _DabblerButtonState extends State<DabblerButton> {
       enabled: !_inert,
       label: widget.semanticLabel ?? widget.label,
       onTap: _inert ? null : _activate,
+      onLongPress: _inert || widget.onLongPress == null ? null : _longPress,
       child: ExcludeSemantics(
         child: FocusableActionDetector(
           enabled: !_inert,
@@ -619,6 +634,9 @@ class _DabblerButtonState extends State<DabblerButton> {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _inert ? null : _activate,
+            onLongPress: _inert || widget.onLongPress == null
+                ? null
+                : _longPress,
             onTapDown: _inert ? null : (TapDownDetails _) => _setPressed(true),
             onTapUp: _inert ? null : (TapUpDetails _) => _setPressed(false),
             onTapCancel: _inert ? null : () => _setPressed(false),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
 
+import '../foundations/icon.dart';
+import '../foundations/vibes.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../surfaces/surface.dart';
@@ -116,6 +118,10 @@ class DabblerChip extends StatefulWidget {
     this.selected = false,
     this.onTap,
     this.leadingIcon,
+    this.onLongPress,
+    this.onRemove,
+    this.removeSemanticLabel,
+    this.vibe,
   });
 
   /// The chip text. `label: string` in `Chip.d.ts`.
@@ -135,6 +141,38 @@ class DabblerChip extends StatefulWidget {
   ///
   /// `leadingIcon?: React.ReactNode` — *"Optional leading icon node (18px)"*.
   final Widget? leadingIcon;
+
+  /// Called on a long press. Additive (DS gaps 5, item 7); the web source
+  /// has none. Only takes effect on an interactive chip ([onTap] non-null),
+  /// and is exposed as a semantics long-press action.
+  final VoidCallback? onLongPress;
+
+  /// Shows a trailing [removeIconName] glyph with its own hit target and its
+  /// own button semantics node, labelled [removeSemanticLabel]. Additive
+  /// (DS gaps 5, item 7) — the removable-tag pattern of the Post composer's
+  /// tagged-people row. Works on static and interactive chips alike; a tap
+  /// on the glyph calls this and never [onTap].
+  ///
+  /// **Deviation:** the glyph's hit box is [DabblerSizing.touchTargetMin]
+  /// wide but only as tall as the pill ([visualHeight], 38): the remaining
+  /// 7px of the 45 floor belong to the chip's own target. The box also
+  /// absorbs the trailing padding, so the visible gap after the glyph is
+  /// `45 - iconGap - iconSm` (21) rather than [horizontalPadding] (15).
+  final VoidCallback? onRemove;
+
+  /// The remove glyph's accessible name. Null reads `Remove <label>`.
+  final String? removeSemanticLabel;
+
+  /// Tints the chip with a vibe's colours instead of the card/brand pair:
+  /// [DabblerVibeColors.surface]/[DabblerVibeColors.border] unselected and
+  /// [DabblerVibeColors.selectedSurface]/[DabblerVibeColors.selectedBorder]
+  /// selected, with the label (and icon) in [DabblerVibeColors.ink] in both
+  /// states. Resolved through [DabblerVibe.resolve]; no new colour values.
+  final DabblerVibe? vibe;
+
+  /// The trailing remove glyph — `close-circle`, the same glyph
+  /// `DabblerTextField`'s inline clear uses.
+  static const String removeIconName = 'close-circle';
 
   /// `padding: '9px 15px'` (`Chip.jsx:28`), vertical component —
   /// [DabblerSpacing.space3].
@@ -206,6 +244,9 @@ class DabblerChip extends StatefulWidget {
         color: labelColorFor(colors, selected: selected),
       );
 
+  /// The default accessible name for the remove glyph.
+  static String defaultRemoveLabelFor(String label) => 'Remove $label';
+
   @override
   State<DabblerChip> createState() => _DabblerChipState();
 }
@@ -234,38 +275,80 @@ class _DabblerChipState extends State<DabblerChip> {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
+    final DabblerVibeColors? vibe = widget.vibe?.resolve(colors);
+    final Color iconColor =
+        vibe?.ink ??
+        DabblerChip.iconColorFor(colors, selected: widget.selected);
+    final TextStyle labelStyle = DabblerChip.labelStyleFor(
+      colors,
+      direction,
+      selected: widget.selected,
+    );
+    final bool removable = widget.onRemove != null;
 
     final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         if (widget.leadingIcon != null) ...<Widget>[
-          SizedBox(
-            width: DabblerSizing.iconSm,
-            height: DabblerSizing.iconSm,
-            child: IconTheme.merge(
-              data: IconThemeData(
-                color: DabblerChip.iconColorFor(
-                  colors,
-                  selected: widget.selected,
+          ExcludeSemantics(
+            child: SizedBox(
+              width: DabblerSizing.iconSm,
+              height: DabblerSizing.iconSm,
+              child: IconTheme.merge(
+                data: IconThemeData(
+                  color: iconColor,
+                  size: DabblerSizing.iconSm,
                 ),
-                size: DabblerSizing.iconSm,
+                child: Center(child: widget.leadingIcon),
               ),
-              child: Center(child: widget.leadingIcon),
             ),
           ),
           const SizedBox(width: DabblerChip.iconGap),
         ],
-        Text(
-          widget.label,
-          style: DabblerChip.labelStyleFor(
-            colors,
-            direction,
-            selected: widget.selected,
+        // The chip node already carries [label]; with a remove glyph the
+        // outer ExcludeSemantics is lifted, so the text must not read twice.
+        ExcludeSemantics(
+          child: Text(
+            widget.label,
+            style: vibe == null
+                ? labelStyle
+                : labelStyle.copyWith(color: vibe.ink),
+            maxLines: 1,
+            softWrap: false,
           ),
-          maxLines: 1,
-          softWrap: false,
         ),
+        if (removable)
+          Semantics(
+            container: true,
+            button: true,
+            label:
+                widget.removeSemanticLabel ??
+                DabblerChip.defaultRemoveLabelFor(widget.label),
+            onTap: widget.onRemove,
+            child: GestureDetector(
+              key: const ValueKey<String>('dabbler-chip-remove'),
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onRemove,
+              child: SizedBox(
+                width: DabblerSizing.touchTargetMin,
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    start: DabblerChip.iconGap,
+                  ),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    widthFactor: 1,
+                    child: DabblerIcon(
+                      DabblerChip.removeIconName,
+                      size: DabblerSizing.iconSm,
+                      color: iconColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
 
@@ -279,10 +362,18 @@ class _DabblerChipState extends State<DabblerChip> {
       // `Chip.jsx:20`). Keeping it transparent rather than absent is what makes
       // the two states the same height: without this, selecting a chip would
       // shrink it by 2px and shift the whole rail.
-      borderColor: widget.selected ? Colors.transparent : null,
-      padding: const EdgeInsetsDirectional.symmetric(
-        vertical: DabblerChip.verticalPadding,
-        horizontal: DabblerChip.horizontalPadding,
+      fill: vibe == null
+          ? null
+          : (widget.selected ? vibe.selectedSurface : vibe.surface),
+      borderColor: vibe != null
+          ? (widget.selected ? vibe.selectedBorder : vibe.border)
+          : (widget.selected ? Colors.transparent : null),
+      padding: EdgeInsetsDirectional.only(
+        top: DabblerChip.verticalPadding,
+        bottom: DabblerChip.verticalPadding,
+        start: DabblerChip.horizontalPadding,
+        // The remove box absorbs the trailing padding — see [onRemove].
+        end: removable ? 0 : DabblerChip.horizontalPadding,
       ),
       child: content,
     );
@@ -306,16 +397,19 @@ class _DabblerChipState extends State<DabblerChip> {
       return Semantics(
         container: true,
         label: widget.label,
-        child: ExcludeSemantics(child: interactive),
+        child: ExcludeSemantics(excluding: !removable, child: interactive),
       );
     }
 
     return Semantics(
+      container: removable,
       button: true,
       selected: widget.selected,
       label: widget.label,
       onTap: widget.onTap,
+      onLongPress: widget.onLongPress,
       child: ExcludeSemantics(
+        excluding: !removable,
         child: FocusableActionDetector(
           mouseCursor: SystemMouseCursors.click,
           onShowFocusHighlight: _setFocused,
@@ -332,6 +426,7 @@ class _DabblerChipState extends State<DabblerChip> {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: widget.onTap,
+            onLongPress: widget.onLongPress,
             onTapDown: (TapDownDetails _) => _setPressed(true),
             onTapUp: (TapUpDetails _) => _setPressed(false),
             onTapCancel: () => _setPressed(false),
