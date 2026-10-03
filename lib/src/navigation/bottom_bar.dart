@@ -6,11 +6,13 @@ import '../controls/fab.dart';
 import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
+import '../surfaces/badge.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 
+part 'bottom_bar_badge.dart';
 part 'bottom_bar_icon_tone.dart';
 
 /// One destination in a [DabblerNavigationBottomBar], transcribed from
@@ -23,6 +25,9 @@ class DabblerNavigationItem {
     required this.id,
     required this.icon,
     required this.label,
+    this.unread = false,
+    this.count,
+    this.badgeLabel,
   });
 
   /// Stable id, compared against [DabblerNavigationBottomBar.active].
@@ -38,16 +43,35 @@ class DabblerNavigationItem {
   /// ever visible.
   final String label;
 
+  /// Whether a count-less unread dot (a `DabblerBadge.dot`) sits on the
+  /// icon's top-inline-end corner. Default false. See
+  /// [DabblerNavigationItemBadge].
+  final bool unread;
+
+  /// A count pill (a `DabblerBadge`) on the icon's top-inline-end corner,
+  /// shown when positive and capped at `99+`. It wins over [unread]. Null or
+  /// zero draws no pill.
+  final int? count;
+
+  /// What the indicator means, appended to the item's accessible name:
+  /// `Inbox, 3 unread`. The package ships no localised strings, so the host
+  /// supplies it (as the top bar's `unreadLabel`). Without it a count is
+  /// appended as its bare text and a dot adds nothing.
+  final String? badgeLabel;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is DabblerNavigationItem &&
           other.id == id &&
           other.icon == icon &&
-          other.label == label;
+          other.label == label &&
+          other.unread == unread &&
+          other.count == count &&
+          other.badgeLabel == badgeLabel;
 
   @override
-  int get hashCode => Object.hash(id, icon, label);
+  int get hashCode => Object.hash(id, icon, label, unread, count, badgeLabel);
 
   @override
   String toString() => 'DabblerNavigationItem($id)';
@@ -527,13 +551,18 @@ class _DabblerNavigationBottomBarState
         ? Duration.zero
         : DabblerMotion.base;
 
-    final Widget glyph = DabblerIcon(
-      item.icon,
-      weight: active ? DabblerIconWeight.bold : DabblerIconWeight.linear,
-      size: DabblerSizing.iconMd,
-      // `--neutral-400` is `--outline-card`, i.e. [DabblerColors.borderDefault]
-      // (`tokens/colors.css:36`). The active chip's content is the brand.
-      color: active ? colors.brandPrimary : colors.borderDefault,
+    final Widget glyph = DabblerNavigationItemBadge.wrap(
+      item: item,
+      colors: colors,
+      glyph: DabblerIcon(
+        item.icon,
+        weight: active ? DabblerIconWeight.bold : DabblerIconWeight.linear,
+        size: DabblerSizing.iconMd,
+        // `--neutral-400` is `--outline-card`, i.e.
+        // [DabblerColors.borderDefault] (`tokens/colors.css:36`). The active
+        // chip's content is the brand.
+        color: active ? colors.brandPrimary : colors.borderDefault,
+      ),
     );
 
     // Width is the content's own: an inactive item is its icon at the 44px
@@ -594,7 +623,7 @@ class _DabblerNavigationBottomBarState
       container: true,
       button: true,
       selected: active,
-      label: item.label,
+      label: DabblerNavigationItemBadge.semanticLabel(item),
       onTap: () => _select(index),
       child: ExcludeSemantics(
         child: GestureDetector(

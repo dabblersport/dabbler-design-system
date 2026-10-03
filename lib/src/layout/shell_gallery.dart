@@ -14,6 +14,7 @@ import '../feed/news_card.dart';
 import '../feed/post_row.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
+import '../navigation/bottom_bar.dart';
 import '../navigation/top_bar.dart';
 import '../surfaces/avatar.dart';
 import '../surfaces/badge.dart';
@@ -33,6 +34,16 @@ const List<GalleryEntry> shellGalleryEntries = <GalleryEntry>[
         'Page background, a top bar, the body and a bottom bar; the safe area '
         'applies only on an edge without a bar.',
     builder: _page,
+  ),
+  GalleryEntry(
+    id: 'page/overlay',
+    page: 'components/page',
+    group: GalleryPurpose.structure,
+    title: 'Page — floating bottom overlay',
+    description:
+        'A bottom bar floating over scrolling rows with the page-colour fade '
+        'behind it; the rows scroll clear of the bar.',
+    builder: _pageOverlay,
   ),
   GalleryEntry(
     id: 'top-bar/titled',
@@ -116,6 +127,43 @@ Widget _page(BuildContext context) => GalleryStack(
         ),
       ),
     ),
+  ],
+);
+
+Widget _pageOverlayFrame(TextDirection direction) => GallerySpecimen(
+  label: direction == TextDirection.rtl ? 'RTL, fade on' : 'LTR, fade on',
+  child: _frame(
+    Directionality(
+      textDirection: direction,
+      child: SizedBox(
+        height: 320,
+        child: DabblerPage(
+          body: ListView.builder(
+            itemCount: 12,
+            itemBuilder: (BuildContext context, int i) => Padding(
+              padding: const EdgeInsets.all(DabblerSpacing.space6),
+              child: Text(
+                direction == TextDirection.rtl ? 'صف $i' : 'Row $i',
+                style: DabblerType.body
+                    .resolveForDirection(direction)
+                    .copyWith(color: DabblerColors.of(context).textPrimary),
+              ),
+            ),
+          ),
+          bottomOverlay: const DabblerNavigationBottomBar(
+            safeArea: false,
+            createItems: <DabblerNavigationCreateItem>[],
+          ),
+        ),
+      ),
+    ),
+  ),
+);
+
+Widget _pageOverlay(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    _pageOverlayFrame(TextDirection.ltr),
+    _pageOverlayFrame(TextDirection.rtl),
   ],
 );
 

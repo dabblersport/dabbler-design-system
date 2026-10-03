@@ -50,7 +50,65 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
         'design draws it (DSG-NEW-001).',
     builder: _bottomBarTones,
   ),
+  GalleryEntry(
+    id: 'bottom-bar/badges',
+    page: 'components/bottom-bar',
+    group: GalleryPurpose.navigation,
+    title: 'Navigation — bottom bar, unread dot and count',
+    description: 'Per-item unread dot and count badge on the icon\'s '
+        'top-inline-end corner, in LTR and RTL.',
+    builder: _bottomBarBadges,
+  ),
 ];
+
+const List<DabblerNavigationItem> _badgeItems = <DabblerNavigationItem>[
+  DabblerNavigationItem(id: 'home', icon: 'home-2', label: 'Home'),
+  DabblerNavigationItem(
+    id: 'inbox',
+    icon: 'sms',
+    label: 'Inbox',
+    count: 3,
+    badgeLabel: '3 unread',
+  ),
+  DabblerNavigationItem(
+    id: 'games',
+    icon: 'game',
+    label: 'Games',
+    unread: true,
+    badgeLabel: 'new',
+  ),
+  DabblerNavigationItem(id: 'you', icon: 'user', label: 'You'),
+];
+
+Widget _bottomBarBadges(BuildContext context) => const GalleryStack(
+      children: <Widget>[
+        GallerySpecimen(
+          label: 'dot and count, LTR',
+          child: SizedBox(
+            width: _phoneWidth,
+            child: DabblerNavigationBottomBar(
+              safeArea: false,
+              items: _badgeItems,
+              createItems: <DabblerNavigationCreateItem>[],
+            ),
+          ),
+        ),
+        GallerySpecimen(
+          label: 'dot and count, RTL',
+          child: SizedBox(
+            width: _phoneWidth,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: DabblerNavigationBottomBar(
+                safeArea: false,
+                items: _badgeItems,
+                createItems: <DabblerNavigationCreateItem>[],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
 
 Widget _bottomBarTones(BuildContext context) => const GallerySpecimen(
       label: 'Home Feed create menu',
