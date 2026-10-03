@@ -178,6 +178,9 @@ abstract final class DabblerSportBackgroundRegistry {
   /// `sport-backgrounds.card.html`'s `MAIN_SRC`.
   static const String assetDirectory = 'assets/images/sports';
 
+  /// The package that bundles the eleven `main` artwork files.
+  static const String assetPackage = 'dabbler_design_system';
+
   /// The eleven sports whose `main` artwork the bundle ships, in `SPORTS`
   /// order.
   ///
@@ -268,36 +271,47 @@ abstract final class DabblerSportBackgroundRegistry {
       <DabblerSport, DabblerSportArtwork>{
         DabblerSport.football: DabblerSportArtwork.asset(
           '$assetDirectory/football-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.padel: DabblerSportArtwork.asset(
           '$assetDirectory/padel-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.tennis: DabblerSportArtwork.asset(
           '$assetDirectory/tennis-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.basketball: DabblerSportArtwork.asset(
           '$assetDirectory/basketball-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.volleyball: DabblerSportArtwork.asset(
           '$assetDirectory/volleyball-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.cricket: DabblerSportArtwork.asset(
           '$assetDirectory/cricket-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.running: DabblerSportArtwork.asset(
           '$assetDirectory/running-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.swimming: DabblerSportArtwork.asset(
           '$assetDirectory/swimming-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.cycling: DabblerSportArtwork.asset(
           '$assetDirectory/cycling-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.badminton: DabblerSportArtwork.asset(
           '$assetDirectory/badminton-main-background.png',
+          package: assetPackage,
         ),
         DabblerSport.gym: DabblerSportArtwork.asset(
           '$assetDirectory/gym-main-background.png',
+          package: assetPackage,
         ),
       };
 

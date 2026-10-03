@@ -53,6 +53,7 @@ flutter:
     # unmodified, as resolution-aware assets (base = 1x, 2.0x/, 3.0x/, 4.0x/).
     # Each directory is named because Flutter does not recurse. The Apple licence
     # ships beside them as APPLE_LICENSE.rtf.
+    - assets/images/sports/
     - assets/provider_marks/
     - assets/provider_marks/2.0x/
     - assets/provider_marks/3.0x/
