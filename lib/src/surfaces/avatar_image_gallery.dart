@@ -23,7 +23,30 @@ const List<GalleryEntry> avatarImageGalleryEntries = <GalleryEntry>[
         'while it loads, when the URL is empty, and when it fails.',
     builder: _image,
   ),
+  GalleryEntry(
+    id: 'avatar/group-image',
+    page: 'components/avatar',
+    group: GalleryPurpose.identityAndStatus,
+    title: 'AvatarGroup — image URLs',
+    description:
+        'imageUrls index-aligned with people; a missing or failing URL '
+        'falls back to that seed. Geometry and +N are unchanged.',
+    builder: _group,
+  ),
 ];
+
+Widget _group(BuildContext context) => const GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'unreachable, null and missing URLs · +6',
+      child: DabblerAvatarGroup(
+        people: <String>['Rahul Menon', 'Aisha Khan', 'Omar Said'],
+        imageUrls: <String?>['https://invalid.example/avatar.png', null],
+        overflow: 6,
+      ),
+    ),
+  ],
+);
 
 Widget _image(BuildContext context) => const GalleryStack(
   children: <Widget>[

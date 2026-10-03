@@ -39,6 +39,10 @@ stands in while it loads, when it is empty, and when it fails.
 
 @specimen avatar/image
 
+The group's `imageUrls` form — index-aligned with `people`; any missing or failing URL shows that seed.
+
+@specimen avatar/group-image
+
 ## Using it
 
 **Pass a stable seed — a name, handle or user id — never assume the portrait can be styled to match

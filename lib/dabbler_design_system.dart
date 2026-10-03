@@ -127,6 +127,8 @@ export 'src/foundations/foundations_gallery.dart';
 export 'src/interaction/focus_ring.dart';
 export 'src/interaction/press_scale.dart';
 export 'src/interaction/scrim.dart';
+export 'src/interaction/swipe_action.dart';
+export 'src/interaction/swipe_action_gallery.dart';
 export 'src/interaction/interaction_gallery.dart';
 export 'src/layout/accordion.dart';
 export 'src/layout/accordion_gallery.dart';

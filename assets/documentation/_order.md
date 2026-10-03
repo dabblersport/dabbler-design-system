@@ -162,6 +162,7 @@ lot about the rest.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.
 - [Chip](components/chip.md) — filtering and tagging, tappable or static.
+- [SwipeAction](components/swipe-action.md) — row actions revealed by swiping toward the start.
 
 ### 7 · Presentation — surfacing more than the flow can hold
 

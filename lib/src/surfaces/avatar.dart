@@ -487,6 +487,7 @@ class DabblerAvatarGroup extends StatelessWidget {
     super.key,
     this.people = const <String>[],
     this.overflow = 0,
+    this.imageUrls,
   }) : assert(overflow >= 0, 'an overflow count cannot be negative');
 
   /// The seeds to render, in order. Each is a stable identifying string, and
@@ -495,6 +496,11 @@ class DabblerAvatarGroup extends StatelessWidget {
 
   /// The trailing `+N` chip's count. `0` renders no chip.
   final int overflow;
+
+  /// Photo URLs, index-aligned with [people] (KAN-410). A null, empty or
+  /// missing entry, and one that fails to load, shows that person's seed
+  /// portrait — see [DabblerAvatar.imageUrl]. Geometry is unchanged.
+  final List<String?>? imageUrls;
 
   /// `size="sm"` — the group's circles are 36px.
   static const DabblerAvatarSize avatarSize = DabblerAvatarSize.sm;
@@ -522,6 +528,7 @@ class DabblerAvatarGroup extends StatelessWidget {
             seed: people[i],
             size: avatarSize,
             ringColor: colors.bgPrimary,
+            imageUrl: i < (imageUrls?.length ?? 0) ? imageUrls![i] : null,
           ),
         ),
       );
