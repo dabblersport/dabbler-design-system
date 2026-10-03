@@ -229,6 +229,25 @@ Widget _sizesAndIcons(BuildContext context) => const GalleryStack(
         ],
       ),
     ),
+    GallerySpecimen(
+      label: 'directional icon — mirrorIconInRtl',
+      child: GalleryWrap(
+        children: <Widget>[
+          DabblerButton(
+            label: 'next',
+            icon: 'arrow-right-1',
+            mirrorIconInRtl: true,
+            onPressed: _noop,
+          ),
+          DabblerButton.icon(
+            icon: 'arrow-left-2',
+            semanticLabel: 'back',
+            mirrorInRtl: true,
+            onPressed: _noop,
+          ),
+        ],
+      ),
+    ),
   ],
 );
 

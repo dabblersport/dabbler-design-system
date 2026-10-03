@@ -54,6 +54,50 @@ import 'icon.dart';
 /// `tag-right`. Those, and any name not in the table, are flipped
 /// horizontally instead — the documented fallback.
 ///
+/// ## What each plain `arrow-*` name actually draws (audit, 2026-10-03)
+///
+/// Measured by rendering every name at both weights. On iconsax.io the plain
+/// name is the chevron; in `iconsax_flutter` 1.0.1 it is not, and **the same
+/// name draws a different shape at each weight**. Use the *correct name*
+/// column, at `linear` (the default weight), and pass `mirrorInRtl: true` for
+/// anything horizontal.
+///
+/// | name | linear draws | bold draws |
+/// |---|---|---|
+/// | `arrow-right` | chevron in a rounded square | right arrow in a filled circle |
+/// | `arrow-right-1` | **right arrow with shaft** | tailed triangle |
+/// | `arrow-right-2` | right arrow in a circle | filled triangle |
+/// | `arrow-right-3` | **right chevron** | right arrow in a filled square |
+/// | `arrow-left` | **left arrow with shaft** | tailed triangle |
+/// | `arrow-left-1` | outline left triangle | left arrow in a filled square |
+/// | `arrow-left-2` | **left chevron** | left arrow in a filled circle |
+/// | `arrow-left-3` | left arrow in a circle | filled left triangle |
+/// | `arrow-up` | outline up triangle | up arrow in a filled circle |
+/// | `arrow-up-1` | up arrow in a circle | filled up triangle |
+/// | `arrow-up-2` | **up chevron** | tailed triangle |
+/// | `arrow-up-3` | **up arrow with shaft** | up arrow in a filled square |
+/// | `arrow-down` | **down arrow with shaft** | filled down triangle |
+/// | `arrow-down-1` | **down chevron** | down arrow in a filled square |
+/// | `arrow-down-2` | down arrow in a circle | down arrow in a filled circle |
+///
+/// Correct names (linear) by intent:
+///
+/// | intent | LTR name | `mirrorInRtl` |
+/// |---|---|---|
+/// | forward / disclosure chevron | `arrow-right-3` | true (→ `arrow-left-2`) |
+/// | back chevron | `arrow-left-2` | true (→ `arrow-right-3`) |
+/// | forward arrow with shaft | `arrow-right-1` | true (→ `arrow-left`) |
+/// | back arrow with shaft | `arrow-left` | true (→ `arrow-right-1`) |
+/// | up chevron / arrow with shaft | `arrow-up-2` / `arrow-up-3` | false |
+/// | down chevron / arrow with shaft | `arrow-down-1` / `arrow-down` | false |
+/// | chevron in a circle | `arrow-circle-right` / `-left` / `-up` / `-down` | true for left/right |
+///
+/// The bold weight has no plain chevron in the `arrow-*` family; use
+/// `arrow-circle-*` there. Replaced in this package on the audit:
+/// `DabblerTextField.selectArrowName`, the accordion and panel-card chevrons
+/// (`arrow-down` → `arrow-down-1`), and the stat-tile gallery trailing glyph
+/// (`arrow-right` → `arrow-right-3` + `mirrorInRtl`).
+///
 /// **Deviation:** the horizontal flip contradicts the card's "not a transform"
 /// rule. It is used only where Iconsax ships no mirrored glyph, where the
 /// alternative is a glyph pointing the wrong way.

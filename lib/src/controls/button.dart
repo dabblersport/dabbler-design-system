@@ -197,6 +197,7 @@ class DabblerButton extends StatefulWidget {
     this.loading = false,
     this.fullWidth = false,
     this.semanticLabel,
+    this.mirrorIconInRtl = false,
   });
 
   /// Creates an icon-only button — the source's `tone="icon"` form.
@@ -212,8 +213,10 @@ class DabblerButton extends StatefulWidget {
     this.onLongPress,
     this.disabled = false,
     this.loading = false,
+    bool mirrorInRtl = false,
   }) : label = null,
-       fullWidth = false;
+       fullWidth = false,
+       mirrorIconInRtl = mirrorInRtl;
 
   /// The button text. `children` in the source. Null only on
   /// [DabblerButton.icon].
@@ -234,6 +237,15 @@ class DabblerButton extends StatefulWidget {
   /// a system icon into a system control. The specimen passes `<Icon name=…>`
   /// in every single instance.
   final String? icon;
+
+  /// Whether [icon] is directional (a back/forward arrow or chevron) and must
+  /// point the other way under [TextDirection.rtl]. Passed straight to
+  /// [DabblerIcon.mirrorInRtl], so it draws the measured mirrored glyph from
+  /// `DabblerIconMirror` and only flips where Iconsax ships none. Pass the
+  /// **LTR** name — e.g. `arrow-right-1` for "Next →". Set by
+  /// `mirrorIconInRtl` on [DabblerButton.new] and `mirrorInRtl` on
+  /// [DabblerButton.icon]. Default false: existing buttons are unchanged.
+  final bool mirrorIconInRtl;
 
   /// Called on tap. Named for the gesture rather than the source's `onClick`.
   ///
@@ -511,6 +523,7 @@ class _DabblerButtonState extends State<DabblerButton> {
                       ? DabblerButton.iconOnlyGlyphSize
                       : DabblerButton.leadingIconSize,
                   color: foreground,
+                  mirrorInRtl: widget.mirrorIconInRtl,
                 )
               : null);
 

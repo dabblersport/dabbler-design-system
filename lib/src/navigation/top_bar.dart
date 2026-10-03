@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../controls/button.dart';
+import '../feedback/spinner.dart';
 import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
@@ -30,6 +31,7 @@ class DabblerNavigationAction {
     this.weight = DabblerIconWeight.linear,
     this.unread = false,
     this.unreadLabel,
+    this.loading = false,
   })  : text = false,
         semanticLabel = null;
 
@@ -45,6 +47,7 @@ class DabblerNavigationAction {
     required this.label,
     this.onPressed,
     this.semanticLabel,
+    this.loading = false,
   })  : text = true,
         icon = '',
         weight = DabblerIconWeight.linear,
@@ -53,6 +56,24 @@ class DabblerNavigationAction {
 
   /// Whether this is the [DabblerNavigationAction.text] variant.
   final bool text;
+
+  /// Whether the action is busy — e.g. a `Save` while the save is in flight.
+  ///
+  /// A [DabblerSpinner] at [DabblerSpinnerSize.md] replaces the glyph (icon
+  /// variant) or the label (text variant) **inside the same hit box**, so the
+  /// bar does not reflow: the text variant keeps its label's width by laying
+  /// the label out invisibly underneath. The action is inert while loading —
+  /// taps are ignored and it leaves the focus order, like
+  /// [DabblerButton.loading] (`const inert = disabled || loading`,
+  /// `Button.jsx:63`) — but it is **not** dimmed.
+  ///
+  /// Semantics keep the action's name ([label] / [semanticLabel]), report it
+  /// disabled, and carry [DabblerSpinner.defaultLabel] as the value.
+  /// **Deviation:** Flutter's semantics have no `aria-busy`; the disabled flag
+  /// plus a `Loading` value is the nearest equivalent. The spinner is
+  /// direction-neutral, so RTL changes only where the action sits (the bar's
+  /// inline end). Defaults to false — existing actions are unchanged.
+  final bool loading;
 
   /// The text variant's accessible name when it must differ from the visible
   /// [label] (e.g. `'Save profile'` for a `Save` button). Ignored by the icon
@@ -92,11 +113,12 @@ class DabblerNavigationAction {
           other.unread == unread &&
           other.unreadLabel == unreadLabel &&
           other.text == text &&
-          other.semanticLabel == semanticLabel;
+          other.semanticLabel == semanticLabel &&
+          other.loading == loading;
 
   @override
-  int get hashCode => Object.hash(
-      icon, label, onPressed, weight, unread, unreadLabel, text, semanticLabel);
+  int get hashCode => Object.hash(icon, label, onPressed, weight, unread,
+      unreadLabel, text, semanticLabel, loading);
 
   @override
   String toString() => text
@@ -448,11 +470,21 @@ class DabblerNavigationTopBar extends StatelessWidget {
     if (action.text) {
       return _textAction(action);
     }
+    final VoidCallback? onPressed = action.loading ? null : action.onPressed;
     final Widget body = SizedBox(
       width: actionTarget.width,
       height: actionTarget.height,
       child: Center(
-        child: DabblerNavigationUnreadDot.wrap(
+        child: action.loading
+            ? IconTheme.merge(
+                data: IconThemeData(color: colors.textPrimary),
+                child: const DabblerSpinner(
+                  // 24 — the nearest spinner size to the 22 glyph.
+                  size: DabblerSpinnerSize.md,
+                  tone: DabblerSpinnerTone.inherit,
+                ),
+              )
+            : DabblerNavigationUnreadDot.wrap(
           visible: action.unread,
           child: DabblerIcon(
             action.icon,
@@ -469,17 +501,18 @@ class DabblerNavigationTopBar extends StatelessWidget {
     return Semantics(
       container: true,
       button: true,
-      enabled: action.onPressed != null,
+      enabled: onPressed != null,
       label: DabblerNavigationUnreadDot.semanticLabel(action),
-      onTap: action.onPressed,
+      value: action.loading ? DabblerSpinner.defaultLabel : null,
+      onTap: onPressed,
       child: ExcludeSemantics(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: action.onPressed,
+          onTap: onPressed,
           child: DabblerFocusRing(
             borderRadius: DabblerRadius.pillAll,
             child: DabblerPressScale.gesture(
-              enabled: action.onPressed != null,
+              enabled: onPressed != null,
               child: body,
             ),
           ),
@@ -504,11 +537,62 @@ class DabblerNavigationTopBar extends StatelessWidget {
       disabled: action.onPressed == null,
       onPressed: action.onPressed,
     );
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: DabblerSizing.touchTargetMin,
+    if (!action.loading) {
+      return ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: DabblerSizing.touchTargetMin,
+        ),
+        child: Center(widthFactor: 1, child: labelled),
+      );
+    }
+    // Loading: the label is laid out invisibly so the action keeps its width,
+    // and the spinner sits centred over it. See [DabblerNavigationAction.loading].
+    return Semantics(
+      container: true,
+      button: true,
+      enabled: false,
+      label: action.semanticLabel ?? action.label,
+      value: DabblerSpinner.defaultLabel,
+      child: ExcludeSemantics(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: DabblerSizing.touchTargetMin,
+          ),
+          child: Center(
+            widthFactor: 1,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Visibility(
+                  visible: false,
+                  maintainSize: true,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  child: DabblerButton(
+                    label: action.label,
+                    tone: DabblerButtonTone.text,
+                    size: DabblerButtonSize.small,
+                  ),
+                ),
+                Builder(
+                  builder: (BuildContext context) => IconTheme.merge(
+                    data: IconThemeData(
+                      color: DabblerButton.foregroundFor(
+                        DabblerColors.of(context),
+                        DabblerButtonTone.text,
+                      ),
+                    ),
+                    child: const DabblerSpinner(
+                      size: DabblerSpinnerSize.md,
+                      tone: DabblerSpinnerTone.inherit,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
-      child: Center(widthFactor: 1, child: labelled),
     );
   }
 

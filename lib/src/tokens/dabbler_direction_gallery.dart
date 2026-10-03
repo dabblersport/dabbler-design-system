@@ -320,8 +320,7 @@ class _ChevronReadout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextDirection direction = Directionality.of(context);
-    final String name =
-        direction == TextDirection.rtl ? 'arrow-left' : 'arrow-right';
+    final String name = DabblerChevron.iconNameFor(direction);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[

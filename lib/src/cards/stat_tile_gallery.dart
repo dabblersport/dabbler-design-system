@@ -78,7 +78,11 @@ Widget _tiles(BuildContext context) => GalleryStack(
               label: 'Squads',
               tone: DabblerStatTileTone.info,
               onTap: () {},
-              trailing: const DabblerIcon('arrow-right', size: 18),
+              trailing: const DabblerIcon(
+                'arrow-right-3',
+                size: 18,
+                mirrorInRtl: true,
+              ),
             ),
           ],
         ),

@@ -179,6 +179,23 @@ Widget _topBar(BuildContext context) => const GalleryStack(
             ),
           ),
         ),
+        GallerySpecimen(
+          label: 'loading actions — saving',
+          child: SizedBox(
+            width: _phoneWidth,
+            child: DabblerNavigationTopBar(
+              safeArea: false,
+              actions: <DabblerNavigationAction>[
+                DabblerNavigationAction(
+                  icon: 'notification-bing',
+                  label: 'Alerts',
+                  loading: true,
+                ),
+                DabblerNavigationAction.text(label: 'Save', loading: true),
+              ],
+            ),
+          ),
+        ),
         GallerySpecimen(label: 'wordmark alone', child: DabblerWordmark()),
       ],
     );

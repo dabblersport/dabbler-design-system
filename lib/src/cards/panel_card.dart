@@ -233,7 +233,8 @@ class DabblerPanelCard extends StatelessWidget {
                                 turns: collapsed ? 0 : 0.5,
                                 duration: DabblerMotion.base,
                                 child: DabblerIcon(
-                                  'arrow-down',
+                                  // Down chevron — see `DabblerIconMirror`.
+                                  'arrow-down-1',
                                   size: chevronSize,
                                   color: panelFg,
                                 ),
