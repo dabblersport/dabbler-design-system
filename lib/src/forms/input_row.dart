@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../foundations/icon_mirror.dart' show DabblerIconMirror;
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../surfaces/surface.dart';
@@ -10,7 +11,6 @@ import '../tokens/dabbler_type.dart';
 import 'highlighted_text.dart';
 import 'input_row_parts.dart';
 import 'toggle.dart';
-
 
 /// InputRow — the settings / content row.
 ///
@@ -155,6 +155,8 @@ class DabblerInputRow extends StatelessWidget {
     this.tone = DabblerInputRowTone.standard,
     this.selected,
     this.trailingChips,
+    this.flat = false,
+    this.showDivider = true,
   }) : assert(
          title == null || titleSpan == null,
          'Pass title or titleSpan, not both.',
@@ -312,6 +314,31 @@ class DabblerInputRow extends StatelessWidget {
   /// scroll follows the ambient direction, so RTL starts at the right.
   final List<Widget>? trailingChips;
 
+  /// The unboxed variant for picker lists inside sheets and pages: no
+  /// sunken fill, no radius, no inline padding — the row runs to its
+  /// parent's gutter and the list's rhythm comes from [flatPadding] and the
+  /// optional hairline under each row. DS gaps 6, item 5.
+  ///
+  /// Drawn at `Listings.dc.html:330` and `:338` (the location picker sheet):
+  /// `display:flex; gap:12px; padding:12px 0; border-bottom:1px solid
+  /// var(--faint)`. `12px 0` is [DabblerSpacing.space4] block / 0 inline,
+  /// `gap:12px` is the existing [slotGap], and `--faint` is
+  /// [DabblerColors.bgTertiary] at [DabblerSizing.borderDefault], the same
+  /// mapping [DabblerDivider] and the reply composer use. Everything else
+  /// (type, slots, tone, selection, semantics, the 45px floor) is the boxed
+  /// row's. A tappable flat row keeps the press scale; its focus ring is
+  /// square because there is no radius to follow.
+  final bool flat;
+
+  /// Draws the `--faint` hairline under a [flat] row. Ignored when [flat] is
+  /// false. Turn it off on the last row of a list, or where the list draws
+  /// its own separators.
+  final bool showDivider;
+
+  /// `padding:12px 0` (`Listings.dc.html:330`) — the [flat] row's padding.
+  static const EdgeInsetsDirectional flatPadding =
+      EdgeInsetsDirectional.symmetric(vertical: DabblerSpacing.space4);
+
   /// The default accessible name of the [verified] mark.
   static const String verifiedSemanticLabel = 'Verified';
 
@@ -424,63 +451,79 @@ class DabblerInputRow extends StatelessWidget {
 
     final Widget? trailingSlot = _trailingSlot(colors, direction, danger);
 
-    Widget row = DabblerSurface(
-      variant: DabblerSurfaceVariant.sunken,
-      radius: defaultRadius,
-      padding: defaultPadding,
-      child: ConstrainedBox(
-        // The floor sits outside the padding for the same reason it does in
-        // `field_shell.dart`: the surface's height is its child's height, so 45
-        // here is 45 on screen.
-        constraints: const BoxConstraints(minHeight: minHeight),
-        child: Row(
-          children: <Widget>[
-            if (leading != null) ...<Widget>[
-              danger == null
-                  ? leading!
-                  : IconTheme.merge(
-                      data: IconThemeData(color: danger),
-                      child: leading!,
+    final Widget body = ConstrainedBox(
+      // The floor sits outside the padding for the same reason it does in
+      // `field_shell.dart`: the surface's height is its child's height, so 45
+      // here is 45 on screen.
+      constraints: const BoxConstraints(minHeight: minHeight),
+      child: Row(
+        children: <Widget>[
+          if (leading != null) ...<Widget>[
+            danger == null
+                ? leading!
+                : IconTheme.merge(
+                    data: IconThemeData(color: danger),
+                    child: leading!,
+                  ),
+            const SizedBox(width: slotGap),
+          ],
+          Expanded(
+            // A tappable row is one button, so its content merges into one
+            // accessible name. [semanticLabel] is a *replacement* for that
+            // name rather than an addition to it, so the text column drops
+            // out of the tree when one is given — otherwise the row would
+            // announce the override and then read the same lines again.
+            child: ExcludeSemantics(
+              excluding: onTap != null && semanticLabel != null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ?firstLine,
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      // D-003: the source's `--subtle` is not a text colour.
+                      style: subtitleStyleFor(
+                        direction,
+                      ).copyWith(color: danger ?? colors.textSecondary),
                     ),
-              const SizedBox(width: slotGap),
-            ],
-            Expanded(
-              // A tappable row is one button, so its content merges into one
-              // accessible name. [semanticLabel] is a *replacement* for that
-              // name rather than an addition to it, so the text column drops
-              // out of the tree when one is given — otherwise the row would
-              // announce the override and then read the same lines again.
-              child: ExcludeSemantics(
-                excluding: onTap != null && semanticLabel != null,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ?firstLine,
-                    if (subtitle != null)
-                      Text(
-                        subtitle!,
-                        // D-003: the source's `--subtle` is not a text colour.
-                        style: subtitleStyleFor(
-                          direction,
-                        ).copyWith(color: danger ?? colors.textSecondary),
-                      ),
-                  ],
-                ),
+                ],
               ),
             ),
-            if (trailingChips != null && trailingChips!.isNotEmpty) ...<Widget>[
-              const SizedBox(width: slotGap),
-              Flexible(child: DabblerInputRowChipStrip(chips: trailingChips!)),
-            ],
-            if (trailingSlot != null) ...<Widget>[
-              const SizedBox(width: slotGap),
-              trailingSlot,
-            ],
+          ),
+          if (trailingChips != null && trailingChips!.isNotEmpty) ...<Widget>[
+            const SizedBox(width: slotGap),
+            Flexible(child: DabblerInputRowChipStrip(chips: trailingChips!)),
           ],
-        ),
+          if (trailingSlot != null) ...<Widget>[
+            const SizedBox(width: slotGap),
+            trailingSlot,
+          ],
+        ],
       ),
     );
+
+    Widget row = flat
+        ? DecoratedBox(
+            decoration: BoxDecoration(
+              border: showDivider
+                  ? Border(
+                      bottom: BorderSide(
+                        color: colors.bgTertiary,
+                        width: DabblerSizing.borderDefault,
+                      ),
+                    )
+                  : null,
+            ),
+            child: Padding(padding: flatPadding, child: body),
+          )
+        : DabblerSurface(
+            variant: DabblerSurfaceVariant.sunken,
+            radius: defaultRadius,
+            padding: defaultPadding,
+            child: body,
+          );
 
     if (!tappable) {
       if (selected == null) {
@@ -503,9 +546,11 @@ class DabblerInputRow extends StatelessWidget {
         child: DabblerFocusRing(
           enabled: interactive,
           canRequestFocus: interactive,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(DabblerInputRow.defaultRadius),
-          ),
+          borderRadius: flat
+              ? BorderRadius.zero
+              : const BorderRadius.all(
+                  Radius.circular(DabblerInputRow.defaultRadius),
+                ),
           child: row,
         ),
       ),
@@ -577,21 +622,32 @@ enum DabblerInputRowTone {
 
 /// Chevron — the kit's trailing disclosure glyph.
 ///
-/// `components/layout/InputRow.jsx:53-63`: `arrow-right` at 18, in
+/// `components/layout/InputRow.jsx:53-63`: web Iconsax `arrow-right` at 18, in
 /// `var(--subtle)`. The phrase *"exported alongside for the trailing
 /// disclosure glyph"* is quoted from `InputRow.prompt.md:9` (unverified: file
 /// not mirrored), not from `InputRow.jsx`.
 ///
-/// ## It mirrors by name, not by transform
+/// ## It mirrors by name, not by transform — and the names are measured
 ///
 /// The source's note is that the glyph *"mirrors in RTL, because Iconsax
 /// renders it inside the document's own direction"*. Flutter has no such
 /// ambient mirroring, and DS-300's [DabblerIcon] states outright that it
 /// *"has none and never mirrors itself; the caller picks the name"*. So this
-/// **is** that caller: it asks for `arrow-right` under [TextDirection.ltr] and
-/// `arrow-left` under [TextDirection.rtl], which is the system's own mechanism
-/// rather than a [Transform] that would flip the glyph's optical weight with
-/// it.
+/// **is** that caller: it asks for [forwardIconName] under
+/// [TextDirection.ltr] and [backwardIconName] under [TextDirection.rtl].
+///
+/// **Corrected DS gaps 6 (item 13).** This used to ask for `arrow-right` /
+/// `arrow-left`, which in `iconsax_flutter` 1.0.1 are neither the drawn glyph
+/// nor a mirrored pair (measured in [DabblerIconMirror]'s table): linear
+/// `arrow-right` renders a chevron inside a rounded square, and `arrow-left`
+/// a long shafted arrow. The design draws the kit's `Chevron`
+/// (`Settings.dc.html:94`, `:131`, `:173`, `:266`; the Arabic frame at
+/// `:368` onwards, e.g. `:422`, `:459`), which is the web Iconsax `arrow-right`
+/// at 18 — a bare open chevron. In `iconsax_flutter` that bare chevron is
+/// published as `arrow-right-3`, and its pixel mirror is `arrow-left-2`
+/// (the linear row of [DabblerIconMirror.linearPairs]). The pair is therefore
+/// both the drawn glyph and a true mirror; `test/forms/chevron_mirror_test.dart`
+/// re-renders it and fails if either stops being true.
 ///
 /// The tint is [DabblerColors.textTertiary], not the source's `--subtle` —
 /// **D-027**: a chevron is a non-informational directional glyph, not text, so
@@ -605,11 +661,11 @@ class DabblerChevron extends StatelessWidget {
   static const double size = DabblerSizing.iconSm;
 
   /// The glyph in a left-to-right layout.
-  static const String forwardIconName = 'arrow-right';
+  static const String forwardIconName = 'arrow-right-3';
 
-  /// The glyph in a right-to-left layout — the mirrored name, not a flipped
-  /// `arrow-right`.
-  static const String backwardIconName = 'arrow-left';
+  /// The glyph in a right-to-left layout — the measured pixel mirror of
+  /// [forwardIconName], not a flipped glyph.
+  static const String backwardIconName = 'arrow-left-2';
 
   /// Overrides the tint. Null takes [DabblerColors.textTertiary].
   final Color? color;
