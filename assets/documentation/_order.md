@@ -135,6 +135,8 @@ they're the chrome every other field in this list is built from, and understandi
 lot about the rest.
 
 - [TextField](components/text-field.md) — the flat input, in five shapes.
+- [SearchField](components/search-field.md) — the search input, with a clear button while it holds a query.
+- [HighlightedText](components/highlighted-text.md) — a search result's text with the matched part picked out.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
