@@ -112,7 +112,8 @@ class DabblerSurface extends StatelessWidget {
     this.height,
     this.center = false,
     this.clipBehavior = Clip.antiAlias,
-  }) : assert(borderWidth == null || borderWidth >= 0,
+  })  : _bleed = false,
+        assert(borderWidth == null || borderWidth >= 0,
             'a border cannot be narrower than zero');
 
   /// The opaque card surface with its hairline —
@@ -234,26 +235,27 @@ class DabblerSurface extends StatelessWidget {
   /// [DabblerSurfaceVariant.brandTint]'s fill with **no radius, no hairline
   /// and no clip**, so it runs edge to edge and meets the bar above it.
   ///
-  /// **Deviation (strength).** The design mixes the brand at 14% into white;
-  /// the system's one brand tint ([brandTintFill]) is 8% light / 22% dark.
-  /// The existing tint is used — no new colour is introduced for one band.
+  /// **Strength.** The design mixes the brand at 14% into white
+  /// (`color-mix(in srgb, var(--color-brand-primary) 14%, #FFFFFF)`). That mix
+  /// is reachable from existing tokens: [brandTintBleedFill] lerps
+  /// [DabblerColors.surfaceCard] (white in light) toward
+  /// [DabblerColors.brandPrimary] by [bleedTintMix]. In light it equals the
+  /// design exactly; in dark (which the design does not draw) the same rule
+  /// mixes into the dark card surface. No new colour is introduced.
   const DabblerSurface.brandTintBleed({
-    Key? key,
-    Widget? child,
-    EdgeInsetsGeometry? padding,
-    double? width,
-    double? height,
-  }) : this(
-          key: key,
-          child: child,
-          variant: DabblerSurfaceVariant.brandTint,
-          radius: 0,
-          borderWidth: 0,
-          padding: padding,
-          width: width,
-          height: height,
-          clipBehavior: Clip.none,
-        );
+    super.key,
+    this.child,
+    this.padding,
+    this.width,
+    this.height,
+  })  : variant = DabblerSurfaceVariant.brandTint,
+        radius = 0,
+        fill = null,
+        borderColor = null,
+        borderWidth = 0,
+        center = false,
+        clipBehavior = Clip.none,
+        _bleed = true;
 
   /// The solid brand fill of a selected control —
   /// [DabblerSurfaceVariant.selected].
@@ -332,6 +334,21 @@ class DabblerSurface extends StatelessWidget {
   /// the source's `overflow: hidden`; pass [Clip.none] for a child that must
   /// paint outside the radius.
   final Clip clipBehavior;
+
+  /// True only for [DabblerSurface.brandTintBleed]: the fill resolves through
+  /// [brandTintBleedFill] instead of [fillOf].
+  final bool _bleed;
+
+  /// The brand share of the full-bleed hero band — `Profiles.dc.html:70`,
+  /// `:933-934`, `color-mix(in srgb, var(--color-brand-primary) 14%, #FFFFFF)`.
+  static const double bleedTintMix = 0.14;
+
+  /// The fill of [DabblerSurface.brandTintBleed]: [DabblerColors.surfaceCard]
+  /// mixed toward [DabblerColors.brandPrimary] by [bleedTintMix]. [Color.lerp]
+  /// over sRGB is the source's `color-mix`, and the light card surface is the
+  /// source's `#FFFFFF`, so light matches the design exactly.
+  static Color brandTintBleedFill(DabblerColors colors) =>
+      Color.lerp(colors.surfaceCard, colors.brandPrimary, bleedTintMix)!;
 
   /// The source's default radius: `--radius-xl`, 18.
   static const double defaultRadius = DabblerRadius.xl;
@@ -417,7 +434,8 @@ class DabblerSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final Color resolvedFill = fill ?? fillOf(colors, variant);
+    final Color resolvedFill = fill ??
+        (_bleed ? brandTintBleedFill(colors) : fillOf(colors, variant));
     final Color? resolvedBorder = borderColor ?? borderOf(colors, variant);
     final double resolvedWidth = borderWidth ?? DabblerSizing.borderDefault;
     final BorderRadius borderRadius =

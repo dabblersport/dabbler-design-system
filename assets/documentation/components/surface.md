@@ -55,8 +55,10 @@ hairline), `selected` (solid brand fill, no border).
 `DabblerSurface.brandTintBleed` is the brand tint as a full-bleed page section: no radius, no
 hairline, no clip, so a profile hero band runs edge to edge.
 
-**Deviation (bleed strength):** the design's hero band is a stronger brand mix than the system's
-one brand tint. The existing tint is used; no colour is added for one band.
+Its fill is the design's 14% brand mix (`Profiles.dc.html:70`): the card surface mixed toward the
+brand primary by 14%, computed from existing tokens (`DabblerSurface.brandTintBleedFill`). In light
+the card surface is white, so it equals the design exactly; dark applies the same rule over the dark
+card surface. No colour is added.
 
 ## Tokens used
 
@@ -66,6 +68,7 @@ brand fill for `selected`. Hairline: `borderDefault`, present on `card` and `bra
 ## Change log
 
 - Alpha DS gaps 6 — adds `brandTintBleed`.
+- Alpha final follow-up — `brandTintBleed` now matches the design's 14% brand mix.
 
 ## Source
 

@@ -119,7 +119,12 @@ void main() {
                 as BoxDecoration;
         expect(
           d.color,
-          DabblerSurface.brandTintFill(testColors(brightness: b)),
+          DabblerSurface.brandTintBleedFill(testColors(brightness: b)),
+        );
+        final DabblerColors c = testColors(brightness: b);
+        expect(
+          d.color,
+          Color.lerp(c.surfaceCard, c.brandPrimary, 0.14),
         );
         expect(d.border, isNull);
         expect(d.borderRadius, BorderRadius.zero);
