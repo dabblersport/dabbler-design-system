@@ -8,6 +8,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'card.dart';
+import 'card_event_listing.dart';
 
 /// The event card family's geometry — **every value in it is ruled by
 /// `DECISIONS.md` D-006, not transcribed from the design bundle.**
@@ -293,6 +294,9 @@ class DabblerCardEventLarge extends StatelessWidget {
     this.enabled = true,
     this.semanticLabel,
     this.width,
+    this.progress,
+    this.price,
+    this.action,
   });
 
   /// The event's title. Truncated to [titleMaxLines] with an ellipsis.
@@ -338,6 +342,16 @@ class DabblerCardEventLarge extends StatelessWidget {
   /// The source's `width: 855` is a Figma frame measurement, not a
   /// specification — a card in a list takes its column's width.
   final double? width;
+
+  /// The player-progress slot — typically a [DabblerCardEventPlayers].
+  /// Laid out by [DabblerCardEventListing.compose]; null draws nothing.
+  final Widget? progress;
+
+  /// The price slot — typically a [DabblerCardEventPrice].
+  final Widget? price;
+
+  /// The action slot — typically [DabblerCardEventListing.joinButton].
+  final Widget? action;
 
   /// The cover's aspect ratio — [DabblerCardEventGeometry.coverAspectRatio].
   ///
@@ -535,7 +549,12 @@ class DabblerCardEventLarge extends StatelessWidget {
       onTap: onTap,
       enabled: enabled,
       semanticLabel: semanticLabel,
-      footer: footer,
+      footer: DabblerCardEventListing.withFooter(
+        footer,
+        progress: progress,
+        price: price,
+        action: action,
+      ),
       media: AspectRatio(
         aspectRatio: DabblerCardEventGeometry.coverAspectRatio,
         child: mediaContent(context, cover: cover, sport: sport),

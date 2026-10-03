@@ -4,6 +4,7 @@ import '../foundations/sports.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import 'card.dart';
+import 'card_event_listing.dart';
 import 'card_event_large.dart';
 
 /// CardEventMedium — the same event as a row: a square cover thumbnail
@@ -77,6 +78,9 @@ class DabblerCardEventMedium extends StatelessWidget {
     this.enabled = true,
     this.semanticLabel,
     this.width,
+    this.progress,
+    this.price,
+    this.action,
   });
 
   /// The event's title. Truncated to [titleMaxLines] line with an ellipsis.
@@ -108,6 +112,16 @@ class DabblerCardEventMedium extends StatelessWidget {
   /// `width: 855` is a Figma frame measurement.
   final double? width;
 
+  /// The player-progress slot — typically a [DabblerCardEventPlayers].
+  /// Laid out by [DabblerCardEventListing.compose]; null draws nothing.
+  final Widget? progress;
+
+  /// The price slot — typically a [DabblerCardEventPrice].
+  final Widget? price;
+
+  /// The action slot — typically [DabblerCardEventListing.joinButton].
+  final Widget? action;
+
   /// The leading thumbnail's side — **64**, ruled by D-006
   /// ([DabblerCardEventGeometry.mediumThumbSide]).
   static const double thumbSide = DabblerCardEventGeometry.mediumThumbSide;
@@ -138,6 +152,11 @@ class DabblerCardEventMedium extends StatelessWidget {
       onTap: onTap,
       enabled: enabled,
       semanticLabel: semanticLabel,
+      footer: DabblerCardEventListing.compose(
+        progress: progress,
+        price: price,
+        action: action,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
