@@ -10,6 +10,7 @@ import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'field_shell.dart';
 
+part 'text_field_editable.dart';
 part 'text_field_parts.dart';
 
 /// The five shapes a [DabblerTextField] takes.
@@ -121,6 +122,10 @@ class DabblerTextField extends StatefulWidget {
     this.clearable = false,
     this.onCleared,
     this.clearLabel = defaultClearLabel,
+    this.validator,
+    this.onSaved,
+    this.autovalidateMode,
+    this.suffixText,
   }) : assert(
          controller == null || initialValue == null,
          'give a controller or an initialValue, not both',
@@ -248,6 +253,31 @@ class DabblerTextField extends StatefulWidget {
   /// The clear button's semantics label — localisable.
   final String clearLabel;
 
+  /// Validates the text inside an enclosing [Form], as
+  /// `TextFormField.validator` does. Its message is shown in the [errorText]
+  /// slot (error border included) and announced to assistive technology as a
+  /// live region. Ignored by [DabblerTextFieldVariant.select].
+  ///
+  /// Giving this, [onSaved] or [autovalidateMode] registers the field as a
+  /// [FormField], so it takes part in `Form.validate()`, `save()` and
+  /// `reset()` (reset restores the initial text). With none of the three the
+  /// field is the plain widget it always was.
+  final FormFieldValidator<String>? validator;
+
+  /// Called with the current text by `FormState.save()`.
+  final FormFieldSetter<String>? onSaved;
+
+  /// When the validator runs on its own — [AutovalidateMode.onUserInteraction]
+  /// re-validates on every edit after the first. Defaults to the enclosing
+  /// [Form]'s mode, else [AutovalidateMode.disabled].
+  final AutovalidateMode? autovalidateMode;
+
+  /// Short text at the trailing edge inside the box — a unit such as `min` or
+  /// `km`. `.t-body`, secondary role. Shown in every editable variant, before
+  /// the password toggle, clear button or [suffixIcon]; ignored by
+  /// [DabblerTextFieldVariant.select].
+  final String? suffixText;
+
   /// The corner radius of [variant] — `TextField.jsx:5-9`.
   static double radiusOf(DabblerTextFieldVariant variant) =>
       variant == DabblerTextFieldVariant.multiline
@@ -265,6 +295,17 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
   bool _reveal = false;
   bool _hasText = false;
 
+  /// The text at first build — what `Form.reset()` restores.
+  String _initialText = '';
+  final GlobalKey<FormFieldState<String>> _formFieldKey =
+      GlobalKey<FormFieldState<String>>();
+
+  bool get _usesForm =>
+      widget.variant != DabblerTextFieldVariant.select &&
+      (widget.validator != null ||
+          widget.onSaved != null ||
+          widget.autovalidateMode != null);
+
   TextEditingController get _controller =>
       widget.controller ??
       (_ownedController ??= TextEditingController(text: widget.initialValue));
@@ -278,6 +319,7 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
     _focusNode.addListener(_handleFocusChange);
     _controller.addListener(_handleTextChange);
     _hasText = _controller.text.isNotEmpty;
+    _initialText = _controller.text;
   }
 
   @override
@@ -316,12 +358,20 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
   }
 
   void _handleTextChange() {
+    // Keep the [FormField]'s value in step with every edit, programmatic ones
+    // (clear, a caller's controller) included — `TextFormField` does the same.
+    final FormFieldState<String>? field = _formFieldKey.currentState;
+    if (field != null && field.value != _controller.text) {
+      field.didChange(_controller.text);
+    }
     final bool hasText = _controller.text.isNotEmpty;
     if (!mounted || hasText == _hasText) {
       return;
     }
     setState(() => _hasText = hasText);
   }
+
+  void _toggleReveal() => setState(() => _reveal = !_reveal);
 
   /// Empties the field and keeps (or takes) focus, so the keyboard stays up.
   void _clear() {
@@ -333,145 +383,27 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final DabblerColors colors = DabblerColors.of(context);
-    final TextDirection direction = Directionality.of(context);
-    final bool disabled = !widget.enabled;
-    final double radius = DabblerTextField.radiusOf(widget.variant);
-
-    if (widget.variant == DabblerTextFieldVariant.select) {
-      return _buildSelect(colors, direction, disabled, radius);
+    if (!_usesForm) {
+      return _buildField(context, widget.errorText, false);
     }
-
-    final bool multiline = widget.variant == DabblerTextFieldVariant.multiline;
-    final bool password = widget.variant == DabblerTextFieldVariant.password;
-    final bool showClear =
-        widget.variant == DabblerTextFieldVariant.search &&
-        widget.clearable &&
-        _hasText &&
-        !disabled;
-
-    // `TextField.jsx:105-110` — the input's own type is `.t-body`'s metrics,
-    // 16/21, which is exactly [DabblerType.body].
-    final TextStyle textStyle = DabblerType.body
-        .resolveForDirection(direction)
-        .copyWith(color: disabled ? colors.textTertiary : colors.textPrimary);
-
-    final Widget? lead = widget.variant == DabblerTextFieldVariant.search
-        ? DabblerIcon(
-            DabblerTextField.searchIconName,
-            size: DabblerSizing.iconMd,
-            color: colors.brandPrimary,
-          )
-        : widget.prefixIcon;
-
-    return DabblerFieldShell(
-      label: widget.label,
-      helperText: widget.helperText,
-      errorText: widget.errorText,
-      focused: _focused,
-      disabled: disabled,
-      radius: radius,
-      align: multiline ? DabblerFieldAlign.start : DabblerFieldAlign.center,
-      // The port of the password toggle's `marginInlineEnd: calc(--space-2 *
-      // -1)`: Flutter forbids a negative [Padding], so the shell's trailing
-      // inset is reduced by the same 6 instead. The toggle's 45px target then
-      // ends 6 from the box edge, as it does in the source.
-      // The clear button follows the same inset, with no block padding: its
-      // 45px target already fills the box's 45px minimum height, so the box
-      // does not grow when the button appears.
-      innerPadding: showClear
-          ? const EdgeInsetsDirectional.fromSTEB(
-              DabblerSpacing.space4,
-              0,
-              DabblerSpacing.space2,
-              0,
-            )
-          : password
-          ? const EdgeInsetsDirectional.fromSTEB(
-              DabblerSpacing.space4,
-              DabblerSpacing.space3,
-              DabblerSpacing.space2,
-              DabblerSpacing.space3,
-            )
-          : DabblerFieldShell.defaultInnerPadding,
-      children: <Widget>[
-        if (lead != null) _iconSlot(lead, colors.brandPrimary),
-        Expanded(
-          // Material's text-editing behaviour needs a [Material] ancestor for
-          // its selection toolbar. `MaterialType.transparency` supplies one
-          // that paints nothing at all — no fill, no shape, no elevation — so
-          // the field works in a bare [WidgetsApp] without putting a second
-          // surface under the shell's own box.
-          child: Material(
-            type: MaterialType.transparency,
-            child: TextField(
-              controller: _controller,
-              focusNode: _focusNode,
-              enabled: widget.enabled,
-              style: textStyle,
-              cursorColor: colors.brandPrimary,
-              obscureText: password && !_reveal,
-              maxLines: multiline ? widget.rows : 1,
-              minLines: multiline ? widget.rows : 1,
-              keyboardType:
-                  widget.keyboardType ??
-                  (multiline ? TextInputType.multiline : TextInputType.text),
-              textInputAction:
-                  widget.textInputAction ??
-                  (multiline ? TextInputAction.newline : TextInputAction.done),
-              autofillHints: widget.autofillHints,
-              onChanged: widget.onChanged,
-              onSubmitted: multiline ? null : widget.onSubmitted,
-              // Material's decoration is stripped to nothing: the box, the
-              // border, the label and the helper line are all
-              // [DabblerFieldShell]'s, and a second set underneath them would be
-              // exactly the visual fork AC1 forbids. What is kept is the
-              // *behaviour* — tap to focus, selection handles, the platform
-              // keyboard, autofill and obscuring — which is why this is Material's
-              // [TextField] and not a bare [EditableText].
-              decoration: InputDecoration(
-                isDense: true,
-                isCollapsed: true,
-                filled: false,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                disabledBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                focusedErrorBorder: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                hintText: widget.placeholder,
-                // D-003(a): an ENABLED placeholder is text under WCAG, so
-                // it takes the ink-soft-backed secondary role, never a
-                // surface neutral. D-025: once the field is disabled, WCAG
-                // 1.4.3 exempts an inactive component and the placeholder
-                // follows the value onto the tertiary role — leaving it
-                // secondary would make a disabled empty field text-identical
-                // to an enabled one, which is the outcome D-025 rejects.
-                hintStyle: textStyle.copyWith(
-                  color: disabled ? colors.textTertiary : colors.textSecondary,
-                ),
-                hintMaxLines: 1,
-              ),
-            ),
-          ),
-        ),
-        if (password)
-          _PasswordToggle(
-            revealed: _reveal,
-            enabled: !disabled,
-            color: colors.textSecondary,
-            onPressed: () => setState(() => _reveal = !_reveal),
-          )
-        else if (showClear)
-          _ClearButton(
-            label: widget.clearLabel,
-            color: colors.textTertiary,
-            onPressed: _clear,
-          )
-        else if (widget.suffixIcon != null)
-          _iconSlot(widget.suffixIcon!, colors.textSecondary),
-      ],
+    return FormField<String>(
+      key: _formFieldKey,
+      initialValue: _initialText,
+      validator: widget.validator,
+      onSaved: widget.onSaved,
+      autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.disabled,
+      enabled: widget.enabled,
+      // `FormField` restores its value on reset; the controller follows, so
+      // the text on screen is the text that was there at first build.
+      onReset: () => _controller.text = _formFieldKey.currentState?.value ?? '',
+      builder: (FormFieldState<String> field) => _buildField(
+        context,
+        // A validator's message wins; a caller's [errorText] still shows when
+        // the validator passes, exactly as `InputDecoration.errorText` does
+        // beside a `TextFormField` validator.
+        field.errorText ?? widget.errorText,
+        field.hasError,
+      ),
     );
   }
 
