@@ -81,6 +81,11 @@ That's built in, not something to lay out defensively around.
 ### Dismissibility
 Dismissible (Escape and a scrim press both close it) or not.
 
+While any action has `loading: true`, the dialog cannot be dismissed. The scrim, Escape, the
+system back and the secondary action's close fallback all do nothing, Enter does not confirm again,
+and the loading button shows a spinner and does not respond. This is true whether the dialog is
+pushed with `showDabblerDialog` or hosted inline with `open`.
+
 @figure 340px lib/src/overlays/dialog.dart#DabblerDialogSize
 @figure 420px lib/src/overlays/dialog.dart#DabblerDialogSize
 

@@ -77,6 +77,20 @@ does not exist in the font at all — renders the placeholder).
 @figure 30 lib/src/tokens/dabbler_geometry.dart#iconLg
 
 
+### Direction
+`mirrorInRtl` (default off) marks a glyph as directional. Under Arabic it draws the glyph that
+is the measured pixel mirror of the name you passed, at the same weight, and flips the glyph
+horizontally only where Iconsax ships no mirror. Pass the LTR name, e.g. `arrow-circle-left` for
+back.
+
+**The pairs are measured, not guessed from the names.** In the pinned `iconsax_flutter` release the plain
+`arrow-*` labels do not describe what they draw: `arrow-left` mirrors `arrow-right-1`, and
+`arrow-left-2` mirrors `arrow-right-3` at linear but `arrow-right` at bold. The full pair table is
+on `DabblerIconMirror` in `icon_mirror.dart`, and a test re-renders every pair.
+
+Deviation: the horizontal flip goes against the icon card's "mirror by name, not by transform"
+rule. It is only the fallback for a glyph with no mirror in the set.
+
 ## Change log
 
 - T-083 (cto) — adopts `iconsax_flutter` as the single icon
@@ -86,4 +100,4 @@ does not exist in the font at all — renders the placeholder).
 
 ## Source
 
-`lib/src/foundations/icon.dart`
+`lib/src/foundations/icon.dart`, `lib/src/foundations/icon_mirror.dart`

@@ -66,6 +66,16 @@ Default (empty or partially filled), filled, masked (PIN entry — digits render
 ### Length
 Any positive box count; the design source's own specimens use both 4 and the default of 6.
 
+### Width
+Fixed (the default) — every box is the touch-target minimum wide. `fullWidth: true` — the boxes
+widen to fill the row, gaps unchanged, each capped at `maxBoxWidth` (by default the box's own
+height, so a box grows to a square and no further); a capped row is centred. The height never changes.
+
+**Deviation:** no sizing token names a maximum code-box width; the cap is the component's own
+stated height rather than an invented token.
+
+@specimen code-input/full-width
+
 ## Direction
 
 **CodeInput's digit order stays left-to-right even when the rest of the screen is in Arabic.** A

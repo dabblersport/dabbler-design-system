@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter/widgets.dart';
 
+import '../controls/chip.dart';
 import '../foundations/icon.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
@@ -142,7 +143,8 @@ const List<GalleryEntry> formsGalleryEntries = <GalleryEntry>[
     page: 'components/field-shell',
     group: GalleryPurpose.selectionAndInput,
     title: 'Fields — the shared shell and its five states',
-    description: 'The anatomy pair and the rest / filled / helper / error / '
+    description:
+        'The anatomy pair and the rest / filled / helper / error / '
         'disabled matrix, over the raw FieldShell holding each state open.',
     builder: _fields,
   ),
@@ -151,7 +153,8 @@ const List<GalleryEntry> formsGalleryEntries = <GalleryEntry>[
     page: 'components/text-field',
     group: GalleryPurpose.selectionAndInput,
     title: 'TextField — the five variants',
-    description: 'standard · search · password · multiline · select, closed '
+    description:
+        'standard · search · password · multiline · select, closed '
         'and open.',
     builder: _textFieldVariants,
   ),
@@ -176,7 +179,8 @@ const List<GalleryEntry> formsGalleryEntries = <GalleryEntry>[
     page: 'components/slider',
     group: GalleryPurpose.selectionAndInput,
     title: 'Slider and Stepper',
-    description: 'Distance, price range, marks and disabled; both stepper '
+    description:
+        'Distance, price range, marks and disabled; both stepper '
         'sizes with their bound, error and disabled states.',
     builder: _valueControls,
   ),
@@ -193,7 +197,8 @@ const List<GalleryEntry> formsGalleryEntries = <GalleryEntry>[
     page: 'components/input-row',
     group: GalleryPurpose.selectionAndInput,
     title: 'InputRow',
-    description: 'The settings row: plain, with a subtitle, with a chevron '
+    description:
+        'The settings row: plain, with a subtitle, with a chevron '
         'and with a toggle.',
     builder: _rows,
   ),
@@ -222,10 +227,7 @@ Widget _fields(BuildContext context) {
           DabblerTextField(
             label: 'Price',
             initialValue: '60',
-            prefixIcon: const DabblerIcon(
-              'wallet',
-              size: DabblerSizing.iconMd,
-            ),
+            prefixIcon: const DabblerIcon('wallet', size: DabblerSizing.iconMd),
             // `<span style={{fontSize:13,color:'var(--muted)'}}>AED</span>`
             // (`fields.card.html:56` (unverified: file not mirrored)) — specimen demo content, and the one
             // place the forms area paints a surface neutral as text. It is
@@ -343,10 +345,7 @@ Widget _textFieldVariants(BuildContext context) => _sections(<Widget>[
     _wrap(<Widget>[
       _field(
         'standard',
-        const DabblerTextField(
-          label: 'Title',
-          placeholder: 'Sunday 7-a-side',
-        ),
+        const DabblerTextField(label: 'Title', placeholder: 'Sunday 7-a-side'),
       ),
       _field(
         'search',
@@ -446,22 +445,19 @@ Widget _selection(BuildContext context) => _sections(<Widget>[
 // selection.card.html — "Select — choosing from a list"
 // ---------------------------------------------------------------------------
 
-const List<DabblerSelectOption<String>> _sports =
-    <DabblerSelectOption<String>>[
+const List<DabblerSelectOption<String>> _sports = <DabblerSelectOption<String>>[
   DabblerSelectOption<String>(value: 'football', label: 'football'),
   DabblerSelectOption<String>(value: 'padel', label: 'padel'),
   DabblerSelectOption<String>(value: 'tennis', label: 'tennis'),
 ];
 
-const List<DabblerSelectOption<String>> _levels =
-    <DabblerSelectOption<String>>[
+const List<DabblerSelectOption<String>> _levels = <DabblerSelectOption<String>>[
   DabblerSelectOption<String>(value: 'beginner', label: 'beginner'),
   DabblerSelectOption<String>(value: 'intermediate', label: 'intermediate'),
   DabblerSelectOption<String>(value: 'advanced', label: 'advanced'),
 ];
 
-const List<DabblerSelectOption<String>> _cities =
-    <DabblerSelectOption<String>>[
+const List<DabblerSelectOption<String>> _cities = <DabblerSelectOption<String>>[
   DabblerSelectOption<String>(value: 'abu-dhabi', label: 'abu dhabi'),
   DabblerSelectOption<String>(value: 'dubai', label: 'dubai'),
   DabblerSelectOption<String>(value: 'sharjah', label: 'sharjah'),
@@ -624,10 +620,7 @@ Widget _pickers(BuildContext context) => _sections(<Widget>[
     _wrap(<Widget>[
       _field(
         'date',
-        DabblerDateField(
-          label: 'Date',
-          value: DateTime(2026, 9, 12),
-        ),
+        DabblerDateField(label: 'Date', value: DateTime(2026, 9, 12)),
       ),
       _field(
         'date — range',
@@ -703,6 +696,60 @@ Widget _rows(BuildContext context) => _sections(<Widget>[
           SizedBox(height: DabblerSpacing.space3),
           DabblerInputRow(title: 'Billing', enabled: false),
         ],
+      ),
+    ),
+    GallerySpecimen(
+      label:
+          'DS gaps 5 — rich title · verified · value · destructive · '
+          'selected · info + toggle · one-line chips',
+      child: Builder(
+        builder: (BuildContext context) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            DabblerInputRow(
+              titleSpan: DabblerInputRow.highlightSpan(
+                'Padel night at the club',
+                'pad',
+                DabblerColors.of(context),
+              ),
+              subtitle: 'Search match',
+              onTap: () {},
+            ),
+            const SizedBox(height: DabblerSpacing.space3),
+            const DabblerInputRow(title: 'dabbler.pro', verified: true),
+            const SizedBox(height: DabblerSpacing.space3),
+            DabblerInputRow(title: 'Language', value: 'English', onTap: () {}),
+            const SizedBox(height: DabblerSpacing.space3),
+            DabblerInputRow(
+              title: 'Sign out',
+              subtitle: 'Leave your account on this device',
+              leading: const DabblerIcon('logout', size: DabblerSizing.iconSm),
+              tone: DabblerInputRowTone.destructive,
+              trailing: const DabblerChevron(),
+              onTap: () {},
+            ),
+            const SizedBox(height: DabblerSpacing.space3),
+            DabblerInputRow(title: 'Everyone', selected: true, onTap: () {}),
+            const SizedBox(height: DabblerSpacing.space3),
+            DabblerInputRow.toggle(
+              title: 'Show activity',
+              checked: true,
+              onChanged: (bool _) {},
+              onInfo: () {},
+            ),
+            const SizedBox(height: DabblerSpacing.space3),
+            const DabblerInputRow(
+              title: 'Sports',
+              trailingChips: <Widget>[
+                DabblerChip(label: 'Padel'),
+                DabblerChip(label: 'Football'),
+                DabblerChip(label: 'Tennis'),
+                DabblerChip(label: 'Squash'),
+              ],
+            ),
+          ],
+        ),
       ),
     ),
   ]),

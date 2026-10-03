@@ -27,11 +27,13 @@ The placeholder cover, the error state with its label, a scrim with a badge over
 
 ## Using it
 
-**Size it with a height or an aspect ratio.** The width fills its parent unless you set one. The photo always covers the frame.
+**Size it with a height or an aspect ratio.** The width fills its parent unless you set one. The photo covers the frame by default; pass the contain fit for a full-screen viewer, where the whole photo must show over the sunken fill.
 
 **Pick the corner from the radius set.** The default is the 18px extra-large corner used by news covers and article heroes; pass the 12px large corner for a thumbnail or tile.
 
 **Turn the scrim on when text or a badge sits over the photo.** It is the one overlay wash, not a custom opacity. Put the badge in the overlay slot; it sits at the start corner, 12px in.
+
+**Pass request headers when the image host needs them.** A content network that wants a user agent or an accept header gets them on the request; loading, error and semantics do not change.
 
 **Supply the error text yourself.** The package carries no strings, so the label under the glyph is yours to localise. Leave it out for the glyph alone.
 
@@ -59,6 +61,7 @@ Surfaces: sunken for the fill. Overlay: the scrim role. Ink: tertiary for the er
 ## Change log
 
 - Added for the Home Feed media surfaces (KAN-410).
+- Gained a fit, for full-screen viewers, and request headers (KAN-412 gaps 5).
 
 ## Source
 

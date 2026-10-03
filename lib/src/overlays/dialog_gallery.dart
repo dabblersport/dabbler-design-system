@@ -55,5 +55,46 @@ Widget _dialogs(BuildContext context) => GalleryWrap(
           ),
         ),
       ),
+    GallerySpecimen(
+      label: 'loading (not dismissible)',
+      child: Builder(
+        builder: (BuildContext context) => DabblerButton(
+          label: 'Open loading',
+          onPressed: () => showDabblerDialog<void>(
+            context: context,
+            builder: (BuildContext context) => _LoadingDialog(),
+          ),
+        ),
+      ),
+    ),
   ],
 );
+
+/// Confirms, then shows the primary's spinner for a moment: the scrim,
+/// Escape and back do nothing until it finishes.
+class _LoadingDialog extends StatefulWidget {
+  @override
+  State<_LoadingDialog> createState() => _LoadingDialogState();
+}
+
+class _LoadingDialogState extends State<_LoadingDialog> {
+  bool _loading = false;
+
+  Future<void> _save() async {
+    setState(() => _loading = true);
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) => DabblerDialog(
+    title: 'Save changes?',
+    onClose: () => Navigator.of(context).pop(),
+    secondaryAction: const DabblerDialogAction(label: 'Cancel'),
+    primaryAction: DabblerDialogAction(
+      label: 'Save',
+      loading: _loading,
+      onPressed: _save,
+    ),
+  );
+}

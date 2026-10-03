@@ -50,7 +50,14 @@ import '../tokens/dabbler_type.dart';
 /// Give a [height] or an [aspectRatio]; with neither, the frame takes the
 /// incoming constraints (which must then be bounded in height). The width
 /// fills the parent unless [width] is set. The image is always
-/// [BoxFit.cover].
+/// [BoxFit.cover] by default; pass [fit] `BoxFit.contain` for a full-screen
+/// viewer, where the whole photo must show (KAN-412 gaps 5 item 8).
+///
+/// ## Request headers
+///
+/// [headers] are passed to the network request as is (a CDN that wants a
+/// `User-Agent` or an `Accept`, say). They change nothing about loading,
+/// error or semantics. Flutter web ignores request headers on image loads.
 ///
 /// ## States
 ///
@@ -81,6 +88,8 @@ class DabblerImage extends StatelessWidget {
     this.semanticLabel,
     this.errorLabel,
     this.onTap,
+    this.fit = BoxFit.cover,
+    this.headers,
   }) : assert(
          aspectRatio == null || aspectRatio > 0,
          'aspectRatio must be positive',
@@ -118,6 +127,14 @@ class DabblerImage extends StatelessWidget {
 
   /// Opens the image. Null leaves it inert.
   final VoidCallback? onTap;
+
+  /// How the photo fills the frame. Default [BoxFit.cover]; use
+  /// [BoxFit.contain] for a full-screen viewer (the sunken fill shows in the
+  /// letterbox).
+  final BoxFit fit;
+
+  /// HTTP headers sent with the image request. Null sends none.
+  final Map<String, String>? headers;
 
   /// Error glyph side — [DabblerSizing.iconLg].
   static const double errorGlyphSize = DabblerSizing.iconLg;
@@ -180,7 +197,8 @@ class DabblerImage extends StatelessWidget {
         if (hasUrl)
           Image.network(
             trimmed,
-            fit: BoxFit.cover,
+            fit: fit,
+            headers: headers,
             excludeFromSemantics: true,
             gaplessPlayback: true,
             frameBuilder:

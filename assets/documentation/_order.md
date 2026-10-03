@@ -71,6 +71,8 @@ The first thing on most screens, and the reason it comes first here.
 - [Tabs](components/tabs.md) — switching between peer views of one screen.
 - [TabPager](components/tab-pager.md) — tabs over swipeable pages that keep their scroll
   position.
+- [StepProgress](components/step-progress.md) — the segmented bar that says which step of a flow you are on.
+- [PageDots](components/page-dots.md) — the position dots under a carousel.
 - [ConversationHeader](components/conversation-header.md) — the top bar of a conversation: back, a
   tappable identity, overflow.
 
@@ -118,12 +120,14 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [NewsCard](components/news-card.md) — one story in the News tab: media, figures, title and excerpt.
 - [Image](components/image.md) — a network photo in a token-radius frame, with placeholder, error state and optional scrim.
 - [ActivityRow](components/activity-row.md) — one entry in the Active tab: who, what, where, when and an action.
+- [CommentRow](components/comment-row.md) — one reply under a post: author, time, body, an optional attachment and the like and reply actions.
 
 ### 3 · Identity and status — who or what a piece of content is
 
 - [Avatar](components/avatar.md) — a person's circular, deterministically generated portrait.
 - [Badge](components/badge.md) — the pill that labels a row, a card or a tab.
 - [Rating](components/rating.md) — a score, shown or collected.
+- [HeroIcon](components/hero-icon.md) — the large round glyph that heads a success or empty screen.
 - [ConversationRow](components/conversation-row.md) — one conversation in the inbox: identity, latest activity, unread and status.
 - [ConversationAvatar](components/conversation-avatar.md) — a conversation's avatar with its kind badge and presence dot.
 
@@ -137,6 +141,8 @@ lot about the rest.
 - [TextField](components/text-field.md) — the flat input, in five shapes.
 - [SearchField](components/search-field.md) — the search input, with a clear button while it holds a query.
 - [HighlightedText](components/highlighted-text.md) — a search result's text with the matched part picked out.
+- [SelectableCard](components/selectable-card.md) — a tappable card that is either chosen or not.
+- [SortControl](components/sort-control.md) — how a view-all list lets the reader change its order.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
@@ -146,6 +152,8 @@ lot about the rest.
 - [CodeInput](components/code-input.md) — one-time-code and PIN entry.
 - [InputRow](components/input-row.md) — the settings-list row: leading slot, text, trailing slot.
 - [ChatComposer](components/chat-composer.md) — the message input, with attach, emoji, quick replies and send.
+- [ReplyComposer](components/reply-composer.md) — the reply bar under a post, with a reply target, attachments and send.
+- [AttachmentChip](components/attachment-chip.md) — one removable attachment: a thumbnail, or an icon and a label.
 - [ReactionPicker](components/reaction-picker.md) — the six reactions in one pill, to choose from.
 - [FieldShell](components/field-shell.md) — the internal chrome every text-entry field paints from.
 - [PickerFieldShell](components/picker-field-shell.md) — the internal chrome every
@@ -163,6 +171,7 @@ lot about the rest.
 ### 6 · Actions — letting the user act
 
 - [Button](components/button.md) — the one control for a tappable action, ten tones, three sizes.
+- [TextLink](components/text-link.md) — a brand-coloured link, on its own line or inside a sentence.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.
 - [Chip](components/chip.md) — filtering and tagging, tappable or static.
@@ -172,6 +181,7 @@ lot about the rest.
 
 - [Dialog](components/dialog.md) — the modal that interrupts to get one decision.
 - [Sheet](components/sheet.md) — the canonical bottom sheet.
+- [SheetList](components/sheet-list.md) — a bounded, scrolling list for the body of a sheet.
 - [Menu](components/menu.md) — the anchored popover for a list of actions or options.
 - [Tooltip](components/tooltip.md) — a short label for a control that carries no visible text.
 

@@ -102,6 +102,9 @@ the design source keeps them separate).
 ### State
 Enabled, disabled, loading, full-width.
 
+`onLongPress` (optional, both constructors) fires on a long press and is exposed as a long-press
+accessibility action; it is inert while disabled or loading, like `onPressed`.
+
 @figure 320 lib/src/controls/button.dart#fullWidthPx
 @figure 52 lib/src/controls/button.dart#fullHeight
 

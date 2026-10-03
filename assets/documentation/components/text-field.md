@@ -49,6 +49,10 @@ section.
 
 @specimen text-field/variants
 
+Inside a `Form` with a validator, and with a unit as suffix text — see `form_extras_gallery.dart`.
+
+@specimen text-field/form
+
 ## Using it
 
 **Reach for the variant, not a manually composed field.** `search` supplies its own leading glyph,
@@ -72,6 +76,19 @@ behave identically.
 
 **Do not fire `onSubmitted` from a multiline field expecting an Enter-to-submit behaviour.** Enter
 inserts a newline in `multiline`; the callback is never called from that variant.
+
+**Give it a `validator` to put it in a `Form`.** With a `validator`, an `onSaved` or an
+`autovalidateMode`, the field registers with the enclosing `Form` exactly as Flutter's own form
+field does: `validate()` shows the message in the error slot (error border included), `save()`
+hands `onSaved` the text, and `reset()` puts back the text the field started with.
+`AutovalidateMode.onUserInteraction` re-checks on every edit after the first. A validator's message
+wins over `errorText`; `errorText` shows again once the validator passes. The message is announced
+to screen readers when it appears. Without any of the three, the field is the plain widget it
+always was. `select` is not a text input and ignores all three.
+
+**Use `suffixText` for a unit, not `suffixIcon` with a hand-styled `Text`.** It sits at the trailing
+edge inside the box in the secondary text role (tertiary once disabled), before the password
+toggle, the clear button or a suffix icon, in every editable variant.
 
 **Give `initialValue` or a `controller`, never both.** They're mutually exclusive ways of seeding
 the same text — passing both is a contract violation the widget asserts against.
@@ -97,6 +114,9 @@ hint and the `select` stand-in (see the note in *Using it*). Everything else —
 states, helper/error line — comes from `FieldShell`.
 
 ## Change log
+
+- Alpha DS gaps 5 — adds `validator`, `onSaved`, `autovalidateMode` (Form integration) and
+  `suffixText`. The editable build moved to `text_field_editable.dart` to hold the 500-line rule.
 
 - D-003 (cxo) — rules the placeholder-is-text finding this page's
   *Using it* section states. The call sites carried it correctly from the start; the file's own

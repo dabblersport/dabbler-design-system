@@ -7,6 +7,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'feed_atoms.dart';
+import 'post_detail.dart';
 
 /// One run of a [DabblerPostRow]'s body text. A [link] run (a `#hashtag` or an
 /// `@mention`) is drawn in the brand colour; the run's own tap is not exposed —
@@ -122,6 +123,7 @@ class DabblerPostRow extends StatelessWidget {
     this.reactions,
     this.kindBadge,
     this.views,
+    this.detail,
     this.divider = true,
     this.likeLabel = 'Like',
     this.vibeLabel = 'Vibe',
@@ -177,6 +179,11 @@ class DabblerPostRow extends StatelessWidget {
   /// The view count, with an eye glyph after the actions. Null hides it; the
   /// caller decides who sees it (the post's author, usually).
   final int? views;
+
+  /// Open-post extras — full timestamp, edited marker and visibility — drawn
+  /// as a [DabblerPostDetailLine] above the actions. Null (the default) leaves
+  /// the feed row exactly as it was.
+  final DabblerPostDetail? detail;
 
   /// The author's role, already localised (the design's `roleLabel`).
   final String? roleLabel;
@@ -517,6 +524,7 @@ class DabblerPostRow extends StatelessWidget {
                     const SizedBox(height: DabblerSpacing.space3),
                     sport,
                   ],
+                  if (detail != null) DabblerPostDetailLine(detail: detail!),
                   actions,
                   if (reactions != null) ...<Widget>[
                     const SizedBox(height: DabblerSpacing.space2),
