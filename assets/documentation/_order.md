@@ -118,6 +118,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [NewsCard](components/news-card.md) — one story in the News tab: media, figures, title and excerpt.
 - [Image](components/image.md) — a network photo in a token-radius frame, with placeholder, error state and optional scrim.
 - [ActivityRow](components/activity-row.md) — one entry in the Active tab: who, what, where, when and an action.
+- [CommentRow](components/comment-row.md) — one reply under a post: author, time, body, an optional attachment and the like and reply actions.
 
 ### 3 · Identity and status — who or what a piece of content is
 
@@ -146,6 +147,8 @@ lot about the rest.
 - [CodeInput](components/code-input.md) — one-time-code and PIN entry.
 - [InputRow](components/input-row.md) — the settings-list row: leading slot, text, trailing slot.
 - [ChatComposer](components/chat-composer.md) — the message input, with attach, emoji, quick replies and send.
+- [ReplyComposer](components/reply-composer.md) — the reply bar under a post, with a reply target, attachments and send.
+- [AttachmentChip](components/attachment-chip.md) — one removable attachment: a thumbnail, or an icon and a label.
 - [ReactionPicker](components/reaction-picker.md) — the six reactions in one pill, to choose from.
 - [FieldShell](components/field-shell.md) — the internal chrome every text-entry field paints from.
 - [PickerFieldShell](components/picker-field-shell.md) — the internal chrome every

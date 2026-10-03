@@ -32,6 +32,10 @@ view count.
 
 @specimen post-row/slots
 
+The open-post detail line: the full timestamp, the edited marker and the visibility line, opted into with `detail`.
+
+@specimen post-row/detail
+
 ## Using it
 
 **Give it the post's facts, already formatted.** Name, time, place and distance are strings; likes and replies are integers, drawn with Western digits in either direction.
@@ -45,6 +49,8 @@ view count.
 **The sport pill takes a glyph slot, not an emoji.** The design shows an emoji beside the sport name; the system is icons only, so the slot is a widget and is empty by default.
 
 **Fill the optional slots from your data; the row decides nothing.** Pass `imageUrl` for the author's photo, `onAuthorTap` to open the author, `media` for the post's photos, `onRepost` only when the post can be reposted, `reactions` for the chips, `kindBadge` for a kind or origin and `views` only when the viewer is the author.
+
+**Pass `detail` on the open post.** It adds the full timestamp, an edited marker and who can see the post above the actions, closed by a hairline. Without it the feed row is unchanged.
 
 **Where it departs from the design.**
 
@@ -73,6 +79,7 @@ Ink: primary for the name, secondary for role, time, place, body and counts, ter
 ## Change log
 
 - Added from the Home Feed design file.
+- Gained the opt-in open-post detail line from the Post design file (KAN-412 gaps 5).
 
 ## Source
 

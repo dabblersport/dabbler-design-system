@@ -209,4 +209,67 @@ void main() {
     final Rect frameRtl = tester.getRect(find.byType(DabblerImage));
     expect(frameRtl.right - rtl.right, DabblerImage.overlayInset);
   });
+
+  testWidgets('fit defaults to cover and passes contain through', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const DabblerImage(url: 'https://example.invalid/a.png', height: 80),
+      ),
+    );
+    expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.cover);
+
+    await tester.pumpWidget(
+      _host(
+        const DabblerImage(
+          url: 'https://example.invalid/a.png',
+          height: 80,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+    expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.contain);
+  });
+
+  testWidgets('headers reach the network image provider', (
+    WidgetTester tester,
+  ) async {
+    const Map<String, String> headers = <String, String>{'Accept': 'image/*'};
+    await tester.pumpWidget(
+      _host(
+        const DabblerImage(
+          url: 'https://example.invalid/b.png',
+          height: 80,
+          headers: headers,
+        ),
+      ),
+    );
+    final NetworkImage provider =
+        tester.widget<Image>(find.byType(Image)).image as NetworkImage;
+    expect(provider.headers, headers);
+  });
+
+  testWidgets('contain + headers keep the failure path and semantics, RTL', (
+    WidgetTester tester,
+  ) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      _host(
+        const DabblerImage(
+          url: 'https://example.invalid/c.png',
+          height: 80,
+          fit: BoxFit.contain,
+          headers: <String, String>{'User-Agent': 'dabbler'},
+          semanticLabel: 'Pitch',
+          errorLabel: 'Could not load',
+        ),
+        direction: TextDirection.rtl,
+      ),
+    );
+    await _settleFailure(tester);
+    expect(find.text('Could not load'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Pitch')), findsOneWidget);
+    handle.dispose();
+  });
 }
