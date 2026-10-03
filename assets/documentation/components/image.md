@@ -15,9 +15,9 @@ Sources  : lib/src/media/image.dart (class dartdoc, incl. the design-to-Dart
 # Image
 ### `DabblerImage`
 
-Image is a network photo in a rounded frame, for article covers, activity thumbnails and post media. It shows a sunken placeholder while the photo loads or when there is no address, and the same fill with a glyph when the photo cannot be loaded.
+Image is a network photo in a rounded frame, for article covers, activity thumbnails and post media.
 
-It uses Flutter's own network image, so the package adds no image dependency. The design shows no paging carousel, so Image is a single image; a row of them is the caller's layout.
+It shows a sunken placeholder while the photo loads or when there is no address, and the same fill with a glyph when the photo cannot be loaded. It uses Flutter's own network image, so the package adds no image dependency. The design shows no paging carousel, so Image is a single image; a row of them is the caller's layout.
 
 ## Specimen
 
