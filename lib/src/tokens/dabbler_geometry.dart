@@ -239,9 +239,11 @@ abstract final class DabblerSizing {
   /// tile. The app's 44 folds here.
   static const double tileMd = touchTargetMin;
 
-  /// The result-row tile (`Search.dc.html:262` draws 40; 39 is the nearest
-  /// base-3 step).
-  static const double tileSm = 39;
+  /// The Search result-row tile: **40**, off the base-3 grid by CXO ruling
+  /// (`Search.dc.html:262` draws 40). Not an app role — see
+  /// [sizingOffGridRulings] and the precedent `D-018` (a drawing overrides
+  /// the grid).
+  static const double resultTile = 40;
 
   /// App role, mapped onto `space11` (48): a large icon tile.
   static const double tileLg = DabblerSpacing.space11;
@@ -290,19 +292,21 @@ abstract final class DabblerSizing {
   /// The app's 200 folds here.
   static const double mediaPreviewHeight = DabblerSpacing.space9 * 6;
 
-  /// The Create post media rail's height (`Home Feed.dc.html:523` draws
-  /// 128; 129 is the nearest base-3 step).
-  static const double mediaRailHeight = 129;
+  /// The Create post media rail's height: **128**, as `Home Feed.dc.html:523`
+  /// draws it (off-grid ruling, see [sizingOffGridRulings]).
+  static const double mediaRailHeight = 128;
 
-  /// The rail's add tile width (draws 64; 63 is the nearest base-3 step).
-  static const double mediaRailAddWidth = 63;
+  /// The rail's add tile width: **64** (`Home Feed.dc.html:523`; off-grid
+  /// ruling, see [sizingOffGridRulings]).
+  static const double mediaRailAddWidth = 64;
 
-  /// The rail's thumbnail width (draws 104; 105 is the nearest base-3 step).
-  static const double mediaRailTileWidth = 105;
+  /// The rail's thumbnail width: **104** (`Home Feed.dc.html:527`; off-grid
+  /// ruling, see [sizingOffGridRulings]).
+  static const double mediaRailTileWidth = 104;
 
-  /// The article hero (`Article.dc.html:81` draws 230; 231 is the nearest
-  /// base-3 step).
-  static const double articleHeroHeight = 231;
+  /// The article hero: **230** (`Article.dc.html:81`; off-grid ruling, see
+  /// [sizingOffGridRulings]).
+  static const double articleHeroHeight = 230;
 
   /// App role, `4 × space9` (120): a compact preview / placeholder panel.
   static const double mediaPreviewCompactHeight = DabblerSpacing.space9 * 4;

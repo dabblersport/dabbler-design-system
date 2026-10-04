@@ -61,6 +61,19 @@ const Map<String, Duration> motionAppRoles = <String, Duration>{
   'delayRetryMax': DabblerMotion.delayRetryMax,
 };
 
+/// Sizes the design draws **off** the base-3 grid, kept as named tokens
+/// outside [sizingAppRoles] on purpose: `D-018` is the precedent that a
+/// drawing overrides the grid, and the CXO ruled the Search result tile 40
+/// (`Search.dc.html:262`). Every entry is pinned and is *not* a multiple of 3;
+/// the `% 3` test over [sizingAppRoles] is unchanged.
+const Map<String, double> sizingOffGridRulings = <String, double>{
+  'resultTile': DabblerSizing.resultTile,
+  'articleHeroHeight': DabblerSizing.articleHeroHeight,
+  'mediaRailHeight': DabblerSizing.mediaRailHeight,
+  'mediaRailAddWidth': DabblerSizing.mediaRailAddWidth,
+  'mediaRailTileWidth': DabblerSizing.mediaRailTileWidth,
+};
+
 /// The sizing and layout-extent app roles, in declaration order.
 const Map<String, double> sizingAppRoles = <String, double>{
   'iconXs': DabblerSizing.iconXs,
@@ -68,7 +81,6 @@ const Map<String, double> sizingAppRoles = <String, double>{
   'iconRow': DabblerSizing.iconRow,
   'iconXl': DabblerSizing.iconXl,
   'tileMd': DabblerSizing.tileMd,
-  'tileSm': DabblerSizing.tileSm,
   'tileLg': DabblerSizing.tileLg,
   'illustrationSm': DabblerSizing.illustrationSm,
   'illustrationMd': DabblerSizing.illustrationMd,
@@ -80,10 +92,6 @@ const Map<String, double> sizingAppRoles = <String, double>{
   'optionTileHeight': DabblerSizing.optionTileHeight,
   'labelColumnWidth': DabblerSizing.labelColumnWidth,
   'heroCoverHeight': DabblerSizing.heroCoverHeight,
-  'articleHeroHeight': DabblerSizing.articleHeroHeight,
-  'mediaRailHeight': DabblerSizing.mediaRailHeight,
-  'mediaRailAddWidth': DabblerSizing.mediaRailAddWidth,
-  'mediaRailTileWidth': DabblerSizing.mediaRailTileWidth,
   'mediaPreviewHeight': DabblerSizing.mediaPreviewHeight,
   'mediaPreviewCompactHeight': DabblerSizing.mediaPreviewCompactHeight,
   'mediaRowHeight': DabblerSizing.mediaRowHeight,
@@ -125,4 +133,9 @@ Widget _motion(BuildContext context) => _table(<MapEntry<String, String>>[
 Widget _sizing(BuildContext context) => _table(<MapEntry<String, String>>[
   for (final MapEntry<String, double> e in sizingAppRoles.entries)
     MapEntry<String, String>(e.key, e.value.toStringAsFixed(0)),
+  for (final MapEntry<String, double> e in sizingOffGridRulings.entries)
+    MapEntry<String, String>(
+      '${e.key} (off-grid ruling)',
+      e.value.toStringAsFixed(0),
+    ),
 ]);
