@@ -14,6 +14,7 @@ import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
 import 'activity_row.dart';
 import 'news_card.dart';
+import 'notification_row.dart';
 import 'post_row.dart';
 
 /// The Home Feed rows' specimens.
@@ -48,6 +49,16 @@ const List<GalleryEntry> feedGalleryEntries = <GalleryEntry>[
         'Person, group and system leading widgets, a filled or outlined action, '
         'a Live or sport badge, a group header, and an Arabic row in RTL.',
     builder: _activity,
+  ),
+  GalleryEntry(
+    id: 'notification-row',
+    page: 'components/notification-row',
+    group: GalleryPurpose.contentContainers,
+    title: 'NotificationRow — one entry in the notification list',
+    description:
+        'Person, group and system leading widgets, a status pill, time and '
+        'unread dot, a meta line and up to two actions; an Arabic row in RTL.',
+    builder: _notification,
   ),
 ];
 
@@ -300,6 +311,64 @@ Widget _activity(BuildContext context) => GalleryStack(
             actionLabel: 'اطلب الانضمام',
             onAction: _noop,
             sportLabel: 'بادل',
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _notification(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'person, unread, pill, meta and two actions',
+      child: _frame(
+        DabblerNotificationRow(
+          leading: const DabblerAvatar(
+            seed: 'Khalid Al Mansouri',
+            size: DabblerAvatarSize.sm,
+          ),
+          actor: 'Khalid Al Mansouri',
+          verb: 'invited you to play',
+          subject: 'Thursday 5-a-side at Al Quoz',
+          pillLabel: 'Invite',
+          pillStatus: DabblerColors.of(context).info,
+          time: '12m',
+          unread: true,
+          meta: const <DabblerNotificationMeta>[
+            DabblerNotificationMeta('clock', 'Thu 9:00 PM'),
+            DabblerNotificationMeta('people', '8/10 players', strong: true),
+          ],
+          actions: const <DabblerNotificationAction>[
+            DabblerNotificationAction('Accept', filled: true, onPressed: _noop),
+            DabblerNotificationAction('Decline', onPressed: _noop),
+          ],
+          onTap: _noop,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'system tile, read',
+      child: _frame(
+        const DabblerNotificationRow(
+          leading: DabblerActivitySystemTile('wallet'),
+          actor: 'Booking confirmed',
+          verb: 'Zayed Sports City',
+          time: '18:02',
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'right-to-left',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: _frame(
+          const DabblerNotificationRow(
+            leading: DabblerAvatar(seed: 'ليلى', size: DabblerAvatarSize.sm),
+            actor: 'ليلى حداد',
+            verb: 'طلبت الانضمام إلى مباراتك',
+            time: '2س',
+            unread: true,
           ),
         ),
       ),

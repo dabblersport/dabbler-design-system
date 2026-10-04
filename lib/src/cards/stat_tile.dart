@@ -20,7 +20,11 @@ enum DabblerStatTileSize {
   hero(span: 4, rows: 2, padding: 15, valueSize: 46, valueLeading: 48),
 
   /// 6 columns by 2 rows, value 22/26, padding 15.
-  wide(span: 6, rows: 2, padding: 15, valueSize: 22, valueLeading: 26);
+  wide(span: 6, rows: 2, padding: 15, valueSize: 22, valueLeading: 26),
+
+  /// The Settings bento tile: 3 columns by 1 row, padding 15, a bold sans
+  /// value 20/25 over a regular 11/15 label (`Settings.dc.html:148-153`).
+  setting(span: 3, rows: 1, padding: 15, valueSize: 20, valueLeading: 25);
 
   const DabblerStatTileSize({
     required this.span,
@@ -241,6 +245,12 @@ class DabblerStatTile extends StatefulWidget {
       right: 0.02,
       top: 0.0,
     ),
+    DabblerStatTileSize.setting => (
+      width: 0.30,
+      height: 0.82,
+      right: 0.02,
+      top: 0.06,
+    ),
   };
 
   /// The tile's effective column span.
@@ -302,10 +312,20 @@ class DabblerStatTile extends StatefulWidget {
     DabblerStatTileSize size,
     TextDirection direction,
   ) {
+    if (size == DabblerStatTileSize.setting) {
+      return DabblerType.headline
+          .resolveForDirection(direction)
+          .copyWith(
+            fontSize: size.valueSize,
+            height: size.valueLeading / size.valueSize,
+            fontWeight: DabblerType.bold,
+          );
+    }
     final DabblerTypeStyle base = switch (size) {
       DabblerStatTileSize.small => DabblerType.title1,
       DabblerStatTileSize.hero => DabblerType.largeTitle,
       DabblerStatTileSize.wide => DabblerType.title2,
+      DabblerStatTileSize.setting => DabblerType.headline,
     };
     final TextStyle resolved = base.resolveForDirection(direction);
     if (size == DabblerStatTileSize.wide) return resolved;
@@ -381,9 +401,18 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
           widget.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: DabblerType.footnote
-              .resolveForDirection(direction)
-              .copyWith(color: fg, fontWeight: DabblerStatTile.labelWeight),
+          style: size == DabblerStatTileSize.setting
+              ? DabblerType.caption1
+                    .resolveForDirection(direction)
+                    .copyWith(
+                      color: DabblerStatTile.subFor(colors, widget.tone),
+                    )
+              : DabblerType.footnote
+                    .resolveForDirection(direction)
+                    .copyWith(
+                      color: fg,
+                      fontWeight: DabblerStatTile.labelWeight,
+                    ),
         ),
         if (widget.sub != null)
           Text(
