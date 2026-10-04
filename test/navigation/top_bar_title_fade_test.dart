@@ -54,6 +54,48 @@ double _titleOpacity(WidgetTester t) => t
     .opacity;
 
 void main() {
+  group('DabblerNavigationTopBar.titled — centerTitle (Sport Profile)', () {
+    for (final TextDirection d in TextDirection.values) {
+      testWidgets('centres the title between back and actions (${d.name})', (
+        WidgetTester t,
+      ) async {
+        await t.pumpWidget(
+          _host(
+            Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 393,
+                child: Column(
+                  children: <Widget>[
+                    DabblerNavigationTopBar.titled(
+                      title: d == TextDirection.rtl ? 'بادل' : 'Padel',
+                      onBack: () {},
+                      safeArea: false,
+                      centerTitle: true,
+                      actions: const <DabblerNavigationAction>[
+                        DabblerNavigationAction(icon: 'more', label: 'More'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            dir: d,
+          ),
+        );
+        final Finder title = find.text(
+          d == TextDirection.rtl ? 'بادل' : 'Padel',
+        );
+        // The back disc is still drawn (centerTitle is not `plain`).
+        expect(find.byType(DabblerIcon), findsWidgets);
+        final double centre = t.getCenter(title).dx;
+        expect(centre, greaterThan(393 * 0.3));
+        expect(centre, lessThan(393 * 0.7));
+        expect(t.takeException(), isNull);
+      });
+    }
+  });
+
   group('DabblerNavigationTopBar.titled — empty title stays titled', () {
     for (final TextDirection d in TextDirection.values) {
       testWidgets("title: '' draws back, no wordmark (${d.name})", (

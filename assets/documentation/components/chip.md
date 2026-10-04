@@ -48,13 +48,24 @@ to reach it, while a tag with no `onTap` stays as dense as it's drawn, because f
 a dense row to touch-target size would buy no accessibility and break the layout rows of tags are
 built for.
 
-**Do not add a removable chip, a trailing icon, or a size variant.** None of the three exists in
-the design source. If the product needs one, that is a design-source change to raise first, not
-something to improvise here.
+**Do not add a trailing icon beyond the design's.** The size classes below and the sport accent were
+added from design frames (KAN-426); anything else the frames do not draw is a design-source change to
+raise first, not something to improvise here.
 
 **A count rides after the label.** Pass `count` for the small count pill the Notifications filter rail draws; it tints with the selection.
 
 ## Axes
+
+### Size
+`size` is `regular` (the default: the system label and pill), `small` (the Activities category chips of
+`Notifications.dc.html:56-58`, a smaller label in a shorter pill) or `large` (the Profiles sport picker of
+`Profiles.dc.html:160-163`, a semibold label in a pill as tall as the touch-target floor). The exact
+metrics are the constants on `DabblerChip`. Ignored by `compact`.
+
+### Sport accent
+`accent` takes a `DabblerSportAccent` (see Sports). Selected, the fill is the accent base with the
+on-brand ink; idle, the card fill with the secondary ink on label and glyph and the primary-sport
+`dot` in the accent base. A `vibe` wins over it.
 
 ### State
 Unselected, selected.
@@ -92,6 +103,9 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 
 ## Change log
 
+- KAN-426 (final) — adds `compactHitArea` (default false): a tappable chip is exactly its 40px pill instead of a 45px box. The target is kept as a hit-tested, not laid-out, area; leave about 2px free above and below.
+- KAN-426 (close) — the regular chip is 40 tall (was 38) and 2px wider: the web `Chip.jsx` pads `9px 15px` inside a 1px hairline that sits outside that padding, so the frames draw 20 + 18 + 2. Both states keep the hairline (transparent when selected).
+- KAN-426 (Seat B) — adds `size` (`small`, `large`) and `accent`, from `Notifications.dc.html:56-58` and `Profiles.dc.html:155-170`.
 - Alpha fidelity (Notifications) — adds `trailingIcon`: a 14px glyph after the label, the quiet-hours pill's `arrow-circle-right` (`Notifications.dc.html:226`).
 - Alpha fidelity (Article) — adds `tag`: 12/16 label, 6 / 12 padding, card fill and outline (Article tag pill).
 - Alpha fidelity (Search/Article) — adds `dense`: 7 / 11 padding, 13px label, 13px leading glyph, 14px remove glyph, card fill kept (Search recent chip, Article tag pill).

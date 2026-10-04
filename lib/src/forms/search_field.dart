@@ -63,6 +63,7 @@ class DabblerSearchField extends StatelessWidget {
     this.autovalidateMode,
     this.onSaved,
     this.suffixText,
+    this.borderOutside = false,
   });
 
   /// The text being edited; see [DabblerTextField.controller].
@@ -130,10 +131,16 @@ class DabblerSearchField extends StatelessWidget {
   /// a result count.
   final String? suffixText;
 
+  /// Forwarded to [DabblerTextField.borderOutside]: the hairline adds to the
+  /// box (47 high, as the Auth frame draws the search field) instead of eating
+  /// into it. Default false.
+  final bool borderOutside;
+
   @override
   Widget build(BuildContext context) {
     return DabblerTextField(
       variant: DabblerTextFieldVariant.search,
+      borderOutside: borderOutside,
       controller: controller,
       initialValue: initialValue,
       onChanged: onChanged,

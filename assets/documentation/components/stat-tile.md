@@ -54,6 +54,8 @@ carry the meaning.
 
 **The Settings tile is its own size.** `DabblerStatTileSize.setting` is 3 columns by 1 row with a bold sans value over a regular caption, the way the Settings root draws its bento.
 
+**Re-tint a brand tile to a sport with `accent`.** The Profiles hero behind a chosen sport is a brand tile in that sport's colour (`Profiles.dc.html:574-579`); pass `accent: DabblerSportAccent.of(sportKey)` and the fill and border take its base colour while the ink stays `onBrand`. Other tones ignore it.
+
 ## Axes
 
 ### Size
@@ -84,6 +86,8 @@ Corner: the 18px extra-large radius. Fill and ink: the surface, brand, ink, stat
   by default.
 
 - KAN-426 — adds the `detail` size and the `success` tone.
+
+- KAN-426 (close) — adds `accent` (a brand tile in a sport's colour).
 
 ## Source
 

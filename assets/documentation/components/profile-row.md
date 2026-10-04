@@ -27,12 +27,14 @@ Games rows and every tint — see `profile_row_gallery.dart`'s *ProfileRow* sect
 
 **Use `captionFirst` for dates.** The games rows put the weekday above the day; the other rows put the figure above its caption.
 
+**Use `icon` and `selected` for the switch-profile rows.** `icon` puts a glyph in a 45 square tile before the text; `selected` is the current row, a brand fill with on-brand ink and a bold tick (`Profiles.dc.html:679-689`).
+
 **Pass `onTap` only when the row navigates.** The accessible name is the title, sub-line and tag read together unless you pass `semanticLabel`.
 
 ## Axes
 
 ### Tone
-`neutral`, `success`, `warning`, `info`, `error`.
+`neutral`, `page` (the page ground with a faint hairline, for rows on a card), `success`, `warning`, `info`, `error`.
 
 ### Interactivity
 Inert or a button.
@@ -44,6 +46,7 @@ Corner: the 12px large radius, 9px for the lead block. Fill: the card and status
 ## Change log
 
 - Added for the Profiles design (KAN-426 fidelity pass).
+- KAN-426 (close) — adds `icon` and `selected` (the switch-profile sheet rows).
 
 ## Source
 

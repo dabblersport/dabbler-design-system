@@ -40,6 +40,7 @@ the same way `InputRow` pairs a title with a trailing control.
 It already switches to an instant snap under reduced motion; there's nothing to configure here.
 
 **Inside a tappable row the row is the target.** A toggle in an `InputRow` that has `onTap` lays out at its painted 28, so the row keeps the Settings rhythm; a bare toggle, or one in a row with no `onTap`, keeps the 45-point target.
+**Pass `compactHitArea: true` only where the row around the switch already carries the tap.** The layout is then 28px tall and the 45px target survives as an area that is hit-tested but not laid out, so the parent has to leave about 8px free above and below the track for it to apply in full.
 
 ## Axes
 
@@ -64,6 +65,7 @@ Track: `brandPrimary` when on, `borderDefault` when off. Knob: `surfaceCard`. Fo
 ## Change log
 
 - A toggle in a tappable input row lays out at 28 instead of 45.
+- KAN-426 (final) — adds `compactHitArea` (default false): drops the 45px-tall box from layout so the switch is exactly its 28px track, as the frames lay it out.
 
 ## Source
 

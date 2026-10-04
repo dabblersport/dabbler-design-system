@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundations/sport_accent.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_neutral_status.dart';
@@ -131,6 +132,7 @@ class DabblerBadge extends StatelessWidget {
     this.fill,
     this.outlined = false,
     this.comfortable = false,
+    this.accent,
   }) : isDot = false,
        semanticLabel = null;
 
@@ -160,6 +162,7 @@ class DabblerBadge extends StatelessWidget {
        fill = null,
        outlined = false,
        comfortable = false,
+       accent = null,
        isDot = true;
 
   /// Whether this is the count-less [DabblerBadge.dot] marker.
@@ -202,6 +205,12 @@ class DabblerBadge extends StatelessWidget {
   /// type, 6 vertical and 12 horizontal padding, 6 between glyph and label.
   /// Additive; false keeps the 11px list badge.
   final bool comfortable;
+
+  /// Colours the badge by sport: the fill is [DabblerSportAccent.base] with
+  /// the on-brand ink (`Profiles.dc.html:605-617`, the sport picker's accent
+  /// treatment). Wins over [tone] and [fill]; ignored when [status] is set or
+  /// the badge is [outlined]. Additive.
+  final DabblerSportAccent? accent;
 
   /// Overrides the tone's fill for a decorative badge (not for [status]).
   ///
@@ -355,10 +364,16 @@ class DabblerBadge extends StatelessWidget {
     final bool quiet = outlined && semantic == null;
     final Color background = quiet
         ? colors.surfaceCard
-        : semantic?.surface ?? fill ?? backgroundOf(tone, colors);
+        : semantic?.surface ??
+              accent?.base ??
+              fill ??
+              backgroundOf(tone, colors);
     final Color foreground = quiet
         ? colors.textSecondary
-        : semantic?.strong ?? foregroundOf(tone, colors);
+        : semantic?.strong ??
+              (accent == null
+                  ? foregroundOf(tone, colors)
+                  : DabblerSportAccent.onColorOf(colors));
     // `Badge.jsx:41` — decorative tones draw no border at all.
     final Color? hairline = quiet
         ? colors.borderDefault

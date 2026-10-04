@@ -75,6 +75,31 @@ Widget _rows(BuildContext context) => GalleryStack(
         ),
       ),
     ),
+    GallerySpecimen(
+      label: 'switch-profile rows — icon tile, current row selected',
+      child: SizedBox(
+        width: 360,
+        child: Column(
+          spacing: 6,
+          children: <Widget>[
+            DabblerProfileRow(
+              title: 'Player',
+              subtitle: '@moatazmustapha · padel, football',
+              icon: 'activity',
+              selected: true,
+              onTap: () {},
+            ),
+            DabblerProfileRow(
+              title: 'Organiser',
+              subtitle: '@moatazmustapha · 214 games run',
+              icon: 'calendar',
+              tone: DabblerProfileRowTone.page,
+              onTap: () {},
+            ),
+          ],
+        ),
+      ),
+    ),
   ],
 );
 

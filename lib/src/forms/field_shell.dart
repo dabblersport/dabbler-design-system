@@ -113,7 +113,14 @@ class DabblerFieldShell extends StatelessWidget {
     this.semanticsLabel,
     this.expanded,
     this.announceError = false,
+    this.borderOutside = false,
   });
+
+  /// Whether the box's hairline sits outside its 45px minimum content box,
+  /// as the Auth and Onboarding frame draws it: the box is then 47 high (49
+  /// while the 2px focus border shows) instead of 45. See
+  /// [DabblerSurface.borderOutside]. Default false keeps the 45px box.
+  final bool borderOutside;
 
   /// Whether [errorText] is exposed as a live region, so a screen reader
   /// announces it when it appears or changes. Set by a validating
@@ -253,6 +260,7 @@ class DabblerFieldShell extends StatelessWidget {
     final BorderRadius borderRadius = BorderRadius.all(Radius.circular(radius));
 
     Widget box = DabblerSurface(
+      borderOutside: borderOutside,
       radius: radius,
       fill: disabled
           ? disabledFill(colors)

@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
+import '../tokens/dabbler_geometry.dart';
 import 'page_dots.dart';
 import 'step_progress.dart';
 
@@ -34,7 +35,7 @@ const List<GalleryEntry> stepProgressGalleryEntries = <GalleryEntry>[
 
 const double _width = 280;
 
-Widget _steps(BuildContext context) => const GalleryStack(
+Widget _steps(BuildContext context) => GalleryStack(
   children: <Widget>[
     GallerySpecimen(
       label: 'step 1 of 5',
@@ -48,6 +49,18 @@ Widget _steps(BuildContext context) => const GalleryStack(
       child: SizedBox(
         width: _width,
         child: DabblerStepProgress(count: 5, current: 2, label: 'Step 3 of 5'),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'segmentHeight 3, segmentGap 6 — the old grid-aligned look',
+      child: SizedBox(
+        width: _width,
+        child: DabblerStepProgress(
+          count: 5,
+          current: 1,
+          segmentHeight: DabblerSpacing.space1,
+          segmentGap: DabblerSpacing.space2,
+        ),
       ),
     ),
     GallerySpecimen(
@@ -67,11 +80,17 @@ Widget _dots(BuildContext context) => const GalleryStack(
       child: DabblerPageDots(count: 4, index: 1),
     ),
     GallerySpecimen(label: 'tappable', child: _DotsDemo()),
+    GallerySpecimen(
+      label: 'compactHitArea — 6px tall, as the carousel frame draws it',
+      child: _DotsDemo(compact: true),
+    ),
   ],
 );
 
 class _DotsDemo extends StatefulWidget {
-  const _DotsDemo();
+  const _DotsDemo({this.compact = false});
+
+  final bool compact;
 
   @override
   State<_DotsDemo> createState() => _DotsDemoState();
@@ -84,6 +103,7 @@ class _DotsDemoState extends State<_DotsDemo> {
   Widget build(BuildContext context) => DabblerPageDots(
     count: 4,
     index: _page,
+    compactHitArea: widget.compact,
     onSelected: (int i) => setState(() => _page = i),
   );
 }

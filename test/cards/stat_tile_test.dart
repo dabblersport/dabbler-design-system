@@ -1,4 +1,5 @@
 import 'package:dabbler_design_system/src/cards/stat_tile.dart';
+import 'package:dabbler_design_system/src/foundations/sport_accent.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
 import 'package:flutter/material.dart';
@@ -332,6 +333,70 @@ void main() {
       expect(hero.width, closeTo(4 * cell + 3 * 9, 0.01));
       expect(hero.height, 2 * 78 + 9);
     });
+  });
+
+  group('accent (KAN-426, Profiles hero behind a sport)', () {
+    test('re-tints only the brand fill and border; ink stays onBrand', () {
+      final DabblerColors c = _colors();
+      expect(
+        DabblerStatTile.fillFor(
+          c,
+          DabblerStatTileTone.brand,
+          accent: DabblerSportAccent.padel,
+        ),
+        DabblerSportAccent.padel.base,
+      );
+      expect(
+        DabblerStatTile.borderFor(
+          c,
+          DabblerStatTileTone.brand,
+          accent: DabblerSportAccent.basketball,
+        ),
+        DabblerSportAccent.basketball.base,
+      );
+      expect(
+        DabblerStatTile.foregroundFor(c, DabblerStatTileTone.brand),
+        c.onBrand,
+      );
+      // Any other tone ignores it.
+      expect(
+        DabblerStatTile.fillFor(
+          c,
+          DabblerStatTileTone.card,
+          accent: DabblerSportAccent.padel,
+        ),
+        c.surfaceCard,
+      );
+    });
+
+    for (final TextDirection dir in TextDirection.values) {
+      testWidgets('paints the accent base ($dir)', (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(
+            DabblerStatTile(
+              value: dir == TextDirection.rtl ? '٩٩' : '99',
+              label: dir == TextDirection.rtl ? 'ألعاب' : 'Games',
+              tone: DabblerStatTileTone.brand,
+              accent: DabblerSportAccent.tennis,
+            ),
+            direction: dir,
+          ),
+        );
+        final BoxDecoration d =
+            tester
+                    .widget<DecoratedBox>(
+                      find
+                          .descendant(
+                            of: find.byType(DabblerStatTile),
+                            matching: find.byType(DecoratedBox),
+                          )
+                          .first,
+                    )
+                    .decoration
+                as BoxDecoration;
+        expect(d.color, DabblerSportAccent.tennis.base);
+      });
+    }
   });
 
   testWidgets('every tone and size renders in RTL and dark without error', (

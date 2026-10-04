@@ -129,6 +129,9 @@ class DabblerTextField extends StatefulWidget {
     this.suffixText,
     this.autofocus = false,
     this.loading = false,
+    this.borderOutside = false,
+    this.circledSelectArrow = false,
+    this.mutedPasswordToggle = false,
   }) : assert(
          controller == null || initialValue == null,
          'give a controller or an initialValue, not both',
@@ -161,6 +164,38 @@ class DabblerTextField extends StatefulWidget {
   /// `iconsax_flutter` 1.0.1 `arrow-down` draws a shafted arrow; the chevron is
   /// `arrow-down-1` (measured — see the audit table on `DabblerIconMirror`).
   static const String selectArrowName = 'arrow-down-1';
+
+  /// The circled chevron a select draws when [circledSelectArrow] is set:
+  /// `arrow-circle-down`, and [selectArrowOpenCircledName] while open
+  /// (`Auth and Onboarding.dc.html`, the date-of-birth field). No rotation:
+  /// the two glyphs are the two states.
+  static const String selectArrowCircledName = 'arrow-circle-down';
+
+  /// The circled chevron of an open select, see [selectArrowCircledName].
+  static const String selectArrowOpenCircledName = 'arrow-circle-up';
+
+  /// Whether the box's hairline sits outside the 45px content box (a 47px
+  /// field), as the Auth and Onboarding frame draws it. See
+  /// [DabblerFieldShell.borderOutside]. Default false.
+  final bool borderOutside;
+
+  /// Whether the password variant's visibility toggle is drawn light and
+  /// small, as the Auth frames draw it: the glyph in
+  /// [DabblerColors.textTertiary] at [mutedPasswordToggleGlyphSize] (20)
+  /// instead of [DabblerColors.textSecondary] at 24. The 45x45 target is
+  /// unchanged. The glyph is not text, which is the D-027 carve-out for
+  /// non-informational affordance glyphs. Default false. Ignored by the other
+  /// variants.
+  final bool mutedPasswordToggle;
+
+  /// The glyph size of a [mutedPasswordToggle], `20`.
+  static const double mutedPasswordToggleGlyphSize = 20;
+
+  /// Whether a [DabblerTextFieldVariant.select] draws the circled chevron
+  /// ([selectArrowCircledName] / [selectArrowOpenCircledName]) instead of the
+  /// plain `arrow-down-1` that rotates on open. Default false, which keeps
+  /// the plain chevron. Ignored by the other variants.
+  final bool circledSelectArrow;
 
   /// Which shape the field takes.
   final DabblerTextFieldVariant variant;

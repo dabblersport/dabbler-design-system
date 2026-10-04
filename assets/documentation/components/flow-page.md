@@ -54,7 +54,10 @@ Deviation: the design's step title is 30px, between `title1` (28) and `largeTitl
 
 ## Change log
 
+- KAN-426 (round 2) — the back control is exactly a 45x45 square holding the 24px glyph, centred 34.5 from the screen edge (the frame's `45x45` box with `margin-left:-12px`); it was an icon button 64 wide. Default change, because every flow frame draws it this way.
+- KAN-426 (final) — adds `bodyBottomPadding` (default 0): space under the scrolling body above the footer. The persona welcome frame uses 24 so the last card sits 42 above Continue.
 - Alpha fidelity rebuild (auth2) — adds this component.
+- KAN-426 (close) — adds `titleGap` (default `space2`; the email, log-in, code and welcome-back frames give `space3`, 9px, between title and subtitle).
 
 ## Source
 

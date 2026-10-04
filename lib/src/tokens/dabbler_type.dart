@@ -25,6 +25,14 @@ import 'package:flutter/widgets.dart';
 /// Gloock and Wingx each ship a single weight (400), so **every title style is
 /// weight 400 in both scripts** — titles never run Light and never run Bold.
 ///
+/// ## D-024 AMENDED (2026-10-04, KAN-426)
+///
+/// **D-024 (type ramp frozen) is amended: the design is the source of truth.**
+/// Roles the design frames use were added on 2026-10-04 as
+/// [DabblerType.frameRoles]; the ramp may grow only from design frames. The
+/// twelve `.t-*` [DabblerType.styles] are unchanged. The freeze text below is
+/// kept as history and still governs anything that is *not* a design frame.
+///
 /// ## FREEZE — in effect now, bounded, `DECISIONS.md` D-024(3)
 ///
 /// `cxo` measured the design source on 2026-09-17 and found it specifies type
@@ -257,6 +265,391 @@ abstract final class DabblerType {
     arabicLeading: 22,
     fontWeight: medium,
   );
+
+  // --- Frame roles (KAN-426, 2026-10-04) ---
+  //
+  // The design is the source of truth: D-024 is amended (see [frameRoles]).
+  // Each role below is a size/leading the design frames set and the twelve
+  // `.t-*` steps cannot express. Arabic is Latin less 0.9px (the live RTL
+  // rule); Arabic leading is the design's own Arabic frame where one exists,
+  // else the Latin leading.
+  /// Hero display — 40/46, weight 400, display role. `Auth and Onboarding.dc.html:305` ("You're in."), `:673`.
+  static const DabblerTypeStyle displayHero = DabblerTypeStyle(
+    name: 'displayHero',
+    role: DabblerTypeRole.display,
+    fontSize: 40,
+    arabicFontSize: 39.1,
+    latinLeading: 46,
+    arabicLeading: 46,
+    fontWeight: regular,
+  );
+
+  /// Welcome headline — 36/42, weight 400, display role. `Auth and Onboarding.dc.html:509` (`doneHeadline`).
+  static const DabblerTypeStyle displayWelcome = DabblerTypeStyle(
+    name: 'displayWelcome',
+    role: DabblerTypeRole.display,
+    fontSize: 36,
+    arabicFontSize: 35.1,
+    latinLeading: 42,
+    arabicLeading: 42,
+    fontWeight: regular,
+  );
+
+  /// Screen title — 34/40, weight 400, display role. `Auth and Onboarding.dc.html:101,155,188,218,292` and the Details/Listings headers; [largeTitle] is the same size at 41.
+  static const DabblerTypeStyle displayScreen = DabblerTypeStyle(
+    name: 'displayScreen',
+    role: DabblerTypeRole.display,
+    fontSize: 34,
+    arabicFontSize: 33.1,
+    latinLeading: 40,
+    arabicLeading: 40,
+    fontWeight: regular,
+  );
+
+  /// Onboarding step title — 30/36, weight 400, display role. `Auth and Onboarding.dc.html:345,460`. The Arabic frame sets it at 40 (`:1003`, `30/40`), so Arabic takes +4 leading.
+  static const DabblerTypeStyle displayStep = DabblerTypeStyle(
+    name: 'displayStep',
+    role: DabblerTypeRole.display,
+    fontSize: 30,
+    arabicFontSize: 29.1,
+    latinLeading: 36,
+    arabicLeading: 40,
+    fontWeight: regular,
+  );
+
+  /// Section display — 26/32, weight 400, display role. `Auth and Onboarding.dc.html:256` (`providerTitle`).
+  static const DabblerTypeStyle displaySection = DabblerTypeStyle(
+    name: 'displaySection',
+    role: DabblerTypeRole.display,
+    fontSize: 26,
+    arabicFontSize: 25.1,
+    latinLeading: 32,
+    arabicLeading: 32,
+    fontWeight: regular,
+  );
+
+  /// Profile statistic — 42/46, weight 400, display role. `Sport Profile v2.dc.html:60` (the sport name heading).
+  static const DabblerTypeStyle displayStat = DabblerTypeStyle(
+    name: 'displayStat',
+    role: DabblerTypeRole.display,
+    fontSize: 42,
+    arabicFontSize: 41.1,
+    latinLeading: 46,
+    arabicLeading: 46,
+    fontWeight: regular,
+  );
+
+  /// Profile hero statistic — 56/56, weight 400, display role. `Sport Profile v2.dc.html:92` (minutes figure).
+  static const DabblerTypeStyle displayStatHero = DabblerTypeStyle(
+    name: 'displayStatHero',
+    role: DabblerTypeRole.display,
+    fontSize: 56,
+    arabicFontSize: 55.1,
+    latinLeading: 56,
+    arabicLeading: 56,
+    fontWeight: regular,
+  );
+
+  /// Profile statistic, mid — 34/36, weight 400, display role.
+  /// `Sport Profile v2.dc.html:146` (matches figure).
+  static const DabblerTypeStyle displayStatMid = DabblerTypeStyle(
+    name: 'displayStatMid',
+    role: DabblerTypeRole.display,
+    fontSize: 34,
+    arabicFontSize: 33.1,
+    latinLeading: 36,
+    arabicLeading: 36,
+    fontWeight: regular,
+  );
+
+  /// Profile statistic, small — 30/32, weight 400, display role.
+  /// `Sport Profile v2.dc.html:118` (per-day minutes).
+  static const DabblerTypeStyle displayStatSmall = DabblerTypeStyle(
+    name: 'displayStatSmall',
+    role: DabblerTypeRole.display,
+    fontSize: 30,
+    arabicFontSize: 29.1,
+    latinLeading: 32,
+    arabicLeading: 32,
+    fontWeight: regular,
+  );
+
+  /// Rail label — 18/23, weight 400, display role. `Listings.dc.html:116,424` ("Upcoming" over a listing's countdown rail).
+  static const DabblerTypeStyle displayLabel = DabblerTypeStyle(
+    name: 'displayLabel',
+    role: DabblerTypeRole.display,
+    fontSize: 18,
+    arabicFontSize: 17.1,
+    latinLeading: 23,
+    arabicLeading: 23,
+    fontWeight: regular,
+  );
+
+  /// Large lead — 19/27, weight 400, sans role. `Auth and Onboarding.dc.html:77` (landing "want" line), `:510` and `:827` at weight 600 via `DabblerText.weight`.
+  static const DabblerTypeStyle leadLarge = DabblerTypeStyle(
+    name: 'leadLarge',
+    role: DabblerTypeRole.sans,
+    fontSize: 19,
+    arabicFontSize: 18.1,
+    latinLeading: 27,
+    arabicLeading: 27,
+    fontWeight: regular,
+  );
+
+  /// Lead / subtitle — 17/24, weight 400, sans role. `Auth and Onboarding.dc.html:102,156,189,219,293,306` (screen subtitles). Arabic leading 25 as [headline].
+  static const DabblerTypeStyle lead = DabblerTypeStyle(
+    name: 'lead',
+    role: DabblerTypeRole.sans,
+    fontSize: 17,
+    arabicFontSize: 16.1,
+    latinLeading: 24,
+    arabicLeading: 25,
+    fontWeight: regular,
+  );
+
+  /// Row title — 17/23, weight 500, sans role. `Auth and Onboarding.dc.html:421,503,772`. Arabic leading 25 (`:1036`, `17/25`).
+  static const DabblerTypeStyle rowTitle = DabblerTypeStyle(
+    name: 'rowTitle',
+    role: DabblerTypeRole.sans,
+    fontSize: 17,
+    arabicFontSize: 16.1,
+    latinLeading: 23,
+    arabicLeading: 25,
+    fontWeight: medium,
+  );
+
+  /// Copy — 15/21, weight 400, sans role. The dominant body size of `Auth and Onboarding.dc.html` (`:108-118,131,311-319,461`); links at weight 500 via `DabblerText.weight`. Arabic leading 24 (`:1004,1075`, `15/24`).
+  static const DabblerTypeStyle copy = DabblerTypeStyle(
+    name: 'copy',
+    role: DabblerTypeRole.sans,
+    fontSize: 15,
+    arabicFontSize: 14.1,
+    latinLeading: 21,
+    arabicLeading: 24,
+    fontWeight: regular,
+  );
+
+  /// Small — 14/20, weight 400, sans role. `Auth and Onboarding.dc.html:85,226,384,428` (role and link text). Arabic leading 22 (`:1037`, `14/22`).
+  static const DabblerTypeStyle small = DabblerTypeStyle(
+    name: 'small',
+    role: DabblerTypeRole.sans,
+    fontSize: 14,
+    arabicFontSize: 13.1,
+    latinLeading: 20,
+    arabicLeading: 22,
+    fontWeight: regular,
+  );
+
+  /// Small, tight — 14/19, weight 400, sans role. `Listings.dc.html`, `Details.dc.html`, `Profiles.dc.html`, `Sport Profile v2.dc.html` (card meta and rows; weight 600 via `DabblerText.weight`). Arabic leading 22.
+  static const DabblerTypeStyle smallTight = DabblerTypeStyle(
+    name: 'smallTight',
+    role: DabblerTypeRole.sans,
+    fontSize: 14,
+    arabicFontSize: 13.1,
+    latinLeading: 19,
+    arabicLeading: 22,
+    fontWeight: regular,
+  );
+
+  /// Small, relaxed — 14/21, weight 400, sans role. `Auth and Onboarding.dc.html:773` (persona body), `Listings.dc.html`, `Favourites.dc.html`. Arabic leading 22 (`:1037`).
+  static const DabblerTypeStyle smallRelaxed = DabblerTypeStyle(
+    name: 'smallRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 14,
+    arabicFontSize: 13.1,
+    latinLeading: 21,
+    arabicLeading: 22,
+    fontWeight: regular,
+  );
+
+  /// Footnote, tight — 13/17, weight 600, sans role. `Listings.dc.html:244,549,786` (player counts, ratings), `Details.dc.html` (labels).
+  static const DabblerTypeStyle footnoteTight = DabblerTypeStyle(
+    name: 'footnoteTight',
+    role: DabblerTypeRole.sans,
+    fontSize: 13,
+    arabicFontSize: 12.1,
+    latinLeading: 17,
+    arabicLeading: 17,
+    fontWeight: semibold,
+  );
+
+  /// Footnote, relaxed — 13/20, weight 400, sans role. `Details.dc.html:486` (venue "About" copy).
+  static const DabblerTypeStyle footnoteRelaxed = DabblerTypeStyle(
+    name: 'footnoteRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 13,
+    arabicFontSize: 12.1,
+    latinLeading: 20,
+    arabicLeading: 20,
+    fontWeight: regular,
+  );
+
+  /// Tag — 11/15, weight 600, sans role. Chip and badge text in `Auth and Onboarding.dc.html`, `Listings.dc.html`, `Details.dc.html`.
+  static const DabblerTypeStyle tag = DabblerTypeStyle(
+    name: 'tag',
+    role: DabblerTypeRole.sans,
+    fontSize: 11,
+    arabicFontSize: 10.1,
+    latinLeading: 15,
+    arabicLeading: 15,
+    fontWeight: semibold,
+  );
+
+  /// Tag, tight — 11/14, weight 600, sans role. Pill labels in `Listings.dc.html`, `Profiles.dc.html`, `Auth and Onboarding.dc.html`.
+  static const DabblerTypeStyle tagTight = DabblerTypeStyle(
+    name: 'tagTight',
+    role: DabblerTypeRole.sans,
+    fontSize: 11,
+    arabicFontSize: 10.1,
+    latinLeading: 14,
+    arabicLeading: 14,
+    fontWeight: semibold,
+  );
+
+  /// Figure — 18/22, weight 700, sans role. `Listings.dc.html:122,459` (calendar day number).
+  static const DabblerTypeStyle figure = DabblerTypeStyle(
+    name: 'figure',
+    role: DabblerTypeRole.sans,
+    fontSize: 18,
+    arabicFontSize: 17.1,
+    latinLeading: 22,
+    arabicLeading: 22,
+    fontWeight: bold,
+  );
+
+  /// Large figure — 20/26, weight 700, sans role. `Listings.dc.html:227,533,1096` (game time).
+  static const DabblerTypeStyle figureLarge = DabblerTypeStyle(
+    name: 'figureLarge',
+    role: DabblerTypeRole.sans,
+    fontSize: 20,
+    arabicFontSize: 19.1,
+    latinLeading: 26,
+    arabicLeading: 26,
+    fontWeight: bold,
+  );
+
+  /// Extra-large figure — 22/27, weight 700, sans role. `Listings.dc.html:251,553,1120` (card price).
+  static const DabblerTypeStyle figureXl = DabblerTypeStyle(
+    name: 'figureXl',
+    role: DabblerTypeRole.sans,
+    fontSize: 22,
+    arabicFontSize: 21.1,
+    latinLeading: 27,
+    arabicLeading: 27,
+    fontWeight: bold,
+  );
+
+  /// Profile name, long — 19/25, weight 400, display role. `Profiles.dc.html:848-849`: a name of 15 to 20 characters steps down from [title2] (22/28) to this.
+  static const DabblerTypeStyle displayNameMid = DabblerTypeStyle(
+    name: 'displayNameMid',
+    role: DabblerTypeRole.display,
+    fontSize: 19,
+    arabicFontSize: 18.1,
+    latinLeading: 25,
+    arabicLeading: 25,
+    fontWeight: regular,
+  );
+
+  /// Profile name, longest — 17/22, weight 400, display role. `Profiles.dc.html:848-849`: a name over 20 characters.
+  static const DabblerTypeStyle displayNameSmall = DabblerTypeStyle(
+    name: 'displayNameSmall',
+    role: DabblerTypeRole.display,
+    fontSize: 17,
+    arabicFontSize: 16.1,
+    latinLeading: 22,
+    arabicLeading: 22,
+    fontWeight: regular,
+  );
+
+  /// Caption, relaxed — 12/18, weight 400, sans role. `Auth and Onboarding.dc.html:134,175,852` (legal line under the CTA). Arabic leading 20 (`:1096`, `12/20`).
+  static const DabblerTypeStyle captionRelaxed = DabblerTypeStyle(
+    name: 'captionRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 12,
+    arabicFontSize: 11.1,
+    latinLeading: 18,
+    arabicLeading: 20,
+    fontWeight: regular,
+  );
+
+  /// Copy, relaxed — 15/22, weight 400, sans role. `Auth and Onboarding.dc.html:257,553,725,809` (provider and feature sub-copy). Arabic leading 24 (`:1004,1075`, `15/24`).
+  static const DabblerTypeStyle copyRelaxed = DabblerTypeStyle(
+    name: 'copyRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 15,
+    arabicFontSize: 14.1,
+    latinLeading: 22,
+    arabicLeading: 24,
+    fontWeight: regular,
+  );
+
+  /// Body, relaxed — 16/22, weight 400, sans role (weight 500/600 via `DabblerText.weight`). `Auth and Onboarding.dc.html:481,561,874` (option labels). Arabic leading 24 as [body].
+  static const DabblerTypeStyle bodyRelaxed = DabblerTypeStyle(
+    name: 'bodyRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 16,
+    arabicFontSize: 15.1,
+    latinLeading: 22,
+    arabicLeading: 24,
+    fontWeight: regular,
+  );
+
+  /// Every role added from the design frames (KAN-426), in declaration order.
+  ///
+  /// **D-024 (type ramp frozen) is amended: the design is the source of truth.**
+  /// The roles here were added on 2026-10-04 because the Auth and Onboarding,
+  /// Listings, Details, Profiles, Sport Profile v2 and Favourites frames set
+  /// type at sizes and leadings the twelve `.t-*` steps do not carry. The ramp
+  /// may grow only from design frames. [styles] is unchanged and still equals
+  /// `typography.css`.
+  ///
+  /// Sizes and leadings not listed (one-off frame chrome, emoji spans, review
+  /// scaffolding) are deliberately not roles.
+  static const List<DabblerTypeStyle> frameRoles = <DabblerTypeStyle>[
+    displayHero,
+    displayWelcome,
+    displayScreen,
+    displayStep,
+    displaySection,
+    displayStat,
+    displayStatHero,
+    displayStatMid,
+    displayStatSmall,
+    displayLabel,
+    leadLarge,
+    lead,
+    rowTitle,
+    copy,
+    small,
+    smallTight,
+    smallRelaxed,
+    footnoteTight,
+    footnoteRelaxed,
+    tag,
+    tagTight,
+    figure,
+    figureLarge,
+    figureXl,
+    displayNameMid,
+    displayNameSmall,
+    captionRelaxed,
+    copyRelaxed,
+    bodyRelaxed,
+  ];
+
+  /// The frame roles that take additional leading in Arabic.
+  static const List<String> frameRolesArabicExtraLeading = <String>[
+    'displayStep',
+    'lead',
+    'rowTitle',
+    'copy',
+    'small',
+    'smallTight',
+    'smallRelaxed',
+    'captionRelaxed',
+    'copyRelaxed',
+    'bodyRelaxed',
+  ];
 
   /// Every named style of the ramp, in source order.
   static const List<DabblerTypeStyle> styles = <DabblerTypeStyle>[

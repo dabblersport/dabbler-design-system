@@ -136,7 +136,7 @@ void main() {
         reason: 'the transparent border keeps both states the same box',
       );
       expect(unselected.height, DabblerChip.visualHeight);
-      expect(unselected.height, 38);
+      expect(unselected.height, 40);
     });
 
     testWidgets(
@@ -526,7 +526,7 @@ void main() {
       expect(
         tester.getRect(find.text('Free')).left -
             tester.getRect(find.byType(DabblerSurface).first).left,
-        closeTo(DabblerChip.horizontalPadding, 0.01),
+        closeTo(DabblerChip.horizontalPadding + 1, 0.01),
       );
     });
   });

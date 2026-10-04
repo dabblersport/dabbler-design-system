@@ -302,26 +302,41 @@ class _DabblerSheetState extends State<DabblerSheet> {
         : null;
 
     if (_hasTitle || widget.headerAction != null || close != null) {
-      rows.add(
-        Padding(
-          // `padding: 0 var(--space-6) var(--space-4)` (`Sheet.jsx:108`).
-          padding: const EdgeInsetsDirectional.fromSTEB(
-            DabblerSpacing.space6,
-            0,
-            DabblerSpacing.space6,
-            DabblerSpacing.space4,
-          ),
-          child: Row(
-            // `gap: 12` between the title and the action
-            // (`Listings.dc.html:286`) — [DabblerSpacing.space4].
-            spacing: widget.headerAction == null ? 0 : DabblerSpacing.space4,
-            children: <Widget>[
-              Expanded(child: _titleContent(context, colors)),
-              ?widget.headerAction,
-              ?close,
-            ],
-          ),
+      final Widget header = Padding(
+        // `padding: 0 var(--space-6) var(--space-4)` (`Sheet.jsx:108`).
+        padding: const EdgeInsetsDirectional.fromSTEB(
+          DabblerSpacing.space6,
+          0,
+          DabblerSpacing.space6,
+          DabblerSpacing.space4,
         ),
+        child: Row(
+          // `gap: 12` between the title and the action
+          // (`Listings.dc.html:286`) — [DabblerSpacing.space4].
+          spacing: widget.headerAction == null ? 0 : DabblerSpacing.space4,
+          children: <Widget>[
+            Expanded(child: _titleContent(context, colors)),
+            ?widget.headerAction,
+            ?close,
+          ],
+        ),
+      );
+      rows.add(
+        widget.headerDivider
+            ? DecoratedBox(
+                decoration: BoxDecoration(
+                  // `border-bottom: 1px solid var(--faint)`
+                  // (`Listings.dc.html:289`).
+                  border: Border(
+                    bottom: BorderSide(
+                      color: colors.bgTertiary,
+                      width: DabblerSizing.borderDefault,
+                    ),
+                  ),
+                ),
+                child: header,
+              )
+            : header,
       );
     }
 

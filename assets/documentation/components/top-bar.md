@@ -157,6 +157,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 
 ## Change log
 
+- KAN-426 (final) — adds `DabblerWordmark.landingSize` (104 x 20), the size the landing frame draws the mark at; the default stays 100 x 19.
 - Alpha fidelity (Settings, Notifications) — `DabblerNavigationAction.tone` (`neutral`/`brand`/`subtle`: the *Mark all read* tick is brand while something is unread, subtle once nothing is; `Notifications.dc.html:48, 561`), and `heroTint` on the titled bar (brand tint until the scroll controller passes `titleRevealOffset`, then page ground and a hairline; `Settings.dc.html:66, 1190-1191`).
 - `transparent` draws the bar with no ground of its own, so it sits on a tinted hero (Settings fidelity rebuild).
 - D-026 (cxo) — confirms the transcription's narrow anatomy is
@@ -175,6 +176,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 - Alpha fidelity (Search) — adds `titleWidget` to the titled variant: a widget that takes the title slot
   beside the back button, for the search header of `Search.dc.html`.
 - Alpha fidelity (Results) — adds `plain` to the titled variant: the back glyph without its bordered disc and a centred title (`Results.dc.html`).
+- KAN-426 (close) — adds `centerTitle` to the titled variant: the title centred between the back disc and the actions (`Sport Profile v2.dc.html:35-37`).
 
 ## Source
 

@@ -24,9 +24,12 @@ import '../tokens/dabbler_type.dart';
 /// them; [isCompleted] / [isCurrent] expose the distinction for callers and
 /// tests, and the semantics value reads "step N of M".
 ///
-/// **Deviation:** no 4px or 5px token exists. The segment height is
-/// [DabblerSpacing.space1] (3) and the gap [DabblerSpacing.space2] (6), the
-/// nearest steps on the 3pt grid.
+/// **Missing tokens, named not resolved:** no 4px or 5px token exists on the
+/// 3pt grid. The frame's `height: 4px` and `gap: 5px` are therefore the
+/// literals [defaultSegmentHeight] and [defaultSegmentGap] below, the defaults, and a caller
+/// that wants the old grid-aligned 3 and 6 passes
+/// [DabblerSpacing.space1] and [DabblerSpacing.space2]. Until 2026-10-04 the
+/// defaults were 3 and 6.
 ///
 /// ## Motion
 ///
@@ -46,8 +49,24 @@ class DabblerStepProgress extends StatelessWidget {
     required this.current,
     this.label,
     this.semanticLabel,
+    this.segmentHeight = defaultSegmentHeight,
+    this.segmentGap = defaultSegmentGap,
   }) : assert(count > 0, 'a flow has at least one step'),
        assert(current >= 0 && current < count, 'current must be a step');
+
+  /// The segments' height. Default [defaultSegmentHeight], `4`.
+  final double segmentHeight;
+
+  /// The gap between segments. Default [defaultSegmentGap], `5`.
+  final double segmentGap;
+
+  /// `height: 4px` (`Auth and Onboarding.dc.html`, the step bar). No token: see the class
+  /// doc.
+  static const double defaultSegmentHeight = 4;
+
+  /// `gap: 5px` (`Auth and Onboarding.dc.html`, the step bar). No token: see the class
+  /// doc.
+  static const double defaultSegmentGap = 5;
 
   /// How many steps the flow has.
   final int count;
@@ -79,7 +98,7 @@ class DabblerStepProgress extends StatelessWidget {
     final List<Widget> segments = <Widget>[];
     for (int i = 0; i < count; i++) {
       if (i > 0) {
-        segments.add(const SizedBox(width: DabblerSpacing.space2));
+        segments.add(SizedBox(width: segmentGap));
       }
       segments.add(
         Expanded(
@@ -87,7 +106,7 @@ class DabblerStepProgress extends StatelessWidget {
             key: ValueKey<int>(i),
             duration: duration,
             curve: DabblerMotion.easeOut,
-            height: DabblerSpacing.space1,
+            height: segmentHeight,
             decoration: BoxDecoration(
               color: i <= current ? colors.brandPrimary : colors.bgTertiary,
               borderRadius: DabblerRadius.pillAll,

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundations/sport_accent.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../tokens/dabbler_colors.dart';
@@ -155,6 +156,7 @@ class DabblerStatTile extends StatefulWidget {
     this.icon,
     this.fitValue = false,
     this.minValueScale = DabblerStatTileValue.defaultMinScale,
+    this.accent,
   });
 
   /// The large display-font figure.
@@ -233,6 +235,13 @@ class DabblerStatTile extends StatefulWidget {
   /// The accessible name; defaults to value, label and sub together.
   final String? semanticLabel;
 
+  /// Re-tints a [DabblerStatTileTone.brand] tile to a sport's accent: the
+  /// fill and border become [DabblerSportAccent.base] and the ink stays
+  /// `onBrand`. This is the Profiles hero tile behind a chosen sport, where
+  /// the source's `bg: a.base` maps to a section-themed `brand` tile
+  /// (`Profiles.dc.html:574-579, 727-733`). Ignored on any other tone.
+  final DabblerSportAccent? accent;
+
   /// `artOpacity` default in the source.
   static const double defaultArtOpacity = 0.32;
 
@@ -277,25 +286,36 @@ class DabblerStatTile extends StatefulWidget {
   int get effectiveRows => rows ?? size.rows;
 
   /// Background fill of [tone].
-  static Color fillFor(DabblerColors colors, DabblerStatTileTone tone) =>
-      switch (tone) {
-        DabblerStatTileTone.card => colors.surfaceCard,
-        DabblerStatTileTone.sunken => colors.surfaceSunken,
-        DabblerStatTileTone.brand => colors.brandPrimary,
-        DabblerStatTileTone.ink => colors.textPrimary,
-        DabblerStatTileTone.amber => DabblerColors.tileAmber.surface,
-        DabblerStatTileTone.info => DabblerColors.tileInfo.surface,
-        DabblerStatTileTone.accent => DabblerColors.tileAccent.surface,
-        DabblerStatTileTone.danger => colors.error.surface,
-        DabblerStatTileTone.success => colors.success.surface,
-      };
+  ///
+  /// [accent] re-tints a [DabblerStatTileTone.brand] fill (see
+  /// [DabblerStatTile.accent]).
+  static Color fillFor(
+    DabblerColors colors,
+    DabblerStatTileTone tone, {
+    DabblerSportAccent? accent,
+  }) => accent != null && tone == DabblerStatTileTone.brand
+      ? accent.base
+      : switch (tone) {
+          DabblerStatTileTone.card => colors.surfaceCard,
+          DabblerStatTileTone.sunken => colors.surfaceSunken,
+          DabblerStatTileTone.brand => colors.brandPrimary,
+          DabblerStatTileTone.ink => colors.textPrimary,
+          DabblerStatTileTone.amber => DabblerColors.tileAmber.surface,
+          DabblerStatTileTone.info => DabblerColors.tileInfo.surface,
+          DabblerStatTileTone.accent => DabblerColors.tileAccent.surface,
+          DabblerStatTileTone.danger => colors.error.surface,
+          DabblerStatTileTone.success => colors.success.surface,
+        };
 
   /// 1px border colour of [tone].
-  static Color borderFor(DabblerColors colors, DabblerStatTileTone tone) =>
-      switch (tone) {
-        DabblerStatTileTone.card => colors.borderDefault,
-        _ => fillFor(colors, tone),
-      };
+  static Color borderFor(
+    DabblerColors colors,
+    DabblerStatTileTone tone, {
+    DabblerSportAccent? accent,
+  }) => switch (tone) {
+    DabblerStatTileTone.card => colors.borderDefault,
+    _ => fillFor(colors, tone, accent: accent),
+  };
 
   /// Primary text colour of [tone].
   static Color foregroundFor(DabblerColors colors, DabblerStatTileTone tone) =>
@@ -467,10 +487,18 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
         final double h = box.hasBoundedHeight ? box.maxHeight : 0;
         return DecoratedBox(
           decoration: BoxDecoration(
-            color: DabblerStatTile.fillFor(colors, widget.tone),
+            color: DabblerStatTile.fillFor(
+              colors,
+              widget.tone,
+              accent: widget.accent,
+            ),
             borderRadius: size.radius,
             border: Border.all(
-              color: DabblerStatTile.borderFor(colors, widget.tone),
+              color: DabblerStatTile.borderFor(
+                colors,
+                widget.tone,
+                accent: widget.accent,
+              ),
               width: DabblerSizing.borderDefault,
             ),
           ),

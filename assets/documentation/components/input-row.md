@@ -145,6 +145,7 @@ shared tokens and primitives every other tappable surface reads.
 ## Change log
 
 - Alpha fidelity (Search) — adds `titleSemibold`: the title in semibold, as the View all people row draws it.
+- KAN-426 (final) — adds `DabblerInputRow.option(title:, selected:, onTap:, textDirection:)`: the sheet option row of the Language and Region lists. `bodyRelaxed` title (400, 600 selected), 9x3 padding around a 52px content box and the 1px hairline, 71 tall, with a bold 22px `tick-circle` while selected. `textDirection` sets the title's own direction so a native-script name sits flush to its own end inside a left-to-right list.
 - Alpha fidelity (Settings) — `DabblerChevron.circled`: the disclosure glyph inside its ring, which the Settings frames draw (`Settings.dc.html:97, 134, 269`).
 - D-003 (cxo) — the subtitle's colour: text under WCAG, so it
   takes `textSecondary`, never a surface-neutral role.

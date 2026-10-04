@@ -115,6 +115,7 @@ class DabblerSheet extends StatefulWidget {
     this.contentMaxFraction = defaultContentMaxFraction,
     this.pageBackground = false,
     this.showCloseButton = true,
+    this.headerDivider = false,
   });
 
   /// The default cap of a [DabblerSheetDetent.content] sheet: 0.8 of the
@@ -235,6 +236,11 @@ class DabblerSheet extends StatefulWidget {
   /// they put their own Done / Cancel button in the body (`:763-770`). The scrim
   /// and the drag still dismiss.
   final bool showCloseButton;
+
+  /// Draws a 1px `--faint` hairline under the header row — the Listings
+  /// design's filter and location sheets (`Listings.dc.html:289`,
+  /// `border-bottom: 1px solid var(--faint)`). Default false.
+  final bool headerDivider;
 
   @override
   State<DabblerSheet> createState() => _DabblerSheetState();

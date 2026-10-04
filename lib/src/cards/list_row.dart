@@ -91,6 +91,8 @@ class DabblerListRow extends StatelessWidget {
     this.onTap,
     this.showChevron = false,
     this.semanticLabel,
+    this.flat = false,
+    this.brand = false,
   });
 
   /// The row's main line.
@@ -116,6 +118,16 @@ class DabblerListRow extends StatelessWidget {
 
   /// The accessible name of a tappable row. Null lets the text compose it.
   final String? semanticLabel;
+
+  /// The sheet-list form: no inline padding (the host supplies the gutter) and
+  /// a 1px `--faint` hairline under the row — the Listings "Change location"
+  /// rows (`Listings.dc.html:343-364`, `padding:12px 0; border-bottom:1px solid
+  /// var(--faint)`). Default false keeps the grouped-panel row exactly.
+  final bool flat;
+
+  /// Sets [title] in the brand colour — the "Use current location" row
+  /// (`Listings.dc.html:340-341`). Default false.
+  final bool brand;
 
   /// The gap between the slots and the text — [DabblerSpacing.space4].
   static const double gap = DabblerSpacing.space4;
@@ -151,7 +163,7 @@ class DabblerListRow extends StatelessWidget {
           style: DabblerType.subheadline
               .resolveForDirection(direction)
               .copyWith(
-                color: colors.textPrimary,
+                color: brand ? colors.brandPrimary : colors.textPrimary,
                 fontWeight: DabblerType.semibold,
               ),
         ),
@@ -168,8 +180,8 @@ class DabblerListRow extends StatelessWidget {
     );
 
     final Widget row = Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: paddingInline,
+      padding: EdgeInsets.symmetric(
+        horizontal: flat ? 0 : paddingInline,
         vertical: paddingBlock,
       ),
       child: Row(
@@ -198,10 +210,16 @@ class DabblerListRow extends StatelessWidget {
       ),
     );
 
-    return DabblerFeedTappable(
+    final Widget tappable = DabblerFeedTappable(
       onTap: onTap,
       semanticLabel: semanticLabel,
       child: row,
+    );
+    if (!flat) return tappable;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[tappable, const DabblerDivider()],
     );
   }
 }

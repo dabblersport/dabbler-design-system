@@ -33,6 +33,10 @@ Widget _page({
   ),
 );
 
+final Finder _backGlyph = find.byWidgetPredicate(
+  (Widget w) => w is DabblerIcon && w.name == 'arrow-circle-left',
+);
+
 void main() {
   group('DabblerFlowPage', () {
     testWidgets('draws back, progress, title, body and the action in order', (
@@ -43,7 +47,7 @@ void main() {
       );
       expect(tester.takeException(), isNull);
       expect(find.byType(DabblerStepProgress), findsOneWidget);
-      final double back = tester.getCenter(find.byType(DabblerButton).first).dy;
+      final double back = tester.getCenter(_backGlyph).dy;
       final double title = tester
           .getCenter(find.text('Tell us a bit about you'))
           .dy;
@@ -134,6 +138,37 @@ void main() {
       );
     });
 
+    test(
+      'the back arrow is 24, as Auth and Onboarding.dc.html:150 draws it',
+      () {
+        expect(DabblerFlowPage.backGlyphSize, 24);
+      },
+    );
+
+    for (final TextDirection dir in TextDirection.values) {
+      testWidgets(
+        'the back glyph renders at 24 and the target stays 45 ($dir)',
+        (WidgetTester tester) async {
+          await tester.pumpWidget(
+            host(_page(onBack: () {}), direction: dir, width: 393),
+          );
+          expect(tester.widget<DabblerIcon>(_backGlyph).size, 24);
+          // The control is exactly the 45 square, no wider (was 64).
+          expect(
+            tester.getSize(
+              find
+                  .ancestor(of: _backGlyph, matching: find.byType(SizedBox))
+                  .first,
+            ),
+            const Size(
+              DabblerSizing.touchTargetMin,
+              DabblerSizing.touchTargetMin,
+            ),
+          );
+        },
+      );
+    }
+
     for (final TextDirection dir in TextDirection.values) {
       testWidgets('title at the inline start, back arrow mirrored ($dir)', (
         WidgetTester tester,
@@ -160,9 +195,7 @@ void main() {
             ? tester.getTopRight(titleFinder).dx
             : tester.getTopLeft(titleFinder).dx;
         final double mid = tester.getCenter(find.byType(DabblerFlowPage)).dx;
-        final double backCentre = tester
-            .getCenter(find.byType(DabblerButton).first)
-            .dx;
+        final double backCentre = tester.getCenter(_backGlyph).dx;
         expect(rtl ? backCentre > mid : backCentre < mid, isTrue);
         expect(rtl ? titleStart > mid : titleStart < mid, isTrue);
       });

@@ -12,6 +12,8 @@ import 'highlighted_text.dart';
 import 'input_row_parts.dart';
 import 'toggle.dart';
 
+part 'input_row_option.dart';
+
 /// InputRow — the settings / content row.
 ///
 /// Transcribed from `components/layout/InputRow.jsx:1-63`,
@@ -214,6 +216,49 @@ class DabblerInputRow extends StatelessWidget {
       ),
     );
   }
+
+  /// A sheet option row: the Language and Region lists of the Auth and
+  /// Onboarding frame (`:557-569`). The [title] is [DabblerType.bodyRelaxed]
+  /// at 400, semibold while [selected], and a selected row ends in the bold
+  /// 22px `tick-circle`. The row is [optionMinHeight] (52) of content inside
+  /// [optionPadding] (`9 3`) over the 1px `--faint` hairline, 71 in all.
+  ///
+  /// [textDirection] sets the direction of the title alone, so a native-script
+  /// name ("the language's own name") reads and sits flush to the end of its
+  /// own script inside a left-to-right list; null follows the ambient
+  /// direction. [onTap] null makes the row inert. [showDivider] false drops
+  /// the hairline (and its 1px) under the last row.
+  factory DabblerInputRow.option({
+    Key? key,
+    required String title,
+    required bool selected,
+    VoidCallback? onTap,
+    TextDirection? textDirection,
+    String? semanticLabel,
+    bool showDivider = true,
+  }) => _DabblerOptionRow(
+    key: key,
+    title: title,
+    selected: selected,
+    onTap: onTap,
+    textDirection: textDirection,
+    semanticLabel: semanticLabel,
+    showDivider: showDivider,
+  );
+
+  /// The sheet option row's content-box minimum, `52`
+  /// (`Auth and Onboarding.dc.html:557`).
+  static const double optionMinHeight = 52;
+
+  /// The sheet option row's padding, `9px 3px`.
+  static const EdgeInsetsDirectional optionPadding =
+      EdgeInsetsDirectional.symmetric(
+        vertical: DabblerSpacing.space3,
+        horizontal: DabblerSpacing.space1,
+      );
+
+  /// The sheet option row's tick, `22` (`:564`). Not an icon step.
+  static const double optionTickSize = 22;
 
   /// `borderRadius: 16` (`InputRow.jsx:32`), transcribed literally. **Token
   /// conflict:** the radius ramp has no 16 — it steps 12 → 18. See the class

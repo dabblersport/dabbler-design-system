@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
+import '../interaction/expanded_hit_area.dart';
 import '../interaction/focus_ring.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
@@ -55,21 +56,6 @@ import '../tokens/dabbler_geometry.dart';
 /// tab order while [disabled], as the source's native `disabled` attribute
 /// does. Semantically it is a switch — [Semantics.toggled], not `checked` —
 /// so assistive technology announces "on"/"off" rather than "ticked".
-/// Tells a [DabblerToggle] below it that a tappable row already supplies the
-/// 45-point touch target, so the switch lays out at its painted 28. Provided
-/// by `DabblerInputRow` when it has an `onTap`.
-class DabblerToggleRowScope extends InheritedWidget {
-  /// Marks [child] as the trailing slot of a row that is itself the target.
-  const DabblerToggleRowScope({super.key, required super.child});
-
-  /// Whether a [DabblerToggleRowScope] is above [context].
-  static bool of(BuildContext context) =>
-      context.getInheritedWidgetOfExactType<DabblerToggleRowScope>() != null;
-
-  @override
-  bool updateShouldNotify(DabblerToggleRowScope oldWidget) => false;
-}
-
 class DabblerToggle extends StatefulWidget {
   /// Creates a controlled switch.
   const DabblerToggle({
@@ -78,6 +64,7 @@ class DabblerToggle extends StatefulWidget {
     this.onChanged,
     this.disabled = false,
     this.semanticLabel,
+    this.compactHitArea = false,
   });
 
   /// Whether the switch is on. Controlled: this widget never holds the value.
@@ -97,6 +84,19 @@ class DabblerToggle extends StatefulWidget {
   /// in the surrounding row; pass that row's text here so the switch is not
   /// announced as an unnamed control.
   final String? semanticLabel;
+
+  /// Whether the switch drops the [DabblerSizing.touchTargetMin] box from
+  /// layout and is exactly as tall as its 28px track, as a frame that lays
+  /// the switch out inside a row draws it (`Auth and Onboarding.dc.html`).
+  /// Default false keeps the 45px-tall box.
+  ///
+  /// The target is not given up: a hit anywhere within 48 by 45 of the
+  /// track's centre still toggles it (hit-test only, through the package's
+  /// internal expanded hit area), so the parent must leave that margin free
+  /// for it to apply in full. Assistive technology still gets the switch as
+  /// a single node. Use it where the row around the switch is itself the
+  /// tap target.
+  final bool compactHitArea;
 
   /// `width: 48` (`Toggle.jsx:14`) — [DabblerSpacing.space11].
   static const double trackWidth = DabblerSpacing.space11;
@@ -182,56 +182,86 @@ class _DabblerToggleState extends State<DabblerToggle> {
       child: track,
     );
 
-    return Semantics(
-      label: widget.semanticLabel,
-      toggled: widget.checked,
-      enabled: _enabled,
-      onTap: _enabled ? _toggle : null,
-      container: true,
-      child: FocusableActionDetector(
+    return _hit(
+      Semantics(
+        label: widget.semanticLabel,
+        toggled: widget.checked,
         enabled: _enabled,
-        onShowFocusHighlight: (bool visible) {
-          if (_ringVisible != visible) {
-            setState(() => _ringVisible = visible);
-          }
-        },
-        shortcuts: const <ShortcutActivator, Intent>{
-          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-        },
-        actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (ActivateIntent intent) {
-              _toggle();
-              return null;
-            },
-          ),
-        },
-        mouseCursor: _enabled
-            ? SystemMouseCursors.click
-            : SystemMouseCursors.basic,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: _enabled ? _toggle : null,
-          child: Opacity(
-            opacity: widget.disabled ? DabblerToggle.disabledOpacity : 1,
-            child: SizedBox(
-              // The hit area, not the switch: 45 square around a 48×28 track,
-              // so the target clears the floor without the painted geometry
-              // moving. The specimen puts Checkbox and Radio "inside a
-              // --touch-target-min row" for the same reason.
-              //
-              // Inside a tappable row (see [DabblerToggleRowScope]) the row is
-              // the target, so the switch lays out at its painted height and
-              // the row keeps the design's rhythm.
-              height: DabblerToggleRowScope.of(context)
-                  ? DabblerToggle.trackHeight
-                  : DabblerSizing.touchTargetMin,
-              child: Center(widthFactor: 1, child: ringed),
+        onTap: _enabled ? _toggle : null,
+        container: true,
+        child: FocusableActionDetector(
+          enabled: _enabled,
+          onShowFocusHighlight: (bool visible) {
+            if (_ringVisible != visible) {
+              setState(() => _ringVisible = visible);
+            }
+          },
+          shortcuts: const <ShortcutActivator, Intent>{
+            SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+            SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+          },
+          actions: <Type, Action<Intent>>{
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (ActivateIntent intent) {
+                _toggle();
+                return null;
+              },
+            ),
+          },
+          mouseCursor: _enabled
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _enabled ? _toggle : null,
+            child: Opacity(
+              opacity: widget.disabled ? DabblerToggle.disabledOpacity : 1,
+              child: widget.compactHitArea
+                  ? ringed
+                  : SizedBox(
+                      // The hit area, not the switch: 45 square around a 48×28 track,
+                      // so the target clears the floor without the painted geometry
+                      // moving. The specimen puts Checkbox and Radio "inside a
+                      // --touch-target-min row" for the same reason.
+                      //
+                      // Inside a tappable row (see [DabblerToggleRowScope]) the
+                      // row is the target, so the switch lays out at its
+                      // painted height and the row keeps the design's rhythm.
+                      height: DabblerToggleRowScope.of(context)
+                          ? DabblerToggle.trackHeight
+                          : DabblerSizing.touchTargetMin,
+                      child: Center(widthFactor: 1, child: ringed),
+                    ),
             ),
           ),
         ),
       ),
     );
   }
+
+  Widget _hit(Widget child) => widget.compactHitArea
+      ? DabblerExpandedHitArea(
+          minimum: const Size(
+            DabblerToggle.trackWidth,
+            DabblerSizing.touchTargetMin,
+          ),
+          child: child,
+        )
+      : child;
+}
+
+/// Tells a [DabblerToggle] below it that a tappable row already supplies the
+/// 45-point touch target, so the switch lays out at its painted 28. Provided
+/// by `DabblerInputRow` when it has an `onTap`. [DabblerToggle.compactHitArea]
+/// is the explicit per-switch form of the same idea.
+class DabblerToggleRowScope extends InheritedWidget {
+  /// Marks [child] as the trailing slot of a row that is itself the target.
+  const DabblerToggleRowScope({super.key, required super.child});
+
+  /// Whether a [DabblerToggleRowScope] is above [context].
+  static bool of(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<DabblerToggleRowScope>() != null;
+
+  @override
+  bool updateShouldNotify(DabblerToggleRowScope oldWidget) => false;
 }

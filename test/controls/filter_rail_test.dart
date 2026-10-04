@@ -64,6 +64,35 @@ void main() {
     expect(first, greaterThan(clear));
   });
 
+  testWidgets('chips are the small size and Clear all is muted text (frame)', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_rail(onClearAll: () {}));
+    for (final DabblerChip c in tester.widgetList<DabblerChip>(
+      find.byType(DabblerChip),
+    )) {
+      expect(c.size, DabblerChipSize.small);
+    }
+    final DabblerTextLink link = tester.widget<DabblerTextLink>(
+      find.byKey(DabblerFilterRail.clearAllKey),
+    );
+    expect(link.muted, isTrue);
+    expect(link.underline, isFalse);
+    expect(find.byType(DabblerButton), findsNothing);
+  });
+
+  testWidgets('RTL Arabic: Clear all is the same muted text', (tester) async {
+    await tester.pumpWidget(
+      _rail(
+        direction: TextDirection.rtl,
+        labels: const <String>['ضمن 5 كم'],
+        onClearAll: () {},
+      ),
+    );
+    expect(find.text('مسح الكل'), findsOneWidget);
+    expect(find.byType(DabblerButton), findsNothing);
+  });
+
   testWidgets('FilterGroup shows caption and chips', (tester) async {
     await tester.pumpWidget(
       host(

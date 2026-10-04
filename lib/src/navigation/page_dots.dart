@@ -55,6 +55,7 @@ class DabblerPageDots extends StatelessWidget {
     required this.index,
     this.onSelected,
     this.semanticLabelBuilder,
+    this.compactHitArea = false,
   }) : assert(count > 0, 'there is at least one page'),
        assert(index >= 0 && index < count, 'index must be a page');
 
@@ -70,6 +71,15 @@ class DabblerPageDots extends StatelessWidget {
   /// Builds each dot's label — pass a localised one. Defaults to
   /// "Page N of M".
   final DabblerPageDotLabel? semanticLabelBuilder;
+
+  /// Whether a tappable row ([onSelected] set) drops the
+  /// [DabblerSizing.touchTargetMin]-tall hit area and is exactly as tall as
+  /// its 6px dots, as the frame draws them
+  /// (`Auth and Onboarding.dc.html:77-81`). Default false keeps the 45px
+  /// target. Use it where another control (a swipe, a Next button) already
+  /// carries the action and the dots only echo it. A static row
+  /// ([onSelected] null) is always compact.
+  final bool compactHitArea;
 
   /// The width of the active dot.
   static const double activeWidth = DabblerSpacing.space8;
@@ -129,15 +139,22 @@ class DabblerPageDots extends StatelessWidget {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => onSelected!(i),
-              child: SizedBox(
-                height: DabblerSizing.touchTargetMin,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: DabblerSpacing.space1,
-                  ),
-                  child: Center(child: dot(i)),
-                ),
-              ),
+              child: compactHitArea
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: DabblerSpacing.space1,
+                      ),
+                      child: dot(i),
+                    )
+                  : SizedBox(
+                      height: DabblerSizing.touchTargetMin,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: DabblerSpacing.space1,
+                        ),
+                        child: Center(child: dot(i)),
+                      ),
+                    ),
             ),
           ),
         ),

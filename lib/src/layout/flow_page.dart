@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '../controls/button.dart';
+import '../foundations/icon.dart';
+import '../interaction/focus_ring.dart';
 import '../tokens/dabbler_colors.dart';
 import '../navigation/step_progress.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -73,12 +75,14 @@ class DabblerFlowPage extends StatelessWidget {
     this.subtitle,
     this.titleStyle = DabblerType.title1,
     this.subtitleStyle = DabblerType.subheadline,
+    this.titleGap = DabblerSpacing.space2,
     this.leading,
     this.content = const <Widget>[],
     this.centered = false,
     this.spreadChildren = false,
     this.bodyGap = DabblerSpacing.space6,
     this.bodyTopPadding = DabblerSpacing.space6,
+    this.bodyBottomPadding = 0,
     this.footerBottomPadding = DabblerSpacing.space8,
     this.headerTopPadding,
     this.footerBanner,
@@ -98,6 +102,12 @@ class DabblerFlowPage extends StatelessWidget {
 
   /// The content never grows wider than this, `480`.
   static const double maxContentWidth = 480;
+
+  /// The back arrow's glyph size — 24, drawn inside the standard 45px target
+  /// (`Auth and Onboarding.dc.html:150`, `<Icon name="arrow-left" size="24">`;
+  /// the same at `:183`, `:213`, `:332`). Was 20 (the icon-only default)
+  /// until 2026-10-04 (KAN-426), when the design's flow frames were measured.
+  static const double backGlyphSize = 24;
 
   /// Called by the back button. Null draws no back row.
   final VoidCallback? onBack;
@@ -120,11 +130,22 @@ class DabblerFlowPage extends StatelessWidget {
   /// The line under the title.
   final String? subtitle;
 
+  /// Padding under the scrolling body, above the footer. Default `0`. The
+  /// persona welcome frame pads the body bottom by `24` so its last card sits
+  /// 42 above the primary button (`DabblerSpacing.space8`). Ignored by the
+  /// [centered] layout, which is not a scrolling body.
+  final double bodyBottomPadding;
+
   /// The title's type step. Default [DabblerType.title1].
   final DabblerTypeStyle titleStyle;
 
   /// The subtitle's type step. Default [DabblerType.subheadline].
   final DabblerTypeStyle subtitleStyle;
+
+  /// The space between the title and the subtitle. Default `space2` (6); the
+  /// email, log-in, code and welcome-back frames give `space3` (9)
+  /// (`Auth and Onboarding.dc.html`, title block `gap:9px`).
+  final double titleGap;
 
   /// A widget above the title block — an avatar or a header row.
   final Widget? leading;
@@ -176,8 +197,7 @@ class DabblerFlowPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         if (title != null) DabblerText(title!, style: titleStyle),
-        if (title != null && subtitle != null)
-          const DabblerGap.v(DabblerSpacing.space2),
+        if (title != null && subtitle != null) DabblerGap.v(titleGap),
         if (subtitle != null)
           DabblerText(
             subtitle!,
@@ -252,10 +272,12 @@ class DabblerFlowPage extends StatelessWidget {
               start: DabblerSpacing.space8,
               end: DabblerSpacing.space8,
               top: bodyTopPadding,
+              bottom: bodyBottomPadding,
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - bodyTopPadding,
+                minHeight:
+                    constraints.maxHeight - bodyTopPadding - bodyBottomPadding,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -274,6 +296,7 @@ class DabblerFlowPage extends StatelessWidget {
                 start: DabblerSpacing.space8,
                 end: DabblerSpacing.space8,
                 top: bodyTopPadding,
+                bottom: bodyBottomPadding,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -297,13 +320,7 @@ class DabblerFlowPage extends StatelessWidget {
             ),
             child: Align(
               alignment: AlignmentDirectional.centerStart,
-              child: DabblerButton.icon(
-                icon: 'arrow-circle-left',
-                mirrorInRtl: true,
-                tone: DabblerButtonTone.text,
-                semanticLabel: backLabel!,
-                onPressed: onBack,
-              ),
+              child: _FlowBackButton(label: backLabel!, onPressed: onBack!),
             ),
           ),
         if (!centered) header,
@@ -362,6 +379,50 @@ class DabblerFlowPage extends StatelessWidget {
           background!,
           SafeArea(child: constrained),
         ],
+      ),
+    );
+  }
+}
+
+/// The flow page's back control: exactly a 45x45 square (the frame's
+/// `width:45px;height:45px`) holding the 24px `arrow-circle-left`, with no
+/// horizontal padding, so the glyph is centred 22.5 in from the box edge. The
+/// page seats the box 12 from the screen edge (the frame's `margin-left:-12px`
+/// inside its 24px gutter). It replaces the icon [DabblerButton], whose box
+/// was 64 wide.
+class _FlowBackButton extends StatelessWidget {
+  const _FlowBackButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      onTap: onPressed,
+      child: DabblerFocusRing(
+        enabled: true,
+        canRequestFocus: true,
+        borderRadius: DabblerRadius.pillAll,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onPressed,
+          child: SizedBox(
+            width: DabblerSizing.touchTargetMin,
+            height: DabblerSizing.touchTargetMin,
+            child: Center(
+              child: DabblerIcon(
+                'arrow-circle-left',
+                mirrorInRtl: true,
+                size: DabblerFlowPage.backGlyphSize,
+                color: DabblerColors.of(context).textPrimary,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

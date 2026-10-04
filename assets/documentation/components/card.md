@@ -86,6 +86,7 @@ is deliberately left unchanged because the ticket card still uses it; the two di
 
 ## Change log
 
+- KAN-426 (fidelity) — adds `borderOutside` (default false), passed to `DabblerSurface.borderOutside`: the web card adds its 1px hairline to the padded content, so a content-sized white card is 2px taller than this paints by default. Existing callers are unchanged; a borderless variant is unaffected.
 - D-018 (cxo) — the card corner is 16, a dedicated step, not
   12; 12 remains the corner of a tile nested inside a card, which is a different thing measuring the
   same as an old, wrong assumption.

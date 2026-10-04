@@ -31,6 +31,7 @@ extension _DabblerTextFieldSelect on _DabblerTextFieldState {
       focused: _focused || widget.open,
       focusRingVisible: _focused,
       disabled: disabled,
+      borderOutside: widget.borderOutside,
       radius: radius,
       onTap: widget.onPressed,
       semanticsLabel: widget.label,
@@ -59,18 +60,27 @@ extension _DabblerTextFieldSelect on _DabblerTextFieldState {
                 ),
           ),
         ),
-        AnimatedRotation(
-          turns: widget.open ? 0.5 : 0,
-          duration: DabblerMotion.reduceMotion(context)
-              ? Duration.zero
-              : DabblerMotion.base,
-          curve: DabblerMotion.easeOut,
-          child: DabblerIcon(
-            DabblerTextField.selectArrowName,
+        if (widget.circledSelectArrow)
+          DabblerIcon(
+            widget.open
+                ? DabblerTextField.selectArrowOpenCircledName
+                : DabblerTextField.selectArrowCircledName,
             size: DabblerSizing.iconSm,
             color: colors.textSecondary,
+          )
+        else
+          AnimatedRotation(
+            turns: widget.open ? 0.5 : 0,
+            duration: DabblerMotion.reduceMotion(context)
+                ? Duration.zero
+                : DabblerMotion.base,
+            curve: DabblerMotion.easeOut,
+            child: DabblerIcon(
+              DabblerTextField.selectArrowName,
+              size: DabblerSizing.iconSm,
+              color: colors.textSecondary,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -83,9 +93,11 @@ class _PasswordToggle extends StatelessWidget {
     required this.revealed,
     required this.enabled,
     required this.color,
+    required this.glyphSize,
     required this.onPressed,
   });
 
+  final double glyphSize;
   final bool revealed;
   final bool enabled;
   final Color color;
@@ -108,7 +120,7 @@ class _PasswordToggle extends StatelessWidget {
               revealed
                   ? DabblerTextField.concealIconName
                   : DabblerTextField.revealIconName,
-              size: DabblerSizing.iconMd,
+              size: glyphSize,
               color: color,
             ),
           ),

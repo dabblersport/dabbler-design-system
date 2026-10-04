@@ -73,6 +73,10 @@ separator problem this solves. Not yet checked against the gallery's direction s
 Trailing button: brand-tinted icon on a 45×45 target. Everything else — label, border states,
 helper/error line, focus colour — comes from `FieldShell`; see that page.
 
+## Change log
+
+- KAN-426 (final) — adds `borderOutside` (default false): the hairline sits outside the content box, as the Auth and Onboarding frame's `Surface` draws it (`box-sizing: border-box` with no explicit height), so the box grows by twice the border. See `DabblerSurface.borderOutside`.
+
 ## Source
 
 `lib/src/forms/picker_field_shell.dart`

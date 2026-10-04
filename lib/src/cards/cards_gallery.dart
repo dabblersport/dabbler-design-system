@@ -118,6 +118,15 @@ Widget _cards(BuildContext context) => GalleryWrap(
           child: Text(variant.name),
         ),
       ),
+    const GallerySpecimen(
+      label: 'white · borderOutside',
+      child: DabblerCard(
+        variant: DabblerCardVariant.white,
+        borderOutside: true,
+        width: 150,
+        child: Text('hairline outside the padding'),
+      ),
+    ),
   ],
 );
 

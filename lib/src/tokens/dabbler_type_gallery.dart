@@ -95,6 +95,17 @@ const List<GalleryEntry> typeGalleryEntries = <GalleryEntry>[
         'shown as what D-024 says it is: a second ramp, not three steps.',
     builder: _weights,
   ),
+  GalleryEntry(
+    id: 'type/frame-roles',
+    page: 'foundations/type',
+    group: null,
+    title: 'Type — roles added from the design frames',
+    description:
+        'The roles the Auth, Listings, Details, Profiles, Sport Profile and '
+        'Favourites frames use that the twelve steps cannot express, '
+        'in Latin and Arabic (D-024 amended, KAN-426).',
+    builder: _frameRoles,
+  ),
 ];
 
 /// The four faces, with the coverage table's own verdicts.
@@ -236,6 +247,35 @@ Widget _scale(BuildContext context) => GalleryStack(
   ],
 );
 
+Widget _frameRoles(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**D-024 (type ramp frozen) is amended: the design is the source of '
+      'truth.** These roles were added on 2026-10-04 (KAN-426) because the '
+      'design frames set type the twelve `.t-*` steps do not carry. The ramp '
+      'may grow only from design frames. Arabic is the Latin size less 0.9px; '
+      'Arabic leading is the design\'s own Arabic frame where it has one. '
+      'Weight is the role\'s default; set another with `DabblerText.weight`.',
+    ),
+    GalleryGroup(
+      name: 'Frame roles — every added step',
+      wrap: false,
+      children: <Widget>[
+        for (final DabblerTypeStyle style in DabblerType.frameRoles)
+          _RampRow(style: style, sample: _frameSample(style)),
+      ],
+    ),
+  ],
+);
+
+(String, String) _frameSample(DabblerTypeStyle style) =>
+    style.role == DabblerTypeRole.display
+    ? ('Let\'s get you playing 24', 'هيا نبدأ اللعب 24')
+    : (
+        'Games, squads and venues near you 24',
+        'مباريات وفرق وملاعب بالقرب منك 24',
+      );
+
 /// The five weight tokens with the source table's own "where it's used" text.
 const List<(String, FontWeight, String)> _weights_ =
     <(String, FontWeight, String)>[
@@ -371,14 +411,17 @@ class _FaceCard extends StatelessWidget {
 
 /// One ramp step: the spec, then the same step set in both scripts.
 class _RampRow extends StatelessWidget {
-  const _RampRow({required this.style});
+  const _RampRow({required this.style, this.sample});
 
   final DabblerTypeStyle style;
+
+  /// Latin and Arabic sample text; null looks the style up in [_samples].
+  final (String, String)? sample;
 
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final (String latin, String arabic) = _samples[style.name]!;
+    final (String latin, String arabic) = sample ?? _samples[style.name]!;
     final String leading = style.takesArabicExtraLeading
         ? '${_n(style.latinLeading)} Latin / ${_n(style.arabicLeading)} Arabic'
         : '${_n(style.latinLeading)} both';

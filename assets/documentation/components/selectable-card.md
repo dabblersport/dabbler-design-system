@@ -58,19 +58,21 @@ layouts.
 
 Fill and idle border: the surface tint at 10% and 28%. Selected border: the tint at twice
 `borderDefault`. Radius: `lg` for rows, `md` for tiles. Padding `space5` (row), gaps `space4` and
-`space2`. Type: `caption1` semibold caption, `callout` title, `footnote` subtitle, `caption2`
-medium tile label.
+`space2`. Type: `body` semibold caption, `body` medium hook at 16/23 (persona row), `small` subtitle, `rowTitle` list-row title, `copy` medium stacked label, `tagTight` medium tile label.
 
 Row caption and title use the 16px `body` step, as the source sets no size and they inherit it; the caption is tracked 0.06em (not under RTL, where tracking breaks joining).
 
 Deviation: the design mixes the fill at 12% and the idle border at 30%, and draws a 26px tile
-glyph, a 14px tile check and a 14px body. The nearest tokens are used: the 10%/28% tint,
-`iconLg`, `iconSm` and `footnote`. There is no 2px border token, so the selected border is two
+glyph and a 14px tile check. The nearest tokens are used: the 10%/28% tint,
+`iconLg` and `iconSm`. There is no 2px border token, so the selected border is two
 `borderDefault` widths.
 
 ## Change log
 
+- KAN-426 (round 2) — the persona row's caption takes the font's natural leading (CSS `normal`, as the frame inherits) instead of the body step's 21, which made the card about 3px taller than the frame. Latin only; Arabic keeps the body's 24. The caption exists only on the row layout, so no other layout moves.
+- KAN-426 (final) — adds `borderOutside` (default false): the persona row and the sport tile grow by twice their border (1px idle, 2px selected, as the frame does); `listRow` and `stacked` keep their outer 63 and 96 minimum, because `min-height` under `border-box` includes the border.
 - Alpha DS gaps 5 — adds this component.
+- KAN-426 (close) — text roles follow the frames: persona subtitle `small` (14/20) with 3px between the lines and the hook at 16/23, list-row title `rowTitle` (17/23), stacked label `copy` medium (15/21), tile label `tagTight` medium (11/14). Previously `footnote`, `callout`, `subheadline` and `caption2`.
 - Alpha fidelity rebuild (auth2) — adds the `listRow` and `stacked` layouts and the `tone` parameter (`DabblerHueTone`: per-sport, per-gender and ramp tints, from the source's `tone()` and `personaCards()`); the row caption and title move to the 16px step the source inherits.
 
 ## Source

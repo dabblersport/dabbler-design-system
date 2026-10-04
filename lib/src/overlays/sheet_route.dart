@@ -42,6 +42,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     this.contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
     this.pageBackground = false,
     this.showCloseButton = true,
+    this.headerDivider = false,
     super.settings,
   });
 
@@ -56,6 +57,9 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
 
   /// See [DabblerSheet.showCloseButton].
   final bool showCloseButton;
+
+  /// See [DabblerSheet.headerDivider].
+  final bool headerDivider;
 
   /// Builds the scrolling body.
   final WidgetBuilder builder;
@@ -126,6 +130,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
       contentMaxFraction: contentMaxFraction,
       pageBackground: pageBackground,
       showCloseButton: showCloseButton,
+      headerDivider: headerDivider,
       child: builder(context),
     );
   }
@@ -183,6 +188,7 @@ Future<T?> showDabblerSheet<T>({
   double contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
   bool pageBackground = false,
   bool showCloseButton = true,
+  bool headerDivider = false,
 }) {
   return Navigator.of(context, rootNavigator: true).push<T>(
     DabblerSheetRoute<T>(
@@ -201,6 +207,7 @@ Future<T?> showDabblerSheet<T>({
       contentMaxFraction: contentMaxFraction,
       pageBackground: pageBackground,
       showCloseButton: showCloseButton,
+      headerDivider: headerDivider,
     ),
   );
 }

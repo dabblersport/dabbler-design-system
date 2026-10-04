@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
 
+import '../foundations/icon.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../surfaces/badge.dart';
@@ -12,6 +14,10 @@ import '../tokens/dabbler_type.dart';
 enum DabblerProfileRowTone {
   /// `--surface-card`, no tint.
   neutral,
+
+  /// `--surface-page` with the faint hairline — the switch-profile sheet's
+  /// idle rows, which sit on the sheet's card ground (`Profiles.dc.html:679`).
+  page,
 
   /// The success status surface.
   success,
@@ -51,6 +57,8 @@ class DabblerProfileRow extends StatefulWidget {
     this.tone = DabblerProfileRowTone.neutral,
     this.onTap,
     this.semanticLabel,
+    this.icon,
+    this.selected = false,
   });
 
   /// The semibold title.
@@ -80,6 +88,30 @@ class DabblerProfileRow extends StatefulWidget {
   /// The accessible name; defaults to title, sub-line and tag.
   final String? semanticLabel;
 
+  /// A glyph (a DS icon name) in a 45 square tile before the text — the
+  /// switch-profile sheet's persona rows (`Profiles.dc.html:296-298`).
+  final String? icon;
+
+  /// The chosen row: a brand fill and brand border, on-brand ink, a bold
+  /// `tick-circle` at the end and the icon tile on a translucent on-brand
+  /// ground (`Profiles.dc.html:679-689`). Neutral-toned rows only.
+  final bool selected;
+
+  /// The icon tile's side — `45`.
+  static const double iconTileSide = DabblerSizing.touchTargetMin;
+
+  /// The icon glyph's size inside the tile — `21`.
+  static const double iconGlyphSize = 21;
+
+  /// The selected row's tick glyph size — `20`.
+  static const double tickGlyphSize = 20;
+
+  /// The selected tile's ground alpha — `rgba(255,255,255,0.18)`.
+  static const double selectedTileAlpha = 0.18;
+
+  /// The selected sub-line's alpha — `rgba(255,255,255,0.78)`.
+  static const double selectedSubAlpha = 0.78;
+
   /// The lead block's minimum width — `min-width: 54`.
   static const double leadMinWidth = 54;
 
@@ -91,13 +123,16 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
   bool _pressed = false;
   bool _focused = false;
 
-  Color _fill(DabblerColors c) => switch (widget.tone) {
-    DabblerProfileRowTone.neutral => c.surfaceCard,
-    DabblerProfileRowTone.success => c.success.surface,
-    DabblerProfileRowTone.warning => c.warning.surface,
-    DabblerProfileRowTone.info => c.info.surface,
-    DabblerProfileRowTone.error => c.error.surface,
-  };
+  Color _fill(DabblerColors c) => widget.selected
+      ? c.brandPrimary
+      : switch (widget.tone) {
+          DabblerProfileRowTone.neutral => c.surfaceCard,
+          DabblerProfileRowTone.page => c.bgPrimary,
+          DabblerProfileRowTone.success => c.success.surface,
+          DabblerProfileRowTone.warning => c.warning.surface,
+          DabblerProfileRowTone.info => c.info.surface,
+          DabblerProfileRowTone.error => c.error.surface,
+        };
 
   @override
   Widget build(BuildContext context) {
@@ -151,8 +186,45 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
       );
     }
 
+    final bool on = widget.selected;
+    final Color ink = on ? colors.onBrand : colors.textPrimary;
+    final Color subInk = on
+        ? colors.onBrand.withValues(alpha: DabblerProfileRow.selectedSubAlpha)
+        : colors.textSecondary;
+    final String? glyph = widget.icon;
+    final Widget? iconTile = glyph == null
+        ? null
+        : SizedBox.square(
+            dimension: DabblerProfileRow.iconTileSide,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: on
+                    ? colors.onBrand.withValues(
+                        alpha: DabblerProfileRow.selectedTileAlpha,
+                      )
+                    : colors.surfaceCard,
+                borderRadius: BorderRadius.circular(DabblerRadius.md),
+                border: Border.all(
+                  color: on ? Colors.transparent : colors.bgTertiary,
+                  width: DabblerSizing.borderDefault,
+                ),
+              ),
+              child: Center(
+                child: DabblerIcon(
+                  glyph,
+                  size: DabblerProfileRow.iconGlyphSize,
+                  color: on ? colors.onBrand : colors.brandPrimary,
+                ),
+              ),
+            ),
+          );
+
     final Widget body = Row(
       children: <Widget>[
+        if (iconTile != null) ...<Widget>[
+          iconTile,
+          const SizedBox(width: DabblerSpacing.space4),
+        ],
         if (leadBlock != null) ...<Widget>[
           leadBlock,
           const SizedBox(width: DabblerSpacing.space4),
@@ -168,10 +240,7 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
                 overflow: TextOverflow.ellipsis,
                 style: DabblerType.subheadline
                     .resolveForDirection(dir)
-                    .copyWith(
-                      color: colors.textPrimary,
-                      fontWeight: DabblerType.semibold,
-                    ),
+                    .copyWith(color: ink, fontWeight: DabblerType.semibold),
               ),
               if (widget.subtitle != null)
                 Text(
@@ -180,11 +249,22 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
                   overflow: TextOverflow.ellipsis,
                   style: DabblerType.footnote
                       .resolveForDirection(dir)
-                      .copyWith(color: colors.textSecondary),
+                      .copyWith(color: subInk),
                 ),
             ],
           ),
         ),
+        if (on) ...<Widget>[
+          const SizedBox(width: DabblerSpacing.space4),
+          ExcludeSemantics(
+            child: DabblerIcon(
+              'tick-circle',
+              weight: DabblerIconWeight.bold,
+              size: DabblerProfileRow.tickGlyphSize,
+              color: colors.onBrand,
+            ),
+          ),
+        ],
         if (widget.tag != null) ...<Widget>[
           const SizedBox(width: DabblerSpacing.space4),
           DabblerBadge(
@@ -201,7 +281,11 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
         color: _fill(colors),
         borderRadius: BorderRadius.circular(DabblerRadius.lg),
         border: Border.all(
-          color: colors.borderDefault,
+          color: on
+              ? colors.brandPrimary
+              : widget.tone == DabblerProfileRowTone.page
+              ? colors.bgTertiary
+              : colors.borderDefault,
           width: DabblerSizing.borderDefault,
         ),
       ),

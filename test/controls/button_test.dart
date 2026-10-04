@@ -409,6 +409,27 @@ void main() {
       expect(bare.children.whereType<SizedBox>(), isEmpty);
     });
 
+    testWidgets('iconGlyphSize overrides the icon-only glyph size (KAN-426)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          DabblerButton.icon(
+            icon: 'more',
+            semanticLabel: 'More',
+            iconGlyphSize: 24,
+            onPressed: () {},
+          ),
+        ),
+      );
+      expect(tester.widget<DabblerIcon>(find.byType(DabblerIcon)).size, 24);
+      // The 45px target is unchanged by a larger glyph.
+      expect(
+        tester.getSize(find.byType(DabblerButton)).height,
+        greaterThanOrEqualTo(DabblerSizing.touchTargetMin),
+      );
+    });
+
     testWidgets('an icon-only button renders its glyph at 20 and no label', (
       WidgetTester tester,
     ) async {

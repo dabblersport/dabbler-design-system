@@ -61,6 +61,10 @@ The same `FieldShell` rest / focused / filled / error / disabled states, inherit
 
 Everything visible belongs to `PickerFieldShell` — see that page.
 
+## Change log
+
+- KAN-426 (final) — adds `borderOutside` (default false): the hairline sits outside the content box, as the Auth and Onboarding frame's `Surface` draws it (`box-sizing: border-box` with no explicit height), so the box grows by twice the border. See `DabblerSurface.borderOutside`.
+
 ## Source
 
 `lib/src/forms/time_field.dart`

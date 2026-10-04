@@ -112,6 +112,7 @@ class DabblerSurface extends StatelessWidget {
     this.height,
     this.center = false,
     this.clipBehavior = Clip.antiAlias,
+    this.borderOutside = false,
   }) : _bleed = false,
        assert(
          borderWidth == null || borderWidth >= 0,
@@ -132,6 +133,7 @@ class DabblerSurface extends StatelessWidget {
     double? height,
     bool center = false,
     Clip clipBehavior = Clip.antiAlias,
+    bool borderOutside = false,
   }) : this(
          key: key,
          child: child,
@@ -145,6 +147,7 @@ class DabblerSurface extends StatelessWidget {
          height: height,
          center: center,
          clipBehavior: clipBehavior,
+         borderOutside: borderOutside,
        );
 
   /// The sunken fill step — [DabblerSurfaceVariant.sunken].
@@ -257,6 +260,7 @@ class DabblerSurface extends StatelessWidget {
        borderWidth = 0,
        center = false,
        clipBehavior = Clip.none,
+       borderOutside = false,
        _bleed = true;
 
   /// The solid brand fill of a selected control —
@@ -336,6 +340,20 @@ class DabblerSurface extends StatelessWidget {
   /// the source's `overflow: hidden`; pass [Clip.none] for a child that must
   /// paint outside the radius.
   final Clip clipBehavior;
+
+  /// Whether the hairline sits **outside** the content box, as the web
+  /// `Surface` draws it (`box-sizing: border-box` with no explicit height, so
+  /// the border adds to the content instead of eating into it). Default false:
+  /// the hairline is painted inside the box and the surface is exactly as tall
+  /// as its content, which is what every existing caller was measured
+  /// against.
+  ///
+  /// When true, [child] is inset by the border width on all four sides, so a
+  /// content-sized surface grows by twice the border (a 45 minimum field box
+  /// is 47 high; a 2px focus border makes it 49) and an explicit [width] or
+  /// [height] stays the outer size, as `border-box` means. Has no effect
+  /// without a border or without a [child].
+  final bool borderOutside;
 
   /// True only for [DabblerSurface.brandTintBleed]: the fill resolves through
   /// [brandTintBleedFill] instead of [fillOf].
@@ -453,6 +471,12 @@ class DabblerSurface extends StatelessWidget {
     }
     if (content != null && center) {
       content = Center(child: content);
+    }
+    if (content != null &&
+        borderOutside &&
+        resolvedBorder != null &&
+        resolvedWidth > 0) {
+      content = Padding(padding: EdgeInsets.all(resolvedWidth), child: content);
     }
 
     return SizedBox(

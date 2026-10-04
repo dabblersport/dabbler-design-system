@@ -2,13 +2,35 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../foundations/sport_accent.dart';
 import '../foundations/vibes.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+
+/// The three heights a [DabblerChip] is drawn at.
+///
+/// Additive (KAN-426, Seat B): the design draws chips at more than one size,
+/// and the package's one 15/20 pill covered only the filter-row chip of
+/// `identity-status.card.html`.
+enum DabblerChipSize {
+  /// The system chip — 15/20 medium, `9 15` padding inside a 1px hairline,
+  /// 40 tall (was 38 before 2026-10-04; see [DabblerChip.visualHeight]). The
+  /// default.
+  regular,
+
+  /// The notification-tab chip — 13/18 medium, 34 tall, `0 13` padding
+  /// (`Notifications.dc.html:56-58`).
+  small,
+
+  /// The sport-picker chip — 14/19 semibold, 45 tall, `0 15` padding
+  /// (`Profiles.dc.html:160-163`). The painted pill is itself the 45 target.
+  large,
+}
 
 /// Chip — the pill filter/tag control.
 ///
@@ -129,10 +151,33 @@ class DabblerChip extends StatefulWidget {
     this.tag = false,
     this.count,
     this.trailingIcon,
+    this.accent,
+    this.size = DabblerChipSize.regular,
+    this.compactHitArea = false,
   });
+
+  /// Whether a tappable chip drops the [DabblerSizing.touchTargetMin] box from
+  /// layout and is exactly as tall as its pill (40 regular), as the frames
+  /// that lay a chip out inside a row draw it. Default false keeps the 45px
+  /// minimum box. A static chip (null [onTap]) never had one.
+  ///
+  /// The target is not given up: a hit within 45 by 45 of the pill's centre
+  /// (wider pills keep their width) still taps it, hit-test only, so the
+  /// parent must leave that margin free for it to apply in full.
+  final bool compactHitArea;
 
   /// The chip text. `label: string` in `Chip.d.ts`.
   final String label;
+
+  /// Colours the chip by sport (`Profiles.dc.html:605-617`): selected, the
+  /// fill is [DabblerSportAccent.base] with the on-brand ink; idle, the card
+  /// fill with the secondary ink on label and glyph, and the [dot] in
+  /// [DabblerSportAccent.base]. A [vibe] wins over it. Additive.
+  final DabblerSportAccent? accent;
+
+  /// The chip's height class; see [DabblerChipSize]. Additive, default
+  /// [DabblerChipSize.regular]. Ignored by [compact].
+  final DabblerChipSize size;
 
   /// A glyph after the label — the quiet-hours pill's `arrow-circle-right`
   /// (`Notifications.dc.html:226`, 14px). Drawn at 14 in the label's ink and
@@ -268,17 +313,32 @@ class DabblerChip extends StatefulWidget {
   /// 15/20/500 constant, would put a type value outside the ramp.
   static const DabblerTypeStyle labelStyle = DabblerType.subheadline;
 
-  /// The pill's own painted height with Latin metrics: 20 leading +
-  /// 2 × [verticalPadding] = 38.
+  /// [DabblerChipSize.small]'s painted height — `34` (`Notifications.dc.html:58`).
+  static const double smallHeight = 34;
+
+  /// [DabblerChipSize.small]'s inline padding — `13`.
+  static const double smallHorizontalPadding = 13;
+
+  /// [DabblerChipSize.large]'s painted height — `45`, the touch-target floor
+  /// (`Profiles.dc.html:160`).
+  static const double largeHeight = DabblerSizing.touchTargetMin;
+
+  /// The regular pill's own painted height with Latin metrics: 20 leading +
+  /// 2 × [verticalPadding] + the 1px hairline on each side = 40.
   ///
-  /// The hairline adds nothing to it. [DabblerSurface] paints its border with a
-  /// [DecoratedBox] and applies its padding separately, so the 1px border is
-  /// drawn *inside* the box rather than inflating it — which is CSS
-  /// `box-sizing: border-box`, the behaviour the source's own stylesheet has.
+  /// **Corrected 2026-10-04 (KAN-426): was 38.** The web `Chip.jsx` pads its
+  /// inner span `9px 15px` *inside* the `Surface`, whose 1px border is outside
+  /// that span (`box-sizing: border-box` only binds when the box has an
+  /// explicit height, and the chip has none), so every frame draws the regular
+  /// chip 40 tall and 2px wider than its content plus padding. [DabblerSurface]
+  /// paints its border inside its box, so the padding here is
+  /// `verticalPadding + borderDefault`. The same hairline is kept, transparent,
+  /// on the selected chip, so both states are 40.
   ///
   /// Under Arabic the step takes 23 leading (`arabicLeading`), so the pill is
-  /// 41 — still the source's own metrics, and still inside the touch target.
-  static const double visualHeight = 20 + verticalPadding * 2;
+  /// 43 — still the source's own metrics, and still inside the touch target.
+  static const double visualHeight =
+      20 + (verticalPadding + DabblerSizing.borderDefault) * 2;
 
   /// The label colour for [selected]: [DabblerColors.onBrand] on the brand
   /// fill, [DabblerColors.textPrimary] otherwise (`Chip.jsx:14`).
@@ -319,6 +379,50 @@ class _DabblerChipState extends State<DabblerChip> {
 
   bool get _interactive => widget.onTap != null;
 
+  // The regular chip's CSS padding sits inside its hairline (see
+  // [DabblerChip.visualHeight]), so the paint-inside border is added to it.
+  static const double _regularVertical =
+      DabblerChip.verticalPadding + DabblerSizing.borderDefault;
+
+  double get _inlinePadding => switch (widget.size) {
+    DabblerChipSize.small => DabblerChip.smallHorizontalPadding,
+    DabblerChipSize.regular =>
+      DabblerChip.horizontalPadding + DabblerSizing.borderDefault,
+    DabblerChipSize.large => DabblerChip.horizontalPadding,
+  };
+
+  TextStyle _sizedLabelStyle(
+    DabblerColors colors,
+    TextDirection direction,
+    Color accentInk,
+    bool accented,
+  ) {
+    final Color color = accented
+        ? accentInk
+        : DabblerChip.labelColorFor(colors, selected: widget.selected);
+    switch (widget.size) {
+      case DabblerChipSize.regular:
+        return DabblerChip.labelStyleFor(
+          colors,
+          direction,
+          selected: widget.selected,
+        ).copyWith(color: color);
+      case DabblerChipSize.small:
+        return DabblerType.footnote
+            .resolveForDirection(direction)
+            .copyWith(fontWeight: DabblerType.medium, color: color);
+      case DabblerChipSize.large:
+        final TextStyle base = DabblerType.subheadline.resolveForDirection(
+          direction,
+        );
+        return base.copyWith(
+          fontSize: (base.fontSize ?? 15) - 1,
+          fontWeight: DabblerType.semibold,
+          color: color,
+        );
+    }
+  }
+
   void _setPressed(bool value) {
     if (_pressed == value) {
       return;
@@ -338,9 +442,17 @@ class _DabblerChipState extends State<DabblerChip> {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     final DabblerVibeColors? vibe = widget.vibe?.resolve(colors);
+    final DabblerSportAccent? accent = vibe == null && !widget.compact
+        ? widget.accent
+        : null;
+    final Color accentInk = widget.selected
+        ? DabblerSportAccent.onColorOf(colors)
+        : colors.textSecondary;
     final Color iconColor =
         vibe?.ink ??
-        DabblerChip.iconColorFor(colors, selected: widget.selected);
+        (accent != null
+            ? accentInk
+            : DabblerChip.iconColorFor(colors, selected: widget.selected));
     final TextStyle labelStyle = widget.tag
         ? DabblerType.caption1
               .resolveForDirection(direction)
@@ -355,11 +467,14 @@ class _DabblerChipState extends State<DabblerChip> {
                 fontWeight: DabblerType.medium,
                 color: colors.textSecondary,
               )
-        : DabblerChip.labelStyleFor(
-            colors,
-            direction,
-            selected: widget.selected,
-          );
+        : _sizedLabelStyle(colors, direction, accentInk, accent != null);
+    final double? pillHeight = widget.compact
+        ? null
+        : switch (widget.size) {
+            DabblerChipSize.regular => null,
+            DabblerChipSize.small => DabblerChip.smallHeight,
+            DabblerChipSize.large => DabblerChip.largeHeight,
+          };
     final double glyph = (widget.compact || widget.dense)
         ? DabblerSizing.iconInline
         : DabblerSizing.iconSm;
@@ -404,7 +519,7 @@ class _DabblerChipState extends State<DabblerChip> {
                   shape: BoxShape.circle,
                   color: widget.selected
                       ? colors.onBrand.withValues(alpha: 0.7)
-                      : colors.brandPrimary,
+                      : (accent?.base ?? colors.brandPrimary),
                 ),
               ),
             ),
@@ -502,7 +617,7 @@ class _DabblerChipState extends State<DabblerChip> {
       fill: widget.compact
           ? colors.surfaceSunken
           : (vibe == null
-                ? null
+                ? (accent != null && widget.selected ? accent.base : null)
                 : (widget.selected ? vibe.selectedSurface : vibe.surface)),
       borderColor: widget.compact
           ? Colors.transparent
@@ -516,21 +631,21 @@ class _DabblerChipState extends State<DabblerChip> {
             ? DabblerChip.denseVerticalPadding
             : widget.compact
             ? DabblerChip.compactVerticalPadding
-            : DabblerChip.verticalPadding,
+            : (pillHeight != null ? 0 : _regularVertical),
         bottom: widget.tag
             ? DabblerChip.tagVerticalPadding
             : widget.dense
             ? DabblerChip.denseVerticalPadding
             : widget.compact
             ? DabblerChip.compactVerticalPadding
-            : DabblerChip.verticalPadding,
+            : (pillHeight != null ? 0 : _regularVertical),
         start: widget.tag
             ? DabblerChip.tagHorizontalPadding
             : widget.dense
             ? DabblerChip.denseHorizontalPadding
             : widget.compact
             ? DabblerChip.compactHorizontalPadding
-            : DabblerChip.horizontalPadding,
+            : _inlinePadding,
         // The remove box absorbs the trailing padding — see [onRemove].
         end: removable
             ? 0
@@ -540,9 +655,14 @@ class _DabblerChipState extends State<DabblerChip> {
                   ? DabblerChip.denseHorizontalPadding
                   : widget.compact
                   ? DabblerChip.compactHorizontalPadding
-                  : DabblerChip.horizontalPadding),
+                  : _inlinePadding),
       ),
-      child: content,
+      child: pillHeight == null
+          ? content
+          : ConstrainedBox(
+              constraints: BoxConstraints(minHeight: pillHeight),
+              child: Center(widthFactor: 1, heightFactor: 1, child: content),
+            ),
     );
 
     // DS-200 supplies both of these. Nothing about the scale, the duration, the
@@ -568,51 +688,66 @@ class _DabblerChipState extends State<DabblerChip> {
       );
     }
 
-    return Semantics(
-      container: removable,
-      button: true,
-      selected: widget.selected,
-      label: widget.label,
-      onTap: widget.onTap,
-      onLongPress: widget.onLongPress,
-      child: ExcludeSemantics(
-        excluding: !removable,
-        child: FocusableActionDetector(
-          mouseCursor: SystemMouseCursors.click,
-          onShowFocusHighlight: _setFocused,
-          actions: <Type, Action<Intent>>{
-            // Enter and Space, which the source's `role="button"` gets from the
-            // user agent and Flutter does not.
-            ActivateIntent: CallbackAction<ActivateIntent>(
-              onInvoke: (ActivateIntent intent) {
-                widget.onTap?.call();
-                return null;
-              },
-            ),
-          },
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onTap,
-            onLongPress: widget.onLongPress,
-            onTapDown: (TapDownDetails _) => _setPressed(true),
-            onTapUp: (TapUpDetails _) => _setPressed(false),
-            onTapCancel: () => _setPressed(false),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                minWidth: DabblerSizing.touchTargetMin,
-                minHeight: DabblerSizing.touchTargetMin,
+    return _hit(
+      Semantics(
+        container: removable,
+        button: true,
+        selected: widget.selected,
+        label: widget.label,
+        onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
+        child: ExcludeSemantics(
+          excluding: !removable,
+          child: FocusableActionDetector(
+            mouseCursor: SystemMouseCursors.click,
+            onShowFocusHighlight: _setFocused,
+            actions: <Type, Action<Intent>>{
+              // Enter and Space, which the source's `role="button"` gets from the
+              // user agent and Flutter does not.
+              ActivateIntent: CallbackAction<ActivateIntent>(
+                onInvoke: (ActivateIntent intent) {
+                  widget.onTap?.call();
+                  return null;
+                },
               ),
-              // heightFactor/widthFactor 1 so the box hugs the pill in the axis
-              // the minimum is not binding on, instead of expanding to fill.
-              child: Center(
-                widthFactor: 1,
-                heightFactor: 1,
-                child: interactive,
-              ),
+            },
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onTap,
+              onLongPress: widget.onLongPress,
+              onTapDown: (TapDownDetails _) => _setPressed(true),
+              onTapUp: (TapUpDetails _) => _setPressed(false),
+              onTapCancel: () => _setPressed(false),
+              child: widget.compactHitArea
+                  ? interactive
+                  : ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: DabblerSizing.touchTargetMin,
+                        minHeight: DabblerSizing.touchTargetMin,
+                      ),
+                      // heightFactor/widthFactor 1 so the box hugs the pill in
+                      // the axis the minimum is not binding on, instead of
+                      // expanding to fill.
+                      child: Center(
+                        widthFactor: 1,
+                        heightFactor: 1,
+                        child: interactive,
+                      ),
+                    ),
             ),
           ),
         ),
       ),
     );
   }
+
+  Widget _hit(Widget child) => widget.compactHitArea
+      ? DabblerExpandedHitArea(
+          minimum: const Size(
+            DabblerSizing.touchTargetMin,
+            DabblerSizing.touchTargetMin,
+          ),
+          child: child,
+        )
+      : child;
 }

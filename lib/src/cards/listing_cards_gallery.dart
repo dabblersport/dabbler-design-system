@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 
 import '../controls/button.dart';
 import '../controls/chip.dart';
+import '../controls/favourite_button.dart';
 import '../feedback/progress_bar.dart';
 import '../foundations/icon.dart';
 import '../foundations/sports.dart';
@@ -169,8 +170,8 @@ Widget _venue({Widget? cover, required String name}) => DabblerCardVenue(
     const DabblerChip(label: 'Football'),
     const DabblerChip(label: 'Padel'),
   ],
-  favourite: DabblerButton.icon(
-    icon: 'heart',
+  favourite: DabblerFavouriteButton(
+    selected: false,
     semanticLabel: 'Save venue',
     onPressed: () {},
   ),

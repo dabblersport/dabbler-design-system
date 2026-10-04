@@ -51,6 +51,7 @@ Deviation: the design draws 4px segments with a 5px gap; no such tokens exist, s
 
 ## Change log
 
+- KAN-426 (round 2) — the segments are now 4 high with a 5 gap, as the frame draws them (were 3 and 6, the nearest grid steps). No 4 or 5 token exists on the 3pt grid, so they are named literals `defaultSegmentHeight` and `defaultSegmentGap`; `segmentHeight` and `segmentGap` override them (pass `DabblerSpacing.space1` and `space2` for the old look). No other frame draws a `DabblerStepProgress`.
 - Alpha DS gaps 5 — adds this component.
 
 ## Source
