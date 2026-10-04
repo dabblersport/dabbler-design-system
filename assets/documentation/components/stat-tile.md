@@ -48,6 +48,10 @@ carry the meaning.
 
 @specimen stat-tile/icon-fit
 
+**Use `DabblerStatTileSize.detail` for the Details fact tiles.** A sans bold value over a small caption, radius 12; `DabblerStatTileTone.success` is the open-now tile.
+
+@specimen stat-tile/detail
+
 **The Settings tile is its own size.** `DabblerStatTileSize.setting` is 3 columns by 1 row with a bold sans value over a regular caption, the way the Settings root draws its bento.
 
 ## Axes
@@ -77,6 +81,8 @@ Corner: the 18px extra-large radius. Fill and ink: the surface, brand, ink, stat
 - Alpha DS gaps 6 — adds `icon`, `fitValue` and `minValueScale` to `DabblerStatTile`,
   `DabblerStatTileValue`, and `rowExtent` with `detailsRowHeight` to `DabblerStatGrid`. All off
   by default.
+
+- KAN-426 — adds the `detail` size and the `success` tone.
 
 ## Source
 

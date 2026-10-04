@@ -155,7 +155,12 @@ class DabblerCard extends StatelessWidget {
     this.width,
     this.height,
     this.clipBehavior = Clip.antiAlias,
+    this.fill,
   });
+
+  /// Overrides the variant's fill — a decorative tint such as the Listings
+  /// Upcoming card's tile tone. Null keeps the variant's own fill.
+  final Color? fill;
 
   /// The body slot — the card's substance. Padded.
   final Widget? child;
@@ -310,7 +315,7 @@ class DabblerCard extends StatelessWidget {
       Radius.circular(resolvedRadius),
     );
 
-    final Color fill = fillOf(colors, variant);
+    final Color fill = this.fill ?? fillOf(colors, variant);
     final Widget? content = _content();
     Widget surfaceWith(Color paint) => DabblerSurface(
       variant: surfaceVariantOf(variant),

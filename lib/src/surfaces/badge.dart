@@ -129,6 +129,8 @@ class DabblerBadge extends StatelessWidget {
     this.paddingInline,
     this.minWidth,
     this.fill,
+    this.outlined = false,
+    this.comfortable = false,
   }) : isDot = false,
        semanticLabel = null;
 
@@ -156,6 +158,8 @@ class DabblerBadge extends StatelessWidget {
        paddingInline = null,
        minWidth = null,
        fill = null,
+       outlined = false,
+       comfortable = false,
        isDot = true;
 
   /// Whether this is the count-less [DabblerBadge.dot] marker.
@@ -187,6 +191,17 @@ class DabblerBadge extends StatelessWidget {
   /// A minimum width. Live `ConversationRow` sets `minWidth: 24` on its unread
   /// pill; the badge is `fit-content` otherwise.
   final double? minWidth;
+
+  /// Draws the badge as a quiet outlined tag: the card surface, the default
+  /// hairline and the secondary ink — the Venues listing's sport tags
+  /// (`Listings.dc.html:795-799`). Wins over [tone] and [fill]; ignored when
+  /// [status] is set.
+  final bool outlined;
+
+  /// The roomier profile-header size (`Profiles.dc.html:89-97`): 12px bold
+  /// type, 6 vertical and 12 horizontal padding, 6 between glyph and label.
+  /// Additive; false keeps the 11px list badge.
+  final bool comfortable;
 
   /// Overrides the tone's fill for a decorative badge (not for [status]).
   ///
@@ -337,11 +352,17 @@ class DabblerBadge extends StatelessWidget {
           : Semantics(label: name, container: true, child: dot);
     }
 
-    final Color background =
-        semantic?.surface ?? fill ?? backgroundOf(tone, colors);
-    final Color foreground = semantic?.strong ?? foregroundOf(tone, colors);
+    final bool quiet = outlined && semantic == null;
+    final Color background = quiet
+        ? colors.surfaceCard
+        : semantic?.surface ?? fill ?? backgroundOf(tone, colors);
+    final Color foreground = quiet
+        ? colors.textSecondary
+        : semantic?.strong ?? foregroundOf(tone, colors);
     // `Badge.jsx:41` — decorative tones draw no border at all.
-    final Color? hairline = semantic == null
+    final Color? hairline = quiet
+        ? colors.borderDefault
+        : semantic == null
         ? null
         : hairlineFor(semantic, colors);
 
@@ -357,8 +378,10 @@ class DabblerBadge extends StatelessWidget {
         constraints: BoxConstraints(minWidth: minWidth ?? 0),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: verticalPadding,
-            horizontal: paddingInline ?? horizontalPadding,
+            vertical: comfortable ? DabblerSpacing.space2 : verticalPadding,
+            horizontal:
+                paddingInline ??
+                (comfortable ? DabblerSpacing.space4 : horizontalPadding),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -376,14 +399,21 @@ class DabblerBadge extends StatelessWidget {
                   data: IconThemeData(color: foreground),
                   child: icon!,
                 ),
-                const SizedBox(width: iconGap),
+                SizedBox(width: comfortable ? DabblerSpacing.space2 : iconGap),
               ],
               Text(
                 label,
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.clip,
-                style: textStyleFor(direction).copyWith(color: foreground),
+                style: comfortable
+                    ? DabblerType.caption1
+                          .resolveForDirection(direction)
+                          .copyWith(
+                            color: foreground,
+                            fontWeight: DabblerType.bold,
+                          )
+                    : textStyleFor(direction).copyWith(color: foreground),
               ),
             ],
           ),

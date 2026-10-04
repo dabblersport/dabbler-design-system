@@ -191,6 +191,7 @@ class DabblerButton extends StatefulWidget {
     this.tone = DabblerButtonTone.primary,
     this.size = DabblerButtonSize.medium,
     this.icon,
+    this.leadingWidget,
     this.onPressed,
     this.onLongPress,
     this.disabled = false,
@@ -215,6 +216,7 @@ class DabblerButton extends StatefulWidget {
     this.loading = false,
     bool mirrorInRtl = false,
   }) : label = null,
+       leadingWidget = null,
        fullWidth = false,
        mirrorIconInRtl = mirrorInRtl;
 
@@ -237,6 +239,12 @@ class DabblerButton extends StatefulWidget {
   /// a system icon into a system control. The specimen passes `<Icon name=…>`
   /// in every single instance.
   final String? icon;
+
+  /// A widget in the leading slot in place of [icon] — a vendor's sign-in mark
+  /// ([DabblerProviderMark]) that is not an Iconsax glyph. Ignored when [icon]
+  /// is set or while [loading]. Decorative: the label names the action, so
+  /// the widget should exclude itself from semantics. Additive.
+  final Widget? leadingWidget;
 
   /// Whether [icon] is directional (a back/forward arrow or chevron) and must
   /// point the other way under [TextDirection.rtl]. Passed straight to
@@ -525,7 +533,7 @@ class _DabblerButtonState extends State<DabblerButton> {
                   color: foreground,
                   mirrorInRtl: widget.mirrorIconInRtl,
                 )
-              : null);
+              : widget.leadingWidget);
 
     final Widget content = Row(
       mainAxisSize: MainAxisSize.min,

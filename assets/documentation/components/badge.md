@@ -59,6 +59,8 @@ a new prop.
 preference — a plain colour can't say which ink goes on it or what hairline it carries, so the type
 system refuses one outright.
 
+**`comfortable` is the profile-header size** (`Profiles.dc.html:89-97`): 12px bold type, 6/12 padding, 6 between glyph and label. Additive; the default stays the 11px list badge.
+
 ## Axes
 
 ### Decorative tone
@@ -81,6 +83,7 @@ opacity — the one badge configuration that carries a border at all.
 
 ## Change log
 
+- Alpha fidelity rebuild (KAN-426) — adds `outlined`, the quiet card-surface tag of the Venues listing's sports row.
 - D-020 (cxo) — a one-step colour drift in a pricing screen's
   trial pill is not grounds for a fill override on this component; the source is corrected instead.
 - D-028 (cxo) — Badge is the one site that must not simply be
