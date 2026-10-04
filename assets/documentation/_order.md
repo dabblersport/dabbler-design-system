@@ -101,6 +101,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardEvent](components/card-event.md) — the event card, in three densities.
 - [CardVenue](components/card-venue.md) — a venue in a listing: cover, name, place, tags and price.
 - [CardGame](components/card-game.md) — a game in a listing: title, tags, day and time, progress, price and join.
+- [CardUpcoming](components/card-upcoming.md) — a game you are in, on a tinted tile with a countdown ring.
 - [CardHouse](components/card-house.md) — a house (a recurring room series) as one row.
 - [CardPricing](components/card-pricing.md) — one subscription plan as a selectable tile.
 - [CardTicket](components/card-ticket.md) — a booking as a ticket, with its own type scale.

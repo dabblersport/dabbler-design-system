@@ -63,6 +63,8 @@ export 'src/cards/card_event_listing.dart';
 export 'src/cards/card_venue.dart';
 export 'src/cards/card_game.dart';
 export 'src/cards/card_game_gallery.dart';
+export 'src/cards/card_upcoming.dart';
+export 'src/cards/card_upcoming_gallery.dart';
 export 'src/cards/listing_cards_gallery.dart';
 export 'src/cards/card_house.dart';
 export 'src/cards/card_pricing_default.dart';
