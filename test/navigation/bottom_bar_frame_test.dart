@@ -204,6 +204,10 @@ void main() {
         expect(hits[i].left, greaterThan(hits[i - 1].right));
       }
       expect(hits[1].left - hits[0].right, 6, reason: 'item gap 6');
+      // The pill hugs its content: 9 of padding after the last item, so the
+      // free space is between the pill and the action, not inside the pill.
+      expect(pill.right, hits[3].right + 9);
+      expect(pill.width, lessThan(action.left - 12 + 0.01));
 
       final Rect fade = t.getRect(find.byType(DabblerFade));
       expect(fade, const Rect.fromLTWH(0, 772, 393, 80));

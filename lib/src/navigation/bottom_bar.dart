@@ -612,37 +612,44 @@ class _DabblerNavigationBottomBarState
               horizontal: DabblerSpacing.space6,
             )
           : EdgeInsets.zero,
-      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: active ? colors.surfaceCard : null,
         borderRadius: DabblerRadius.pillAll,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        // `gap: on ? 8 : 0` — transcribed literally, see [activeGap].
-        spacing: active ? DabblerNavigationBottomBar.activeGap : 0,
-        children: <Widget>[
-          glyph,
-          if (active)
-            Flexible(
-              child: Text(
-                item.label,
-                // `fontSize: 15, fontWeight: 500` — `.t-subheadline` at
-                // `--weight-medium`.
-                style: DabblerType.subheadline
-                    .resolveForDirection(Directionality.of(context))
-                    .copyWith(
-                      color: colors.brandPrimary,
-                      fontWeight: DabblerType.medium,
-                    ),
-                // `whiteSpace: 'nowrap'`.
-                softWrap: false,
-                textDirection: Directionality.of(context),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      // `Center` with factors of 1 rather than the container's own `alignment`:
+      // an aligned container fills the width it is offered, which made the
+      // active chip (a `Flexible`) swallow the whole pill. The factors hug the
+      // content, and the 44 minimum still centres a lone glyph.
+      child: Center(
+        widthFactor: 1,
+        heightFactor: 1,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          // `gap: on ? 8 : 0` — transcribed literally, see [activeGap].
+          spacing: active ? DabblerNavigationBottomBar.activeGap : 0,
+          children: <Widget>[
+            glyph,
+            if (active)
+              Flexible(
+                child: Text(
+                  item.label,
+                  // `fontSize: 15, fontWeight: 500` — `.t-subheadline` at
+                  // `--weight-medium`.
+                  style: DabblerType.subheadline
+                      .resolveForDirection(Directionality.of(context))
+                      .copyWith(
+                        color: colors.brandPrimary,
+                        fontWeight: DabblerType.medium,
+                      ),
+                  // `whiteSpace: 'nowrap'`.
+                  softWrap: false,
+                  textDirection: Directionality.of(context),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
 
