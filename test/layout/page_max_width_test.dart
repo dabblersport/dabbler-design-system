@@ -6,9 +6,7 @@ import '../forms/_host.dart';
 
 Widget _page({double? maxWidth, TextDirection direction = TextDirection.ltr}) {
   return MaterialApp(
-    theme: ThemeData(
-      extensions: <ThemeExtension<dynamic>>[testColors()],
-    ),
+    theme: ThemeData(extensions: <ThemeExtension<dynamic>>[testColors()]),
     home: Directionality(
       textDirection: direction,
       child: DabblerPage(
@@ -35,21 +33,22 @@ void main() {
       expect(tester.getSize(find.byKey(const Key('bottom'))).width, 900);
     });
 
-    testWidgets('holds the top bar, body and bottom bar to the limit, centred', (
-      WidgetTester tester,
-    ) async {
-      tester.view.physicalSize = const Size(900, 600);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(_page(maxWidth: DabblerPage.readableWidth));
-      for (final String k in <String>['top', 'body', 'bottom']) {
-        final Rect r = tester.getRect(find.byKey(Key(k)));
-        expect(r.width, DabblerPage.readableWidth, reason: k);
-        expect(r.left, (900 - DabblerPage.readableWidth) / 2, reason: k);
-      }
-      // The body still fills the height between the bars.
-      expect(tester.getSize(find.byKey(const Key('body'))).height, 560);
-    });
+    testWidgets(
+      'holds the top bar, body and bottom bar to the limit, centred',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(900, 600);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(_page(maxWidth: DabblerPage.readableWidth));
+        for (final String k in <String>['top', 'body', 'bottom']) {
+          final Rect r = tester.getRect(find.byKey(Key(k)));
+          expect(r.width, DabblerPage.readableWidth, reason: k);
+          expect(r.left, (900 - DabblerPage.readableWidth) / 2, reason: k);
+        }
+        // The body still fills the height between the bars.
+        expect(tester.getSize(find.byKey(const Key('body'))).height, 560);
+      },
+    );
 
     testWidgets('a page narrower than the limit is not widened', (
       WidgetTester tester,

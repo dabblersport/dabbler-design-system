@@ -205,6 +205,7 @@ export 'src/layout/divider_gallery.dart';
 export 'src/layout/fade.dart';
 export 'src/layout/fade_gallery.dart';
 export 'src/layout/section.dart';
+export 'src/layout/settings_choices.dart';
 export 'src/layout/key_value_row.dart';
 export 'src/layout/key_value_row_gallery.dart';
 export 'src/cards/transaction_row.dart';

@@ -97,7 +97,7 @@ forms — paint identical to `neutral` and `filled` respectively, kept as separa
 the design source keeps them separate).
 
 ### Size
-`full` (320×52, fixed), `medium` (the default), `small`.
+`full` (320×52, fixed), `medium` (the default), `small`, and `block` (the sheet and form action: touch-target tall, as wide as its parent, with the medium corner and a subheadline label).
 
 ### State
 Enabled, disabled, loading, full-width.
@@ -136,6 +136,7 @@ from the shared press-scale and focus-ring primitives; nothing here defines its 
 
 ## Change log
 
+- Alpha fidelity (Settings) — adds the `block` size for the full-width sheet and form action.
 - D-004 (cxo) — `accent`'s fill is a known, documented defect: it
   currently stands in with the nearest declared indigo, pending the missing token being declared
   in the design source's own colour file.

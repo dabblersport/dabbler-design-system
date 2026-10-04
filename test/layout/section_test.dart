@@ -335,14 +335,19 @@ void main() {
     });
   });
 
-  testWidgets('compact + icon draws a brand glyph and a semibold subheadline',
-      (tester) async {
-    await tester.pumpWidget(_host(const DabblerSection(
-      title: 'People',
-      icon: 'people',
-      compact: true,
-      children: <Widget>[SizedBox(height: 10)],
-    )));
+  testWidgets('compact + icon draws a brand glyph and a semibold subheadline', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const DabblerSection(
+          title: 'People',
+          icon: 'people',
+          compact: true,
+          children: <Widget>[SizedBox(height: 10)],
+        ),
+      ),
+    );
     final Text t = tester.widget<Text>(find.text('People'));
     expect(t.style!.fontWeight, DabblerType.semibold);
     expect(t.style!.fontSize, DabblerType.subheadline.fontSize);
