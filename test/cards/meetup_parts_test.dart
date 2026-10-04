@@ -143,6 +143,10 @@ void main() {
         tester.widget<Text>(find.text('19')).style!.fontSize,
         DabblerCardUpcomingRail.ringValueSize,
       );
+      expect(
+        tester.widget<Text>(find.text('19')).style!.color,
+        testColors().textPrimary,
+      );
     });
 
     testWidgets('action bar: the action gets the width the price leaves', (

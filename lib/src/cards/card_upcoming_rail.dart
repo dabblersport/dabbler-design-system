@@ -175,6 +175,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
             style: DabblerType.footnote
                 .resolveForDirection(direction)
                 .copyWith(
+                  color: colors.textPrimary,
                   fontSize: ringValueSize,
                   height: ringValueLeading / ringValueSize,
                 ),
