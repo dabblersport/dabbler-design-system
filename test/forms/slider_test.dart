@@ -12,9 +12,9 @@ import '_host.dart';
 /// Each thumb's hit area — the [FocusableActionDetector] inside its positioned
 /// slot. Measured, not assumed: this is what AC2 is about.
 Finder _thumbHits() => find.descendant(
-      of: find.byType(DabblerSlider),
-      matching: find.byType(FocusableActionDetector),
-    );
+  of: find.byType(DabblerSlider),
+  matching: find.byType(FocusableActionDetector),
+);
 
 /// The brand-filled bar, distinguished from the tertiary track by its colour.
 Rect _fillRect(WidgetTester tester, DabblerColors colors) {
@@ -27,13 +27,13 @@ Rect _fillRect(WidgetTester tester, DabblerColors colors) {
 }
 
 Rect _trackRowRect(WidgetTester tester) => tester.getRect(
-      find
-          .descendant(
-            of: find.byType(DabblerSlider),
-            matching: find.byType(GestureDetector),
-          )
-          .first,
-    );
+  find
+      .descendant(
+        of: find.byType(DabblerSlider),
+        matching: find.byType(GestureDetector),
+      )
+      .first,
+);
 
 void main() {
   group('Slider anatomy is the design source', () {
@@ -103,9 +103,14 @@ void main() {
           .evaluate();
       expect(ticks.length, 5);
       expect(
-        tester.getSize(find.byWidgetPredicate(
-          (Widget w) => w is ColoredBox && w.color == colors.borderDefault,
-        ).first),
+        tester.getSize(
+          find
+              .byWidgetPredicate(
+                (Widget w) =>
+                    w is ColoredBox && w.color == colors.borderDefault,
+              )
+              .first,
+        ),
         const Size(1, 12),
       );
     });
@@ -169,9 +174,7 @@ void main() {
     ) async {
       double value = 0;
       await tester.pumpWidget(
-        host(
-          DabblerSlider(value: value, onChanged: (double v) => value = v),
-        ),
+        host(DabblerSlider(value: value, onChanged: (double v) => value = v)),
       );
 
       final Rect row = _trackRowRect(tester);
@@ -189,16 +192,17 @@ void main() {
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) =>
                 DabblerSlider(
-              value: value,
-              onChanged: (double v) => setState(() => value = v),
-            ),
+                  value: value,
+                  onChanged: (double v) => setState(() => value = v),
+                ),
           ),
         ),
       );
 
       final Rect row = _trackRowRect(tester);
-      final TestGesture gesture =
-          await tester.startGesture(Offset(row.left, row.center.dy));
+      final TestGesture gesture = await tester.startGesture(
+        Offset(row.left, row.center.dy),
+      );
       await gesture.moveTo(Offset(row.left + row.width * 0.75, row.center.dy));
       await tester.pump();
       await gesture.up();
@@ -215,9 +219,10 @@ void main() {
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) =>
                 DabblerSlider.range(
-              values: values,
-              onChanged: (DabblerSliderRange v) => setState(() => values = v),
-            ),
+                  values: values,
+                  onChanged: (DabblerSliderRange v) =>
+                      setState(() => values = v),
+                ),
           ),
         ),
       );
@@ -278,9 +283,9 @@ void main() {
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) =>
                 DabblerSlider(
-              value: value,
-              onChanged: (double v) => setState(() => value = v),
-            ),
+                  value: value,
+                  onChanged: (double v) => setState(() => value = v),
+                ),
           ),
         ),
       );
@@ -367,9 +372,9 @@ void main() {
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) =>
                 DabblerSlider(
-              value: value,
-              onChanged: (double v) => setState(() => value = v),
-            ),
+                  value: value,
+                  onChanged: (double v) => setState(() => value = v),
+                ),
           ),
           direction: TextDirection.rtl,
         ),
@@ -406,8 +411,7 @@ void main() {
         ),
       );
 
-      final SemanticsNode node =
-          tester.getSemantics(_thumbHits().first.first);
+      final SemanticsNode node = tester.getSemantics(_thumbHits().first.first);
       expect(node.value, '8 km');
       expect(node.label, 'distance');
       expect(node.increasedValue, '9 km');

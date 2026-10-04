@@ -10,6 +10,7 @@ import '../controls/button.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../tokens/dabbler_geometry.dart';
+import 'action_row.dart';
 import 'sheet.dart';
 
 /// Sheet's specimens.
@@ -32,7 +33,76 @@ const List<GalleryEntry> sheetGalleryEntries = <GalleryEntry>[
         'that stops at the 80% cap and scrolls.',
     builder: _contentSheets,
   ),
+  GalleryEntry(
+    id: 'action-row',
+    page: 'components/action-row',
+    group: GalleryPurpose.presentation,
+    title: 'ActionRow — one action in a sheet',
+    description:
+        'A default action with a note, a destructive action, one without a '
+        'note, and an Arabic row in RTL.',
+    builder: _actionRows,
+  ),
 ];
+
+void _noopAction() {}
+
+Widget _actionRows(BuildContext context) => const GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'default with a note',
+      child: SizedBox(
+        width: 360,
+        child: DabblerActionRow(
+          icon: 'eye-slash',
+          label: 'Hide post',
+          note: 'You will see fewer posts like this',
+          onTap: _noopAction,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'destructive',
+      child: SizedBox(
+        width: 360,
+        child: DabblerActionRow(
+          icon: 'danger',
+          label: 'Report post',
+          note: 'Tell us what is wrong with this post',
+          destructive: true,
+          onTap: _noopAction,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'no note',
+      child: SizedBox(
+        width: 360,
+        child: DabblerActionRow(
+          icon: 'user-remove',
+          label: 'Block user',
+          destructive: true,
+          onTap: _noopAction,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'Arabic, right-to-left',
+      child: SizedBox(
+        width: 360,
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: DabblerActionRow(
+            icon: 'eye-slash',
+            label: 'إخفاء المنشور',
+            note: 'سترى منشورات أقل من هذا النوع',
+            onTap: _noopAction,
+          ),
+        ),
+      ),
+    ),
+  ],
+);
 
 Widget _contentSheets(BuildContext context) => GalleryWrap(
   children: <Widget>[

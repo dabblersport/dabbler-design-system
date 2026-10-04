@@ -21,7 +21,8 @@ const List<GalleryEntry> ratingGalleryEntries = <GalleryEntry>[
     page: 'components/rating',
     group: GalleryPurpose.identityAndStatus,
     title: 'Rating — evaluation',
-    description: 'Read-only (value, halves, count, sizes) and the interactive '
+    description:
+        'Read-only (value, halves, count, sizes) and the interactive '
         'radio group, as the identity specimen draws them.',
     builder: _ratings,
   ),
@@ -42,10 +43,7 @@ Widget _ratings(BuildContext context) => const GalleryStack(
           ),
         ),
         // `<Rating value={3.5} />` — the clipped half.
-        GallerySpecimen(
-          label: '3.5 — half',
-          child: DabblerRating(value: 3.5),
-        ),
+        GallerySpecimen(label: '3.5 — half', child: DabblerRating(value: 3.5)),
         // `<Rating value={5} size="lg" />`
         GallerySpecimen(
           label: '5 · lg',

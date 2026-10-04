@@ -23,7 +23,8 @@ const List<GalleryEntry> interactionGalleryEntries = <GalleryEntry>[
     page: 'foundations/interaction',
     group: null,
     title: 'Interaction — focus ring, press scale, scrim',
-    description: 'The three primitives every other component composes. Tab '
+    description:
+        'The three primitives every other component composes. Tab '
         'to the first to raise a real keyboard-focus ring.',
     builder: _interaction,
   ),

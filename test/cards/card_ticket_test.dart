@@ -11,8 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 Widget _host(
   Widget child, {
@@ -44,63 +43,73 @@ DabblerCardTicket _specimen({
   String? status = 'Upcoming',
   List<DabblerTicketAction> actions = const <DabblerTicketAction>[],
   bool enabled = true,
-}) =>
-    DabblerCardTicket(
-      header: header,
-      code: 'GBD99763JS',
-      date: '24/09/2024',
-      organiser: 'Reform Padel Club',
-      title: 'Tuesday Padel Doubles',
-      status: status,
-      statusTone: tone,
-      price: 'AED 45',
-      actions: actions,
-      enabled: enabled,
-    );
+}) => DabblerCardTicket(
+  header: header,
+  code: 'GBD99763JS',
+  date: '24/09/2024',
+  organiser: 'Reform Padel Club',
+  title: 'Tuesday Padel Doubles',
+  status: status,
+  statusTone: tone,
+  price: 'AED 45',
+  actions: actions,
+  enabled: enabled,
+);
 
 void main() {
   group('KAN-234 AC1 — CardTicket composes DS-800\'s base Card', () {
-    testWidgets('it renders exactly one DabblerCard',
-        (WidgetTester tester) async {
+    testWidgets('it renders exactly one DabblerCard', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_specimen()));
 
       expect(find.byType(DabblerCard), findsOneWidget);
     });
 
-    testWidgets('on the white shell at --radius-xxl',
-        (WidgetTester tester) async {
+    testWidgets('on the white shell at --radius-xxl', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_specimen()));
 
-      final DabblerCard card =
-          tester.widget<DabblerCard>(find.byType(DabblerCard));
+      final DabblerCard card = tester.widget<DabblerCard>(
+        find.byType(DabblerCard),
+      );
       expect(card.variant, DabblerCardVariant.white);
       expect(card.radius, DabblerRadius.xxl);
-      expect(DabblerCard.fillOf(_colors(), card.variant),
-          _colors().surfaceCard);
+      expect(
+        DabblerCard.fillOf(_colors(), card.variant),
+        _colors().surfaceCard,
+      );
     });
 
-    testWidgets('all four slots are used, as DS-800 published them',
-        (WidgetTester tester) async {
+    testWidgets('all four slots are used, as DS-800 published them', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_specimen()));
 
-      final DabblerCard card =
-          tester.widget<DabblerCard>(find.byType(DabblerCard));
+      final DabblerCard card = tester.widget<DabblerCard>(
+        find.byType(DabblerCard),
+      );
       expect(card.media, isNotNull, reason: 'the coloured strip');
       expect(card.header, isNotNull, reason: 'organiser, title, pill');
       expect(card.child, isNotNull, reason: 'the dashed rule');
       expect(card.footer, isNotNull, reason: 'price beside actions');
     });
 
-    testWidgets('padding and gap are the source\'s grid steps',
-        (WidgetTester tester) async {
+    testWidgets('padding and gap are the source\'s grid steps', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_specimen()));
 
-      final DabblerCard card =
-          tester.widget<DabblerCard>(find.byType(DabblerCard));
+      final DabblerCard card = tester.widget<DabblerCard>(
+        find.byType(DabblerCard),
+      );
       // `padding: '18px 24px 21px'` — every one a base-3 step.
       expect(card.padding, DabblerCardTicket.bodyPadding);
-      expect(DabblerSpacing.scale,
-          containsAll(<double>[18, 24, 21, DabblerCardTicket.bodyGap]));
+      expect(
+        DabblerSpacing.scale,
+        containsAll(<double>[18, 24, 21, DabblerCardTicket.bodyGap]),
+      );
       // `gap: 15`, not DabblerCard's default 12.
       expect(card.gap, DabblerSpacing.space5);
     });
@@ -151,42 +160,48 @@ void main() {
       );
     });
 
-    test('indigo is --accent-indigo (#5C50E6), not the --social-info stand-in',
-        () {
-      final DabblerColors colors = _colors();
-      expect(
-        DabblerCardTicket.headerFillOf(DabblerTicketHeader.indigo, colors),
-        DabblerPalette.accentIndigo,
-      );
-      expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
-      expect(
-        DabblerCardTicket.headerFillOf(DabblerTicketHeader.indigo, colors),
-        isNot(DabblerPalette.socialInfo),
-      );
-      expect(
-        DabblerCardTicket.headerInkOf(DabblerTicketHeader.indigo, colors),
-        DabblerPalette.paper,
-        reason: 'the source names --neutral-white, a literal, not a role',
-      );
-    });
+    test(
+      'indigo is --accent-indigo (#5C50E6), not the --social-info stand-in',
+      () {
+        final DabblerColors colors = _colors();
+        expect(
+          DabblerCardTicket.headerFillOf(DabblerTicketHeader.indigo, colors),
+          DabblerPalette.accentIndigo,
+        );
+        expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
+        expect(
+          DabblerCardTicket.headerFillOf(DabblerTicketHeader.indigo, colors),
+          isNot(DabblerPalette.socialInfo),
+        );
+        expect(
+          DabblerCardTicket.headerInkOf(DabblerTicketHeader.indigo, colors),
+          DabblerPalette.paper,
+          reason: 'the source names --neutral-white, a literal, not a role',
+        );
+      },
+    );
 
     test('indigo is brightness-invariant, because its fill is', () {
       expect(
         DabblerCardTicket.headerFillOf(
-            DabblerTicketHeader.indigo, _colors(brightness: Brightness.dark)),
+          DabblerTicketHeader.indigo,
+          _colors(brightness: Brightness.dark),
+        ),
         DabblerCardTicket.headerFillOf(DabblerTicketHeader.indigo, _colors()),
       );
     });
 
-    testWidgets('the strip carries the code and the date',
-        (WidgetTester tester) async {
+    testWidgets('the strip carries the code and the date', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_specimen()));
 
       expect(find.text('GBD99763JS'), findsOneWidget);
       expect(find.text('24/09/2024'), findsOneWidget);
 
-      final TextStyle style =
-          tester.widget<Text>(find.text('24/09/2024')).style!;
+      final TextStyle style = tester
+          .widget<Text>(find.text('24/09/2024'))
+          .style!;
       // `fontSize: 17, lineHeight: '22px', fontWeight: 500` — .t-callout.
       expect(style.fontSize, DabblerType.callout.fontSize);
       expect(style.fontWeight, DabblerType.callout.fontWeight);
@@ -201,8 +216,9 @@ void main() {
   // is NOT DabblerBadge (11px Bold + a 20% hairline). These assertions are the
   // guard against it being "fixed" back to composing Badge.
   group('the status pill is literal, per D-015', () {
-    testWidgets('a status renders one pill; no status renders none',
-        (WidgetTester tester) async {
+    testWidgets('a status renders one pill; no status renders none', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_specimen()));
       expect(find.text('Upcoming'), findsOneWidget);
 
@@ -210,31 +226,34 @@ void main() {
       expect(find.text('Upcoming'), findsNothing);
     });
 
-    testWidgets('the pill is 13px at weight 500 on the tag pair\'s ink',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        _specimen(tone: DabblerTicketStatusTone.success),
-      ));
+    testWidgets('the pill is 13px at weight 500 on the tag pair\'s ink', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(_specimen(tone: DabblerTicketStatusTone.success)),
+      );
 
-      final TextStyle style =
-          tester.widget<Text>(find.text('Upcoming')).style!;
+      final TextStyle style = tester.widget<Text>(find.text('Upcoming')).style!;
       expect(style.fontSize, 13);
       expect(style.fontSize, DabblerType.footnote.fontSize);
       expect(style.fontWeight, DabblerType.medium);
       expect(style.color, DabblerColors.tagSuccess.ink);
     });
 
-    testWidgets('the pill has the tag surface, the pill radius and NO border',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        _specimen(tone: DabblerTicketStatusTone.success),
-      ));
+    testWidgets('the pill has the tag surface, the pill radius and NO border', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(_specimen(tone: DabblerTicketStatusTone.success)),
+      );
 
       final Container pill = tester.widget<Container>(
-        find.ancestor(
-          of: find.text('Upcoming'),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('Upcoming'),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       final BoxDecoration decoration = pill.decoration! as BoxDecoration;
       expect(decoration.color, DabblerColors.tagSuccess.surface);
@@ -250,32 +269,54 @@ void main() {
     });
 
     test('the seven workflow tones map to their own --tag-* pair', () {
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.pending),
-          DabblerColors.tagPending);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.progress),
-          DabblerColors.tagProgress);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.submitted),
-          DabblerColors.tagSubmitted);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.review),
-          DabblerColors.tagReview);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.success),
-          DabblerColors.tagSuccess);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.failed),
-          DabblerColors.tagFailed);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.expired),
-          DabblerColors.tagExpired);
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.pending),
+        DabblerColors.tagPending,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.progress),
+        DabblerColors.tagProgress,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.submitted),
+        DabblerColors.tagSubmitted,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.review),
+        DabblerColors.tagReview,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.success),
+        DabblerColors.tagSuccess,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.failed),
+        DabblerColors.tagFailed,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.expired),
+        DabblerColors.tagExpired,
+      );
     });
 
     test('the four booking aliases resolve exactly as STATUSES declares', () {
       // upcoming → progress, past → review, live → success, cancelled → failed.
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.upcoming),
-          DabblerColors.tagProgress);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.past),
-          DabblerColors.tagReview);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.live),
-          DabblerColors.tagSuccess);
-      expect(DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.cancelled),
-          DabblerColors.tagFailed);
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.upcoming),
+        DabblerColors.tagProgress,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.past),
+        DabblerColors.tagReview,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.live),
+        DabblerColors.tagSuccess,
+      );
+      expect(
+        DabblerCardTicket.toneColorOf(DabblerTicketStatusTone.cancelled),
+        DabblerColors.tagFailed,
+      );
     });
 
     test('every tone resolves — the table has no hole', () {
@@ -288,68 +329,84 @@ void main() {
   });
 
   group('the body', () {
-    testWidgets('organiser is the drawn 14/19; title and price keep their steps',
-        (WidgetTester tester) async {
+    testWidgets(
+      'organiser is the drawn 14/19; title and price keep their steps',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(_host(_specimen()));
+
+        final TextStyle organiser = tester
+            .widget<Text>(find.text('Reform Padel Club'))
+            .style!;
+        // TOKEN CONFLICT, asserted deliberately: the design draws the organiser
+        // at `font-size: 14px; line-height: 19px` — measured on the rendered
+        // specimen `components/cards/cards.card.html` with `getComputedStyle`.
+        // **The ramp has no 14.** This asserted `.t-footnote` (13/18) on the
+        // reasoning that the nearest step should win; that snapped the organiser
+        // a pixel under every surface that draws it, and it is the class of
+        // substitution the fidelity pass exists to undo.
+        //
+        // Do NOT "restore" `DabblerType.footnote.fontSize` here. The ramp gap is
+        // reported; if a 14 step is added, this becomes a reference to it.
+        expect(organiser.fontSize, 14);
+        expect(organiser.height, 19 / 14);
+        expect(organiser.color, _colors().textSecondary);
+
+        final TextStyle title = tester
+            .widget<Text>(find.text('Tuesday Padel Doubles'))
+            .style!;
+        // .t-title-2's metrics, the sans face, the source's Medium.
+        expect(title.fontSize, DabblerType.title2.fontSize);
+        expect(title.fontWeight, DabblerType.medium);
+        expect(
+          title.fontFamily,
+          DabblerType.fontFamilyFor(
+            DabblerTypeRole.sans,
+            DabblerTypeScript.latin,
+          ),
+        );
+        expect(title.color, _colors().textPrimary);
+
+        final TextStyle price = tester.widget<Text>(find.text('AED 45')).style!;
+        expect(price.fontSize, DabblerType.title1.fontSize);
+        expect(price.fontWeight, DabblerType.medium);
+        expect(
+          price.fontFamily,
+          DabblerType.fontFamilyFor(
+            DabblerTypeRole.sans,
+            DabblerTypeScript.latin,
+          ),
+        );
+      },
+    );
+
+    testWidgets(
+      'RTL swaps the sans face to Meral Sans, not to a display face',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(_specimen(), direction: TextDirection.rtl),
+        );
+
+        final TextStyle title = tester
+            .widget<Text>(find.text('Tuesday Padel Doubles'))
+            .style!;
+        expect(
+          title.fontFamily,
+          DabblerType.fontFamilyFor(
+            DabblerTypeRole.sans,
+            DabblerTypeScript.arabic,
+          ),
+        );
+      },
+    );
+
+    testWidgets('the dashed rule is one hairline tall in --outline-card', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(_specimen()));
 
-      final TextStyle organiser =
-          tester.widget<Text>(find.text('Reform Padel Club')).style!;
-      // TOKEN CONFLICT, asserted deliberately: the design draws the organiser
-      // at `font-size: 14px; line-height: 19px` — measured on the rendered
-      // specimen `components/cards/cards.card.html` with `getComputedStyle`.
-      // **The ramp has no 14.** This asserted `.t-footnote` (13/18) on the
-      // reasoning that the nearest step should win; that snapped the organiser
-      // a pixel under every surface that draws it, and it is the class of
-      // substitution the fidelity pass exists to undo.
-      //
-      // Do NOT "restore" `DabblerType.footnote.fontSize` here. The ramp gap is
-      // reported; if a 14 step is added, this becomes a reference to it.
-      expect(organiser.fontSize, 14);
-      expect(organiser.height, 19 / 14);
-      expect(organiser.color, _colors().textSecondary);
-
-      final TextStyle title =
-          tester.widget<Text>(find.text('Tuesday Padel Doubles')).style!;
-      // .t-title-2's metrics, the sans face, the source's Medium.
-      expect(title.fontSize, DabblerType.title2.fontSize);
-      expect(title.fontWeight, DabblerType.medium);
-      expect(
-        title.fontFamily,
-        DabblerType.fontFamilyFor(
-            DabblerTypeRole.sans, DabblerTypeScript.latin),
+      final DabblerCard card = tester.widget<DabblerCard>(
+        find.byType(DabblerCard),
       );
-      expect(title.color, _colors().textPrimary);
-
-      final TextStyle price = tester.widget<Text>(find.text('AED 45')).style!;
-      expect(price.fontSize, DabblerType.title1.fontSize);
-      expect(price.fontWeight, DabblerType.medium);
-      expect(
-        price.fontFamily,
-        DabblerType.fontFamilyFor(
-            DabblerTypeRole.sans, DabblerTypeScript.latin),
-      );
-    });
-
-    testWidgets('RTL swaps the sans face to Meral Sans, not to a display face',
-        (WidgetTester tester) async {
-      await tester
-          .pumpWidget(_host(_specimen(), direction: TextDirection.rtl));
-
-      final TextStyle title =
-          tester.widget<Text>(find.text('Tuesday Padel Doubles')).style!;
-      expect(
-        title.fontFamily,
-        DabblerType.fontFamilyFor(
-            DabblerTypeRole.sans, DabblerTypeScript.arabic),
-      );
-    });
-
-    testWidgets('the dashed rule is one hairline tall in --outline-card',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(_specimen()));
-
-      final DabblerCard card =
-          tester.widget<DabblerCard>(find.byType(DabblerCard));
       final Size size = tester.getSize(find.byWidget(card.child!));
       expect(size.height, DabblerSizing.borderDefault);
       // GRID CONFLICT, asserted deliberately: the rule's drawn period is ~4px
@@ -366,61 +423,85 @@ void main() {
   });
 
   group('the action pills', () {
-    testWidgets('one action for a past booking, two for an open one',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(_specimen(
-        actions: const <DabblerTicketAction>[
-          DabblerTicketAction(label: 'View Detail'),
-        ],
-      )));
+    testWidgets('one action for a past booking, two for an open one', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          _specimen(
+            actions: const <DabblerTicketAction>[
+              DabblerTicketAction(label: 'View Detail'),
+            ],
+          ),
+        ),
+      );
       expect(find.text('View Detail'), findsOneWidget);
 
-      await tester.pumpWidget(_host(_specimen(
-        actions: const <DabblerTicketAction>[
-          DabblerTicketAction(label: 'Register'),
-          DabblerTicketAction(label: 'Done'),
-        ],
-      )));
+      await tester.pumpWidget(
+        _host(
+          _specimen(
+            actions: const <DabblerTicketAction>[
+              DabblerTicketAction(label: 'Register'),
+              DabblerTicketAction(label: 'Done'),
+            ],
+          ),
+        ),
+      );
       expect(find.text('Register'), findsOneWidget);
       expect(find.text('Done'), findsOneWidget);
     });
 
-    testWidgets('a live pill fires and carries the system focus ring',
-        (WidgetTester tester) async {
+    testWidgets('a live pill fires and carries the system focus ring', (
+      WidgetTester tester,
+    ) async {
       int taps = 0;
-      await tester.pumpWidget(_host(_specimen(
-        actions: <DabblerTicketAction>[
-          DabblerTicketAction(label: 'Register', onPressed: () => taps++),
-        ],
-      )));
+      await tester.pumpWidget(
+        _host(
+          _specimen(
+            actions: <DabblerTicketAction>[
+              DabblerTicketAction(label: 'Register', onPressed: () => taps++),
+            ],
+          ),
+        ),
+      );
 
       expect(find.byType(DabblerFocusRing), findsOneWidget);
       await tester.tap(find.text('Register'));
       expect(taps, 1);
     });
 
-    testWidgets('enabled: false withholds every action',
-        (WidgetTester tester) async {
+    testWidgets('enabled: false withholds every action', (
+      WidgetTester tester,
+    ) async {
       int taps = 0;
-      await tester.pumpWidget(_host(_specimen(
-        enabled: false,
-        actions: <DabblerTicketAction>[
-          DabblerTicketAction(label: 'Register', onPressed: () => taps++),
-        ],
-      )));
+      await tester.pumpWidget(
+        _host(
+          _specimen(
+            enabled: false,
+            actions: <DabblerTicketAction>[
+              DabblerTicketAction(label: 'Register', onPressed: () => taps++),
+            ],
+          ),
+        ),
+      );
 
       await tester.tap(find.text('Register'));
       expect(taps, 0);
       expect(find.byType(DabblerFocusRing), findsNothing);
     });
 
-    testWidgets('a pill is the drawn 40, under --touch-target-min',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(_specimen(
-        actions: const <DabblerTicketAction>[
-          DabblerTicketAction(label: 'Register'),
-        ],
-      )));
+    testWidgets('a pill is the drawn 40, under --touch-target-min', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          _specimen(
+            actions: const <DabblerTicketAction>[
+              DabblerTicketAction(label: 'Register'),
+            ],
+          ),
+        ),
+      );
 
       // TOKEN + ACCESSIBILITY CONFLICT, asserted deliberately: every action
       // pill on every ticket of the rendered specimen is a 40px box. This
@@ -434,10 +515,12 @@ void main() {
       // is resolved in favour of the floor it is resolved in the DESIGN first
       // and transcribed back — not decided here, and not by restoring the 45.
       expect(DabblerCardTicket.actionHeight, 40);
-      expect(DabblerCardTicket.actionHeight, lessThan(DabblerSizing.touchTargetMin));
+      expect(
+        DabblerCardTicket.actionHeight,
+        lessThan(DabblerSizing.touchTargetMin),
+      );
 
-      final TextStyle style =
-          tester.widget<Text>(find.text('Register')).style!;
+      final TextStyle style = tester.widget<Text>(find.text('Register')).style!;
       // `--ink` fill carrying `--surface-page` ink.
       expect(style.color, _colors().bgPrimary);
       expect(style.fontSize, DabblerType.subheadline.fontSize);
@@ -448,29 +531,38 @@ void main() {
   group('the whole card', () {
     testWidgets('onTap reaches DabblerCard', (WidgetTester tester) async {
       int taps = 0;
-      await tester.pumpWidget(_host(DabblerCardTicket(
-        code: 'GBD99763JS',
-        title: 'Tuesday Padel Doubles',
-        onTap: () => taps++,
-      )));
+      await tester.pumpWidget(
+        _host(
+          DabblerCardTicket(
+            code: 'GBD99763JS',
+            title: 'Tuesday Padel Doubles',
+            onTap: () => taps++,
+          ),
+        ),
+      );
 
       await tester.tap(find.byType(DabblerCard));
       expect(taps, 1);
     });
 
-    testWidgets('every header × every tone renders in every theme and mode',
-        (WidgetTester tester) async {
+    testWidgets('every header × every tone renders in every theme and mode', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in DabblerTheme.values) {
         for (final Brightness brightness in Brightness.values) {
-          for (final DabblerTicketHeader header
-              in DabblerTicketHeader.values) {
-            await tester.pumpWidget(_host(
-              _specimen(header: header),
-              theme: theme,
-              brightness: brightness,
-            ));
-            expect(tester.takeException(), isNull,
-                reason: '$theme / $brightness / $header');
+          for (final DabblerTicketHeader header in DabblerTicketHeader.values) {
+            await tester.pumpWidget(
+              _host(
+                _specimen(header: header),
+                theme: theme,
+                brightness: brightness,
+              ),
+            );
+            expect(
+              tester.takeException(),
+              isNull,
+              reason: '$theme / $brightness / $header',
+            );
           }
         }
       }
@@ -483,22 +575,24 @@ void main() {
     });
   });
 
-  testWidgets('RTL mirrors the title row: title on the right, status on the left',
-      (WidgetTester tester) async {
-    for (final TextDirection dir in TextDirection.values) {
-      await tester.pumpWidget(_host(_specimen(), direction: dir));
-      await tester.pumpAndSettle();
-      final Rect card = tester.getRect(find.byType(DabblerCard));
-      final Rect title = tester.getRect(find.text('Tuesday Padel Doubles'));
-      final Rect status = tester.getRect(find.text('Upcoming'));
-      if (dir == TextDirection.rtl) {
-        expect(title.center.dx, greaterThan(status.center.dx));
-        // bodyPadding's start inset (24) is measured from the right in RTL.
-        expect(card.right - title.right, closeTo(24, 0.6));
-      } else {
-        expect(title.center.dx, lessThan(status.center.dx));
-        expect(title.left - card.left, closeTo(24, 0.6));
+  testWidgets(
+    'RTL mirrors the title row: title on the right, status on the left',
+    (WidgetTester tester) async {
+      for (final TextDirection dir in TextDirection.values) {
+        await tester.pumpWidget(_host(_specimen(), direction: dir));
+        await tester.pumpAndSettle();
+        final Rect card = tester.getRect(find.byType(DabblerCard));
+        final Rect title = tester.getRect(find.text('Tuesday Padel Doubles'));
+        final Rect status = tester.getRect(find.text('Upcoming'));
+        if (dir == TextDirection.rtl) {
+          expect(title.center.dx, greaterThan(status.center.dx));
+          // bodyPadding's start inset (24) is measured from the right in RTL.
+          expect(card.right - title.right, closeTo(24, 0.6));
+        } else {
+          expect(title.center.dx, lessThan(status.center.dx));
+          expect(title.left - card.left, closeTo(24, 0.6));
+        }
       }
-    }
-  });
+    },
+  );
 }

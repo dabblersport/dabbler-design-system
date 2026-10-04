@@ -27,8 +27,10 @@ const List<DabblerSelectOption<String>> _sports = <DabblerSelectOption<String>>[
   DabblerSelectOption<String>(value: 'tennis', label: 'tennis', disabled: true),
 ];
 
-DabblerColors _colours() =>
-    DabblerColors.resolve(theme: DabblerTheme.main, brightness: Brightness.light);
+DabblerColors _colours() => DabblerColors.resolve(
+  theme: DabblerTheme.main,
+  brightness: Brightness.light,
+);
 
 Widget _host(
   Widget child, {
@@ -40,9 +42,7 @@ Widget _host(
   // which needs MaterialLocalizations, and its Navigator supplies the Overlay
   // that DS-700's OverlayPortal needs.
   return MaterialApp(
-    theme: ThemeData(
-      extensions: <ThemeExtension<dynamic>>[_colours()],
-    ),
+    theme: ThemeData(extensions: <ThemeExtension<dynamic>>[_colours()]),
     home: MediaQuery(
       data: MediaQueryData(size: size),
       child: Directionality(
@@ -132,8 +132,9 @@ void main() {
       expect(find.byType(DabblerFieldShell), findsOneWidget);
     });
 
-    testWidgets('an empty select shows the source placeholder',
-        (WidgetTester tester) async {
+    testWidgets('an empty select shows the source placeholder', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const _SelectHarness()));
 
       expect(DabblerSelect.defaultPlaceholder, 'select');
@@ -211,14 +212,12 @@ void main() {
       expect(menu.fullWidth, isTrue);
       // `fullWidth` means the popover is the field's width, not the 200–320
       // popover range.
-      expect(
-        tester.getSize(find.byType(DabblerMenuList)).width,
-        _fieldWidth,
-      );
+      expect(tester.getSize(find.byType(DabblerMenuList)).width, _fieldWidth);
     });
 
-    testWidgets('every option becomes a menu entry, disabled rows included',
-        (WidgetTester tester) async {
+    testWidgets('every option becomes a menu entry, disabled rows included', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const _SelectHarness(initial: 'padel')));
       await _open(tester);
 
@@ -238,8 +237,9 @@ void main() {
       expect(list.items[0].selected, isFalse);
     });
 
-    testWidgets('the list is role=menu, which is what the design source says',
-        (WidgetTester tester) async {
+    testWidgets('the list is role=menu, which is what the design source says', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const _SelectHarness()));
       await _open(tester);
 
@@ -251,19 +251,20 @@ void main() {
       );
     });
 
-    testWidgets('below 480px the list is a Sheet — inherited, not reimplemented',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(const _SelectHarness(), size: _phone),
-      );
-      await _open(tester);
+    testWidgets(
+      'below 480px the list is a Sheet — inherited, not reimplemented',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(_host(const _SelectHarness(), size: _phone));
+        await _open(tester);
 
-      expect(find.byType(DabblerSheet), findsOneWidget);
-      expect(find.byType(DabblerMenuList), findsOneWidget);
-    });
+        expect(find.byType(DabblerSheet), findsOneWidget);
+        expect(find.byType(DabblerMenuList), findsOneWidget);
+      },
+    );
 
-    testWidgets('choosing a row reports the value and closes',
-        (WidgetTester tester) async {
+    testWidgets('choosing a row reports the value and closes', (
+      WidgetTester tester,
+    ) async {
       String? picked;
       await tester.pumpWidget(
         _host(_SelectHarness(onChanged: (String v) => picked = v)),
@@ -281,8 +282,9 @@ void main() {
       );
     });
 
-    testWidgets('multiple keeps the list open and accumulates values',
-        (WidgetTester tester) async {
+    testWidgets('multiple keeps the list open and accumulates values', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const _MultiHarness()));
       await _open(tester);
 
@@ -314,9 +316,7 @@ void main() {
 
     testWidgets('searchable adds a search field above the list and filters by '
         'label', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(const _SelectHarness(searchable: true)),
-      );
+      await tester.pumpWidget(_host(const _SelectHarness(searchable: true)));
       await _open(tester);
 
       final Finder search = find.byWidgetPredicate(
@@ -346,8 +346,9 @@ void main() {
   });
 
   group('DabblerSelect — keyboard and announcement', () {
-    testWidgets('Enter, Space and ArrowDown each open a focused field',
-        (WidgetTester tester) async {
+    testWidgets('Enter, Space and ArrowDown each open a focused field', (
+      WidgetTester tester,
+    ) async {
       for (final LogicalKeyboardKey key in <LogicalKeyboardKey>[
         LogicalKeyboardKey.enter,
         LogicalKeyboardKey.space,
@@ -371,8 +372,9 @@ void main() {
       }
     });
 
-    testWidgets('Escape closes and returns focus to the field',
-        (WidgetTester tester) async {
+    testWidgets('Escape closes and returns focus to the field', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const _SelectHarness()));
       await _open(tester);
       expect(find.byType(DabblerMenuList), findsOneWidget);
@@ -386,13 +388,16 @@ void main() {
       // The field is back in its focused paint state, so the next Tab
       // continues from here.
       expect(
-        tester.widget<DabblerFieldShell>(find.byType(DabblerFieldShell)).focused,
+        tester
+            .widget<DabblerFieldShell>(find.byType(DabblerFieldShell))
+            .focused,
         isTrue,
       );
     });
 
-    testWidgets('the selected value is announced as the field button label',
-        (WidgetTester tester) async {
+    testWidgets('the selected value is announced as the field button label', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(_host(const _SelectHarness(initial: 'padel')));
 
@@ -435,8 +440,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('RTL: the popover still matches the field, on the field',
-        (WidgetTester tester) async {
+    testWidgets('RTL: the popover still matches the field, on the field', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const _SelectHarness(initial: 'padel'),
@@ -465,8 +471,9 @@ void main() {
   });
 
   group('DabblerPickerField', () {
-    testWidgets('is a FieldShell with a typed input and one trailing button',
-        (WidgetTester tester) async {
+    testWidgets('is a FieldShell with a typed input and one trailing button', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerPickerField(label: 'Date', text: '12/03/2026')),
       );
@@ -478,8 +485,9 @@ void main() {
       expect(DabblerPickerFieldShell.defaultOpenSemanticsLabel, 'Open picker');
     });
 
-    testWidgets('typing does not open the picker; the button does',
-        (WidgetTester tester) async {
+    testWidgets('typing does not open the picker; the button does', (
+      WidgetTester tester,
+    ) async {
       final List<bool> opens = <bool>[];
       await tester.pumpWidget(
         _host(
@@ -503,11 +511,14 @@ void main() {
       expect(opens, <bool>[true]);
     });
 
-    testWidgets('committing fires on submit with the typed text',
-        (WidgetTester tester) async {
+    testWidgets('committing fires on submit with the typed text', (
+      WidgetTester tester,
+    ) async {
       final List<String> committed = <String>[];
       await tester.pumpWidget(
-        _host(DabblerPickerField(label: 'Time', onTextCommitted: committed.add)),
+        _host(
+          DabblerPickerField(label: 'Time', onTextCommitted: committed.add),
+        ),
       );
 
       await tester.enterText(find.byType(EditableText), '6pm');
@@ -517,8 +528,9 @@ void main() {
       expect(committed, <String>['6pm']);
     });
 
-    testWidgets('above the breakpoint the picker is DS-700\'s popover',
-        (WidgetTester tester) async {
+    testWidgets('above the breakpoint the picker is DS-700\'s popover', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const DabblerPickerField(
@@ -535,8 +547,9 @@ void main() {
       expect(find.byType(DabblerSheet), findsNothing);
     });
 
-    testWidgets('below it the picker is a Sheet at the source\'s own detent',
-        (WidgetTester tester) async {
+    testWidgets('below it the picker is a Sheet at the source\'s own detent', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const DabblerPickerField(
@@ -558,8 +571,9 @@ void main() {
       expect(find.text('picker'), findsOneWidget);
     });
 
-    testWidgets('a disabled field neither types nor opens',
-        (WidgetTester tester) async {
+    testWidgets('a disabled field neither types nor opens', (
+      WidgetTester tester,
+    ) async {
       final List<bool> opens = <bool>[];
       await tester.pumpWidget(
         _host(

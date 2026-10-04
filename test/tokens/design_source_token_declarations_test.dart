@@ -86,8 +86,9 @@ Directory? _findDesignSource() {
   for (int i = 0; i < 8; i++) {
     final Directory candidate = Directory('${dir.path}/$designSourceSuffix');
     if (candidate.existsSync()) return candidate;
-    final Directory nested =
-        Directory('${dir.path}/Dabbler/$designSourceSuffix');
+    final Directory nested = Directory(
+      '${dir.path}/Dabbler/$designSourceSuffix',
+    );
     if (nested.existsSync()) return nested;
     if (dir.parent.path == dir.path) break;
     dir = dir.parent;
@@ -117,11 +118,14 @@ bool _isScanned(String relativePath) =>
 Set<String> _declaredTokens(Directory tokens) {
   final RegExp declaration = RegExp(r'(--[a-zA-Z0-9-]+)\s*:');
   final Set<String> declared = <String>{};
-  for (final File file in tokens
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((File f) => f.path.endsWith('.css'))) {
-    for (final RegExpMatch m in declaration.allMatches(file.readAsStringSync())) {
+  for (final File file
+      in tokens
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((File f) => f.path.endsWith('.css'))) {
+    for (final RegExpMatch m in declaration.allMatches(
+      file.readAsStringSync(),
+    )) {
       declared.add(m.group(1)!);
     }
   }
@@ -146,15 +150,17 @@ final RegExp _varReference = RegExp(r'var\(\s*(--[a-zA-Z0-9-]+)');
 /// Without these the scan reports six phantom names and the real finding is
 /// lost in them — which is the failure mode this ticket exists to prevent,
 /// arriving from the opposite direction.
-final RegExp _bareReference =
-    RegExp(r'(?<![a-zA-Z0-9-])(--[a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)(?![a-zA-Z0-9-])');
+final RegExp _bareReference = RegExp(
+  r'(?<![a-zA-Z0-9-])(--[a-zA-Z0-9-]*[a-zA-Z][a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)(?![a-zA-Z0-9-])',
+);
 
 /// Every referenced `--name`, mapped to the source files referencing it.
 Map<String, Set<String>> _references(Directory project) {
   final Map<String, Set<String>> refs = <String, Set<String>>{};
   for (final File file in project.listSync(recursive: true).whereType<File>()) {
-    final String relative =
-        file.path.substring(project.path.length + 1).replaceAll(r'\', '/');
+    final String relative = file.path
+        .substring(project.path.length + 1)
+        .replaceAll(r'\', '/');
     if (!_isScanned(relative)) continue;
     if (!relative.endsWith('.jsx') &&
         !relative.endsWith('.d.ts') &&
@@ -194,76 +200,105 @@ void main() {
     references = _references(project);
   });
 
-  group('D-007(3) — every referenced design token is declared', () {
-    test('the scan actually found the source it is meant to police', () {
-      // The gate that cannot find its input passes vacuously, which is the
-      // exact failure DS-504 was caught in. Assert the inputs are non-trivial
-      // before asserting anything about them.
-      expect(declared.length, greaterThan(200),
-          reason: 'tokens/ parsed to ${declared.length} names — too few to be '
-              'the real token set; the parse or the path is wrong');
-      expect(references.length, greaterThan(100),
-          reason: 'only ${references.length} references found across the '
-              'source — the file walk is not reaching the components');
-    });
+  group(
+    'D-007(3) — every referenced design token is declared',
+    () {
+      test('the scan actually found the source it is meant to police', () {
+        // The gate that cannot find its input passes vacuously, which is the
+        // exact failure DS-504 was caught in. Assert the inputs are non-trivial
+        // before asserting anything about them.
+        expect(
+          declared.length,
+          greaterThan(200),
+          reason:
+              'tokens/ parsed to ${declared.length} names — too few to be '
+              'the real token set; the parse or the path is wrong',
+        );
+        expect(
+          references.length,
+          greaterThan(100),
+          reason:
+              'only ${references.length} references found across the '
+              'source — the file walk is not reaching the components',
+        );
+      });
 
-    test('no var(--x) reference is undeclared, beyond the pinned defects', () {
-      final Map<String, Set<String>> undeclared = <String, Set<String>>{
-        for (final MapEntry<String, Set<String>> e in references.entries)
-          if (!declared.contains(e.key)) e.key: e.value,
-      };
+      test('no var(--x) reference is undeclared, beyond the pinned defects', () {
+        final Map<String, Set<String>> undeclared = <String, Set<String>>{
+          for (final MapEntry<String, Set<String>> e in references.entries)
+            if (!declared.contains(e.key)) e.key: e.value,
+        };
 
-      // Exact, in both directions — see the header. A name added here is a new
-      // finding; a name that disappears means its ticket landed and the pin
-      // must be deleted.
-      expect(
-        undeclared.keys.toSet(),
-        knownUndeclared,
-        reason: 'Referenced but not declared under tokens/:\n'
-            '${undeclared.entries.map((MapEntry<String, Set<String>> e) => '  ${e.key} — ${e.value.join(', ')}').join('\n')}\n'
-            'If a name here is new, that is the defect D-007 predicted. If a '
-            'name in knownUndeclared has gone, its fix landed — delete the '
-            'entry rather than widening the pin.',
-      );
-    });
+        // Exact, in both directions — see the header. A name added here is a new
+        // finding; a name that disappears means its ticket landed and the pin
+        // must be deleted.
+        expect(
+          undeclared.keys.toSet(),
+          knownUndeclared,
+          reason:
+              'Referenced but not declared under tokens/:\n'
+              '${undeclared.entries.map((MapEntry<String, Set<String>> e) => '  ${e.key} — ${e.value.join(', ')}').join('\n')}\n'
+              'If a name here is new, that is the defect D-007 predicted. If a '
+              'name in knownUndeclared has gone, its fix landed — delete the '
+              'entry rather than widening the pin.',
+        );
+      });
 
-    test('--text-body is still the open D-007(1) defect, at its one call site',
+      test(
+        '--text-body is still the open D-007(1) defect, at its one call site',
         () {
-      // Pinned at the site as well as the name, so the entry above cannot be
-      // kept alive by an unrelated second use of the same name.
-      expect(
-        references['--text-body'],
-        <String>{'components/navigation/NavigationBottomBar.jsx'},
-        reason: 'D-007 verified exactly one reference; the shape of the defect '
-            'has changed',
+          // Pinned at the site as well as the name, so the entry above cannot be
+          // kept alive by an unrelated second use of the same name.
+          expect(
+            references['--text-body'],
+            <String>{'components/navigation/NavigationBottomBar.jsx'},
+            reason:
+                'D-007 verified exactly one reference; the shape of the defect '
+                'has changed',
+          );
+          expect(
+            declared.contains('--text-body'),
+            isFalse,
+            reason:
+                'D-007(1) ruled --text-body a defect, NOT a token to add to '
+                'colors.css — if it is now declared, that resolution was not the '
+                'one ruled',
+          );
+        },
       );
-      expect(declared.contains('--text-body'), isFalse,
-          reason: 'D-007(1) ruled --text-body a defect, NOT a token to add to '
-              'colors.css — if it is now declared, that resolution was not the '
-              'one ruled',
-      );
-    });
 
-    test('the gate can fail — mutation check, AC3', () {
-      // Proved end to end against the real tree by injecting a scratch
-      // component (see the header). Retained here against the matcher so a
-      // later edit to the regexes cannot quietly stop them matching.
-      const String injected = 'style={{ color: "var(--kan271-does-not-exist)" }}';
-      expect(
-        _varReference.allMatches(injected).map((RegExpMatch m) => m.group(1)),
-        <String>['--kan271-does-not-exist'],
-      );
-      expect(declared.contains('--kan271-does-not-exist'), isFalse);
+      test('the gate can fail — mutation check, AC3', () {
+        // Proved end to end against the real tree by injecting a scratch
+        // component (see the header). Retained here against the matcher so a
+        // later edit to the regexes cannot quietly stop them matching.
+        const String injected =
+            'style={{ color: "var(--kan271-does-not-exist)" }}';
+        expect(
+          _varReference.allMatches(injected).map((RegExpMatch m) => m.group(1)),
+          <String>['--kan271-does-not-exist'],
+        );
+        expect(declared.contains('--kan271-does-not-exist'), isFalse);
 
-      // …and the two exclusions that keep it honest still exclude.
-      expect(_bareReference.hasMatch('\n---\n'), isFalse,
-          reason: 'a markdown rule is not a token');
-      expect(_bareReference.hasMatch('the `--surface-` family'), isFalse,
-          reason: 'a prose prefix is not a token');
-      expect(_bareReference.hasMatch('prefer `--text-body` here'), isTrue,
-          reason: 'a bare name in prose IS a reference and must be scanned');
-    });
-  }, skip: source == null
-      ? 'design source tokens/*.css not found beside the package'
-      : false);
+        // …and the two exclusions that keep it honest still exclude.
+        expect(
+          _bareReference.hasMatch('\n---\n'),
+          isFalse,
+          reason: 'a markdown rule is not a token',
+        );
+        expect(
+          _bareReference.hasMatch('the `--surface-` family'),
+          isFalse,
+          reason: 'a prose prefix is not a token',
+        );
+        expect(
+          _bareReference.hasMatch('prefer `--text-body` here'),
+          isTrue,
+          reason: 'a bare name in prose IS a reference and must be scanned',
+        );
+      });
+    },
+    skip: source == null
+        ? 'design source tokens/*.css not found beside the package'
+        : false,
+  );
 }

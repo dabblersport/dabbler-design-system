@@ -123,8 +123,8 @@ class DabblerRating extends StatefulWidget {
     this.count,
     this.showValue = false,
     this.label = 'Rating',
-  })  : assert(max > 0, 'a rating needs at least one star'),
-        assert(value >= 0, 'a rating cannot be negative');
+  }) : assert(max > 0, 'a rating needs at least one star'),
+       assert(value >= 0, 'a rating cannot be negative');
 
   /// The score. Fractional values are drawn by clipping — see the class doc.
   final double value;
@@ -197,8 +197,7 @@ class _DabblerRatingState extends State<DabblerRating> {
 
   double get _shown => _hover?.toDouble() ?? widget.value;
 
-  void _change(int next) =>
-      widget.onChanged?.call(next.clamp(1, widget.max));
+  void _change(int next) => widget.onChanged?.call(next.clamp(1, widget.max));
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (_interactive && event is! KeyUpEvent) {

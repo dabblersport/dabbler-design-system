@@ -56,11 +56,7 @@ class DabblerAccordionItem {
 /// Under [DabblerMotion.reduceMotion] the child simply appears.
 class DabblerCollapse extends StatelessWidget {
   /// Creates a collapsible region.
-  const DabblerCollapse({
-    super.key,
-    required this.open,
-    required this.child,
-  });
+  const DabblerCollapse({super.key, required this.open, required this.child});
 
   /// Whether the child is revealed.
   final bool open;
@@ -154,9 +150,7 @@ class _DabblerAccordionState extends State<DabblerAccordion> {
       final List<String> open = <String>[
         if (_current case final List<Object?> list) ...list.cast<String>(),
       ];
-      next = _isOpen(id)
-          ? (open..remove(id))
-          : (open..add(id));
+      next = _isOpen(id) ? (open..remove(id)) : (open..add(id));
     } else {
       next = _isOpen(id) ? null : id;
     }
@@ -306,13 +300,13 @@ class _DabblerAccordionItemView extends StatelessWidget {
               )
             // `borderBlockEnd: 1px solid var(--faint)` between plain items.
             : separator
-                ? Border(
-                    bottom: BorderSide(
-                      color: colors.bgTertiary,
-                      width: DabblerSizing.borderDefault,
-                    ),
-                  )
-                : null,
+            ? Border(
+                bottom: BorderSide(
+                  color: colors.bgTertiary,
+                  width: DabblerSizing.borderDefault,
+                ),
+              )
+            : null,
       ),
       child: body,
     );

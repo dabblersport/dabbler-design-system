@@ -76,7 +76,8 @@ const List<GalleryEntry> colorsGalleryEntries = <GalleryEntry>[
     page: 'foundations/colour',
     group: null,
     title: 'Colour — brand ladders and the seven section themes',
-    description: 'The five primitive brand ramps, then all seven themes '
+    description:
+        'The five primitive brand ramps, then all seven themes '
         'resolved side by side at the current brightness.',
     builder: _brand,
   ),
@@ -85,7 +86,8 @@ const List<GalleryEntry> colorsGalleryEntries = <GalleryEntry>[
     page: 'foundations/colour',
     group: null,
     title: 'Colour — surfaces, ink and outline',
-    description: 'The shared paper ramp and every semantic surface, text and '
+    description:
+        'The shared paper ramp and every semantic surface, text and '
         'border role, resolved under the current (theme, brightness) pair.',
     builder: _surfaces,
   ),
@@ -94,7 +96,8 @@ const List<GalleryEntry> colorsGalleryEntries = <GalleryEntry>[
     page: 'foundations/colour',
     group: null,
     title: 'Colour — status, tags and decorative tones',
-    description: 'The four status tones in all four roles, the seven workflow '
+    description:
+        'The four status tones in all four roles, the seven workflow '
         'tags and the three decorative tiles.',
     builder: _status,
   ),
@@ -103,7 +106,8 @@ const List<GalleryEntry> colorsGalleryEntries = <GalleryEntry>[
     page: 'foundations/colour',
     group: null,
     title: 'Colour — contrast, measured live',
-    description: 'Every status pair measured from the resolved tokens at '
+    description:
+        'Every status pair measured from the resolved tokens at '
         'render time, not transcribed. Switch theme or brightness and the '
         'numbers change.',
     builder: _contrast,
@@ -597,52 +601,67 @@ Widget _contrast(BuildContext context) {
 /// shared ink ramp — so there are five ladders for seven themes.
 const List<(String, List<(String, String, Color)>)> _brandLadders =
     <(String, List<(String, String, Color)>)>[
-  ('Main', <(String, String, Color)>[
-    ('300', '--main-p-300', DabblerPalette.mainP300),
-    ('400', '--main-p-400', DabblerPalette.mainP400),
-    ('600 · primary', '--main-p-600', DabblerPalette.mainP600),
-    ('700 · hover', '--main-p-700', DabblerPalette.mainP700),
-    ('secondary 400', '--main-s-400', DabblerPalette.mainS400),
-    ('secondary 600', '--main-s-600', DabblerPalette.mainS600),
-    ('secondary 700', '--main-s-700', DabblerPalette.mainS700),
-  ]),
-  ('Sport', <(String, String, Color)>[
-    ('300', '--sport-p-300', DabblerPalette.sportP300),
-    ('400', '--sport-p-400', DabblerPalette.sportP400),
-    ('600 · primary', '--sport-p-600', DabblerPalette.sportP600),
-    ('700 · hover', '--sport-p-700', DabblerPalette.sportP700),
-    ('secondary 400', '--sport-s-400', DabblerPalette.sportS400),
-    ('secondary 600', '--sport-s-600', DabblerPalette.sportS600),
-    ('secondary 700', '--sport-s-700', DabblerPalette.sportS700),
-  ]),
-  ('Social', <(String, String, Color)>[
-    ('300', '--social-p-300', DabblerPalette.socialP300),
-    ('400', '--social-p-400', DabblerPalette.socialP400),
-    ('600 · primary', '--social-p-600', DabblerPalette.socialP600),
-    ('700 · hover', '--social-p-700', DabblerPalette.socialP700),
-    ('secondary 400', '--social-s-400', DabblerPalette.socialS400),
-    ('secondary 600', '--social-s-600', DabblerPalette.socialS600),
-    ('secondary 700', '--social-s-700', DabblerPalette.socialS700),
-  ]),
-  ('Active', <(String, String, Color)>[
-    ('300', '--active-p-300', DabblerPalette.activeP300),
-    ('400', '--active-p-400', DabblerPalette.activeP400),
-    ('600 · primary', '--active-p-600', DabblerPalette.activeP600),
-    ('700 · hover', '--active-p-700', DabblerPalette.activeP700),
-    ('secondary 400', '--active-s-400', DabblerPalette.activeS400),
-    ('secondary 600', '--active-s-600', DabblerPalette.activeS600),
-    ('secondary 700', '--active-s-700', DabblerPalette.activeS700),
-  ]),
-  ('Bright', <(String, String, Color)>[
-    ('300', '--bright-p-300', DabblerPalette.brightP300),
-    ('400', '--bright-p-400', DabblerPalette.brightP400),
-    ('600 · primary', '--bright-p-600', DabblerPalette.brightP600),
-    ('700 · hover', '--bright-p-700', DabblerPalette.brightP700),
-    ('secondary 400', '--bright-s-400', DabblerPalette.brightS400),
-    ('secondary 600', '--bright-s-600', DabblerPalette.brightS600),
-    ('secondary 700', '--bright-s-700', DabblerPalette.brightS700),
-  ]),
-];
+      (
+        'Main',
+        <(String, String, Color)>[
+          ('300', '--main-p-300', DabblerPalette.mainP300),
+          ('400', '--main-p-400', DabblerPalette.mainP400),
+          ('600 · primary', '--main-p-600', DabblerPalette.mainP600),
+          ('700 · hover', '--main-p-700', DabblerPalette.mainP700),
+          ('secondary 400', '--main-s-400', DabblerPalette.mainS400),
+          ('secondary 600', '--main-s-600', DabblerPalette.mainS600),
+          ('secondary 700', '--main-s-700', DabblerPalette.mainS700),
+        ],
+      ),
+      (
+        'Sport',
+        <(String, String, Color)>[
+          ('300', '--sport-p-300', DabblerPalette.sportP300),
+          ('400', '--sport-p-400', DabblerPalette.sportP400),
+          ('600 · primary', '--sport-p-600', DabblerPalette.sportP600),
+          ('700 · hover', '--sport-p-700', DabblerPalette.sportP700),
+          ('secondary 400', '--sport-s-400', DabblerPalette.sportS400),
+          ('secondary 600', '--sport-s-600', DabblerPalette.sportS600),
+          ('secondary 700', '--sport-s-700', DabblerPalette.sportS700),
+        ],
+      ),
+      (
+        'Social',
+        <(String, String, Color)>[
+          ('300', '--social-p-300', DabblerPalette.socialP300),
+          ('400', '--social-p-400', DabblerPalette.socialP400),
+          ('600 · primary', '--social-p-600', DabblerPalette.socialP600),
+          ('700 · hover', '--social-p-700', DabblerPalette.socialP700),
+          ('secondary 400', '--social-s-400', DabblerPalette.socialS400),
+          ('secondary 600', '--social-s-600', DabblerPalette.socialS600),
+          ('secondary 700', '--social-s-700', DabblerPalette.socialS700),
+        ],
+      ),
+      (
+        'Active',
+        <(String, String, Color)>[
+          ('300', '--active-p-300', DabblerPalette.activeP300),
+          ('400', '--active-p-400', DabblerPalette.activeP400),
+          ('600 · primary', '--active-p-600', DabblerPalette.activeP600),
+          ('700 · hover', '--active-p-700', DabblerPalette.activeP700),
+          ('secondary 400', '--active-s-400', DabblerPalette.activeS400),
+          ('secondary 600', '--active-s-600', DabblerPalette.activeS600),
+          ('secondary 700', '--active-s-700', DabblerPalette.activeS700),
+        ],
+      ),
+      (
+        'Bright',
+        <(String, String, Color)>[
+          ('300', '--bright-p-300', DabblerPalette.brightP300),
+          ('400', '--bright-p-400', DabblerPalette.brightP400),
+          ('600 · primary', '--bright-p-600', DabblerPalette.brightP600),
+          ('700 · hover', '--bright-p-700', DabblerPalette.brightP700),
+          ('secondary 400', '--bright-s-400', DabblerPalette.brightS400),
+          ('secondary 600', '--bright-s-600', DabblerPalette.brightS600),
+          ('secondary 700', '--bright-s-700', DabblerPalette.brightS700),
+        ],
+      ),
+    ];
 
 /// The seven workflow tags, in `colors.html`'s order, with its own labels.
 const List<(String, DabblerToneColor)> _tags = <(String, DabblerToneColor)>[
@@ -699,9 +718,9 @@ String _hex(Color color) =>
 /// it, which is the failure mode this specimen exists to rule out.
 Color _inkOn(Color background) =>
     _contrastRatio(background, DabblerPalette.paper) >=
-            _contrastRatio(background, DabblerPalette.ink)
-        ? DabblerPalette.paper
-        : DabblerPalette.ink;
+        _contrastRatio(background, DabblerPalette.ink)
+    ? DabblerPalette.paper
+    : DabblerPalette.ink;
 
 // --- Widgets -------------------------------------------------------------
 
@@ -769,9 +788,10 @@ class _Swatch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color on = ink ?? _inkOn(color);
-    final TextStyle mono = DabblerType.caption2
-        .resolve()
-        .copyWith(color: on.withValues(alpha: 0.75), fontSize: 10);
+    final TextStyle mono = DabblerType.caption2.resolve().copyWith(
+      color: on.withValues(alpha: 0.75),
+      fontSize: 10,
+    );
     return Container(
       height: _height,
       padding: const EdgeInsets.all(8),
@@ -789,11 +809,16 @@ class _Swatch extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: DabblerType.caption2.resolve().copyWith(
-                  color: on,
-                  fontWeight: DabblerType.semibold,
-                ),
+              color: on,
+              fontWeight: DabblerType.semibold,
+            ),
           ),
-          Text(token, maxLines: 1, overflow: TextOverflow.ellipsis, style: mono),
+          Text(
+            token,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: mono,
+          ),
           Text(_hex(color), style: mono),
         ],
       ),
@@ -821,45 +846,42 @@ class _SwatchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          // How many `min-width:118px` swatches, plus their gaps, fit.
-          final int perLine = constraints.maxWidth.isFinite
-              ? ((constraints.maxWidth + _gap) / (_Swatch.minWidth + _gap))
-                  .floor()
-                  .clamp(1, children.length)
-              : children.length;
-          final List<List<Widget>> lines = <List<Widget>>[
-            for (int i = 0; i < children.length; i += perLine)
-              children.sublist(
-                i,
-                (i + perLine).clamp(0, children.length),
-              ),
-          ];
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              for (int line = 0; line < lines.length; line++) ...<Widget>[
-                if (line > 0) const SizedBox(height: _gap),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    for (int i = 0; i < lines[line].length; i++) ...<Widget>[
-                      if (i > 0) const SizedBox(width: _gap),
-                      Expanded(child: lines[line][i]),
-                    ],
-                    // A short last line keeps its swatches at the same width
-                    // as the full lines above it, rather than stretching two
-                    // swatches across the page.
-                    if (lines[line].length < perLine)
-                      Spacer(flex: perLine - lines[line].length),
-                  ],
-                ),
+    builder: (BuildContext context, BoxConstraints constraints) {
+      // How many `min-width:118px` swatches, plus their gaps, fit.
+      final int perLine = constraints.maxWidth.isFinite
+          ? ((constraints.maxWidth + _gap) / (_Swatch.minWidth + _gap))
+                .floor()
+                .clamp(1, children.length)
+          : children.length;
+      final List<List<Widget>> lines = <List<Widget>>[
+        for (int i = 0; i < children.length; i += perLine)
+          children.sublist(i, (i + perLine).clamp(0, children.length)),
+      ];
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (int line = 0; line < lines.length; line++) ...<Widget>[
+            if (line > 0) const SizedBox(height: _gap),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                for (int i = 0; i < lines[line].length; i++) ...<Widget>[
+                  if (i > 0) const SizedBox(width: _gap),
+                  Expanded(child: lines[line][i]),
+                ],
+                // A short last line keeps its swatches at the same width
+                // as the full lines above it, rather than stretching two
+                // swatches across the page.
+                if (lines[line].length < perLine)
+                  Spacer(flex: perLine - lines[line].length),
               ],
-            ],
-          );
-        },
+            ),
+          ],
+        ],
       );
+    },
+  );
 }
 
 /// One of the seven themes, resolved at [brightness] — the band that proves
@@ -872,8 +894,10 @@ class _ThemeSwatch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DabblerColors resolved =
-        DabblerColors.resolve(theme: theme, brightness: brightness);
+    final DabblerColors resolved = DabblerColors.resolve(
+      theme: theme,
+      brightness: brightness,
+    );
     final bool current = DabblerColors.of(context).theme == theme;
     return _Swatch(
       label: current ? '${theme.name} · current' : theme.name,
@@ -895,30 +919,30 @@ class _TagChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(
-              vertical: DabblerSpacing.space3,
-              horizontal: 16,
-            ),
-            decoration: BoxDecoration(
-              color: tone.surface,
-              borderRadius: DabblerRadius.lgAll,
-            ),
-            child: Text(
-              label,
-              style: DabblerType.subheadline.resolve().copyWith(
-                    color: tone.ink,
-                    fontWeight: DabblerType.semibold,
-                  ),
-            ),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: DabblerSpacing.space3,
+          horizontal: 16,
+        ),
+        decoration: BoxDecoration(
+          color: tone.surface,
+          borderRadius: DabblerRadius.lgAll,
+        ),
+        child: Text(
+          label,
+          style: DabblerType.subheadline.resolve().copyWith(
+            color: tone.ink,
+            fontWeight: DabblerType.semibold,
           ),
-          const SizedBox(height: DabblerSpacing.space2),
-          GalleryMono('${_hex(tone.surface)} · ${_hex(tone.ink)}'),
-        ],
-      );
+        ),
+      ),
+      const SizedBox(height: DabblerSpacing.space2),
+      GalleryMono('${_hex(tone.surface)} · ${_hex(tone.ink)}'),
+    ],
+  );
 }
 
 /// One measured pair: the sample painted in the real colours, and the ratio
@@ -964,9 +988,10 @@ class _ContrastRow extends StatelessWidget {
             child: Text(
               'Aa 0123',
               textAlign: TextAlign.center,
-              style: DabblerType.caption1
-                  .resolve()
-                  .copyWith(color: foreground, fontWeight: DabblerType.medium),
+              style: DabblerType.caption1.resolve().copyWith(
+                color: foreground,
+                fontWeight: DabblerType.medium,
+              ),
             ),
           ),
           const SizedBox(width: DabblerSpacing.space4),
@@ -974,13 +999,13 @@ class _ContrastRow extends StatelessWidget {
             '${ratio.toStringAsFixed(2)}:1  '
             '${passes ? 'AA' : (expectedToFail ? 'by design' : 'FAIL')}',
             style: DabblerType.caption1.resolve().copyWith(
-                  color: passes
-                      ? colors.success.strong
-                      : (expectedToFail
-                          ? colors.textTertiary
-                          : colors.error.strong),
-                  fontWeight: DabblerType.semibold,
-                ),
+              color: passes
+                  ? colors.success.strong
+                  : (expectedToFail
+                        ? colors.textTertiary
+                        : colors.error.strong),
+              fontWeight: DabblerType.semibold,
+            ),
           ),
         ],
       ),
@@ -996,27 +1021,27 @@ class _ScrimSample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: 240,
-        height: 88,
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: colors.surfaceCard,
-                  border: Border.all(color: colors.borderDefault),
-                  borderRadius: DabblerRadius.lgAll,
-                ),
-              ),
+    width: 240,
+    height: 88,
+    child: Stack(
+      children: <Widget>[
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.surfaceCard,
+              border: Border.all(color: colors.borderDefault),
+              borderRadius: DabblerRadius.lgAll,
             ),
-            PositionedDirectional(
-              start: 120,
-              top: 0,
-              bottom: 0,
-              width: 120,
-              child: ColoredBox(color: colors.scrim),
-            ),
-          ],
+          ),
         ),
-      );
+        PositionedDirectional(
+          start: 120,
+          top: 0,
+          bottom: 0,
+          width: 120,
+          child: ColoredBox(color: colors.scrim),
+        ),
+      ],
+    ),
+  );
 }

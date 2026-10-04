@@ -43,31 +43,33 @@ List<DabblerAccordionItem> _items(BuildContext context) {
     DabblerAccordionItem(
       id: 'refund',
       title: 'refunds',
-      content:
-          Text('free cancellation up to 6 hours before kick-off.', style: body),
+      content: Text(
+        'free cancellation up to 6 hours before kick-off.',
+        style: body,
+      ),
     ),
   ];
 }
 
 Widget _accordions(BuildContext context) => GalleryStack(
-      children: <Widget>[
-        GallerySpecimen(
-          label: 'plain',
-          child: DabblerAccordion(items: _items(context)),
-        ),
-        GallerySpecimen(
-          label: 'card',
-          child: DabblerAccordion(
-            items: _items(context),
-            variant: DabblerAccordionVariant.card,
-          ),
-        ),
-        const GallerySpecimen(
-          label: 'Collapse — the system\'s one expand animation',
-          child: _CollapseDemo(),
-        ),
-      ],
-    );
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'plain',
+      child: DabblerAccordion(items: _items(context)),
+    ),
+    GallerySpecimen(
+      label: 'card',
+      child: DabblerAccordion(
+        items: _items(context),
+        variant: DabblerAccordionVariant.card,
+      ),
+    ),
+    const GallerySpecimen(
+      label: 'Collapse — the system\'s one expand animation',
+      child: _CollapseDemo(),
+    ),
+  ],
+);
 
 class _CollapseDemo extends StatefulWidget {
   const _CollapseDemo();

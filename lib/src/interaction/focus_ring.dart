@@ -65,8 +65,8 @@ class DabblerFocusRing extends StatefulWidget {
     this.onFocusChange,
     this.width = ringWidth,
     this.offset = ringOffset,
-  })  : _selfDriven = true,
-        visible = false;
+  }) : _selfDriven = true,
+       visible = false;
 
   /// Paints the ring when [visible]; tracks nothing.
   const DabblerFocusRing.visible({
@@ -77,11 +77,11 @@ class DabblerFocusRing extends StatefulWidget {
     this.enabled = true,
     this.width = ringWidth,
     this.offset = ringOffset,
-  })  : _selfDriven = false,
-        focusNode = null,
-        autofocus = false,
-        canRequestFocus = true,
-        onFocusChange = null;
+  }) : _selfDriven = false,
+       focusNode = null,
+       autofocus = false,
+       canRequestFocus = true,
+       onFocusChange = null;
 
   /// `--focus-ring-width: 2px` (`tokens/spacing.css:65`).
   static const double ringWidth = 2;
@@ -164,8 +164,7 @@ class _DabblerFocusRingState extends State<DabblerFocusRing> {
   bool _showRing(bool focused) =>
       widget.enabled &&
       focused &&
-      (!widget._selfDriven ||
-          _highlightMode == FocusHighlightMode.traditional);
+      (!widget._selfDriven || _highlightMode == FocusHighlightMode.traditional);
 
   Widget _paint(BuildContext context, {required bool focused}) {
     return CustomPaint(
@@ -174,8 +173,9 @@ class _DabblerFocusRingState extends State<DabblerFocusRing> {
       foregroundPainter: _showRing(focused)
           ? _FocusRingPainter(
               color: DabblerColors.of(context).focusRing,
-              borderRadius:
-                  widget.borderRadius.resolve(Directionality.maybeOf(context)),
+              borderRadius: widget.borderRadius.resolve(
+                Directionality.maybeOf(context),
+              ),
               width: widget.width,
               offset: widget.offset,
             )
@@ -228,9 +228,7 @@ class _FocusRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final double grow = offset + width / 2;
-    final RRect rrect = borderRadius
-        .toRRect(Offset.zero & size)
-        .inflate(grow);
+    final RRect rrect = borderRadius.toRRect(Offset.zero & size).inflate(grow);
     canvas.drawRRect(
       rrect,
       Paint()

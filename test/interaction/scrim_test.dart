@@ -17,8 +17,9 @@ Widget _sized(Widget child) => SizedBox(width: 200, height: 200, child: child);
 
 void main() {
   group('the wash is --color-scrim and nothing else', () {
-    testWidgets('light is ink at 45% (tokens/colors.css:157)',
-        (WidgetTester tester) async {
+    testWidgets('light is ink at 45% (tokens/colors.css:157)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(host(_sized(const DabblerScrim())));
       expect(_washColour(tester), DabblerPalette.ink.withValues(alpha: 0.45));
       expect(
@@ -30,18 +31,25 @@ void main() {
       );
     });
 
-    testWidgets('dark is ink-950 at 65% (tokens/colors.css:203)',
-        (WidgetTester tester) async {
+    testWidgets('dark is ink-950 at 65% (tokens/colors.css:203)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(_sized(const DabblerScrim()), brightness: Brightness.dark),
       );
-      expect(_washColour(tester), DabblerPalette.ink950.withValues(alpha: 0.65));
+      expect(
+        _washColour(tester),
+        DabblerPalette.ink950.withValues(alpha: 0.65),
+      );
     });
 
-    testWidgets('every theme gets the same scrim — it is not brand-tinted',
-        (WidgetTester tester) async {
+    testWidgets('every theme gets the same scrim — it is not brand-tinted', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in DabblerTheme.values) {
-        await tester.pumpWidget(host(_sized(const DabblerScrim()), theme: theme));
+        await tester.pumpWidget(
+          host(_sized(const DabblerScrim()), theme: theme),
+        );
         expect(_washColour(tester), DabblerPalette.ink.withValues(alpha: 0.45));
       }
     });
@@ -61,7 +69,10 @@ void main() {
 
     testWidgets('reduced motion appears at once', (WidgetTester tester) async {
       await tester.pumpWidget(
-        host(_sized(const DabblerScrim(visible: false)), disableAnimations: true),
+        host(
+          _sized(const DabblerScrim(visible: false)),
+          disableAnimations: true,
+        ),
       );
       await tester.pumpWidget(
         host(_sized(const DabblerScrim()), disableAnimations: true),
@@ -72,31 +83,35 @@ void main() {
   });
 
   group('dismissal', () {
-    testWidgets('is inert and lets pointers through with no onDismiss',
-        (WidgetTester tester) async {
+    testWidgets('is inert and lets pointers through with no onDismiss', (
+      WidgetTester tester,
+    ) async {
       int beneath = 0;
       await tester.pumpWidget(
-        host(_sized(
-          Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => beneath++,
+        host(
+          _sized(
+            Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => beneath++,
+                  ),
                 ),
-              ),
-              const Positioned.fill(child: DabblerScrim()),
-            ],
+                const Positioned.fill(child: DabblerScrim()),
+              ],
+            ),
           ),
-        )),
+        ),
       );
       await tester.tapAt(const Offset(100, 100));
       await tester.pump();
       expect(beneath, 1);
     });
 
-    testWidgets('a press on the scrim dismisses when onDismiss is set',
-        (WidgetTester tester) async {
+    testWidgets('a press on the scrim dismisses when onDismiss is set', (
+      WidgetTester tester,
+    ) async {
       int dismissed = 0;
       await tester.pumpWidget(
         host(_sized(DabblerScrim(onDismiss: () => dismissed++))),
@@ -106,13 +121,14 @@ void main() {
       expect(dismissed, 1);
     });
 
-    testWidgets('a hidden scrim no longer absorbs pointers',
-        (WidgetTester tester) async {
+    testWidgets('a hidden scrim no longer absorbs pointers', (
+      WidgetTester tester,
+    ) async {
       int dismissed = 0;
       await tester.pumpWidget(
-        host(_sized(
-          DabblerScrim(visible: false, onDismiss: () => dismissed++),
-        )),
+        host(
+          _sized(DabblerScrim(visible: false, onDismiss: () => dismissed++)),
+        ),
       );
       await tester.pumpAndSettle();
       await tester.tapAt(const Offset(100, 100));
@@ -126,21 +142,16 @@ void main() {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(host(_sized(const DabblerScrim())));
       expect(find.bySemanticsLabel('anything'), findsNothing);
-      expect(
-        tester.getSemantics(find.byType(DabblerScrim)).label,
-        isEmpty,
-      );
+      expect(tester.getSemantics(find.byType(DabblerScrim)).label, isEmpty);
       handle.dispose();
     });
 
-    testWidgets('the dismiss affordance carries the label it was given',
-        (WidgetTester tester) async {
+    testWidgets('the dismiss affordance carries the label it was given', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
-        host(_sized(DabblerScrim(
-          dismissLabel: 'Close',
-          onDismiss: () {},
-        ))),
+        host(_sized(DabblerScrim(dismissLabel: 'Close', onDismiss: () {}))),
       );
       expect(find.bySemanticsLabel('Close'), findsOneWidget);
       handle.dispose();

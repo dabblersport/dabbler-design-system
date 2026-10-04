@@ -61,8 +61,9 @@ void main() {
     });
   }
 
-  testWidgets('the active label is not squeezed: only the active item flexes',
-      (WidgetTester tester) async {
+  testWidgets('the active label is not squeezed: only the active item flexes', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         const DabblerNavigationBottomBar(

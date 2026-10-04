@@ -158,8 +158,9 @@ class DabblerRepostRow extends StatelessWidget {
             DabblerType.toWesternDigits(repostedLabel),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: t(DabblerType.caption1)
-                .copyWith(color: colors.textSecondary),
+            style: t(
+              DabblerType.caption1,
+            ).copyWith(color: colors.textSecondary),
           ),
         ),
       ],
@@ -168,13 +169,15 @@ class DabblerRepostRow extends StatelessWidget {
     final String? q = quote?.trim();
     final Widget card = DabblerCard(
       padding: EdgeInsets.zero,
-      child: original ??
+      child:
+          original ??
           Padding(
             padding: const EdgeInsets.all(DabblerSpacing.space4),
             child: Text(
               unavailableLabel ?? '',
-              style: t(DabblerType.footnote)
-                  .copyWith(color: colors.textSecondary),
+              style: t(
+                DabblerType.footnote,
+              ).copyWith(color: colors.textSecondary),
             ),
           ),
     );
@@ -226,8 +229,9 @@ class DabblerRepostRow extends StatelessWidget {
                         q,
                         maxLines: quoteMaxLines,
                         overflow: TextOverflow.ellipsis,
-                        style: t(DabblerType.subheadline)
-                            .copyWith(color: colors.textPrimary),
+                        style: t(
+                          DabblerType.subheadline,
+                        ).copyWith(color: colors.textPrimary),
                       ),
                     ),
                   const SizedBox(height: DabblerSpacing.space3),

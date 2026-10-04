@@ -133,7 +133,7 @@ class GalleryThemeScope extends StatefulWidget {
 
   /// Builds the app under the current appearance.
   final Widget Function(BuildContext context, GalleryAppearance appearance)
-      builder;
+  builder;
 
   /// The appearance the gallery opens on.
   final GalleryAppearance initial;

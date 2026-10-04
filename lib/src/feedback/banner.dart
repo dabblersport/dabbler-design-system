@@ -43,11 +43,11 @@ enum DabblerBannerTone {
   /// The tone's default Iconsax glyph, from `statusTones`
   /// (`components/foundations/overlay.jsx:161-166`).
   String get glyph => switch (this) {
-        DabblerBannerTone.success => 'tick-circle',
-        DabblerBannerTone.warning => 'warning-2',
-        DabblerBannerTone.error => 'danger',
-        DabblerBannerTone.info || DabblerBannerTone.neutral => 'info-circle',
-      };
+    DabblerBannerTone.success => 'tick-circle',
+    DabblerBannerTone.warning => 'warning-2',
+    DabblerBannerTone.error => 'danger',
+    DabblerBannerTone.info || DabblerBannerTone.neutral => 'info-circle',
+  };
 
   /// Whether this tone interrupts.
   ///
@@ -179,7 +179,8 @@ class DabblerBanner extends StatelessWidget {
   /// The button is 45 wide and starts `--space-5 - --space-3` (6) from the
   /// container's inline end, so it reaches 51 in; the row's own padding
   /// already covers 15 of that.
-  static const double dismissReserve = DabblerSizing.touchTargetMin +
+  static const double dismissReserve =
+      DabblerSizing.touchTargetMin +
       (DabblerSpacing.space5 - DabblerSpacing.space3) -
       DabblerSpacing.space5;
 
@@ -187,8 +188,9 @@ class DabblerBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final DabblerStatusTone? status = tone.status;
-    final DabblerStatusColor? resolved =
-        status == null ? null : colors.status(status);
+    final DabblerStatusColor? resolved = status == null
+        ? null
+        : colors.status(status);
 
     // `statusTones` / `statusHairline` in overlay.jsx:160-173.
     final Color surface = resolved?.surface ?? colors.surfaceCard;
@@ -204,12 +206,12 @@ class DabblerBanner extends StatelessWidget {
     final Widget? glyph = identical(icon, noIcon)
         ? null
         : icon ??
-            DabblerIcon(
-              tone.glyph,
-              weight: DabblerIconWeight.bold,
-              size: DabblerSizing.iconMd,
-              color: ink,
-            );
+              DabblerIcon(
+                tone.glyph,
+                weight: DabblerIconWeight.bold,
+                size: DabblerSizing.iconMd,
+                color: ink,
+              );
 
     final List<Widget> column = <Widget>[];
 
@@ -256,10 +258,7 @@ class DabblerBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: surface,
         borderRadius: DabblerRadius.lgAll,
-        border: Border.all(
-          color: hairline,
-          width: DabblerSizing.borderDefault,
-        ),
+        border: Border.all(color: hairline, width: DabblerSizing.borderDefault),
         // No boxShadow and no gradient: the system is flat.
       ),
       child: Row(
@@ -285,8 +284,7 @@ class DabblerBanner extends StatelessWidget {
             ),
           ),
           // The dismiss button is NOT in this row — see [_dismissInset].
-          if (onDismiss != null)
-            const SizedBox(width: dismissReserve),
+          if (onDismiss != null) const SizedBox(width: dismissReserve),
         ],
       ),
     );
@@ -430,20 +428,14 @@ class DabblerBanner extends StatelessWidget {
   /// Neither primitive lays anything out — the ring is painted outside the
   /// child's bounds and the scale is a transform — so the targets' measured
   /// [DabblerSizing.touchTargetMin] boxes are untouched.
-  static Widget _interactive({
-    required bool enabled,
-    required Widget child,
-  }) {
+  static Widget _interactive({required bool enabled, required Widget child}) {
     return DabblerFocusRing(
       enabled: enabled,
       canRequestFocus: enabled,
       // Both targets are drawn on --radius-md: the action by its own outlined
       // Container, the dismiss by the round `close-circle` glyph it carries.
       borderRadius: DabblerRadius.mdAll,
-      child: DabblerPressScale.gesture(
-        enabled: enabled,
-        child: child,
-      ),
+      child: DabblerPressScale.gesture(enabled: enabled, child: child),
     );
   }
 }

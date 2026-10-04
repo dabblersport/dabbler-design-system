@@ -41,17 +41,20 @@ void main() {
 
     testWidgets('a disabled control never rings', (WidgetTester tester) async {
       await tester.pumpWidget(
-        host(const DabblerFocusRing.visible(
-          visible: true,
-          enabled: false,
-          child: _child,
-        )),
+        host(
+          const DabblerFocusRing.visible(
+            visible: true,
+            enabled: false,
+            child: _child,
+          ),
+        ),
       );
       expect(_ringPainted(tester), isFalse);
     });
 
-    testWidgets('showing the ring does not move or resize the child',
-        (WidgetTester tester) async {
+    testWidgets('showing the ring does not move or resize the child', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(const DabblerFocusRing.visible(visible: false, child: _child)),
       );
@@ -62,8 +65,9 @@ void main() {
       expect(tester.getRect(find.byKey(const Key('child'))), before);
     });
 
-    testWidgets('the ring colour is the theme focus-ring role, per theme',
-        (WidgetTester tester) async {
+    testWidgets('the ring colour is the theme focus-ring role, per theme', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in DabblerTheme.values) {
         await tester.pumpWidget(
           host(
@@ -71,20 +75,23 @@ void main() {
             theme: theme,
           ),
         );
-        final Color expected =
-            DabblerColors.resolve(theme: theme, brightness: Brightness.light)
-                .focusRing;
+        final Color expected = DabblerColors.resolve(
+          theme: theme,
+          brightness: Brightness.light,
+        ).focusRing;
         // The painter is the only thing that knows the colour; painting it and
         // reading the recorded stroke proves it reached the canvas.
         expect(
           find.byType(CustomPaint),
-          paints..rrect(color: expected, strokeWidth: DabblerFocusRing.ringWidth),
+          paints
+            ..rrect(color: expected, strokeWidth: DabblerFocusRing.ringWidth),
         );
       }
     });
 
-    testWidgets('the ring sits offset + half its width outside the child',
-        (WidgetTester tester) async {
+    testWidgets('the ring sits offset + half its width outside the child', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(const DabblerFocusRing.visible(visible: true, child: _child)),
       );
@@ -92,36 +99,40 @@ void main() {
           DabblerFocusRing.ringOffset + DabblerFocusRing.ringWidth / 2;
       expect(
         find.byType(CustomPaint),
-        paints
-          ..rrect(
-            rrect: RRect.fromRectAndRadius(
-              const Rect.fromLTWH(0, 0, 100, 50).inflate(grow),
-              const Radius.circular(grow),
-            ),
+        paints..rrect(
+          rrect: RRect.fromRectAndRadius(
+            const Rect.fromLTWH(0, 0, 100, 50).inflate(grow),
+            const Radius.circular(grow),
           ),
+        ),
       );
     });
   });
 
   group('DabblerFocusRing (self-driven, :focus-visible equivalent)', () {
-    testWidgets('keyboard focus raises the ring; blur drops it',
-        (WidgetTester tester) async {
+    testWidgets('keyboard focus raises the ring; blur drops it', (
+      WidgetTester tester,
+    ) async {
       final FocusNode node = FocusNode();
       final FocusNode elsewhere = FocusNode();
       addTearDown(node.dispose);
       addTearDown(elsewhere.dispose);
       await tester.pumpWidget(
-        host(Column(
-          children: <Widget>[
-            DabblerFocusRing(focusNode: node, child: _child),
-            Focus(focusNode: elsewhere, child: const SizedBox()),
-          ],
-        )),
+        host(
+          Column(
+            children: <Widget>[
+              DabblerFocusRing(focusNode: node, child: _child),
+              Focus(focusNode: elsewhere, child: const SizedBox()),
+            ],
+          ),
+        ),
       );
       FocusManager.instance.highlightStrategy =
           FocusHighlightStrategy.alwaysTraditional;
-      addTearDown(() => FocusManager.instance.highlightStrategy =
-          FocusHighlightStrategy.automatic);
+      addTearDown(
+        () => FocusManager.instance.highlightStrategy =
+            FocusHighlightStrategy.automatic,
+      );
       node.requestFocus();
       await tester.pump();
       expect(_ringPainted(tester), isTrue);
@@ -135,8 +146,9 @@ void main() {
       expect(_ringPainted(tester), isFalse);
     });
 
-    testWidgets('a pointer press does not raise a ring',
-        (WidgetTester tester) async {
+    testWidgets('a pointer press does not raise a ring', (
+      WidgetTester tester,
+    ) async {
       final FocusNode node = FocusNode();
       addTearDown(node.dispose);
       await tester.pumpWidget(
@@ -151,17 +163,20 @@ void main() {
           FocusHighlightStrategy.automatic;
     });
 
-    testWidgets('reports focus changes to the composing control',
-        (WidgetTester tester) async {
+    testWidgets('reports focus changes to the composing control', (
+      WidgetTester tester,
+    ) async {
       final List<bool> changes = <bool>[];
       final FocusNode node = FocusNode();
       addTearDown(node.dispose);
       await tester.pumpWidget(
-        host(DabblerFocusRing(
-          focusNode: node,
-          onFocusChange: changes.add,
-          child: _child,
-        )),
+        host(
+          DabblerFocusRing(
+            focusNode: node,
+            onFocusChange: changes.add,
+            child: _child,
+          ),
+        ),
       );
       node.requestFocus();
       await tester.pump();
@@ -170,8 +185,9 @@ void main() {
       expect(changes, <bool>[true, false]);
     });
 
-    testWidgets('a disabled control cannot take focus',
-        (WidgetTester tester) async {
+    testWidgets('a disabled control cannot take focus', (
+      WidgetTester tester,
+    ) async {
       final FocusNode node = FocusNode();
       addTearDown(node.dispose);
       await tester.pumpWidget(

@@ -34,9 +34,9 @@ class DabblerDocSpecimenResolver {
   /// canonical `galleryEntries` lives in `lib/main.dart`, which is the gallery
   /// app and not part of this package's library surface.
   DabblerDocSpecimenResolver(List<GalleryEntry> entries)
-      : _byId = <String, GalleryEntry>{
-          for (final GalleryEntry entry in entries) entry.id: entry,
-        };
+    : _byId = <String, GalleryEntry>{
+        for (final GalleryEntry entry in entries) entry.id: entry,
+      };
 
   final Map<String, GalleryEntry> _byId;
 

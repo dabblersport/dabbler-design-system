@@ -13,8 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// Wraps a banner in the minimum it needs: a [ThemeData] carrying the
 /// [DabblerColors] extension, and a direction.
@@ -43,12 +42,7 @@ Widget _host(
 
 BoxDecoration _shell(WidgetTester tester) {
   final Container container = tester.widget<Container>(
-    find
-        .ancestor(
-          of: find.byType(Row),
-          matching: find.byType(Container),
-        )
-        .first,
+    find.ancestor(of: find.byType(Row), matching: find.byType(Container)).first,
   );
   return container.decoration! as BoxDecoration;
 }
@@ -64,16 +58,14 @@ void main() {
       DabblerBannerTone.error,
       DabblerBannerTone.info,
     ]) {
-      testWidgets('${tone.name} uses surface, strong and a 20% hairline',
-          (WidgetTester tester) async {
+      testWidgets('${tone.name} uses surface, strong and a 20% hairline', (
+        WidgetTester tester,
+      ) async {
         await tester.pumpWidget(
-          _host(
-            DabblerBanner(tone: tone, title: 'title', message: 'message'),
-          ),
+          _host(DabblerBanner(tone: tone, title: 'title', message: 'message')),
         );
 
-        final DabblerStatusColor expected =
-            _colors().status(tone.status!);
+        final DabblerStatusColor expected = _colors().status(tone.status!);
         final BoxDecoration decoration = _shell(tester);
 
         expect(decoration.color, expected.surface);
@@ -86,15 +78,17 @@ void main() {
           expect(
             tester.widget<Text>(find.text(text)).style!.color,
             expected.strong,
-            reason: '$text must use the tone strong ink, never a secondary '
+            reason:
+                '$text must use the tone strong ink, never a secondary '
                 'text colour (Banner.prompt.md, "Contrast")',
           );
         }
       });
     }
 
-    testWidgets('neutral uses the card roles, not a status triple',
-        (WidgetTester tester) async {
+    testWidgets('neutral uses the card roles, not a status triple', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const DabblerBanner(
@@ -116,8 +110,9 @@ void main() {
       );
     });
 
-    testWidgets('the tone follows the theme it is resolved in',
-        (WidgetTester tester) async {
+    testWidgets('the tone follows the theme it is resolved in', (
+      WidgetTester tester,
+    ) async {
       // The sport theme overrides success; the banner must not cache a colour.
       await tester.pumpWidget(
         _host(
@@ -142,8 +137,9 @@ void main() {
       );
     });
 
-    testWidgets('the shell is flat — no shadow, no gradient',
-        (WidgetTester tester) async {
+    testWidgets('the shell is flat — no shadow, no gradient', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerBanner(title: 'new season starting')),
       );
@@ -159,8 +155,9 @@ void main() {
   });
 
   group('AC2 — the dismiss target measures at least 44×44', () {
-    testWidgets('the rendered box is touchTargetMin square',
-        (WidgetTester tester) async {
+    testWidgets('the rendered box is touchTargetMin square', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           DabblerBanner(
@@ -171,27 +168,30 @@ void main() {
         ),
       );
 
-      final Size size = tester.getSize(find.byKey(DabblerBanner.dismissTargetKey));
+      final Size size = tester.getSize(
+        find.byKey(DabblerBanner.dismissTargetKey),
+      );
       expect(size.width, greaterThanOrEqualTo(44));
       expect(size.height, greaterThanOrEqualTo(44));
-      expect(size, const Size(DabblerSizing.touchTargetMin,
-          DabblerSizing.touchTargetMin));
+      expect(
+        size,
+        const Size(DabblerSizing.touchTargetMin, DabblerSizing.touchTargetMin),
+      );
     });
 
-    testWidgets('the whole box is live, not just the glyph',
-        (WidgetTester tester) async {
+    testWidgets('the whole box is live, not just the glyph', (
+      WidgetTester tester,
+    ) async {
       int dismissed = 0;
       await tester.pumpWidget(
         _host(
-          DabblerBanner(
-            title: 'game cancelled',
-            onDismiss: () => dismissed++,
-          ),
+          DabblerBanner(title: 'game cancelled', onDismiss: () => dismissed++),
         ),
       );
 
-      final Rect box =
-          tester.getRect(find.byKey(DabblerBanner.dismissTargetKey));
+      final Rect box = tester.getRect(
+        find.byKey(DabblerBanner.dismissTargetKey),
+      );
       // The four corners, inset half a logical pixel so they land inside.
       for (final Offset corner in <Offset>[
         box.topLeft + const Offset(0.5, 0.5),
@@ -202,20 +202,25 @@ void main() {
         await tester.tapAt(corner);
         await tester.pump();
       }
-      expect(dismissed, 4,
-          reason: 'every corner of the 45×45 target must dispatch the tap');
+      expect(
+        dismissed,
+        4,
+        reason: 'every corner of the 45×45 target must dispatch the tap',
+      );
     });
 
-    testWidgets('no dismiss button without onDismiss',
-        (WidgetTester tester) async {
+    testWidgets('no dismiss button without onDismiss', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerBanner(title: 'new season starting')),
       );
       expect(find.byKey(DabblerBanner.dismissTargetKey), findsNothing);
     });
 
-    testWidgets('the action button also clears the floor',
-        (WidgetTester tester) async {
+    testWidgets('the action button also clears the floor', (
+      WidgetTester tester,
+    ) async {
       int pressed = 0;
       await tester.pumpWidget(
         _host(
@@ -231,7 +236,9 @@ void main() {
         ),
       );
 
-      final Size size = tester.getSize(find.byKey(DabblerBanner.actionTargetKey));
+      final Size size = tester.getSize(
+        find.byKey(DabblerBanner.actionTargetKey),
+      );
       expect(size.height, greaterThanOrEqualTo(44));
       expect(size.height, DabblerSizing.touchTargetMin);
 
@@ -241,14 +248,16 @@ void main() {
   });
 
   group('structure and semantics', () {
-    testWidgets('error and warning are live regions; the others are not',
-        (WidgetTester tester) async {
+    testWidgets('error and warning are live regions; the others are not', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerBannerTone tone in DabblerBannerTone.values) {
         await tester.pumpWidget(
           _host(DabblerBanner(tone: tone, title: 'title')),
         );
-        final SemanticsNode node =
-            tester.getSemantics(find.byType(DabblerBanner));
+        final SemanticsNode node = tester.getSemantics(
+          find.byType(DabblerBanner),
+        );
         expect(
           node.getSemanticsData().flagsCollection.isLiveRegion,
           tone.interrupts,
@@ -257,8 +266,9 @@ void main() {
       }
     });
 
-    testWidgets('the dismiss button is a named button',
-        (WidgetTester tester) async {
+    testWidgets('the dismiss button is a named button', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(DabblerBanner(title: 'title', onDismiss: () {})),
       );
@@ -276,120 +286,149 @@ void main() {
       );
     });
 
-    testWidgets('the leading glyph sits in a 24×24 slot',
-        (WidgetTester tester) async {
+    testWidgets('the leading glyph sits in a 24×24 slot', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
-          const DabblerBanner(
-            title: 'title',
-            icon: Icon(Icons.info_outline),
-          ),
+          const DabblerBanner(title: 'title', icon: Icon(Icons.info_outline)),
         ),
       );
       expect(
-        tester.getSize(find.ancestor(
-          of: find.byIcon(Icons.info_outline),
-          matching: find.byType(SizedBox),
-        ).first),
+        tester.getSize(
+          find
+              .ancestor(
+                of: find.byIcon(Icons.info_outline),
+                matching: find.byType(SizedBox),
+              )
+              .first,
+        ),
         const Size(DabblerSizing.iconMd, DabblerSizing.iconMd),
       );
     });
 
-    testWidgets('RTL puts the dismiss button at the inline end',
-        (WidgetTester tester) async {
+    testWidgets('RTL puts the dismiss button at the inline end', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           DabblerBanner(title: 'title', onDismiss: () {}),
           direction: TextDirection.rtl,
         ),
       );
-      final Rect dismiss =
-          tester.getRect(find.byKey(DabblerBanner.dismissTargetKey));
+      final Rect dismiss = tester.getRect(
+        find.byKey(DabblerBanner.dismissTargetKey),
+      );
       final Rect text = tester.getRect(find.text('title'));
-      expect(dismiss.right, lessThan(text.left),
-          reason: 'in RTL the inline end is the left edge');
+      expect(
+        dismiss.right,
+        lessThan(text.left),
+        reason: 'in RTL the inline end is the left edge',
+      );
     });
   });
 
-  group('KAN-258 — both targets are folded onto the DS-200 interaction layer',
-      () {
-    /// The press-scale animation driving the target behind [key].
-    AnimatedScale scaleOf(WidgetTester tester, Key key) =>
-        tester.widget<AnimatedScale>(find
-            .ancestor(of: find.byKey(key), matching: find.byType(AnimatedScale))
-            .first);
+  group(
+    'KAN-258 — both targets are folded onto the DS-200 interaction layer',
+    () {
+      /// The press-scale animation driving the target behind [key].
+      AnimatedScale scaleOf(WidgetTester tester, Key key) =>
+          tester.widget<AnimatedScale>(
+            find
+                .ancestor(
+                  of: find.byKey(key),
+                  matching: find.byType(AnimatedScale),
+                )
+                .first,
+          );
 
-    Widget bothTargets() => DabblerBanner(
-          tone: DabblerBannerTone.warning,
-          title: 'verification needed',
-          message: 'add a phone number before you can host games.',
-          action: DabblerBannerAction(label: 'verify now', onPressed: () {}),
-          onDismiss: () {},
+      Widget bothTargets() => DabblerBanner(
+        tone: DabblerBannerTone.warning,
+        title: 'verification needed',
+        message: 'add a phone number before you can host games.',
+        action: DabblerBannerAction(label: 'verify now', onPressed: () {}),
+        onDismiss: () {},
+      );
+
+      for (final MapEntry<String, Key> target in <String, Key>{
+        'action': DabblerBanner.actionTargetKey,
+        'dismiss': DabblerBanner.dismissTargetKey,
+      }.entries) {
+        testWidgets('the ${target.key} target carries a DabblerFocusRing', (
+          WidgetTester tester,
+        ) async {
+          await tester.pumpWidget(_host(bothTargets()));
+          expect(
+            find.ancestor(
+              of: find.byKey(target.value),
+              matching: find.byType(DabblerFocusRing),
+            ),
+            findsAtLeastNWidgets(1),
+            reason: 'the source marks both targets .dbl-focus',
+          );
+        });
+
+        testWidgets(
+          'the ${target.key} target presses to the shared press scale',
+          (WidgetTester tester) async {
+            await tester.pumpWidget(_host(bothTargets()));
+            expect(scaleOf(tester, target.value).scale, 1);
+
+            final TestGesture gesture = await tester.startGesture(
+              tester.getCenter(find.byKey(target.value)),
+            );
+            await tester.pump();
+            expect(
+              scaleOf(tester, target.value).scale,
+              DabblerMotion.pressScale,
+              reason: 'the source marks both targets .dbl-press',
+            );
+            expect(scaleOf(tester, target.value).duration, DabblerMotion.fast);
+            expect(scaleOf(tester, target.value).curve, DabblerMotion.easeOut);
+
+            await gesture.up();
+            await tester.pumpAndSettle();
+            expect(scaleOf(tester, target.value).scale, 1);
+          },
         );
 
-    for (final MapEntry<String, Key> target in <String, Key>{
-      'action': DabblerBanner.actionTargetKey,
-      'dismiss': DabblerBanner.dismissTargetKey,
-    }.entries) {
-      testWidgets('the ${target.key} target carries a DabblerFocusRing',
+        testWidgets(
+          'the ${target.key} target still exposes one tappable node',
           (WidgetTester tester) async {
-        await tester.pumpWidget(_host(bothTargets()));
-        expect(
-          find.ancestor(
-            of: find.byKey(target.value),
-            matching: find.byType(DabblerFocusRing),
-          ),
-          findsAtLeastNWidgets(1),
-          reason: 'the source marks both targets .dbl-focus',
+            final SemanticsHandle handle = tester.ensureSemantics();
+            await tester.pumpWidget(_host(bothTargets()));
+            final String label = target.value == DabblerBanner.actionTargetKey
+                ? 'verify now'
+                : DabblerBanner.defaultDismissSemanticLabel;
+            expect(find.bySemanticsLabel(label), findsOneWidget);
+            expect(
+              tester
+                  .getSemantics(find.bySemanticsLabel(label))
+                  .getSemanticsData()
+                  .flagsCollection
+                  .isButton,
+              isTrue,
+            );
+            handle.dispose();
+          },
         );
-      });
-
-      testWidgets('the ${target.key} target presses to the shared press scale',
-          (WidgetTester tester) async {
-        await tester.pumpWidget(_host(bothTargets()));
-        expect(scaleOf(tester, target.value).scale, 1);
-
-        final TestGesture gesture = await tester
-            .startGesture(tester.getCenter(find.byKey(target.value)));
-        await tester.pump();
-        expect(scaleOf(tester, target.value).scale, DabblerMotion.pressScale,
-            reason: 'the source marks both targets .dbl-press');
-        expect(scaleOf(tester, target.value).duration, DabblerMotion.fast);
-        expect(scaleOf(tester, target.value).curve, DabblerMotion.easeOut);
-
-        await gesture.up();
-        await tester.pumpAndSettle();
-        expect(scaleOf(tester, target.value).scale, 1);
-      });
-
-      testWidgets('the ${target.key} target still exposes one tappable node',
-          (WidgetTester tester) async {
-        final SemanticsHandle handle = tester.ensureSemantics();
-        await tester.pumpWidget(_host(bothTargets()));
-        final String label = target.value == DabblerBanner.actionTargetKey
-            ? 'verify now'
-            : DabblerBanner.defaultDismissSemanticLabel;
-        expect(find.bySemanticsLabel(label), findsOneWidget);
-        expect(
-          tester.getSemantics(find.bySemanticsLabel(label)).getSemanticsData()
-              .flagsCollection.isButton,
-          isTrue,
-        );
-        handle.dispose();
-      });
-    }
-  });
+      }
+    },
+  );
 
   group('KAN-262 — the dismiss glyph is the source\'s close-circle', () {
-    testWidgets('the dismiss button draws DabblerIcon(close-circle)',
-        (WidgetTester tester) async {
+    testWidgets('the dismiss button draws DabblerIcon(close-circle)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(DabblerBanner(title: 'game cancelled', onDismiss: () {})),
       );
-      final DabblerIcon icon = tester.widget<DabblerIcon>(find.descendant(
-        of: find.byKey(DabblerBanner.dismissTargetKey),
-        matching: find.byType(DabblerIcon),
-      ));
+      final DabblerIcon icon = tester.widget<DabblerIcon>(
+        find.descendant(
+          of: find.byKey(DabblerBanner.dismissTargetKey),
+          matching: find.byType(DabblerIcon),
+        ),
+      );
       expect(icon.name, 'close-circle');
       expect(icon.size, DabblerSizing.iconSm);
       expect(

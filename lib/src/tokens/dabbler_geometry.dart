@@ -267,7 +267,8 @@ abstract final class DabblerSizing {
   static const double indicatorThickness = DabblerSpacing.space2;
 
   /// App role, `space11 + space4` (60): a square media thumbnail.
-  static const double thumbnail = DabblerSpacing.space11 + DabblerSpacing.space4;
+  static const double thumbnail =
+      DabblerSpacing.space11 + DabblerSpacing.space4;
 
   /// App role, `space11 + space6` (66): a selectable option tile's height.
   static const double optionTileHeight =
@@ -364,38 +365,36 @@ abstract final class DabblerElevation {
   /// `rgb(23, 17, 35)` is `#171123`, which is [DabblerPalette.ink950] — the
   /// shadow does not introduce a colour of its own, so it is expressed through
   /// the palette rather than as a hex literal.
-  static final List<BoxShadow> dialogLight = List<BoxShadow>.unmodifiable(
-    <BoxShadow>[
-      BoxShadow(
-        color: DabblerPalette.ink950.withValues(alpha: 0.14),
-        offset: const Offset(0, DabblerSpacing.space3),
-        blurRadius: DabblerSpacing.space8,
-      ),
-      BoxShadow(
-        color: DabblerPalette.ink950.withValues(alpha: 0.08),
-        offset: const Offset(0, DabblerSpacing.space1),
-        blurRadius: DabblerSpacing.space2,
-      ),
-    ],
-  );
+  static final List<BoxShadow> dialogLight =
+      List<BoxShadow>.unmodifiable(<BoxShadow>[
+        BoxShadow(
+          color: DabblerPalette.ink950.withValues(alpha: 0.14),
+          offset: const Offset(0, DabblerSpacing.space3),
+          blurRadius: DabblerSpacing.space8,
+        ),
+        BoxShadow(
+          color: DabblerPalette.ink950.withValues(alpha: 0.08),
+          offset: const Offset(0, DabblerSpacing.space1),
+          blurRadius: DabblerSpacing.space2,
+        ),
+      ]);
 
   /// `--elevation-2` under `[data-mode="dark"]`. **Dialog (DS-702) only.**
   ///
   /// `0 9px 24px rgba(0, 0, 0, 0.28), 0 3px 6px rgba(0, 0, 0, 0.20)`.
-  static final List<BoxShadow> dialogDark = List<BoxShadow>.unmodifiable(
-    <BoxShadow>[
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.28),
-        offset: const Offset(0, DabblerSpacing.space3),
-        blurRadius: DabblerSpacing.space8,
-      ),
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.20),
-        offset: const Offset(0, DabblerSpacing.space1),
-        blurRadius: DabblerSpacing.space2,
-      ),
-    ],
-  );
+  static final List<BoxShadow> dialogDark =
+      List<BoxShadow>.unmodifiable(<BoxShadow>[
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.28),
+          offset: const Offset(0, DabblerSpacing.space3),
+          blurRadius: DabblerSpacing.space8,
+        ),
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.20),
+          offset: const Offset(0, DabblerSpacing.space1),
+          blurRadius: DabblerSpacing.space2,
+        ),
+      ]);
 
   /// The legal dialog shadow for [brightness]. **Dialog (DS-702) only.**
   static List<BoxShadow> dialogFor(Brightness brightness) =>

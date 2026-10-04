@@ -90,8 +90,8 @@ class DabblerDivider extends StatelessWidget {
     super.key,
     this.inset = 0,
     this.strong = false,
-  })  : orientation = DabblerDividerOrientation.vertical,
-        label = null;
+  }) : orientation = DabblerDividerOrientation.vertical,
+       label = null;
 
   /// Which way the rule runs.
   final DabblerDividerOrientation orientation;
@@ -185,8 +185,8 @@ class DabblerDivider extends StatelessWidget {
 
   /// One 1px rule in [color], filling the width it is given.
   Widget _rule(Color color) => SizedBox(
-        height: DabblerSizing.borderDefault,
-        width: double.infinity,
-        child: ColoredBox(color: color),
-      );
+    height: DabblerSizing.borderDefault,
+    width: double.infinity,
+    child: ColoredBox(color: color),
+  );
 }

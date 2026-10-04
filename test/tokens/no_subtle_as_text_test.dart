@@ -36,7 +36,6 @@ import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-
 /// Files under `lib/src/` permitted to name [DabblerPalette.subtle] or
 /// [DabblerPalette.muted] at all. Everything else must reach them through
 /// [DabblerColors], which is where the role mapping lives and is therefore the
@@ -95,9 +94,9 @@ List<(String, int, String)> scanForTokenAsText(List<File> files) {
   for (final File file in files) {
     final String relative = _relative(file);
     if (tokenLayerAllowlist.contains(relative)) continue;
-    final List<String> lines = _stripComments(file.readAsStringSync()).split(
-      '\n',
-    );
+    final List<String> lines = _stripComments(
+      file.readAsStringSync(),
+    ).split('\n');
     for (int i = 0; i < lines.length; i++) {
       final String line = lines[i];
       if (!_bannedToken.hasMatch(line)) continue;
@@ -135,9 +134,13 @@ void main() {
         reason: 'run this from the package root; lib/src must exist',
       );
       libFiles = _dartFilesUnder('lib/src');
-      expect(libFiles.length, greaterThan(20),
-          reason: 'the scan found almost nothing — it is not looking at the '
-              'package, and would pass vacuously');
+      expect(
+        libFiles.length,
+        greaterThan(20),
+        reason:
+            'the scan found almost nothing — it is not looking at the '
+            'package, and would pass vacuously',
+      );
     });
 
     test('no component names --subtle or --muted directly', () {
@@ -145,7 +148,8 @@ void main() {
       expect(
         hits,
         isEmpty,
-        reason: 'D-003(a): components reach these tokens through '
+        reason:
+            'D-003(a): components reach these tokens through '
             'DabblerColors, never by name. Found:\n'
             '${hits.map(((String, int, String) h) => '  ${h.$1}:${h.$2} — '
                 '${h.$3}').join('\n')}',
@@ -202,7 +206,8 @@ const int x = 0;
           expect(
             value,
             isNot(DabblerPalette.subtle),
-            reason: '$theme.$name resolves to --subtle (2.15:1), which '
+            reason:
+                '$theme.$name resolves to --subtle (2.15:1), which '
                 'D-003(a) forbids as a text colour outright',
           );
         }
@@ -230,19 +235,21 @@ const int x = 0;
       expect(c.textTertiary, isNot(c.textSecondary));
     });
 
-    test('the dark ramp is the one recorded exemption, and it is deliberate',
-        () {
-      // D-003(c), not this ticket. Asserted so that a change to the dark ramp
-      // has to come back through here rather than slipping past a gate that
-      // only ever looked at light.
-      expect(DabblerProvisionalDark.textSecondary, DabblerPalette.subtle);
-      expect(DabblerProvisionalDark.textTertiary, DabblerPalette.muted);
-      final DabblerColors dark = DabblerColors.resolve(
-        theme: DabblerTheme.main,
-        brightness: Brightness.dark,
-      );
-      expect(dark.textSecondary, DabblerProvisionalDark.textSecondary);
-      expect(dark.textTertiary, DabblerProvisionalDark.textTertiary);
-    });
+    test(
+      'the dark ramp is the one recorded exemption, and it is deliberate',
+      () {
+        // D-003(c), not this ticket. Asserted so that a change to the dark ramp
+        // has to come back through here rather than slipping past a gate that
+        // only ever looked at light.
+        expect(DabblerProvisionalDark.textSecondary, DabblerPalette.subtle);
+        expect(DabblerProvisionalDark.textTertiary, DabblerPalette.muted);
+        final DabblerColors dark = DabblerColors.resolve(
+          theme: DabblerTheme.main,
+          brightness: Brightness.dark,
+        );
+        expect(dark.textSecondary, DabblerProvisionalDark.textSecondary);
+        expect(dark.textTertiary, DabblerProvisionalDark.textTertiary);
+      },
+    );
   });
 }

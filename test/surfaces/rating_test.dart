@@ -14,7 +14,9 @@ Widget _host(Widget child, {TextDirection direction = TextDirection.ltr}) {
     theme: ThemeData(extensions: <ThemeExtension<dynamic>>[colors]),
     home: Directionality(
       textDirection: direction,
-      child: Scaffold(body: Align(alignment: Alignment.topLeft, child: child)),
+      child: Scaffold(
+        body: Align(alignment: Alignment.topLeft, child: child),
+      ),
     ),
   );
 }
@@ -22,10 +24,7 @@ Widget _host(Widget child, {TextDirection direction = TextDirection.ltr}) {
 Future<void> _focus(WidgetTester tester) async {
   final BuildContext inside = tester.element(
     find
-        .descendant(
-          of: find.byType(DabblerRating),
-          matching: find.byType(Row),
-        )
+        .descendant(of: find.byType(DabblerRating), matching: find.byType(Row))
         .first,
   );
   Focus.of(inside).requestFocus();

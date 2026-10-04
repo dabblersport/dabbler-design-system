@@ -241,10 +241,12 @@ class DabblerCodeInput extends StatefulWidget {
   /// 'var(--outline-card)'}` (`CodeInput.jsx:96`). `--outline-card` is the
   /// card surface's own hairline, so it is read off [DabblerSurface] rather
   /// than named again here.
-  static Color? borderColorFor(DabblerColors colors, {required bool hasError}) =>
-      hasError
-          ? colors.status(DabblerStatusTone.error).base
-          : DabblerSurface.borderOf(colors, DabblerSurfaceVariant.card);
+  static Color? borderColorFor(
+    DabblerColors colors, {
+    required bool hasError,
+  }) => hasError
+      ? colors.status(DabblerStatusTone.error).base
+      : DabblerSurface.borderOf(colors, DabblerSurfaceVariant.card);
 
   /// The box fill for the current state.
   ///
@@ -252,8 +254,8 @@ class DabblerCodeInput extends StatefulWidget {
   /// (`CodeInput.jsx:95`).
   static Color fillFor(DabblerColors colors, {required bool disabled}) =>
       disabled
-          ? colors.bgSecondary
-          : DabblerSurface.fillOf(colors, DabblerSurfaceVariant.card);
+      ? colors.bgSecondary
+      : DabblerSurface.fillOf(colors, DabblerSurfaceVariant.card);
 
   /// The digit's style — `.t-title-3` metrics with lining numerals.
   ///
@@ -263,10 +265,9 @@ class DabblerCodeInput extends StatefulWidget {
   /// request is [DabblerType.numeralFeatures], which is also the package's
   /// Western-digits rule — a code is digits, and they must not render as
   /// Arabic-Indic forms under an Arabic face.
-  static TextStyle digitStyle(TextDirection direction) =>
-      DabblerType.title3
-          .resolveForDirection(direction)
-          .copyWith(fontFeatures: DabblerType.numeralFeatures);
+  static TextStyle digitStyle(TextDirection direction) => DabblerType.title3
+      .resolveForDirection(direction)
+      .copyWith(fontFeatures: DabblerType.numeralFeatures);
 
   @override
   State<DabblerCodeInput> createState() => _DabblerCodeInputState();
@@ -330,19 +331,19 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
     }
   }
 
-  String _digitAt(int index) =>
-      index < _code.length ? _code[index] : '';
+  String _digitAt(int index) => index < _code.length ? _code[index] : '';
 
   /// The current code as the source's dense array: [widget.length] entries,
   /// each a digit or the empty string.
-  List<String> get _digits =>
-      List<String>.generate(widget.length, _digitAt);
+  List<String> get _digits => List<String>.generate(widget.length, _digitAt);
 
   void _handleFocusChange(int index, FocusNode node) {
     if (!mounted) {
       return;
     }
-    final int next = node.hasFocus ? index : (_focusedIndex == index ? -1 : _focusedIndex);
+    final int next = node.hasFocus
+        ? index
+        : (_focusedIndex == index ? -1 : _focusedIndex);
     if (next != _focusedIndex) {
       setState(() => _focusedIndex = next);
     }
@@ -416,7 +417,9 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
       // truncated to `length`, then focuses `min(pasted.length, length - 1)`.
       final int n = typed.length < widget.length ? typed.length : widget.length;
       _emit(typed.substring(0, n).split(''));
-      _focusBox(typed.length < widget.length - 1 ? typed.length : widget.length - 1);
+      _focusBox(
+        typed.length < widget.length - 1 ? typed.length : widget.length - 1,
+      );
       return;
     }
 
@@ -478,20 +481,19 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
         textDirection: TextDirection.ltr,
         child: widget.fullWidth
             ? LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints c) =>
-                    Center(
-                      child: _row(
-                        colors,
-                        disabled,
-                        c.hasBoundedWidth
-                            ? DabblerCodeInput.fittedBoxWidth(
-                                c.maxWidth,
-                                widget.length,
-                                widget.maxBoxWidth,
-                              )
-                            : DabblerCodeInput.boxWidth,
-                      ),
-                    ),
+                builder: (BuildContext context, BoxConstraints c) => Center(
+                  child: _row(
+                    colors,
+                    disabled,
+                    c.hasBoundedWidth
+                        ? DabblerCodeInput.fittedBoxWidth(
+                            c.maxWidth,
+                            widget.length,
+                            widget.maxBoxWidth,
+                          )
+                        : DabblerCodeInput.boxWidth,
+                  ),
+                ),
               )
             : _row(colors, disabled, DabblerCodeInput.boxWidth),
       ),
@@ -514,10 +516,9 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
     bool disabled,
     double boxWidth,
   ) {
-    final TextStyle style = DabblerCodeInput.digitStyle(TextDirection.ltr)
-        .copyWith(
-          color: disabled ? colors.textTertiary : colors.textPrimary,
-        );
+    final TextStyle style = DabblerCodeInput.digitStyle(
+      TextDirection.ltr,
+    ).copyWith(color: disabled ? colors.textTertiary : colors.textPrimary);
 
     return DabblerFocusRing.visible(
       visible: _focusedIndex == index,
@@ -544,8 +545,9 @@ class _DabblerCodeInputState extends State<DabblerCodeInput> {
           child: Material(
             type: MaterialType.transparency,
             child: Focus(
-              onKeyEvent: (FocusNode _, KeyEvent event) =>
-                  widget.enabled ? _handleKey(index, event) : KeyEventResult.ignored,
+              onKeyEvent: (FocusNode _, KeyEvent event) => widget.enabled
+                  ? _handleKey(index, event)
+                  : KeyEventResult.ignored,
               child: TextField(
                 controller: _controllers[index],
                 focusNode: _nodes[index],

@@ -26,7 +26,8 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
     page: 'components/top-bar',
     group: GalleryPurpose.navigation,
     title: 'Navigation — top bar',
-    description: 'The wordmark, the two actions and the account avatar, as the '
+    description:
+        'The wordmark, the two actions and the account avatar, as the '
         'specimen exports it. Safe-area padding is off here so the bar reads '
         'at gallery scale.',
     builder: _topBar,
@@ -36,7 +37,8 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
     page: 'components/bottom-bar',
     group: GalleryPurpose.navigation,
     title: 'Navigation — bottom bar',
-    description: 'The split bar at phone width: closed, with the create menu '
+    description:
+        'The split bar at phone width: closed, with the create menu '
         'open, and in RTL. Tap create to open the menu.',
     builder: _bottomBar,
   ),
@@ -45,7 +47,8 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
     page: 'components/bottom-bar',
     group: GalleryPurpose.navigation,
     title: 'Navigation — bottom bar, toned create menu',
-    description: 'createItems with iconTone info / success / accent, and the '
+    description:
+        'createItems with iconTone info / success / accent, and the '
         'action held upright (rotateActionOnOpen: false), as the Home Feed '
         'design draws it (DSG-NEW-001).',
     builder: _bottomBarTones,
@@ -55,7 +58,8 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
     page: 'components/bottom-bar',
     group: GalleryPurpose.navigation,
     title: 'Navigation — bottom bar, unread dot and count',
-    description: 'Per-item unread dot and count badge on the icon\'s '
+    description:
+        'Per-item unread dot and count badge on the icon\'s '
         'top-inline-end corner, in LTR and RTL.',
     builder: _bottomBarBadges,
   ),
@@ -81,156 +85,147 @@ const List<DabblerNavigationItem> _badgeItems = <DabblerNavigationItem>[
 ];
 
 Widget _bottomBarBadges(BuildContext context) => const GalleryStack(
-      children: <Widget>[
-        GallerySpecimen(
-          label: 'dot and count, LTR',
-          child: SizedBox(
-            width: _phoneWidth,
-            child: DabblerNavigationBottomBar(
-              safeArea: false,
-              items: _badgeItems,
-              createItems: <DabblerNavigationCreateItem>[],
-            ),
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'dot and count, LTR',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationBottomBar(
+          safeArea: false,
+          items: _badgeItems,
+          createItems: <DabblerNavigationCreateItem>[],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'dot and count, RTL',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: DabblerNavigationBottomBar(
+            safeArea: false,
+            items: _badgeItems,
+            createItems: <DabblerNavigationCreateItem>[],
           ),
         ),
-        GallerySpecimen(
-          label: 'dot and count, RTL',
-          child: SizedBox(
-            width: _phoneWidth,
-            child: Directionality(
-              textDirection: TextDirection.rtl,
-              child: DabblerNavigationBottomBar(
-                safeArea: false,
-                items: _badgeItems,
-                createItems: <DabblerNavigationCreateItem>[],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+      ),
+    ),
+  ],
+);
 
 Widget _bottomBarTones(BuildContext context) => const GallerySpecimen(
-      label: 'Home Feed create menu',
+  label: 'Home Feed create menu',
+  child: SizedBox(
+    width: _phoneWidth,
+    child: DabblerNavigationBottomBar(
+      safeArea: false,
+      defaultMenuOpen: true,
+      rotateActionOnOpen: false,
+      createItems: <DabblerNavigationCreateItem>[
+        DabblerNavigationCreateItem(
+          id: 'post',
+          icon: 'edit-2',
+          label: 'Create post',
+          iconTone: DabblerNavigationIconTone.info,
+        ),
+        DabblerNavigationCreateItem(
+          id: 'game',
+          icon: 'game',
+          label: 'Create game',
+          iconTone: DabblerNavigationIconTone.success,
+        ),
+        DabblerNavigationCreateItem(
+          id: 'meetup',
+          icon: 'people',
+          label: 'Create meetup',
+          iconTone: DabblerNavigationIconTone.accent,
+        ),
+      ],
+    ),
+  ),
+);
+
+Widget _topBar(BuildContext context) => const GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      // The specimen's own top bar carries the border and radius, and its
+      // two trailing glyphs are `sms` and `notification-bing`.
+      label: 'as the specimen draws it',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationTopBar(
+          safeArea: false,
+          border: true,
+          actions: <DabblerNavigationAction>[
+            DabblerNavigationAction(icon: 'sms', label: 'Messages'),
+            DabblerNavigationAction(icon: 'notification-bing', label: 'Alerts'),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'on a screen — no frame',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationTopBar(
+          safeArea: false,
+          actions: <DabblerNavigationAction>[
+            DabblerNavigationAction(icon: 'sms', label: 'Messages'),
+            DabblerNavigationAction(icon: 'notification-bing', label: 'Alerts'),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'loading actions — saving',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationTopBar(
+          safeArea: false,
+          actions: <DabblerNavigationAction>[
+            DabblerNavigationAction(
+              icon: 'notification-bing',
+              label: 'Alerts',
+              loading: true,
+            ),
+            DabblerNavigationAction.text(label: 'Save', loading: true),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(label: 'wordmark alone', child: DabblerWordmark()),
+  ],
+);
+
+Widget _bottomBar(BuildContext context) => const GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'closed',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationBottomBar(safeArea: false),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'create menu open',
       child: SizedBox(
         width: _phoneWidth,
         child: DabblerNavigationBottomBar(
           safeArea: false,
           defaultMenuOpen: true,
-          rotateActionOnOpen: false,
-          createItems: <DabblerNavigationCreateItem>[
-            DabblerNavigationCreateItem(
-              id: 'post',
-              icon: 'edit-2',
-              label: 'Create post',
-              iconTone: DabblerNavigationIconTone.info,
-            ),
-            DabblerNavigationCreateItem(
-              id: 'game',
-              icon: 'game',
-              label: 'Create game',
-              iconTone: DabblerNavigationIconTone.success,
-            ),
-            DabblerNavigationCreateItem(
-              id: 'meetup',
-              icon: 'people',
-              label: 'Create meetup',
-              iconTone: DabblerNavigationIconTone.accent,
-            ),
-          ],
         ),
       ),
-    );
-
-Widget _topBar(BuildContext context) => const GalleryStack(
-      children: <Widget>[
-        GallerySpecimen(
-          // The specimen's own top bar carries the border and radius, and its
-          // two trailing glyphs are `sms` and `notification-bing`.
-          label: 'as the specimen draws it',
-          child: SizedBox(
-            width: _phoneWidth,
-            child: DabblerNavigationTopBar(
-              safeArea: false,
-              border: true,
-              actions: <DabblerNavigationAction>[
-                DabblerNavigationAction(icon: 'sms', label: 'Messages'),
-                DabblerNavigationAction(
-                  icon: 'notification-bing',
-                  label: 'Alerts',
-                ),
-              ],
-            ),
-          ),
+    ),
+    GallerySpecimen(
+      label: 'RTL — pill and action swap sides',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: SizedBox(
+          width: _phoneWidth,
+          child: DabblerNavigationBottomBar(safeArea: false, active: 'explore'),
         ),
-        GallerySpecimen(
-          label: 'on a screen — no frame',
-          child: SizedBox(
-            width: _phoneWidth,
-            child: DabblerNavigationTopBar(
-              safeArea: false,
-              actions: <DabblerNavigationAction>[
-                DabblerNavigationAction(icon: 'sms', label: 'Messages'),
-                DabblerNavigationAction(
-                  icon: 'notification-bing',
-                  label: 'Alerts',
-                ),
-              ],
-            ),
-          ),
-        ),
-        GallerySpecimen(
-          label: 'loading actions — saving',
-          child: SizedBox(
-            width: _phoneWidth,
-            child: DabblerNavigationTopBar(
-              safeArea: false,
-              actions: <DabblerNavigationAction>[
-                DabblerNavigationAction(
-                  icon: 'notification-bing',
-                  label: 'Alerts',
-                  loading: true,
-                ),
-                DabblerNavigationAction.text(label: 'Save', loading: true),
-              ],
-            ),
-          ),
-        ),
-        GallerySpecimen(label: 'wordmark alone', child: DabblerWordmark()),
-      ],
-    );
-
-Widget _bottomBar(BuildContext context) => const GalleryStack(
-      children: <Widget>[
-        GallerySpecimen(
-          label: 'closed',
-          child: SizedBox(
-            width: _phoneWidth,
-            child: DabblerNavigationBottomBar(safeArea: false),
-          ),
-        ),
-        GallerySpecimen(
-          label: 'create menu open',
-          child: SizedBox(
-            width: _phoneWidth,
-            child: DabblerNavigationBottomBar(
-              safeArea: false,
-              defaultMenuOpen: true,
-            ),
-          ),
-        ),
-        GallerySpecimen(
-          label: 'RTL — pill and action swap sides',
-          child: Directionality(
-            textDirection: TextDirection.rtl,
-            child: SizedBox(
-              width: _phoneWidth,
-              child: DabblerNavigationBottomBar(
-                safeArea: false,
-                active: 'explore',
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+      ),
+    ),
+  ],
+);

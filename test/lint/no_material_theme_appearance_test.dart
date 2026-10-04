@@ -85,8 +85,10 @@ const String _permittedMember = '.extension';
 /// — as this very file's header does — is not itself a violation. Documenting
 /// where a rule bites is the house style.
 String _stripComments(String source) {
-  final String noBlock =
-      source.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '');
+  final String noBlock = source.replaceAll(
+    RegExp(r'/\*.*?\*/', dotAll: true),
+    '',
+  );
   return noBlock
       .split('\n')
       .map((String line) {
@@ -126,24 +128,28 @@ List<String> _violations(String code) {
 
 void main() {
   group('D-017 — Material is a mechanism here, never an appearance', () {
-    test('no widget under lib/src paints from Material\'s Theme.of(context)',
-        () {
-      final Map<String, List<String>> offenders = <String, List<String>>{};
-      for (final File file in _dartFilesUnder('lib/src')) {
-        final List<String> found =
-            _violations(_stripComments(file.readAsStringSync()));
-        if (found.isNotEmpty) {
-          offenders[file.path.replaceAll(r'\', '/')] = found;
+    test(
+      'no widget under lib/src paints from Material\'s Theme.of(context)',
+      () {
+        final Map<String, List<String>> offenders = <String, List<String>>{};
+        for (final File file in _dartFilesUnder('lib/src')) {
+          final List<String> found = _violations(
+            _stripComments(file.readAsStringSync()),
+          );
+          if (found.isNotEmpty) {
+            offenders[file.path.replaceAll(r'\', '/')] = found;
+          }
         }
-      }
-      expect(
-        offenders,
-        isEmpty,
-        reason: 'D-017: a Material theme value reached this package\'s paint. '
-            'Only `Theme.of(context).extension<…>()` is permitted — take the '
-            'value from DabblerColors/DabblerType instead.',
-      );
-    });
+        expect(
+          offenders,
+          isEmpty,
+          reason:
+              'D-017: a Material theme value reached this package\'s paint. '
+              'Only `Theme.of(context).extension<…>()` is permitted — take the '
+              'value from DabblerColors/DabblerType instead.',
+        );
+      },
+    );
 
     test('the four files D-017 names are clean (AC3)', () {
       // cxo ruled these compliant by inspection. The gate agreeing with the
@@ -196,7 +202,8 @@ void main() {
       expect(
         _violations('IconTheme.of(context).color ?? DabblerColors.of(context)'),
         isEmpty,
-        reason: 'IconTheme is the inherited-icon mechanism, not a Material '
+        reason:
+            'IconTheme is the inherited-icon mechanism, not a Material '
             'theme read',
       );
     });

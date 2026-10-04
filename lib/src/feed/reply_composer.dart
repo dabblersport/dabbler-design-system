@@ -73,6 +73,9 @@ class DabblerReplyComposer extends StatefulWidget {
     this.sendLabel = 'Send',
     this.cancelReplyLabel = 'Cancel reply',
     this.padSafeArea = true,
+    this.composing = false,
+    this.counter,
+    this.replyLabel = 'Reply',
   });
 
   /// Called with the field's text when send is pressed (or Enter in
@@ -131,6 +134,19 @@ class DabblerReplyComposer extends StatefulWidget {
   /// Whether the bar pads the home-indicator inset while the keyboard is
   /// closed. Turn off when the host already does.
   final bool padSafeArea;
+
+  /// Draws the composing frame (`Post.dc.html:525-580`): previews and a
+  /// multi-line field inside a boxed editor with a 2px brand border, and a
+  /// toolbar of attach glyphs, [counter] and a pill [replyLabel] button
+  /// under it. False keeps the resting bar.
+  final bool composing;
+
+  /// The length counter (`82/280`) at the toolbar's end; null hides it.
+  final String? counter;
+
+  /// The composing frame's pill button text (`Reply`); also the send name
+  /// there.
+  final String replyLabel;
 
   /// Send button and field minimum — the 45px touch minimum (design 42).
   static const double sendSize = DabblerSizing.touchTargetMin;
@@ -342,6 +358,40 @@ class _DabblerReplyComposerState extends State<DabblerReplyComposer> {
             ],
           );
 
+    final Widget textField = Material(
+      type: MaterialType.transparency,
+      child: TextField(
+        controller: _controller,
+        focusNode: _focus,
+        enabled: widget.enabled,
+        style: inputStyle,
+        cursorColor: colors.textPrimary,
+        minLines: 1,
+        maxLines: widget.multiline ? widget.maxLines : 1,
+        keyboardType: widget.multiline
+            ? TextInputType.multiline
+            : TextInputType.text,
+        textInputAction: widget.multiline
+            ? TextInputAction.newline
+            : TextInputAction.send,
+        onChanged: widget.onChanged,
+        onSubmitted: widget.multiline ? null : (_) => _send(),
+        decoration: InputDecoration(
+          isDense: true,
+          isCollapsed: true,
+          filled: false,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          hintText: widget.placeholder,
+          hintStyle: inputStyle.copyWith(color: colors.textSecondary),
+          hintMaxLines: 1,
+        ),
+      ),
+    );
+
     final Widget field = AnimatedContainer(
       duration: fade,
       curve: DabblerMotion.easeOut,
@@ -362,41 +412,7 @@ class _DabblerReplyComposerState extends State<DabblerReplyComposer> {
           width: DabblerSizing.borderDefault,
         ),
       ),
-      // Material's TextField needs a Material ancestor for its selection
-      // toolbar; transparency paints nothing.
-      child: Material(
-        type: MaterialType.transparency,
-        child: TextField(
-          controller: _controller,
-          focusNode: _focus,
-          enabled: widget.enabled,
-          style: inputStyle,
-          cursorColor: colors.textPrimary,
-          minLines: 1,
-          maxLines: widget.multiline ? widget.maxLines : 1,
-          keyboardType: widget.multiline
-              ? TextInputType.multiline
-              : TextInputType.text,
-          textInputAction: widget.multiline
-              ? TextInputAction.newline
-              : TextInputAction.send,
-          onChanged: widget.onChanged,
-          onSubmitted: widget.multiline ? null : (_) => _send(),
-          decoration: InputDecoration(
-            isDense: true,
-            isCollapsed: true,
-            filled: false,
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
-            hintText: widget.placeholder,
-            hintStyle: inputStyle.copyWith(color: colors.textSecondary),
-            hintMaxLines: 1,
-          ),
-        ),
-      ),
+      child: textField,
     );
 
     final Widget send = _target(
@@ -458,6 +474,125 @@ class _DabblerReplyComposerState extends State<DabblerReplyComposer> {
         send,
       ],
     );
+
+    if (widget.composing) {
+      final Widget editor = DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.surfaceCard,
+          borderRadius: DabblerRadius.xlAll,
+          border: Border.all(color: colors.brandPrimary, width: 2),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DabblerSpacing.space4,
+            vertical: DabblerSpacing.space3,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              if (widget.attachments != null) ...<Widget>[
+                widget.attachments!,
+                const SizedBox(height: DabblerSpacing.space3),
+              ],
+              textField,
+            ],
+          ),
+        ),
+      );
+      final Widget toolbar = Row(
+        children: <Widget>[
+          for (final DabblerReplyComposerAction a in widget.attachActions)
+            _target(
+              label: a.label,
+              onTap: live ? a.onTap : null,
+              width: a.text == null ? null : 0,
+              child: a.text != null
+                  ? _textPill(a.text!, colors.textSecondary, dir)
+                  : DabblerIcon(
+                      a.icon,
+                      size: DabblerReplyComposer.attachGlyphSize,
+                      weight: a.active
+                          ? DabblerIconWeight.bold
+                          : DabblerIconWeight.linear,
+                      color: a.active
+                          ? colors.brandPrimary
+                          : colors.textSecondary,
+                    ),
+            ),
+          const Spacer(),
+          if (widget.counter != null) ...<Widget>[
+            Text(
+              DabblerType.toWesternDigits(widget.counter!),
+              maxLines: 1,
+              style: caption.copyWith(fontWeight: DabblerType.semibold),
+            ),
+            const SizedBox(width: DabblerSpacing.space4),
+          ],
+          _target(
+            label: widget.sendLabel,
+            onTap: ready ? _send : null,
+            width: 0,
+            child: AnimatedContainer(
+              duration: fade,
+              curve: DabblerMotion.easeOut,
+              padding: const EdgeInsets.symmetric(
+                horizontal: DabblerSpacing.space7,
+                vertical: DabblerSpacing.space3,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: DabblerRadius.pillAll,
+                color: ready ? colors.brandPrimary : colors.surfaceSunken,
+              ),
+              child: widget.sending
+                  ? const DabblerSpinner(size: DabblerSpinnerSize.sm)
+                  : Text(
+                      widget.replyLabel,
+                      maxLines: 1,
+                      style: DabblerType.subheadline
+                          .resolveForDirection(dir)
+                          .copyWith(
+                            color: ready ? colors.onBrand : colors.textTertiary,
+                            fontWeight: DabblerType.semibold,
+                          ),
+                    ),
+            ),
+          ),
+        ],
+      );
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.bgPrimary,
+          border: Border(
+            top: BorderSide(
+              color: colors.bgTertiary,
+              width: DabblerSizing.borderDefault,
+            ),
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsetsDirectional.only(
+            start: DabblerSpacing.space5,
+            end: DabblerSpacing.space5,
+            top: DabblerSpacing.space4,
+            bottom: DabblerSpacing.space4 + homeInset,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              if (replyLine != null) ...<Widget>[
+                replyLine,
+                const SizedBox(height: DabblerSpacing.space2),
+              ],
+              editor,
+              const SizedBox(height: DabblerSpacing.space2),
+              toolbar,
+            ],
+          ),
+        ),
+      );
+    }
 
     return DecoratedBox(
       decoration: BoxDecoration(

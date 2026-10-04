@@ -51,10 +51,12 @@ void main() {
       expect(find.text('body'), findsOneWidget);
       expect(find.byType(Scaffold), findsNothing);
       final ColoredBox ground = t.widget<ColoredBox>(
-        find.descendant(
-          of: find.byType(DabblerPage),
-          matching: find.byType(ColoredBox),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(DabblerPage),
+              matching: find.byType(ColoredBox),
+            )
+            .first,
       );
       expect(ground.color, _colors().bgPrimary);
     });
@@ -282,11 +284,11 @@ void main() {
     });
 
     testWidgets('reposted draws the bold brand glyph', (t) async {
-      await t.pumpWidget(
-        _host(_inBox(row(onRepost: () {}, reposted: true))),
-      );
+      await t.pumpWidget(_host(_inBox(row(onRepost: () {}, reposted: true))));
       final DabblerIcon glyph = t.widget<DabblerIcon>(
-        find.byWidgetPredicate((Widget w) => w is DabblerIcon && w.name == 'refresh'),
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'refresh',
+        ),
       );
       expect(glyph.weight, DabblerIconWeight.bold);
       expect(glyph.color, _colors().brandPrimary);

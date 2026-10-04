@@ -18,8 +18,7 @@ const double kTargetFloor = 44;
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 Widget _host(
   Widget child, {
@@ -55,38 +54,45 @@ Widget _host(
 
 /// Every hit box the bar exposes: each destination's and the action's.
 List<Element> _hitBoxes(WidgetTester tester) => tester
-    .elementList(find.descendant(
-      of: find.byType(DabblerNavigationBottomBar),
-      matching: find.byWidgetPredicate(
-        (Widget w) =>
-            w is GestureDetector && w.behavior == HitTestBehavior.opaque,
+    .elementList(
+      find.descendant(
+        of: find.byType(DabblerNavigationBottomBar),
+        matching: find.byWidgetPredicate(
+          (Widget w) =>
+              w is GestureDetector && w.behavior == HitTestBehavior.opaque,
+        ),
       ),
-    ))
+    )
     .toList();
 
 void main() {
   group('defaults transcribed from the source', () {
-    testWidgets('the four destinations are Home / Explore / Games / You',
-        (WidgetTester tester) async {
+    testWidgets('the four destinations are Home / Explore / Games / You', (
+      WidgetTester tester,
+    ) async {
       expect(
-        DabblerNavigationBottomBar.defaultItems
-            .map((DabblerNavigationItem i) => i.id),
+        DabblerNavigationBottomBar.defaultItems.map(
+          (DabblerNavigationItem i) => i.id,
+        ),
         <String>['home', 'explore', 'games', 'you'],
       );
       expect(
-        DabblerNavigationBottomBar.defaultItems
-            .map((DabblerNavigationItem i) => i.icon),
+        DabblerNavigationBottomBar.defaultItems.map(
+          (DabblerNavigationItem i) => i.icon,
+        ),
         <String>['home-2', 'search-normal', 'game', 'user'],
       );
       expect(
-        DabblerNavigationBottomBar.defaultCreateItems
-            .map((DabblerNavigationCreateItem i) => i.id),
+        DabblerNavigationBottomBar.defaultCreateItems.map(
+          (DabblerNavigationCreateItem i) => i.id,
+        ),
         <String>['post', 'game', 'meetup'],
       );
     });
 
-    testWidgets('only the active destination shows a label',
-        (WidgetTester tester) async {
+    testWidgets('only the active destination shows a label', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
 
       // `defaultActive ?? items[0].id` — Home.
@@ -96,8 +102,9 @@ void main() {
       expect(find.text('You'), findsNothing);
     });
 
-    testWidgets('a controlled `active` moves the chip',
-        (WidgetTester tester) async {
+    testWidgets('a controlled `active` moves the chip', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(active: 'games')),
       );
@@ -107,21 +114,25 @@ void main() {
   });
 
   group('AC1 — icon weight is the active signal', () {
-    testWidgets('active renders bold, every other destination linear',
-        (WidgetTester tester) async {
+    testWidgets('active renders bold, every other destination linear', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(active: 'explore')),
       );
 
       final List<DabblerIcon> icons = tester
-          .widgetList<DabblerIcon>(find.descendant(
-            of: find.byType(DabblerNavigationBottomBar),
-            matching: find.byType(DabblerIcon),
-          ))
+          .widgetList<DabblerIcon>(
+            find.descendant(
+              of: find.byType(DabblerNavigationBottomBar),
+              matching: find.byType(DabblerIcon),
+            ),
+          )
           .toList();
 
-      final DabblerIcon explore =
-          icons.firstWhere((DabblerIcon i) => i.name == 'search-normal');
+      final DabblerIcon explore = icons.firstWhere(
+        (DabblerIcon i) => i.name == 'search-normal',
+      );
       expect(explore.weight, DabblerIconWeight.bold);
 
       for (final String name in <String>['home-2', 'game', 'user']) {
@@ -133,33 +144,37 @@ void main() {
       }
     });
 
-    testWidgets('the active glyph takes the brand, the inactive --neutral-400',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(const DabblerNavigationBottomBar(active: 'home')),
-      );
-      final DabblerColors colors = _colors();
+    testWidgets(
+      'the active glyph takes the brand, the inactive --neutral-400',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(const DabblerNavigationBottomBar(active: 'home')),
+        );
+        final DabblerColors colors = _colors();
 
-      final List<DabblerIcon> icons = tester
+        final List<DabblerIcon> icons = tester
+            .widgetList<DabblerIcon>(find.byType(DabblerIcon))
+            .toList();
+
+        expect(
+          icons.firstWhere((DabblerIcon i) => i.name == 'home-2').color,
+          colors.brandPrimary,
+        );
+        // `--neutral-400` is `--outline-card` — tokens/colors.css:36.
+        expect(
+          icons.firstWhere((DabblerIcon i) => i.name == 'user').color,
+          colors.borderDefault,
+        );
+      },
+    );
+
+    testWidgets('a destination glyph is --icon-md; the action is the drawn 26', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
+      final List<DabblerIcon> glyphs = tester
           .widgetList<DabblerIcon>(find.byType(DabblerIcon))
           .toList();
-
-      expect(
-        icons.firstWhere((DabblerIcon i) => i.name == 'home-2').color,
-        colors.brandPrimary,
-      );
-      // `--neutral-400` is `--outline-card` — tokens/colors.css:36.
-      expect(
-        icons.firstWhere((DabblerIcon i) => i.name == 'user').color,
-        colors.borderDefault,
-      );
-    });
-
-    testWidgets('a destination glyph is --icon-md; the action is the drawn 26',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
-      final List<DabblerIcon> glyphs =
-          tester.widgetList<DabblerIcon>(find.byType(DabblerIcon)).toList();
 
       // The four destinations are `size={24}` (`NavigationBottomBar.jsx:167`),
       // which is `--icon-md` and on the 18/24/30 ramp.
@@ -176,14 +191,15 @@ void main() {
   });
 
   group('AC1 — touch targets, measured', () {
-    testWidgets('every destination and the action clear 44x44',
-        (WidgetTester tester) async {
+    testWidgets('every destination and the action clear 44x44', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const SizedBox());
       for (final String? active in <String?>[
         'home',
         'explore',
         'games',
-        'you'
+        'you',
       ]) {
         await tester.pumpWidget(
           _host(DabblerNavigationBottomBar(active: active)),
@@ -192,19 +208,26 @@ void main() {
         // four destinations + the action
         expect(boxes.length, 5);
         for (final Element box in boxes) {
-          final Size size = tester.getSize(find.byElementPredicate(
-            (Element e) => identical(e, box),
-          ));
-          expect(size.width, greaterThanOrEqualTo(kTargetFloor),
-              reason: 'width with active=$active');
-          expect(size.height, greaterThanOrEqualTo(kTargetFloor),
-              reason: 'height with active=$active');
+          final Size size = tester.getSize(
+            find.byElementPredicate((Element e) => identical(e, box)),
+          );
+          expect(
+            size.width,
+            greaterThanOrEqualTo(kTargetFloor),
+            reason: 'width with active=$active',
+          );
+          expect(
+            size.height,
+            greaterThanOrEqualTo(kTargetFloor),
+            reason: 'height with active=$active',
+          );
         }
       }
     });
 
-    testWidgets('the create tiles clear 44x44 too',
-        (WidgetTester tester) async {
+    testWidgets('the create tiles clear 44x44 too', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(defaultMenuOpen: true)),
       );
@@ -228,28 +251,32 @@ void main() {
       final Size action = tester.getSize(find.byType(DabblerIcon).last);
       // The glyph is the drawn 26 inside a 56 plate; assert both.
       expect(action.width, DabblerNavigationBottomBar.glyph26);
-      final Size plate = tester.getSize(find.ancestor(
-        of: find.byType(AnimatedRotation),
-        matching: find.byType(Container),
-      ));
+      final Size plate = tester.getSize(
+        find.ancestor(
+          of: find.byType(AnimatedRotation),
+          matching: find.byType(Container),
+        ),
+      );
       expect(plate, const Size(DabblerFab.size, DabblerFab.size));
     });
   });
 
   group('AC1 — DS-200 focus and press', () {
-    testWidgets('every target carries the shared focus ring',
-        (WidgetTester tester) async {
+    testWidgets('every target carries the shared focus ring', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
       // four destinations + the action
       expect(find.byType(DabblerFocusRing), findsNWidgets(5));
     });
 
-    testWidgets('no destination draws a ring of its own',
-        (WidgetTester tester) async {
+    testWidgets('no destination draws a ring of its own', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
-      for (final DabblerFocusRing ring
-          in tester.widgetList<DabblerFocusRing>(
-              find.byType(DabblerFocusRing))) {
+      for (final DabblerFocusRing ring in tester.widgetList<DabblerFocusRing>(
+        find.byType(DabblerFocusRing),
+      )) {
         expect(ring.width, DabblerFocusRing.ringWidth);
         expect(ring.offset, DabblerFocusRing.ringOffset);
       }
@@ -257,16 +284,19 @@ void main() {
   });
 
   group('selection', () {
-    testWidgets('tapping a destination reports and moves the chip',
-        (WidgetTester tester) async {
+    testWidgets('tapping a destination reports and moves the chip', (
+      WidgetTester tester,
+    ) async {
       final List<String> selected = <String>[];
       await tester.pumpWidget(
         _host(DabblerNavigationBottomBar(onSelect: selected.add)),
       );
 
-      await tester.tap(find.byWidgetPredicate(
-        (Widget w) => w is DabblerIcon && w.name == 'game',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'game',
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(selected, <String>['games']);
@@ -275,19 +305,21 @@ void main() {
       expect(find.text('Home'), findsNothing);
     });
 
-    testWidgets('a controlled bar reports but does not move itself',
-        (WidgetTester tester) async {
+    testWidgets('a controlled bar reports but does not move itself', (
+      WidgetTester tester,
+    ) async {
       final List<String> selected = <String>[];
       await tester.pumpWidget(
-        _host(DabblerNavigationBottomBar(
-          active: 'home',
-          onSelect: selected.add,
-        )),
+        _host(
+          DabblerNavigationBottomBar(active: 'home', onSelect: selected.add),
+        ),
       );
 
-      await tester.tap(find.byWidgetPredicate(
-        (Widget w) => w is DabblerIcon && w.name == 'user',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'user',
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(selected, <String>['you']);
@@ -296,8 +328,9 @@ void main() {
   });
 
   group('the create menu', () {
-    testWidgets('the action opens it, replacing the pill in flow',
-        (WidgetTester tester) async {
+    testWidgets('the action opens it, replacing the pill in flow', (
+      WidgetTester tester,
+    ) async {
       final List<bool> reported = <bool>[];
       await tester.pumpWidget(
         _host(DabblerNavigationBottomBar(onAction: reported.add)),
@@ -306,9 +339,11 @@ void main() {
       expect(find.text('Create post'), findsNothing);
       expect(find.text('Home'), findsOneWidget);
 
-      await tester.tap(find.byWidgetPredicate(
-        (Widget w) => w is DabblerIcon && w.name == 'add',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'add',
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(reported, <bool>[true]);
@@ -319,16 +354,17 @@ void main() {
       expect(find.text('Home'), findsNothing);
     });
 
-    testWidgets(
-        'the create-tile label is the drawn 12.5 in body ink — D-007(1)',
-        (WidgetTester tester) async {
+    testWidgets('the create-tile label is the drawn 12.5 in body ink — D-007(1)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(defaultMenuOpen: true)),
       );
       await tester.pumpAndSettle();
 
-      final TextStyle style =
-          tester.widget<Text>(find.text('Create game')).style!;
+      final TextStyle style = tester
+          .widget<Text>(find.text('Create game'))
+          .style!;
       final DabblerColors colors = _colors();
 
       // `fontSize: 12.5, fontWeight: 500, color: var(--text-body)`
@@ -347,8 +383,9 @@ void main() {
       expect(style.color, isNot(colors.brandPrimary));
     });
 
-    testWidgets('the action rotates 45 degrees while open',
-        (WidgetTester tester) async {
+    testWidgets('the action rotates 45 degrees while open', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationBottomBar()));
       expect(
         tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns,
@@ -358,10 +395,12 @@ void main() {
       // A distinct key, so the bar is rebuilt rather than reusing the State
       // whose `defaultMenuOpen` was already read in `initState`.
       await tester.pumpWidget(
-        _host(const DabblerNavigationBottomBar(
-          key: ValueKey<String>('open'),
-          defaultMenuOpen: true,
-        )),
+        _host(
+          const DabblerNavigationBottomBar(
+            key: ValueKey<String>('open'),
+            defaultMenuOpen: true,
+          ),
+        ),
       );
       await tester.pumpAndSettle();
       expect(
@@ -370,14 +409,17 @@ void main() {
       );
     });
 
-    testWidgets('tapping a tile reports its id and closes the menu',
-        (WidgetTester tester) async {
+    testWidgets('tapping a tile reports its id and closes the menu', (
+      WidgetTester tester,
+    ) async {
       final List<String> created = <String>[];
       await tester.pumpWidget(
-        _host(DabblerNavigationBottomBar(
-          defaultMenuOpen: true,
-          onCreate: created.add,
-        )),
+        _host(
+          DabblerNavigationBottomBar(
+            defaultMenuOpen: true,
+            onCreate: created.add,
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -389,14 +431,14 @@ void main() {
       expect(find.text('Home'), findsOneWidget);
     });
 
-    testWidgets('a controlled menu does not close itself',
-        (WidgetTester tester) async {
+    testWidgets('a controlled menu does not close itself', (
+      WidgetTester tester,
+    ) async {
       final List<String> created = <String>[];
       await tester.pumpWidget(
-        _host(DabblerNavigationBottomBar(
-          menuOpen: true,
-          onCreate: created.add,
-        )),
+        _host(
+          DabblerNavigationBottomBar(menuOpen: true, onCreate: created.add),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -407,15 +449,21 @@ void main() {
       expect(find.text('Create post'), findsOneWidget);
     });
 
-    testWidgets('the row bottom-aligns while open', (WidgetTester tester) async {
+    testWidgets('the row bottom-aligns while open', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(defaultMenuOpen: true)),
       );
       await tester.pumpAndSettle();
-      final Row row = tester.widget<Row>(find.descendant(
-        of: find.byType(DabblerNavigationBottomBar),
-        matching: find.byType(Row),
-      ).first);
+      final Row row = tester.widget<Row>(
+        find
+            .descendant(
+              of: find.byType(DabblerNavigationBottomBar),
+              matching: find.byType(Row),
+            )
+            .first,
+      );
       expect(row.crossAxisAlignment, CrossAxisAlignment.end);
     });
   });
@@ -426,8 +474,9 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('arrow keys move and select, wrapping at both ends',
-        (WidgetTester tester) async {
+    testWidgets('arrow keys move and select, wrapping at both ends', (
+      WidgetTester tester,
+    ) async {
       final List<String> selected = <String>[];
       await tester.pumpWidget(
         _host(DabblerNavigationBottomBar(onSelect: selected.add)),
@@ -437,9 +486,11 @@ void main() {
       // WidgetsApp and therefore no traversal root for a Tab press to enter,
       // so the tap — which requests focus on the node it selects — is what
       // gets us onto the roving strip.
-      await tester.tap(find.byWidgetPredicate(
-        (Widget w) => w is DabblerIcon && w.name == 'home-2',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'home-2',
+        ),
+      );
       await tester.pumpAndSettle();
       selected.clear();
 
@@ -458,9 +509,11 @@ void main() {
       await tester.pumpWidget(
         _host(DabblerNavigationBottomBar(onSelect: selected.add)),
       );
-      await tester.tap(find.byWidgetPredicate(
-        (Widget w) => w is DabblerIcon && w.name == 'home-2',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'home-2',
+        ),
+      );
       await tester.pumpAndSettle();
       selected.clear();
 
@@ -478,9 +531,11 @@ void main() {
           direction: TextDirection.rtl,
         ),
       );
-      await tester.tap(find.byWidgetPredicate(
-        (Widget w) => w is DabblerIcon && w.name == 'home-2',
-      ));
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'home-2',
+        ),
+      );
       await tester.pumpAndSettle();
       selected.clear();
 
@@ -491,34 +546,47 @@ void main() {
   });
 
   group('RTL', () {
-    testWidgets('the pill leads and the action trails, both directions',
-        (WidgetTester tester) async {
+    testWidgets('the pill leads and the action trails, both directions', (
+      WidgetTester tester,
+    ) async {
       Future<({double pill, double action})> edges(
-          TextDirection direction) async {
+        TextDirection direction,
+      ) async {
         await tester.pumpWidget(const SizedBox());
         await tester.pumpWidget(
           _host(const DabblerNavigationBottomBar(), direction: direction),
         );
-        final Rect pill = tester.getRect(find.byWidgetPredicate(
-          (Widget w) => w is DabblerIcon && w.name == 'home-2',
-        ));
-        final Rect action = tester.getRect(find.byWidgetPredicate(
-          (Widget w) => w is DabblerIcon && w.name == 'add',
-        ));
+        final Rect pill = tester.getRect(
+          find.byWidgetPredicate(
+            (Widget w) => w is DabblerIcon && w.name == 'home-2',
+          ),
+        );
+        final Rect action = tester.getRect(
+          find.byWidgetPredicate(
+            (Widget w) => w is DabblerIcon && w.name == 'add',
+          ),
+        );
         return (pill: pill.center.dx, action: action.center.dx);
       }
 
       final ({double action, double pill}) ltr = await edges(TextDirection.ltr);
-      expect(ltr.pill, lessThan(ltr.action),
-          reason: 'LTR: pill left, action right');
+      expect(
+        ltr.pill,
+        lessThan(ltr.action),
+        reason: 'LTR: pill left, action right',
+      );
 
       final ({double action, double pill}) rtl = await edges(TextDirection.rtl);
-      expect(rtl.pill, greaterThan(rtl.action),
-          reason: 'RTL: pill right, action left');
+      expect(
+        rtl.pill,
+        greaterThan(rtl.action),
+        reason: 'RTL: pill right, action left',
+      );
     });
 
-    testWidgets('the active item flips icon and label order',
-        (WidgetTester tester) async {
+    testWidgets('the active item flips icon and label order', (
+      WidgetTester tester,
+    ) async {
       Future<bool> iconLeadsLabel(TextDirection direction) async {
         await tester.pumpWidget(const SizedBox());
         await tester.pumpWidget(
@@ -528,9 +596,11 @@ void main() {
           ),
         );
         final double icon = tester
-            .getRect(find.byWidgetPredicate(
-              (Widget w) => w is DabblerIcon && w.name == 'home-2',
-            ))
+            .getRect(
+              find.byWidgetPredicate(
+                (Widget w) => w is DabblerIcon && w.name == 'home-2',
+              ),
+            )
             .center
             .dx;
         final double label = tester.getRect(find.text('Home')).center.dx;
@@ -550,31 +620,41 @@ void main() {
           padding: const EdgeInsets.only(bottom: 34),
         ),
       );
-      final Padding pad = tester.widget<Padding>(find.descendant(
-        of: find.byType(DabblerNavigationBottomBar),
-        matching: find.byType(Padding),
-      ).first);
+      final Padding pad = tester.widget<Padding>(
+        find
+            .descendant(
+              of: find.byType(DabblerNavigationBottomBar),
+              matching: find.byType(Padding),
+            )
+            .first,
+      );
       expect(pad.padding, const EdgeInsets.only(bottom: 34));
     });
 
-    testWidgets('does not double-apply under an ancestor SafeArea',
-        (WidgetTester tester) async {
+    testWidgets('does not double-apply under an ancestor SafeArea', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const SafeArea(child: DabblerNavigationBottomBar()),
           padding: const EdgeInsets.only(bottom: 34),
         ),
       );
-      final Padding pad = tester.widget<Padding>(find.descendant(
-        of: find.byType(DabblerNavigationBottomBar),
-        matching: find.byType(Padding),
-      ).first);
+      final Padding pad = tester.widget<Padding>(
+        find
+            .descendant(
+              of: find.byType(DabblerNavigationBottomBar),
+              matching: find.byType(Padding),
+            )
+            .first,
+      );
       // The SafeArea consumed it; the bar reads zero and adds nothing.
       expect(pad.padding, EdgeInsets.zero);
     });
 
-    testWidgets('safeArea: false adds no padding at all',
-        (WidgetTester tester) async {
+    testWidgets('safeArea: false adds no padding at all', (
+      WidgetTester tester,
+    ) async {
       Future<double> heightWith({required bool safeArea}) async {
         await tester.pumpWidget(const SizedBox());
         await tester.pumpWidget(
@@ -593,8 +673,9 @@ void main() {
   });
 
   group('flat, themed, and no hardcoded colour', () {
-    testWidgets('only the two surfaces D-031 names are elevated; no gradients',
-        (WidgetTester tester) async {
+    testWidgets('only the two surfaces D-031 names are elevated; no gradients', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(defaultMenuOpen: true)),
       );
@@ -612,10 +693,12 @@ void main() {
       // two elevated surfaces, each with the shadow that belongs to it, and
       // still no gradient anywhere.
       final List<List<BoxShadow>> elevated = <List<BoxShadow>>[];
-      for (final Container box in tester.widgetList<Container>(find.descendant(
-        of: find.byType(DabblerNavigationBottomBar),
-        matching: find.byType(Container),
-      ))) {
+      for (final Container box in tester.widgetList<Container>(
+        find.descendant(
+          of: find.byType(DabblerNavigationBottomBar),
+          matching: find.byType(Container),
+        ),
+      )) {
         final Decoration? decoration = box.decoration;
         if (decoration is BoxDecoration) {
           expect(decoration.gradient, isNull);
@@ -633,8 +716,9 @@ void main() {
       expect(elevated.last, DabblerFab.shadow);
     });
 
-    testWidgets('the pill re-tints with the section theme',
-        (WidgetTester tester) async {
+    testWidgets('the pill re-tints with the section theme', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in <DabblerTheme>[
         DabblerTheme.main,
         DabblerTheme.sport,
@@ -654,21 +738,25 @@ void main() {
   });
 
   group('edge cases', () {
-    testWidgets('an empty items list still renders the action',
-        (WidgetTester tester) async {
+    testWidgets('an empty items list still renders the action', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const DabblerNavigationBottomBar(
-          items: <DabblerNavigationItem>[],
-        )),
+        _host(
+          const DabblerNavigationBottomBar(items: <DabblerNavigationItem>[]),
+        ),
       );
       expect(
-        find.byWidgetPredicate((Widget w) => w is DabblerIcon && w.name == 'add'),
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'add',
+        ),
         findsOneWidget,
       );
     });
 
-    testWidgets('an active id matching nothing expands no chip',
-        (WidgetTester tester) async {
+    testWidgets('an active id matching nothing expands no chip', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationBottomBar(active: 'nowhere')),
       );
@@ -677,19 +765,22 @@ void main() {
       }
     });
 
-    testWidgets('more than four create tiles wrap into a second row',
-        (WidgetTester tester) async {
+    testWidgets('more than four create tiles wrap into a second row', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const DabblerNavigationBottomBar(
-          defaultMenuOpen: true,
-          createItems: <DabblerNavigationCreateItem>[
-            DabblerNavigationCreateItem(id: 'a', icon: 'game', label: 'A'),
-            DabblerNavigationCreateItem(id: 'b', icon: 'game', label: 'B'),
-            DabblerNavigationCreateItem(id: 'c', icon: 'game', label: 'C'),
-            DabblerNavigationCreateItem(id: 'd', icon: 'game', label: 'D'),
-            DabblerNavigationCreateItem(id: 'e', icon: 'game', label: 'E'),
-          ],
-        )),
+        _host(
+          const DabblerNavigationBottomBar(
+            defaultMenuOpen: true,
+            createItems: <DabblerNavigationCreateItem>[
+              DabblerNavigationCreateItem(id: 'a', icon: 'game', label: 'A'),
+              DabblerNavigationCreateItem(id: 'b', icon: 'game', label: 'B'),
+              DabblerNavigationCreateItem(id: 'c', icon: 'game', label: 'C'),
+              DabblerNavigationCreateItem(id: 'd', icon: 'game', label: 'D'),
+              DabblerNavigationCreateItem(id: 'e', icon: 'game', label: 'E'),
+            ],
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -701,23 +792,38 @@ void main() {
       // The wrapped tile keeps a full column's width, not the whole row.
       expect(
         tester.getSize(find.text('E')).width,
-        lessThan(tester.getSize(find.byType(DabblerNavigationBottomBar)).width /
-            2),
+        lessThan(
+          tester.getSize(find.byType(DabblerNavigationBottomBar)).width / 2,
+        ),
       );
     });
 
-    testWidgets('value equality on the item models', (WidgetTester tester) async {
-      const DabblerNavigationItem a =
-          DabblerNavigationItem(id: 'x', icon: 'game', label: 'X');
-      const DabblerNavigationItem b =
-          DabblerNavigationItem(id: 'x', icon: 'game', label: 'X');
+    testWidgets('value equality on the item models', (
+      WidgetTester tester,
+    ) async {
+      const DabblerNavigationItem a = DabblerNavigationItem(
+        id: 'x',
+        icon: 'game',
+        label: 'X',
+      );
+      const DabblerNavigationItem b = DabblerNavigationItem(
+        id: 'x',
+        icon: 'game',
+        label: 'X',
+      );
       expect(a, b);
       expect(a.hashCode, b.hashCode);
 
-      const DabblerNavigationCreateItem c =
-          DabblerNavigationCreateItem(id: 'y', icon: 'game', label: 'Y');
-      const DabblerNavigationCreateItem d =
-          DabblerNavigationCreateItem(id: 'y', icon: 'game', label: 'Y');
+      const DabblerNavigationCreateItem c = DabblerNavigationCreateItem(
+        id: 'y',
+        icon: 'game',
+        label: 'Y',
+      );
+      const DabblerNavigationCreateItem d = DabblerNavigationCreateItem(
+        id: 'y',
+        icon: 'game',
+        label: 'Y',
+      );
       expect(c, d);
       expect(c.hashCode, d.hashCode);
     });

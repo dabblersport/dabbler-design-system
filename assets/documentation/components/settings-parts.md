@@ -12,9 +12,9 @@ Sources  : lib/src/layout/settings_parts.dart
 # SettingsParts
 ### `DabblerSettingsHeader`, `DabblerRowGroup`, `DabblerColorDots`
 
-The two parts a Settings page is built from. SettingsHeader is the tinted hero at the top of the root page; RowGroup is a titled card of rows divided by hairlines.
+The parts a Settings page is built from: a tinted hero, a titled card of rows, and a row of palette dots.
 
-ColorDots is a row of small round dots for previewing a palette.
+SettingsHeader is the tinted hero at the top of the root page; RowGroup is a titled card of rows divided by hairlines; ColorDots is a row of small round dots for previewing a palette.
 
 ## Specimen
 

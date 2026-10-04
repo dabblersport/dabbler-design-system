@@ -43,12 +43,12 @@ class _MapBundle extends CachingAssetBundle {
 }
 
 GalleryEntry _entry(GalleryPurpose group, String id) => GalleryEntry(
-      id: id,
-      title: id,
-      page: 'components/$id.md',
-      group: group,
-      builder: (BuildContext context) => const SizedBox.shrink(),
-    );
+  id: id,
+  title: id,
+  page: 'components/$id.md',
+  group: group,
+  builder: (BuildContext context) => const SizedBox.shrink(),
+);
 
 /// One entry in each of the nine groups, registered in an order that matches
 /// neither the enum nor the file — so a pass cannot come from registration.
@@ -70,15 +70,17 @@ Future<List<String>> _renderedBands(
   WidgetTester tester, {
   required Map<String, String> files,
 }) async {
-  await tester.pumpWidget(MaterialApp(
-    theme: galleryTheme(DabblerTheme.main, Brightness.light),
-    home: Scaffold(
-      body: GalleryIndex(
-        entries: _nine,
-        loader: DabblerDocLoader(bundle: _MapBundle(files)),
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: galleryTheme(DabblerTheme.main, Brightness.light),
+      home: Scaffold(
+        body: GalleryIndex(
+          entries: _nine,
+          loader: DabblerDocLoader(bundle: _MapBundle(files)),
+        ),
       ),
     ),
-  ));
+  );
   await tester.pumpAndSettle();
   // Band names render through GalleryGroup -> GallerySectionLabel, uppercase,
   // suffixed with a count. Existing chrome, read as found.
@@ -92,12 +94,15 @@ void main() {
   group('D-047(d) — the index never degrades', () {
     testWidgets('an unreadable _order.md falls back to the enum, all nine '
         'bands present', (WidgetTester tester) async {
-      final List<String> bands =
-          await _renderedBands(tester, files: const <String, String>{});
+      final List<String> bands = await _renderedBands(
+        tester,
+        files: const <String, String>{},
+      );
       expect(
         bands,
         GalleryPurpose.values.map((GalleryPurpose p) => p.label).toList(),
-        reason: 'the nav may show "unavailable"; the index may not — it is '
+        reason:
+            'the nav may show "unavailable"; the index may not — it is '
             'the below-1000 navigation and nothing replaces it',
       );
     });
@@ -116,7 +121,8 @@ void main() {
       WidgetTester tester,
     ) async {
       // A file naming only two groups must not drop the other seven.
-      const String partial = '# Reading order\n\nLead.\n\n## Components\n\n'
+      const String partial =
+          '# Reading order\n\nLead.\n\n## Components\n\n'
           '### 1 \u00b7 Structure — a tagline\n\n- [A](components/a.md) — x.\n\n'
           '### 2 \u00b7 Actions — a tagline\n\n- [B](components/b.md) — y.\n';
       final List<String> bands = await _renderedBands(
@@ -125,8 +131,11 @@ void main() {
       );
       expect(bands.first, 'Structure');
       expect(bands[1], 'Actions');
-      expect(bands.length, GalleryPurpose.values.length,
-          reason: 'unnamed groups are appended, never dropped');
+      expect(
+        bands.length,
+        GalleryPurpose.values.length,
+        reason: 'unnamed groups are appended, never dropped',
+      );
     });
   });
 }

@@ -55,7 +55,9 @@ class _StubControlState extends State<_StubControl> {
             decoration: BoxDecoration(
               color: DabblerColors.of(context).surfaceCard,
               borderRadius: DabblerRadius.mdAll,
-              border: Border.all(color: DabblerColors.of(context).borderDefault),
+              border: Border.all(
+                color: DabblerColors.of(context).borderDefault,
+              ),
             ),
           ),
         ),
@@ -87,10 +89,12 @@ bool _ringPainted(WidgetTester tester) => tester
 
 double _scale(WidgetTester tester) => tester
     .widget<Transform>(
-      find.ancestor(
-        of: find.byKey(const Key('surface')),
-        matching: find.byType(Transform),
-      ).first,
+      find
+          .ancestor(
+            of: find.byKey(const Key('surface')),
+            matching: find.byType(Transform),
+          )
+          .first,
     )
     .transform
     .storage[0];
@@ -99,8 +103,9 @@ double _scrimOpacity(WidgetTester tester) =>
     tester.widget<FadeTransition>(find.byType(FadeTransition)).opacity.value;
 
 void main() {
-  testWidgets('the stub composes all three primitives at once',
-      (WidgetTester tester) async {
+  testWidgets('the stub composes all three primitives at once', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(host(const _StubControl()));
 
     expect(find.byType(DabblerFocusRing), findsOneWidget);
@@ -108,12 +113,15 @@ void main() {
     expect(find.byType(DabblerScrim), findsOneWidget);
   });
 
-  testWidgets('focus, press and overlay work independently and together',
-      (WidgetTester tester) async {
+  testWidgets('focus, press and overlay work independently and together', (
+    WidgetTester tester,
+  ) async {
     FocusManager.instance.highlightStrategy =
         FocusHighlightStrategy.alwaysTraditional;
-    addTearDown(() => FocusManager.instance.highlightStrategy =
-        FocusHighlightStrategy.automatic);
+    addTearDown(
+      () => FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.automatic,
+    );
 
     await tester.pumpWidget(host(const _StubControl()));
     expect(_ringPainted(tester), isFalse);
@@ -132,8 +140,9 @@ void main() {
     expect(_scale(tester), 1, reason: 'focus is not press');
 
     // Press while focused: both at once, neither cancelling the other.
-    final TestGesture gesture = await tester
-        .startGesture(tester.getCenter(find.byKey(const Key('surface'))));
+    final TestGesture gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('surface'))),
+    );
     await tester.pumpAndSettle();
     expect(_ringPainted(tester), isTrue);
     expect(_scale(tester), closeTo(DabblerMotion.pressScale, 0.0001));
@@ -151,24 +160,29 @@ void main() {
     expect(_scrimOpacity(tester), 0);
   });
 
-  testWidgets('disabling the stub silences the ring and the press together',
-      (WidgetTester tester) async {
+  testWidgets('disabling the stub silences the ring and the press together', (
+    WidgetTester tester,
+  ) async {
     FocusManager.instance.highlightStrategy =
         FocusHighlightStrategy.alwaysTraditional;
-    addTearDown(() => FocusManager.instance.highlightStrategy =
-        FocusHighlightStrategy.automatic);
+    addTearDown(
+      () => FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.automatic,
+    );
 
     await tester.pumpWidget(host(const _StubControl(enabled: false)));
-    final TestGesture gesture = await tester
-        .startGesture(tester.getCenter(find.byKey(const Key('surface'))));
+    final TestGesture gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('surface'))),
+    );
     await tester.pumpAndSettle();
     expect(_ringPainted(tester), isFalse);
     expect(_scale(tester), 1);
     await gesture.up();
   });
 
-  testWidgets('reduced motion reaches every primitive through one MediaQuery',
-      (WidgetTester tester) async {
+  testWidgets('reduced motion reaches every primitive through one MediaQuery', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       host(const _StubControl(), disableAnimations: true),
     );

@@ -48,9 +48,8 @@ Map<String, _CssRule> _parseRules(String css) {
     r'^\.t-([a-z0-9-]+)\s*\{([^}]*)\}',
     multiLine: true,
   );
-  double px(String body, String prop) => double.parse(
-    RegExp('$prop:\\s*([0-9.]+)px').firstMatch(body)!.group(1)!,
-  );
+  double px(String body, String prop) =>
+      double.parse(RegExp('$prop:\\s*([0-9.]+)px').firstMatch(body)!.group(1)!);
   return <String, _CssRule>{
     for (final RegExpMatch m in rule.allMatches(css))
       m.group(1)!: _CssRule(
@@ -109,52 +108,64 @@ void main() {
     expect(rules, isNotEmpty);
   });
 
-  group('DabblerType transcribes typography.css', () {
-    test('declares every named style the source declares, and no other', () {
-      expect(
-        DabblerType.styles.map((DabblerTypeStyle s) => _cssName(s.name)).toSet(),
-        rules.keys.toSet(),
-      );
-    });
+  group(
+    'DabblerType transcribes typography.css',
+    () {
+      test('declares every named style the source declares, and no other', () {
+        expect(
+          DabblerType.styles
+              .map((DabblerTypeStyle s) => _cssName(s.name))
+              .toSet(),
+          rules.keys.toSet(),
+        );
+      });
 
-    test('size, Latin leading, weight and role match the source', () {
-      for (final DabblerTypeStyle style in DabblerType.styles) {
-        final _CssRule rule = rules[_cssName(style.name)]!;
-        expect(style.fontSize, rule.fontSize, reason: '${style.name} size');
-        expect(
-          style.latinLeading,
-          rule.lineHeight,
-          reason: '${style.name} Latin leading',
-        );
-        expect(
-          style.fontWeight.value,
-          rule.fontWeight,
-          reason: '${style.name} weight',
-        );
-        expect(
-          style.role,
-          rule.family == 'display'
-              ? DabblerTypeRole.display
-              : DabblerTypeRole.sans,
-          reason: '${style.name} role',
-        );
-        expect(style.letterSpacing, 0, reason: 'tracking is near-zero');
-      }
-    });
+      test('size, Latin leading, weight and role match the source', () {
+        for (final DabblerTypeStyle style in DabblerType.styles) {
+          final _CssRule rule = rules[_cssName(style.name)]!;
+          expect(style.fontSize, rule.fontSize, reason: '${style.name} size');
+          expect(
+            style.latinLeading,
+            rule.lineHeight,
+            reason: '${style.name} Latin leading',
+          );
+          expect(
+            style.fontWeight.value,
+            rule.fontWeight,
+            reason: '${style.name} weight',
+          );
+          expect(
+            style.role,
+            rule.family == 'display'
+                ? DabblerTypeRole.display
+                : DabblerTypeRole.sans,
+            reason: '${style.name} role',
+          );
+          expect(style.letterSpacing, 0, reason: 'tracking is near-zero');
+        }
+      });
 
-    test('Arabic size is pinned: Latin less 0.9 at every step (live RTL rules)',
+      test(
+        'Arabic size is pinned: Latin less 0.9 at every step (live RTL rules)',
         () {
-      for (final DabblerTypeStyle style in DabblerType.styles) {
-        expect(
-          style.resolve(DabblerTypeScript.arabic).fontSize,
-          closeTo(style.resolve(DabblerTypeScript.latin).fontSize! - 0.9, 1e-9),
-          reason: '${style.name} Arabic size is the declared Latin less 0.9',
-        );
-      }
-    });
-  }, skip: source == null
-      ? 'tokens/typography.css not found beside the package'
-      : false);
+          for (final DabblerTypeStyle style in DabblerType.styles) {
+            expect(
+              style.resolve(DabblerTypeScript.arabic).fontSize,
+              closeTo(
+                style.resolve(DabblerTypeScript.latin).fontSize! - 0.9,
+                1e-9,
+              ),
+              reason:
+                  '${style.name} Arabic size is the declared Latin less 0.9',
+            );
+          }
+        },
+      );
+    },
+    skip: source == null
+        ? 'tokens/typography.css not found beside the package'
+        : false,
+  );
 
   group('title styles', () {
     test('display-role styles are weight 400 in BOTH script slots', () {
@@ -185,63 +196,67 @@ void main() {
     });
   });
 
-  group('Arabic leading', () {
-    test('exactly four styles take additional leading', () {
-      expect(
-        DabblerType.styles
-            .where((DabblerTypeStyle s) => s.takesArabicExtraLeading)
-            .map((DabblerTypeStyle s) => s.name),
-        <String>['headline', 'body', 'callout', 'subheadline'],
-      );
-      expect(DabblerType.arabicExtraLeadingStyles, hasLength(4));
-    });
-
-    test('the four values match the [dir="rtl"] block', () {
-      expect(rtlLeading.keys.toSet(), <String>{
-        'headline',
-        'body',
-        'callout',
-        'subheadline',
-      });
-      for (final MapEntry<String, double> entry in rtlLeading.entries) {
-        final DabblerTypeStyle style = DabblerType.styles.firstWhere(
-          (DabblerTypeStyle s) => _cssName(s.name) == entry.key,
-        );
-        expect(style.arabicLeading, entry.value, reason: entry.key);
-        expect(style.arabicLeading, greaterThan(style.latinLeading));
-      }
-    });
-
-    test('every other style has identical leading in both directions', () {
-      for (final DabblerTypeStyle style in DabblerType.styles) {
-        if (rtlLeading.containsKey(_cssName(style.name))) continue;
+  group(
+    'Arabic leading',
+    () {
+      test('exactly four styles take additional leading', () {
         expect(
-          style.leadingFor(DabblerTypeScript.arabic),
-          style.leadingFor(DabblerTypeScript.latin),
-          reason: '${style.name} must inherit Latin leading',
+          DabblerType.styles
+              .where((DabblerTypeStyle s) => s.takesArabicExtraLeading)
+              .map((DabblerTypeStyle s) => s.name),
+          <String>['headline', 'body', 'callout', 'subheadline'],
         );
-      }
-    });
+        expect(DabblerType.arabicExtraLeadingStyles, hasLength(4));
+      });
 
-    test('resolve() turns pixel leading into a height multiple', () {
-      expect(
-        DabblerType.body.resolve(DabblerTypeScript.latin).height,
-        21 / 16,
-      );
-      // Live `typography.css` RTL `.t-body`: `font-size:15.1px;
-      // line-height:24px` — the multiple is taken over the Arabic size.
-      expect(
-        DabblerType.body.resolve(DabblerTypeScript.arabic).height,
-        24 / 15.1,
-      );
-      expect(
-        DabblerType.body.resolveForDirection(TextDirection.rtl).height,
-        DabblerType.body.resolve(DabblerTypeScript.arabic).height,
-      );
-    });
-  }, skip: source == null
-      ? 'tokens/typography.css not found beside the package'
-      : false);
+      test('the four values match the [dir="rtl"] block', () {
+        expect(rtlLeading.keys.toSet(), <String>{
+          'headline',
+          'body',
+          'callout',
+          'subheadline',
+        });
+        for (final MapEntry<String, double> entry in rtlLeading.entries) {
+          final DabblerTypeStyle style = DabblerType.styles.firstWhere(
+            (DabblerTypeStyle s) => _cssName(s.name) == entry.key,
+          );
+          expect(style.arabicLeading, entry.value, reason: entry.key);
+          expect(style.arabicLeading, greaterThan(style.latinLeading));
+        }
+      });
+
+      test('every other style has identical leading in both directions', () {
+        for (final DabblerTypeStyle style in DabblerType.styles) {
+          if (rtlLeading.containsKey(_cssName(style.name))) continue;
+          expect(
+            style.leadingFor(DabblerTypeScript.arabic),
+            style.leadingFor(DabblerTypeScript.latin),
+            reason: '${style.name} must inherit Latin leading',
+          );
+        }
+      });
+
+      test('resolve() turns pixel leading into a height multiple', () {
+        expect(
+          DabblerType.body.resolve(DabblerTypeScript.latin).height,
+          21 / 16,
+        );
+        // Live `typography.css` RTL `.t-body`: `font-size:15.1px;
+        // line-height:24px` — the multiple is taken over the Arabic size.
+        expect(
+          DabblerType.body.resolve(DabblerTypeScript.arabic).height,
+          24 / 15.1,
+        );
+        expect(
+          DabblerType.body.resolveForDirection(TextDirection.rtl).height,
+          DabblerType.body.resolve(DabblerTypeScript.arabic).height,
+        );
+      });
+    },
+    skip: source == null
+        ? 'tokens/typography.css not found beside the package'
+        : false,
+  );
 
   group('numerals are always Western Arabic', () {
     test('every resolved style disables Arabic-Indic substitution', () {
@@ -268,75 +283,79 @@ void main() {
     });
   });
 
-  group('font families', () {
-    test('fontFamily is the qualified packages/… form', () {
-      for (final DabblerTypeStyle style in DabblerType.styles) {
-        for (final DabblerTypeScript script in DabblerTypeScript.values) {
-          final TextStyle resolved = style.resolve(script);
-          expect(
-            resolved.fontFamily,
-            startsWith('packages/dabbler_design_system/'),
-            reason: '${style.name} in $script',
-          );
-          expect(
-            resolved.fontFamilyFallback!.first,
-            DabblerType.bareFamilyFor(style.role, script),
-            reason: 'bare name leads the fallback chain',
-          );
-          expect(
-            resolved.fontFamily,
-            'packages/dabbler_design_system/'
-            '${DabblerType.bareFamilyFor(style.role, script)}',
-          );
+  group(
+    'font families',
+    () {
+      test('fontFamily is the qualified packages/… form', () {
+        for (final DabblerTypeStyle style in DabblerType.styles) {
+          for (final DabblerTypeScript script in DabblerTypeScript.values) {
+            final TextStyle resolved = style.resolve(script);
+            expect(
+              resolved.fontFamily,
+              startsWith('packages/dabbler_design_system/'),
+              reason: '${style.name} in $script',
+            );
+            expect(
+              resolved.fontFamilyFallback!.first,
+              DabblerType.bareFamilyFor(style.role, script),
+              reason: 'bare name leads the fallback chain',
+            );
+            expect(
+              resolved.fontFamily,
+              'packages/dabbler_design_system/'
+              '${DabblerType.bareFamilyFor(style.role, script)}',
+            );
+          }
         }
-      }
-    });
+      });
 
-    test('the role is fixed and only the script swaps the face', () {
-      expect(
-        DabblerType.bareFamilyFor(
-          DabblerTypeRole.display,
-          DabblerTypeScript.latin,
-        ),
-        'Gloock',
-      );
-      expect(
-        DabblerType.bareFamilyFor(
-          DabblerTypeRole.display,
-          DabblerTypeScript.arabic,
-        ),
-        'Wingx',
-      );
-      expect(
-        DabblerType.bareFamilyFor(
-          DabblerTypeRole.sans,
-          DabblerTypeScript.latin,
-        ),
-        'Glory',
-      );
-      expect(
-        DabblerType.bareFamilyFor(
-          DabblerTypeRole.sans,
-          DabblerTypeScript.arabic,
-        ),
-        'Meral Sans',
-      );
-    });
+      test('the role is fixed and only the script swaps the face', () {
+        expect(
+          DabblerType.bareFamilyFor(
+            DabblerTypeRole.display,
+            DabblerTypeScript.latin,
+          ),
+          'Gloock',
+        );
+        expect(
+          DabblerType.bareFamilyFor(
+            DabblerTypeRole.display,
+            DabblerTypeScript.arabic,
+          ),
+          'Wingx',
+        );
+        expect(
+          DabblerType.bareFamilyFor(
+            DabblerTypeRole.sans,
+            DabblerTypeScript.latin,
+          ),
+          'Glory',
+        );
+        expect(
+          DabblerType.bareFamilyFor(
+            DabblerTypeRole.sans,
+            DabblerTypeScript.arabic,
+          ),
+          'Meral Sans',
+        );
+      });
 
-    test('all four faces are the ones the source declares', () {
-      final String css = source!.readAsStringSync();
-      for (final String family in <String>[
-        DabblerType.displayLatinFamily,
-        DabblerType.displayArabicFamily,
-        DabblerType.sansLatinFamily,
-        DabblerType.sansArabicFamily,
-      ]) {
-        expect(css, contains("'$family'"), reason: '$family not in source');
-      }
-    });
-  }, skip: source == null
-      ? 'tokens/typography.css not found beside the package'
-      : false);
+      test('all four faces are the ones the source declares', () {
+        final String css = source!.readAsStringSync();
+        for (final String family in <String>[
+          DabblerType.displayLatinFamily,
+          DabblerType.displayArabicFamily,
+          DabblerType.sansLatinFamily,
+          DabblerType.sansArabicFamily,
+        ]) {
+          expect(css, contains("'$family'"), reason: '$family not in source');
+        }
+      });
+    },
+    skip: source == null
+        ? 'tokens/typography.css not found beside the package'
+        : false,
+  );
 
   test('DabblerType is a plain const class, not a ThemeExtension', () {
     // Doc comments discuss the ruling, so only declaration lines are checked.

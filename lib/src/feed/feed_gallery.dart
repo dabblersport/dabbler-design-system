@@ -16,6 +16,7 @@ import 'activity_row.dart';
 import 'news_card.dart';
 import 'notification_row.dart';
 import 'post_row.dart';
+import 'upcoming_reminder.dart';
 
 /// The Home Feed rows' specimens.
 const List<GalleryEntry> feedGalleryEntries = <GalleryEntry>[
@@ -59,6 +60,17 @@ const List<GalleryEntry> feedGalleryEntries = <GalleryEntry>[
         'Person, group and system leading widgets, a status pill, time and '
         'unread dot, a meta line and up to two actions; an Arabic row in RTL.',
     builder: _notification,
+  ),
+  GalleryEntry(
+    id: 'upcoming-reminder',
+    page: 'components/upcoming-reminder',
+    group: GalleryPurpose.contentContainers,
+    title: 'UpcomingReminder — the next games on the Home Feed',
+    description:
+        'A single game with its countdown ring, three games folded as a '
+        'stack, the opened list, the one-line strip, and an Arabic block in '
+        'RTL.',
+    builder: _upcoming,
   ),
 ];
 
@@ -371,6 +383,91 @@ Widget _notification(BuildContext context) => GalleryStack(
             unread: true,
           ),
         ),
+      ),
+    ),
+  ],
+);
+
+const List<DabblerUpcomingItem> _games = <DabblerUpcomingItem>[
+  DabblerUpcomingItem(
+    month: 'OCT',
+    day: '4',
+    title: 'Tuesday 5-a-side',
+    detail: 'Dubai Sports City · 7:30 PM',
+    ringFraction: 0.97,
+    ringBig: '2',
+    ringSmall: 'hours',
+    short: 'in 2h 10m',
+    onTap: _noop,
+  ),
+  DabblerUpcomingItem(
+    month: 'OCT',
+    day: '6',
+    title: 'Padel doubles',
+    detail: 'Meydan Padel · 8:00 PM',
+    ringFraction: 0.6,
+    ringBig: '2',
+    ringSmall: 'days',
+    short: 'in 2d',
+    onTap: _noop,
+  ),
+  DabblerUpcomingItem(
+    month: 'OCT',
+    day: '8',
+    title: 'Friday net practice',
+    detail: 'Al Maryah Island · 6:00 PM',
+    ringFraction: 0.2,
+    ringBig: '4',
+    ringSmall: 'days',
+    short: 'in 4d',
+    onTap: _noop,
+  ),
+];
+
+Widget _reminder({
+  required List<DabblerUpcomingItem> items,
+  bool collapsed = false,
+  bool expanded = false,
+  String title = 'Upcoming · 3',
+}) => _frame(
+  DabblerUpcomingReminder(
+    items: items,
+    title: title,
+    collapsed: collapsed,
+    expanded: expanded,
+    onDismiss: _noop,
+    onExpandStrip: _noop,
+    onToggleExpanded: _noop,
+    stripLabel: '3 upcoming',
+    moreLabel: '2 more this week',
+    showLessLabel: 'Show less',
+    dismissLabel: 'Hide',
+  ),
+);
+
+Widget _upcoming(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'one game',
+      child: _reminder(items: _games.sublist(0, 1), title: 'Upcoming'),
+    ),
+    GallerySpecimen(
+      label: 'three games, stacked',
+      child: _reminder(items: _games),
+    ),
+    GallerySpecimen(
+      label: 'opened as a list',
+      child: _reminder(items: _games, expanded: true),
+    ),
+    GallerySpecimen(
+      label: 'folded to the strip',
+      child: _reminder(items: _games, collapsed: true),
+    ),
+    GallerySpecimen(
+      label: 'Arabic, right-to-left',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: _reminder(items: _games, title: 'القادمة · 3'),
       ),
     ),
   ],
