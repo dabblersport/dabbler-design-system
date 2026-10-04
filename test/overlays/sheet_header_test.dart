@@ -169,4 +169,39 @@ void main() {
     expect(find.text('Reset'), findsOneWidget);
     expect(find.text('Filters', findRichText: true), findsOneWidget);
   });
+
+  for (final TextDirection direction in TextDirection.values) {
+    testWidgets(
+      'headerDivider draws a hairline under the header ($direction)',
+      (WidgetTester tester) async {
+        final String title = direction == TextDirection.rtl
+            ? 'التصفية'
+            : 'Filters';
+        Widget sheet({required bool divider}) => DabblerSheet(
+          presentation: DabblerSheetPresentation.inline,
+          title: title,
+          headerDivider: divider,
+          onClose: () {},
+          child: const Text('body'),
+        );
+        bool hasDivider() => tester
+            .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+            .any((DecoratedBox d) {
+              final Decoration dec = d.decoration;
+              return dec is BoxDecoration &&
+                  dec.border is Border &&
+                  (dec.border! as Border).bottom.width > 0 &&
+                  (dec.border! as Border).top.width == 0;
+            });
+        await tester.pumpWidget(
+          _host(sheet(divider: false), direction: direction),
+        );
+        expect(hasDivider(), isFalse);
+        await tester.pumpWidget(
+          _host(sheet(divider: true), direction: direction),
+        );
+        expect(hasDivider(), isTrue);
+      },
+    );
+  }
 }
