@@ -53,7 +53,7 @@ twelve `.t-*` steps are unchanged; the added roles live in `DabblerType.frameRol
 (`displayHero`, `displayWelcome`, `displayScreen`, `displayStep`, `displaySection`, `displayStat`,
 `displayStatHero`, `displayStatMid`, `displayStatSmall`, `displayLabel`, `leadLarge`, `lead`, `rowTitle`, `copy`,
 `small`, `smallTight`, `smallRelaxed`, `footnoteTight`, `footnoteRelaxed`, `tag`, `tagTight`, `figure`, `figureLarge`,
-`figureXl`), each documented with the design file and line it is read from. Arabic is the Latin
+`figureXl`, `displayNameMid`, `displayNameSmall`), each documented with the design file and line it is read from. Arabic is the Latin
 size less 0.9px; Arabic leading is the design's own Arabic frame where one exists. A role has a
 default weight and `DabblerText.weight` overrides it. The freeze text that follows is kept as
 history and still holds for anything that is not a design frame.
@@ -94,7 +94,7 @@ Glory/Meral Sans, the full weight range).
 leading override where the two scripts diverge) and weight.
 
 ### Frame roles
-The twenty-four roles in `DabblerType.frameRoles` (see *Using it*). Only `displayStep`, `lead`,
+The twenty-six roles in `DabblerType.frameRoles` (see *Using it*). Only `displayStep`, `lead`,
 `rowTitle`, `copy`, `small`, `smallTight` and `smallRelaxed` take extra Arabic leading
 (`DabblerType.frameRolesArabicExtraLeading`).
 

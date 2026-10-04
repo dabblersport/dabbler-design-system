@@ -539,6 +539,28 @@ abstract final class DabblerType {
     fontWeight: bold,
   );
 
+  /// Profile name, long — 19/25, weight 400, display role. `Profiles.dc.html:848-849`: a name of 15 to 20 characters steps down from [title2] (22/28) to this.
+  static const DabblerTypeStyle displayNameMid = DabblerTypeStyle(
+    name: 'displayNameMid',
+    role: DabblerTypeRole.display,
+    fontSize: 19,
+    arabicFontSize: 18.1,
+    latinLeading: 25,
+    arabicLeading: 25,
+    fontWeight: regular,
+  );
+
+  /// Profile name, longest — 17/22, weight 400, display role. `Profiles.dc.html:848-849`: a name over 20 characters.
+  static const DabblerTypeStyle displayNameSmall = DabblerTypeStyle(
+    name: 'displayNameSmall',
+    role: DabblerTypeRole.display,
+    fontSize: 17,
+    arabicFontSize: 16.1,
+    latinLeading: 22,
+    arabicLeading: 22,
+    fontWeight: regular,
+  );
+
   /// Every role added from the design frames (KAN-426), in declaration order.
   ///
   /// **D-024 (type ramp frozen) is amended: the design is the source of truth.**
@@ -575,6 +597,8 @@ abstract final class DabblerType {
     figure,
     figureLarge,
     figureXl,
+    displayNameMid,
+    displayNameSmall,
   ];
 
   /// The frame roles that take additional leading in Arabic.

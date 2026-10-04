@@ -33,6 +33,8 @@ _pinned = <String, (double, double, double, FontWeight, DabblerTypeRole)>{
   'figure': (18, 22, 22, FontWeight.w700, DabblerTypeRole.sans),
   'figureLarge': (20, 26, 26, FontWeight.w700, DabblerTypeRole.sans),
   'figureXl': (22, 27, 27, FontWeight.w700, DabblerTypeRole.sans),
+  'displayNameMid': (19, 25, 25, FontWeight.w400, DabblerTypeRole.display),
+  'displayNameSmall': (17, 22, 22, FontWeight.w400, DabblerTypeRole.display),
 };
 
 void main() {
