@@ -27,6 +27,7 @@ Color _glyphColor(WidgetTester t, String icon) =>
     )).color!;
 
 void main() {
+  chevronTests();
   for (final TextDirection d in TextDirection.values) {
     testWidgets('action tone colours the glyph (${d.name})', (t) async {
       await t.pumpWidget(_host(
@@ -126,6 +127,21 @@ void main() {
       ));
       expect(d == TextDirection.ltr ? icon.dx > label.dx : icon.dx < label.dx,
           isTrue);
+    });
+  }
+}
+
+void chevronTests() {
+  for (final TextDirection d in TextDirection.values) {
+    testWidgets('circled chevron points at the inline end (${d.name})', (
+      t,
+    ) async {
+      await t.pumpWidget(_host(dir: d, const DabblerChevron(circled: true)));
+      final DabblerIcon icon = t.widget<DabblerIcon>(find.byType(DabblerIcon));
+      expect(
+        icon.name,
+        d == TextDirection.rtl ? 'arrow-circle-left' : 'arrow-circle-right',
+      );
     });
   }
 }
