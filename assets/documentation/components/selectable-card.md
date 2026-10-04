@@ -36,13 +36,15 @@ ignores it and selects that card. A null `onChanged` disables the card.
 
 **Pass the persona's own colour as `tint`.** Without one the card is tinted with the brand.
 
+**Pass a `tone` when the card is tinted by hue.** A `DabblerHueTone` gives the card its own fill, idle border, selected border, glyph and idle radio colours — a sport (`DabblerHueTone.forSportKey`), a gender (`DabblerHueTone.gender`) or a palette ramp (`DabblerHueTone.ramp`).
+
 **Don't use it for a setting that takes effect immediately.** That is a `Toggle`.
 
 ## Axes
 
 ### Layout
 `row` — glyph, caption, title and subtitle, with a radio-style check at the inline end. `tile` —
-glyph over a short label, with a small check in the top inline-end corner while selected.
+glyph over a short label, with a small check in the top inline-end corner while selected. `listRow` — a one-line option: glyph, one label and the check, centred in a row with a minimum height (the primary-sport step). `stacked` — a centred glyph over a label with the check after it, with a larger minimum height (the gender step).
 
 ### Selected
 Idle: a tinted fill with a tinted hairline border and an empty `record` glyph. Selected: a doubled border in
@@ -59,6 +61,8 @@ Fill and idle border: the surface tint at 10% and 28%. Selected border: the tint
 `space2`. Type: `caption1` semibold caption, `callout` title, `footnote` subtitle, `caption2`
 medium tile label.
 
+Row caption and title use the 16px `body` step, as the source sets no size and they inherit it; the caption is tracked 0.06em (not under RTL, where tracking breaks joining).
+
 Deviation: the design mixes the fill at 12% and the idle border at 30%, and draws a 26px tile
 glyph, a 14px tile check and a 14px body. The nearest tokens are used: the 10%/28% tint,
 `iconLg`, `iconSm` and `footnote`. There is no 2px border token, so the selected border is two
@@ -67,6 +71,7 @@ glyph, a 14px tile check and a 14px body. The nearest tokens are used: the 10%/2
 ## Change log
 
 - Alpha DS gaps 5 — adds this component.
+- Alpha fidelity rebuild (auth2) — adds the `listRow` and `stacked` layouts and the `tone` parameter (`DabblerHueTone`: per-sport, per-gender and ramp tints, from the source's `tone()` and `personaCards()`); the row caption and title move to the 16px step the source inherits.
 
 ## Source
 

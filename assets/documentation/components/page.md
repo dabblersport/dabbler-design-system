@@ -64,6 +64,8 @@ Ground: `bgPrimary`, the page surface. No border, no shadow, no other fill.
 - Added for the Alpha shell (DS-3, shell part).
 - KAN-412 W1 — `bottomOverlay`, `overlayFade`, `overlayPadding`: a floating bar over the body with
   the fade behind it. Additive; a page without an overlay is unchanged.
+- Alpha fidelity (KAN-426) — `maxContentWidth` (and `DabblerPage.readableWidth`, 480) holds the top
+  bar, body and bottom bar to a phone-shaped column, centred on a wide window. Null by default.
 
 ## Source
 

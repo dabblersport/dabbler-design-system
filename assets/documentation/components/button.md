@@ -97,7 +97,7 @@ forms — paint identical to `neutral` and `filled` respectively, kept as separa
 the design source keeps them separate).
 
 ### Size
-`full` (320×52, fixed), `medium` (the default), `small`, and `block` (the sheet and form action: 45 tall, as wide as its parent, a 9px corner and a 15px label).
+`full` (320×52, fixed), `medium` (the default), `small`, and `block` (the sheet and form action: touch-target tall, as wide as its parent, with the medium corner and a subheadline label).
 
 ### State
 Enabled, disabled, loading, full-width.

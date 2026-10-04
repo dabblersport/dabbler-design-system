@@ -59,22 +59,19 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
       // -1)`: Flutter forbids a negative [Padding], so the shell's trailing
       // inset is reduced by the same 6 instead. The toggle's 45px target then
       // ends 6 from the box edge, as it does in the source.
-      // The clear button follows the same inset, with no block padding: its
-      // 45px target already fills the box's 45px minimum height, so the box
-      // does not grow when the button appears.
-      innerPadding: showClear || showLoading
+      // The clear button and the password toggle follow the same inset, with
+      // no block padding: their 45px target already fills the box's 45px
+      // minimum height, so the box does not grow when they appear. This is the
+      // design's `input[type="password"] + button { margin-block: -9px }`
+      // (`Auth and Onboarding.dc.html:28-30`): the toggle keeps its 45px tap
+      // target but stops stretching the field past the 45px box every other
+      // field draws.
+      innerPadding: showClear || showLoading || password
           ? const EdgeInsetsDirectional.fromSTEB(
               DabblerSpacing.space4,
               0,
               DabblerSpacing.space2,
               0,
-            )
-          : password
-          ? const EdgeInsetsDirectional.fromSTEB(
-              DabblerSpacing.space4,
-              DabblerSpacing.space3,
-              DabblerSpacing.space2,
-              DabblerSpacing.space3,
             )
           : DabblerFieldShell.defaultInnerPadding,
       children: <Widget>[

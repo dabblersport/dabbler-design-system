@@ -106,16 +106,5 @@ void main() {
       await tester.tap(find.text('Anyone'));
       expect(taps, 1);
     });
-
-    testWidgets('hint renders its text — $dir', (tester) async {
-      await tester.pumpWidget(
-        _host(
-          const DabblerSettingsHint(text: 'Changes save automatically.'),
-          dir,
-        ),
-      );
-      expect(tester.takeException(), isNull);
-      expect(find.text('Changes save automatically.'), findsOneWidget);
-    });
   }
 }

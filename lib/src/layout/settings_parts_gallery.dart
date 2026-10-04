@@ -29,7 +29,7 @@ const List<GalleryEntry> settingsPartsGalleryEntries = <GalleryEntry>[
     id: 'settings-choices',
     page: 'components/settings-parts',
     group: GalleryPurpose.contentContainers,
-    title: 'PresetCard, OptionSegments and SettingsHint — Settings choices',
+    title: 'PresetCard, OptionSegments and OptionRow — Settings choices',
     description:
         'A stack of described preset cards with the chosen one filled, a '
         'card of icon-over-label segments, and the muted hint under a group.',
@@ -104,6 +104,37 @@ Widget _parts(BuildContext context) => GalleryStack(
         ),
       ),
     ),
+    GallerySpecimen(
+      label: 'row action and hint',
+      child: SizedBox(
+        width: 360,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DabblerRowGroup(
+              children: <Widget>[
+                DabblerInputRow(
+                  flat: true,
+                  showDivider: false,
+                  leading: const DabblerAvatar(
+                    seed: 'Youssef El Khatib',
+                    size: DabblerAvatarSize.md,
+                  ),
+                  title: 'Youssef El Khatib',
+                  subtitle: '@youssef.elkhatib',
+                  trailing: const DabblerRowAction(
+                    label: 'Unblock',
+                    onPressed: _noop,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 9),
+            const DabblerRowHint(text: "You haven't blocked anyone."),
+          ],
+        ),
+      ),
+    ),
   ],
 );
 
@@ -159,17 +190,6 @@ Widget _choices(BuildContext context) => GalleryStack(
             const SizedBox(height: 6),
             DabblerOptionRow(label: 'Friends only', onTap: _noop),
           ],
-        ),
-      ),
-    ),
-    const GallerySpecimen(
-      label: 'hint',
-      child: SizedBox(
-        width: 360,
-        child: DabblerSettingsHint(
-          text:
-              'You can always customize individual settings below. Changes '
-              'save automatically.',
         ),
       ),
     ),

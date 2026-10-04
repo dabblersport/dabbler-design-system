@@ -1,10 +1,10 @@
-/// The three choice parts the Settings sub-pages are built from:
+/// The choice parts the Settings sub-pages are built from:
 /// [DabblerPresetCard] (one of a stack of described options, the chosen one
 /// filled), [DabblerOptionSegments] (a card holding a row of icon-over-label
-/// options) and [DabblerSettingsHint] (a muted line under a group).
+/// options).
 ///
 /// Source: Claude Design file `Settings.dc.html` — the preset cards at
-/// `:317-345`, the segmented options at `:347-366`, the hint at `:398-406`.
+/// `:317-345`, the segmented options at `:347-366`.
 library;
 
 import 'package:flutter/widgets.dart';
@@ -368,52 +368,6 @@ class _DabblerOptionRowState extends State<DabblerOptionRow> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// The caption under a group: a muted `information` glyph beside a line of
-/// text. Settings uses it for a reassurance that belongs to no single row.
-class DabblerSettingsHint extends StatelessWidget {
-  /// A hint reading [text].
-  const DabblerSettingsHint({super.key, required this.text});
-
-  /// The hint.
-  final String text;
-
-  /// The leading glyph.
-  static const String iconName = 'information';
-
-  @override
-  Widget build(BuildContext context) {
-    final DabblerColors colors = DabblerColors.of(context);
-    final TextDirection dir = Directionality.of(context);
-    return Padding(
-      padding: const EdgeInsetsDirectional.symmetric(
-        horizontal: DabblerSpacing.space2,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsetsDirectional.only(top: 1),
-            child: DabblerIcon(
-              iconName,
-              size: DabblerSizing.iconInline,
-              color: colors.textTertiary,
-            ),
-          ),
-          const SizedBox(width: DabblerSpacing.space3),
-          Expanded(
-            child: Text(
-              text,
-              style: DabblerType.caption1
-                  .resolveForDirection(dir)
-                  .copyWith(color: colors.textSecondary),
-            ),
-          ),
-        ],
       ),
     );
   }

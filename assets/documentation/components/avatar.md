@@ -62,6 +62,8 @@ overlap, the inside-drawn ring and the RTL stacking order are all this component
 recreating them by hand risks getting the ring wrong (see *Change log*) or the overlap direction
 wrong under Arabic.
 
+**`onTap` makes an avatar a button** (the edit-profile avatar with its camera badge); give it a `semanticLabel`. Without `onTap` it stays decorative, as before.
+
 ## Axes
 
 ### Size

@@ -123,11 +123,19 @@ class DabblerChip extends StatefulWidget {
     this.mutedRemove = false,
     this.removeSemanticLabel,
     this.vibe,
+    this.dot = false,
+    this.compact = false,
     this.count,
+    this.trailingIcon,
   });
 
   /// The chip text. `label: string` in `Chip.d.ts`.
   final String label;
+
+  /// A glyph after the label — the quiet-hours pill's `arrow-circle-right`
+  /// (`Notifications.dc.html:226`, 14px). Drawn at 14 in the label's ink and
+  /// mirrored under RTL; the chip's semantics are unchanged.
+  final Widget? trailingIcon;
 
   /// Whether the chip is selected, which switches it to the brand-filled
   /// treatment. `selected?: boolean`, default `false`.
@@ -176,6 +184,24 @@ class DabblerChip extends StatefulWidget {
   /// selected, with the label (and icon) in [DabblerVibeColors.ink] in both
   /// states. Resolved through [DabblerVibe.resolve]; no new colour values.
   final DabblerVibe? vibe;
+
+  /// Draws a trailing marker dot after the label — the Profiles sport picker's
+  /// "primary sport" mark (`Profiles.dc.html:160-162`): brand when idle, the
+  /// on-brand ink at 70% when selected. Additive.
+  final bool dot;
+
+  /// The small static tag the Details frames use for facilities and "what to
+  /// bring" (`Details.dc.html:159-163, 440-446`): the sunken fill with no
+  /// visible hairline, `8 14` padding, a `footnote` (13/18) medium label in
+  /// the secondary ink and a brand glyph at [DabblerSizing.iconInline]. Meant
+  /// for a static tag; additive, default false.
+  final bool compact;
+
+  /// [compact]'s vertical padding — `8` (`Details.dc.html:441`).
+  static const double compactVerticalPadding = 8;
+
+  /// [compact]'s horizontal padding — `14`.
+  static const double compactHorizontalPadding = 14;
 
   /// A small count pill after the label (`Notifications.dc.html:58`), already
   /// localised. Omitted when null.
@@ -290,11 +316,21 @@ class _DabblerChipState extends State<DabblerChip> {
     final Color iconColor =
         vibe?.ink ??
         DabblerChip.iconColorFor(colors, selected: widget.selected);
-    final TextStyle labelStyle = DabblerChip.labelStyleFor(
-      colors,
-      direction,
-      selected: widget.selected,
-    );
+    final TextStyle labelStyle = widget.compact
+        ? DabblerType.footnote
+              .resolveForDirection(direction)
+              .copyWith(
+                fontWeight: DabblerType.medium,
+                color: colors.textSecondary,
+              )
+        : DabblerChip.labelStyleFor(
+            colors,
+            direction,
+            selected: widget.selected,
+          );
+    final double glyph = widget.compact
+        ? DabblerSizing.iconInline
+        : DabblerSizing.iconSm;
     final bool removable = widget.onRemove != null;
 
     final Widget content = Row(
@@ -304,13 +340,10 @@ class _DabblerChipState extends State<DabblerChip> {
         if (widget.leadingIcon != null) ...<Widget>[
           ExcludeSemantics(
             child: SizedBox(
-              width: DabblerSizing.iconSm,
-              height: DabblerSizing.iconSm,
+              width: glyph,
+              height: glyph,
               child: IconTheme.merge(
-                data: IconThemeData(
-                  color: iconColor,
-                  size: DabblerSizing.iconSm,
-                ),
+                data: IconThemeData(color: iconColor, size: glyph),
                 child: Center(child: widget.leadingIcon),
               ),
             ),
@@ -329,6 +362,22 @@ class _DabblerChipState extends State<DabblerChip> {
             softWrap: false,
           ),
         ),
+        if (widget.dot) ...<Widget>[
+          const SizedBox(width: DabblerChip.iconGap),
+          ExcludeSemantics(
+            child: SizedBox.square(
+              dimension: DabblerSpacing.space2,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.selected
+                      ? colors.onBrand.withValues(alpha: 0.7)
+                      : colors.brandPrimary,
+                ),
+              ),
+            ),
+          ),
+        ],
         if (widget.count != null) ...<Widget>[
           const SizedBox(width: DabblerChip.iconGap),
           ExcludeSemantics(
@@ -358,6 +407,15 @@ class _DabblerChipState extends State<DabblerChip> {
             ),
           ),
         ],
+        if (widget.trailingIcon != null) ...<Widget>[
+          const SizedBox(width: DabblerChip.iconGap),
+          ExcludeSemantics(
+            child: IconTheme.merge(
+              data: IconThemeData(color: iconColor, size: 14),
+              child: widget.trailingIcon!,
+            ),
+          ),
+        ],
         if (removable)
           Semantics(
             container: true,
@@ -382,7 +440,8 @@ class _DabblerChipState extends State<DabblerChip> {
                     child: DabblerIcon(
                       DabblerChip.removeIconName,
                       size: DabblerSizing.iconSm,
-                      color: widget.mutedRemove && vibe == null && !widget.selected
+                      color:
+                          widget.mutedRemove && vibe == null && !widget.selected
                           ? colors.textTertiary
                           : iconColor,
                     ),
@@ -404,18 +463,32 @@ class _DabblerChipState extends State<DabblerChip> {
       // `Chip.jsx:20`). Keeping it transparent rather than absent is what makes
       // the two states the same height: without this, selecting a chip would
       // shrink it by 2px and shift the whole rail.
-      fill: vibe == null
-          ? null
-          : (widget.selected ? vibe.selectedSurface : vibe.surface),
-      borderColor: vibe != null
-          ? (widget.selected ? vibe.selectedBorder : vibe.border)
-          : (widget.selected ? Colors.transparent : null),
+      fill: widget.compact
+          ? colors.surfaceSunken
+          : (vibe == null
+                ? null
+                : (widget.selected ? vibe.selectedSurface : vibe.surface)),
+      borderColor: widget.compact
+          ? Colors.transparent
+          : (vibe != null
+                ? (widget.selected ? vibe.selectedBorder : vibe.border)
+                : (widget.selected ? Colors.transparent : null)),
       padding: EdgeInsetsDirectional.only(
-        top: DabblerChip.verticalPadding,
-        bottom: DabblerChip.verticalPadding,
-        start: DabblerChip.horizontalPadding,
+        top: widget.compact
+            ? DabblerChip.compactVerticalPadding
+            : DabblerChip.verticalPadding,
+        bottom: widget.compact
+            ? DabblerChip.compactVerticalPadding
+            : DabblerChip.verticalPadding,
+        start: widget.compact
+            ? DabblerChip.compactHorizontalPadding
+            : DabblerChip.horizontalPadding,
         // The remove box absorbs the trailing padding — see [onRemove].
-        end: removable ? 0 : DabblerChip.horizontalPadding,
+        end: removable
+            ? 0
+            : (widget.compact
+                  ? DabblerChip.compactHorizontalPadding
+                  : DabblerChip.horizontalPadding),
       ),
       child: content,
     );

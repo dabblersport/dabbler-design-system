@@ -68,7 +68,13 @@ class DabblerActivitySystemTile extends StatelessWidget {
 /// inferred (the first group, "Happening now", is the live one).
 class DabblerActivityGroupHeader extends StatelessWidget {
   /// A heading reading [label].
-  const DabblerActivityGroupHeader(this.label, {super.key, this.live = false});
+  const DabblerActivityGroupHeader(
+    this.label, {
+    super.key,
+    this.live = false,
+    this.count,
+    this.dense = false,
+  });
 
   /// The heading text.
   final String label;
@@ -76,14 +82,22 @@ class DabblerActivityGroupHeader extends StatelessWidget {
   /// Whether the group is the live one (tints the label with the success ink).
   final bool live;
 
+  /// The group's size, drawn between the label and the hairline — `3 items`
+  /// (`Notifications.dc.html:111`, 11/14 semibold `--subtle`). Null omits it.
+  final String? count;
+
+  /// The tighter heading of `Notifications.dc.html:109` — `padding:9px 0 3px`
+  /// instead of the Home Feed's `18px 0 9px`.
+  final bool dense;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
     return Padding(
-      padding: const EdgeInsetsDirectional.only(
-        top: DabblerSpacing.space6,
-        bottom: DabblerSpacing.space3,
+      padding: EdgeInsetsDirectional.only(
+        top: dense ? DabblerSpacing.space3 : DabblerSpacing.space6,
+        bottom: dense ? DabblerSpacing.space1 : DabblerSpacing.space3,
       ),
       child: Row(
         children: <Widget>[
@@ -100,6 +114,21 @@ class DabblerActivityGroupHeader extends StatelessWidget {
                   ),
             ),
           ),
+          if (count != null) ...<Widget>[
+            const SizedBox(width: DabblerSpacing.space3),
+            Text(
+              count!,
+              maxLines: 1,
+              softWrap: false,
+              style: DabblerType.caption1
+                  .resolveForDirection(dir)
+                  .copyWith(
+                    color: colors.textTertiary,
+                    fontSize: 11,
+                    height: 14 / 11,
+                  ),
+            ),
+          ],
           const SizedBox(width: DabblerSpacing.space3),
           Expanded(
             child: ExcludeSemantics(

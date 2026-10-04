@@ -32,6 +32,10 @@ Selected, unselected, and a leading-icon variant — see `chip_gallery.dart`'s *
 
 @specimen chip
 
+**Use `compact` for a static facility tag.** Sunken fill, 13/18 label, brand glyph.
+
+@specimen chip/compact
+
 ## Using it
 
 **Never hardcode white for a selected chip's label.** Use the shared on-brand ink role instead. In
@@ -88,6 +92,7 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 
 ## Change log
 
+- Alpha fidelity (Notifications) — adds `trailingIcon`: a 14px glyph after the label, the quiet-hours pill's `arrow-circle-right` (`Notifications.dc.html:226`).
 - Alpha fidelity (Search) — adds `mutedRemove`: the remove glyph in the muted ink (`Search.dc.html` recent chips).
 
 ## Source

@@ -6,15 +6,15 @@ Sources  : lib/src/layout/settings_parts.dart
            lib/src/layout/settings_choices.dart
            lib/src/layout/settings_parts_gallery.dart (specimen title:
            "SettingsHeader and RowGroup — the Settings page parts";
-           "PresetCard, OptionSegments and SettingsHint — Settings choices")
+           "PresetCard, OptionSegments and OptionRow — Settings choices")
            Claude Design file "Settings.dc.html", the hero at lines 77-95 and
            the group at lines 131-240.
 -->
 
 # SettingsParts
-### `DabblerSettingsHeader`, `DabblerRowGroup`, `DabblerColorDots`, `DabblerPresetCard`, `DabblerOptionSegments`, `DabblerOptionRow`, `DabblerSettingsHint`
+### `DabblerSettingsHeader`, `DabblerRowGroup`, `DabblerColorDots`, `DabblerPresetCard`, `DabblerOptionSegments`, `DabblerOptionRow`
 
-The parts a Settings page is built from: a tinted hero, a titled card of rows, a row of palette dots, and the three choice parts of the sub-pages.
+The parts a Settings page is built from: a tinted hero, a titled card of rows, a row of palette dots, and the choice parts of the sub-pages.
 
 SettingsHeader is the tinted hero at the top of the root page; RowGroup is a titled card of rows divided by hairlines; ColorDots is a row of small round dots for previewing a palette.
 
@@ -24,7 +24,7 @@ The hero with its version pill, title and identity row, and a group with a toggl
 
 @specimen settings-parts
 
-PresetCard is one option in a stack of described choices, the chosen one filled with the brand colour; OptionSegments is a card of equal icon-over-label options; SettingsHint is a muted line with an information glyph under a group.
+PresetCard is one option in a stack of described choices, the chosen one filled with the brand colour; OptionSegments is a card of equal icon-over-label options; 
 
 @specimen settings-choices
 
@@ -36,8 +36,6 @@ PresetCard is one option in a stack of described choices, the chosen one filled 
 
 **OptionRow is a choice in a sheet.** One bordered card row per option, with a brand check on the chosen one; the caller closes the sheet.
 
-**SettingsHint sits under a group.** One line of reassurance that belongs to no single row.
-
 **The hero carries its own top bar.** Pass a titled top bar as `topBar` so the bar sits on the tint.
 
 **The identity row is a flat input row.** Pass a `DabblerInputRow` with `flat: true` and `showDivider: false`; the hero draws the translucent card behind it.
@@ -47,6 +45,8 @@ PresetCard is one option in a stack of described choices, the chosen one filled 
 **A group of choices uses `DabblerRowGroup.stack`.** It draws the heading and note over loose children — preset cards or option segments — with a 9px gap and no card.
 
 **RowGroup separates, it does not style.** Give it flat input rows with `showDivider: false`; it draws the card and the hairlines between them. `header` and `note` sit above the card.
+
+**RowHint and RowAction.** A hint is a muted one-line note with an information glyph, used where a group has nothing to list; a row action is a destructive text action at a row's end, such as Unblock.
 
 ## Axes
 
@@ -68,7 +68,8 @@ The brand colour at 14% over the card surface for the tint, the card surface and
 
 - Added for the Settings fidelity rebuild.
 - Added OptionRow for sheet choice lists.
-- Added PresetCard, OptionSegments and SettingsHint for the Settings sub-pages (privacy presets, appearance).
+- Added PresetCard and OptionSegments for the Settings sub-pages (privacy presets, appearance).
+- Added RowHint and RowAction for the blocked-accounts list.
 
 ## Source
 

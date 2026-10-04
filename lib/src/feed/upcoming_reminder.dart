@@ -370,7 +370,8 @@ class DabblerUpcomingReminder extends StatelessWidget {
           end: DabblerSpacing.space2,
           bottom: 0,
           height: DabblerSpacing.space10,
-          child: DabblerSurface.sunken(
+          child: DabblerSurface(
+            fill: colors.surfaceSunken,
             radius: DabblerRadius.lg,
             borderColor: hairline,
           ),
@@ -445,7 +446,8 @@ class DabblerUpcomingReminder extends StatelessWidget {
                     children: <Widget>[
                       SizedBox(
                         width: DabblerSpacing.space10,
-                        child: DabblerSurface.sunken(
+                        child: DabblerSurface(
+                          fill: colors.surfaceSunken,
                           radius: DabblerRadius.sm,
                           padding: const EdgeInsets.symmetric(
                             vertical: DabblerSpacing.space1,

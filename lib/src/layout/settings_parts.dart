@@ -9,6 +9,8 @@ library;
 import 'package:flutter/widgets.dart';
 
 import '../forms/input_row.dart';
+import '../foundations/icon.dart';
+import '../interaction/focus_ring.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -265,6 +267,113 @@ class DabblerColorDots extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// A one-line hint under a group: a small information glyph and a muted
+/// sentence (`Settings.dc.html`, the `isHint` block — `information` 16 in
+/// `--subtle`, 12/17 `--muted`, inset 6).
+class DabblerRowHint extends StatelessWidget {
+  /// A hint reading [text].
+  const DabblerRowHint({super.key, required this.text});
+
+  /// The sentence.
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    final TextDirection dir = Directionality.of(context);
+    return Padding(
+      padding: const EdgeInsetsDirectional.symmetric(
+        horizontal: DabblerSpacing.space2,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsetsDirectional.only(top: 1),
+            child: DabblerIcon(
+              'information',
+              size: DabblerSizing.iconSm,
+              color: colors.textTertiary,
+            ),
+          ),
+          const SizedBox(width: DabblerSpacing.space3),
+          Expanded(
+            child: Text(
+              text,
+              style: DabblerType.caption1
+                  .resolveForDirection(dir)
+                  .copyWith(color: colors.textTertiary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A destructive text action at the end of a row — "Unblock"
+/// (`Settings.dc.html`, row `action`: 14/19, weight 600, `--color-status-error-strong`,
+/// padded 8 × 12, pill).
+class DabblerRowAction extends StatelessWidget {
+  /// An action reading [label].
+  const DabblerRowAction({super.key, required this.label, this.onPressed});
+
+  /// The action's text.
+  final String label;
+
+  /// Fired on tap, Enter or Space; null disables it.
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    final TextDirection dir = Directionality.of(context);
+    final bool enabled = onPressed != null;
+    final Color color = enabled ? colors.error.strong : colors.textTertiary;
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      excludeSemantics: true,
+      onTap: onPressed,
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent _) {
+              onPressed?.call();
+              return null;
+            },
+          ),
+        },
+        child: DabblerFocusRing(
+          borderRadius: DabblerRadius.pillAll,
+          enabled: enabled,
+          canRequestFocus: enabled,
+          child: MouseRegion(
+            cursor: enabled ? SystemMouseCursors.click : MouseCursor.defer,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onPressed,
+              child: Padding(
+                padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: DabblerSpacing.space5,
+                  vertical: DabblerSpacing.space4,
+                ),
+                child: Text(
+                  label,
+                  style: DabblerType.subheadline
+                      .resolveForDirection(dir)
+                      .copyWith(color: color, fontWeight: DabblerType.semibold),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

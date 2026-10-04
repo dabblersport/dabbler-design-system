@@ -274,7 +274,17 @@ class DabblerAvatar extends StatelessWidget {
     this.ringColor,
     this.badgeSize = badgeDiameter,
     this.imageUrl,
+    this.onTap,
+    this.semanticLabel,
   });
+
+  /// Makes the avatar a button (the edit-profile avatar with its camera badge).
+  /// Additive: null, the default, keeps the avatar inert and decorative.
+  final VoidCallback? onTap;
+
+  /// The accessible name of a tappable avatar. An avatar without [onTap] stays
+  /// decorative, as before.
+  final String? semanticLabel;
 
   /// The stable identifying string — a name, handle or user id. **Never
   /// rendered.** Defaults to [DabblerAvatarSeed.fallback]. The source's
@@ -335,6 +345,34 @@ class DabblerAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget content = _content(context);
+    if (onTap == null) return content;
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      onTap: onTap,
+      child: ExcludeSemantics(
+        child: FocusableActionDetector(
+          mouseCursor: SystemMouseCursors.click,
+          actions: <Type, Action<Intent>>{
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (ActivateIntent intent) {
+                onTap?.call();
+                return null;
+              },
+            ),
+          },
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+            child: content,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _content(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final double d = size.diameter;
     final Color? ring = ringColor;

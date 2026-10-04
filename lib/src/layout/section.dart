@@ -5,6 +5,19 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 
+/// How a [DabblerSection] sets its heading.
+enum DabblerSectionStyle {
+  /// The system's section heading: `title3` (20/25, display), the subtitle on
+  /// its own line below, 12 between the header and the content.
+  heading,
+
+  /// The small label the Details frames use (`Details.dc.html:117, 156, 436`):
+  /// `subheadline` (15/20) at weight 600 in the primary ink, with the subtitle
+  /// **beside** it on the baseline in `caption1` (12/16, secondary ink), and 9
+  /// between the header and the content.
+  label,
+}
+
 /// Section — a titled group of content.
 ///
 /// Transcribed from `components/layout/Section.jsx`, `Section.d.ts` and
@@ -88,6 +101,7 @@ class DabblerSection extends StatelessWidget {
     this.subtitle,
     this.action,
     this.children = const <Widget>[],
+    this.style = DabblerSectionStyle.heading,
     this.icon,
     this.iconWeight = DabblerIconWeight.bold,
     this.iconColor,
@@ -126,10 +140,18 @@ class DabblerSection extends StatelessWidget {
   /// The section's content, stacked with [DabblerSpacing.stackDefault] gaps.
   final List<Widget> children;
 
+  /// How the heading is set. Defaults to [DabblerSectionStyle.heading], the
+  /// original treatment; [DabblerSectionStyle.label] is the small Details
+  /// label, with its subtitle beside it and 9 (not 12) between the parts.
+  final DabblerSectionStyle style;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
+    if (style == DabblerSectionStyle.label) {
+      return _buildLabel(colors, direction);
+    }
     // Section.jsx:12 — `title != null || action != null`.
     final bool hasHeader = title != null || action != null;
 
@@ -212,6 +234,53 @@ class DabblerSection extends StatelessWidget {
       // `align-items: stretch` — children take the section's full width.
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: column,
+    );
+  }
+
+  /// The Details frames' label: title and subtitle on one baseline row, then
+  /// the children 9 apart (`Details.dc.html:155-157, 193-194`).
+  Widget _buildLabel(DabblerColors colors, TextDirection direction) {
+    final bool hasHeader = title != null || action != null;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: DabblerSpacing.space3,
+      children: <Widget>[
+        if (hasHeader)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: <Widget>[
+              if (title != null)
+                Text(
+                  title!,
+                  style: DabblerType.subheadline
+                      .resolveForDirection(direction)
+                      .copyWith(
+                        color: colors.textPrimary,
+                        fontWeight: DabblerType.semibold,
+                      ),
+                ),
+              if (title != null && subtitle != null)
+                const SizedBox(width: DabblerSpacing.space3),
+              if (subtitle != null)
+                Expanded(
+                  child: Text(
+                    subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: DabblerType.caption1
+                        .resolveForDirection(direction)
+                        .copyWith(color: colors.textSecondary),
+                  ),
+                )
+              else
+                const Spacer(),
+              ?action,
+            ],
+          ),
+        ...children,
+      ],
     );
   }
 }

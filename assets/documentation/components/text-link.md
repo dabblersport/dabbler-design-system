@@ -43,8 +43,6 @@ Pass `underline: false` and the footnote step at the weight the design draws. `t
 optional glyph after the label in the link's colour, mirrored in right-to-left; it is decorative and
 adds nothing to the link's name.
 
-**A quiet destructive row action passes `destructive: true`.** The label then takes the error colour; pair it with `underline: false`.
-
 **Pass `onPressed: null` to disable it, not a no-op.** It then reads in the tertiary text role and
 is announced as disabled.
 
@@ -76,7 +74,6 @@ at medium weight. Target: `touchTargetMin` (45). Focus ring: the shared ring at 
 ## Change log
 
 - Alpha DS gaps 5 — adds this component.
-- Alpha fidelity (Settings) — adds `destructive`, the quiet error-coloured row action ("Unblock").
 - Alpha DS gaps 6 — adds `underline` (on by default) and `trailingIcon` for the lone section link.
 
 ## Source

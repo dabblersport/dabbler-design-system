@@ -13,7 +13,9 @@ Sources  : lib/src/overlays/action_row.dart (class dartdoc, incl. the
 # ActionRow
 ### `DabblerActionRow`
 
-ActionRow is one action in a bottom sheet: a leading glyph, the action's name and a one-line note under it, on a sunken tile. A destructive action draws the glyph and name in the error ink.
+ActionRow is one action in a bottom sheet: a leading glyph, the action's name and a one-line note under it, on a sunken tile.
+
+A destructive action draws the glyph and name in the error ink.
 
 ## Specimen
 
