@@ -15,6 +15,10 @@ enum DabblerProfileRowTone {
   /// `--surface-card`, no tint.
   neutral,
 
+  /// `--surface-page` with the faint hairline — the switch-profile sheet's
+  /// idle rows, which sit on the sheet's card ground (`Profiles.dc.html:679`).
+  page,
+
   /// The success status surface.
   success,
 
@@ -123,6 +127,7 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
       ? c.brandPrimary
       : switch (widget.tone) {
           DabblerProfileRowTone.neutral => c.surfaceCard,
+          DabblerProfileRowTone.page => c.bgPrimary,
           DabblerProfileRowTone.success => c.success.surface,
           DabblerProfileRowTone.warning => c.warning.surface,
           DabblerProfileRowTone.info => c.info.surface,
@@ -276,7 +281,11 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
         color: _fill(colors),
         borderRadius: BorderRadius.circular(DabblerRadius.lg),
         border: Border.all(
-          color: on ? colors.brandPrimary : colors.borderDefault,
+          color: on
+              ? colors.brandPrimary
+              : widget.tone == DabblerProfileRowTone.page
+              ? colors.bgTertiary
+              : colors.borderDefault,
           width: DabblerSizing.borderDefault,
         ),
       ),

@@ -93,6 +93,7 @@ Widget _rows(BuildContext context) => GalleryStack(
               title: 'Organiser',
               subtitle: '@moatazmustapha · 214 games run',
               icon: 'calendar',
+              tone: DabblerProfileRowTone.page,
               onTap: () {},
             ),
           ],

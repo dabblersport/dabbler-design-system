@@ -34,7 +34,7 @@ Games rows and every tint — see `profile_row_gallery.dart`'s *ProfileRow* sect
 ## Axes
 
 ### Tone
-`neutral`, `success`, `warning`, `info`, `error`.
+`neutral`, `page` (the page ground with a faint hairline, for rows on a card), `success`, `warning`, `info`, `error`.
 
 ### Interactivity
 Inert or a button.
