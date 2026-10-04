@@ -35,6 +35,9 @@ _pinned = <String, (double, double, double, FontWeight, DabblerTypeRole)>{
   'figureXl': (22, 27, 27, FontWeight.w700, DabblerTypeRole.sans),
   'displayNameMid': (19, 25, 25, FontWeight.w400, DabblerTypeRole.display),
   'displayNameSmall': (17, 22, 22, FontWeight.w400, DabblerTypeRole.display),
+  'captionRelaxed': (12, 18, 20, FontWeight.w400, DabblerTypeRole.sans),
+  'copyRelaxed': (15, 22, 24, FontWeight.w400, DabblerTypeRole.sans),
+  'bodyRelaxed': (16, 22, 24, FontWeight.w400, DabblerTypeRole.sans),
 };
 
 void main() {

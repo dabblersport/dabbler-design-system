@@ -66,8 +66,10 @@ class _Rail extends StatefulWidget {
     this.counts = false,
     this.rows = 1,
     this.size = DabblerChipSize.regular,
+    this.gap,
   });
 
+  final double? gap;
   final List<String> labels;
   final bool counts;
   final int rows;
@@ -86,6 +88,7 @@ class _RailState extends State<_Rail> {
     child: DabblerChipRail(
       rows: widget.rows,
       size: widget.size,
+      gap: widget.gap,
       padding: const EdgeInsetsDirectional.symmetric(
         horizontal: DabblerSpacing.space6,
       ),
@@ -111,6 +114,10 @@ Widget _rails(BuildContext context) => GalleryStack(
     const GallerySpecimen(
       label: 'activities — small chips with counts',
       child: _Rail(labels: _period, counts: true, size: DabblerChipSize.small),
+    ),
+    const GallerySpecimen(
+      label: 'gap 9 — the display-name suggestions',
+      child: _Rail(labels: _period, gap: DabblerSpacing.space3),
     ),
     const GallerySpecimen(
       label: 'two rows',

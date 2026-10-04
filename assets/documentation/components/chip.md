@@ -103,6 +103,7 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 
 ## Change log
 
+- KAN-426 (close) — the regular chip is 40 tall (was 38) and 2px wider: the web `Chip.jsx` pads `9px 15px` inside a 1px hairline that sits outside that padding, so the frames draw 20 + 18 + 2. Both states keep the hairline (transparent when selected).
 - KAN-426 (Seat B) — adds `size` (`small`, `large`) and `accent`, from `Notifications.dc.html:56-58` and `Profiles.dc.html:155-170`.
 - Alpha fidelity (Notifications) — adds `trailingIcon`: a 14px glyph after the label, the quiet-hours pill's `arrow-circle-right` (`Notifications.dc.html:226`).
 - Alpha fidelity (Search) — adds `mutedRemove`: the remove glyph in the muted ink (`Search.dc.html` recent chips).

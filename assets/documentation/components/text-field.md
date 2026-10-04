@@ -119,6 +119,8 @@ states, helper/error line — comes from `FieldShell`.
 
 ## Change log
 
+- KAN-426 (close) — the label and the placeholder are drawn in the muted (tertiary) ink, as the frames do: in the design's token map `--color-text-secondary` resolves to `--muted`. This supersedes the D-003(a) placeholder-on-secondary choice below for fields; helper text is unchanged. Flagged to cxo as a contrast trade-off.
+
 - Alpha DS gaps 5 — adds `validator`, `onSaved`, `autovalidateMode` (Form integration) and
   `suffixText`. The editable build moved to `text_field_editable.dart` to hold the 500-line rule.
 

@@ -325,7 +325,9 @@ class DabblerFieldShell extends StatelessWidget {
             style: DabblerType.subheadline
                 .resolveForDirection(direction)
                 .copyWith(
-                  color: focused ? colors.brandPrimary : colors.textSecondary,
+                  // KAN-426: the design draws the field label in `--muted`
+                  // (the tertiary role) at rest.
+                  color: focused ? colors.brandPrimary : colors.textTertiary,
                 ),
           ),
           const SizedBox(height: DabblerSpacing.stackTight),

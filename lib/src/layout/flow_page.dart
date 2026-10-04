@@ -73,6 +73,7 @@ class DabblerFlowPage extends StatelessWidget {
     this.subtitle,
     this.titleStyle = DabblerType.title1,
     this.subtitleStyle = DabblerType.subheadline,
+    this.titleGap = DabblerSpacing.space2,
     this.leading,
     this.content = const <Widget>[],
     this.centered = false,
@@ -132,6 +133,11 @@ class DabblerFlowPage extends StatelessWidget {
   /// The subtitle's type step. Default [DabblerType.subheadline].
   final DabblerTypeStyle subtitleStyle;
 
+  /// The space between the title and the subtitle. Default `space2` (6); the
+  /// email, log-in, code and welcome-back frames give `space3` (9)
+  /// (`Auth and Onboarding.dc.html`, title block `gap:9px`).
+  final double titleGap;
+
   /// A widget above the title block — an avatar or a header row.
   final Widget? leading;
 
@@ -182,8 +188,7 @@ class DabblerFlowPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         if (title != null) DabblerText(title!, style: titleStyle),
-        if (title != null && subtitle != null)
-          const DabblerGap.v(DabblerSpacing.space2),
+        if (title != null && subtitle != null) DabblerGap.v(titleGap),
         if (subtitle != null)
           DabblerText(
             subtitle!,

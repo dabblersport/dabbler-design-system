@@ -55,7 +55,7 @@ extension _DabblerTextFieldSelect on _DabblerTextFieldState {
                   // user-interface component.
                   color: disabled
                       ? colors.textTertiary
-                      : (filled ? colors.textPrimary : colors.textSecondary),
+                      : (filled ? colors.textPrimary : colors.textTertiary),
                 ),
           ),
         ),

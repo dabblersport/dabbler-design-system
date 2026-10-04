@@ -102,7 +102,9 @@ class DabblerChipRail extends StatefulWidget {
     this.padding = EdgeInsetsDirectional.zero,
     this.fade = true,
     this.controller,
-  }) : assert(rows == 1 || rows == 2, 'a chip rail has one or two rows');
+    double? gap,
+  }) : assert(rows == 1 || rows == 2, 'a chip rail has one or two rows'),
+       railGap = gap ?? DabblerChipRail.gap;
 
   /// The chips, in reading order.
   final List<DabblerChipRailItem> items;
@@ -124,8 +126,14 @@ class DabblerChipRail extends StatefulWidget {
   /// An external scroll controller.
   final ScrollController? controller;
 
-  /// The gap between chips and between the two rows — [DabblerSpacing.space2]
-  /// (6, `gap: 6px`).
+  /// The gap actually used between chips and between the two rows — the
+  /// constructor's `gap`, default [gap] (6). The Auth display-name suggestion
+  /// rail passes [DabblerSpacing.space3] (9, `Auth and Onboarding.dc.html:435`,
+  /// `gap:9px`).
+  final double railGap;
+
+  /// The default gap between chips and between the two rows —
+  /// [DabblerSpacing.space2] (6, `gap: 6px`).
   static const double gap = DabblerSpacing.space2;
 
   /// The fade's width — [DabblerSpacing.space8] (24).
@@ -254,7 +262,7 @@ class DabblerChipRailState extends State<DabblerChipRail> {
 
   Widget _row(Iterable<int> indices) => Row(
     mainAxisSize: MainAxisSize.min,
-    spacing: DabblerChipRail.gap,
+    spacing: widget.railGap,
     children: <Widget>[for (final int i in indices) _chip(i)],
   );
 
@@ -267,7 +275,7 @@ class DabblerChipRailState extends State<DabblerChipRail> {
         : Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: DabblerChipRail.gap,
+            spacing: widget.railGap,
             children: <Widget>[
               _row(<int>[for (int i = 0; i < count; i += 2) i]),
               _row(<int>[for (int i = 1; i < count; i += 2) i]),

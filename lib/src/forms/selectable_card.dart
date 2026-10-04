@@ -77,8 +77,10 @@ enum DabblerSelectableCardLayout {
 /// 30%; the package's tint tokens are 10% / 28%
 /// ([DabblerSurface.tintFillAlpha]). No 2px border token exists, so the
 /// selected border is `2 × borderDefault`. The tile's 26px glyph and 14px
-/// check use [DabblerSizing.iconLg] (30) and [DabblerSizing.iconSm] (18), and
-/// the row's 14px body uses `footnote` (13) — the nearest steps.
+/// check use [DabblerSizing.iconLg] (30) and [DabblerSizing.iconSm] (18), the
+/// nearest steps. Text follows the frames: persona subtitle
+/// [DabblerType.small], list-row title [DabblerType.rowTitle], stacked label
+/// [DabblerType.copy] and tile label [DabblerType.tagTight].
 ///
 /// ## Accessibility
 ///
@@ -160,6 +162,9 @@ class DabblerSelectableCard extends StatefulWidget {
   /// The [DabblerSelectableCardLayout.stacked] minimum height, `96px`
   /// (`:360`).
   static const double stackedMinHeight = DabblerSpacing.space11 * 2;
+
+  /// The persona row hook's Latin line height, `23` (`:383`).
+  static const double rowHookLeading = 23;
 
   /// The empty radio glyph shown on an idle row.
   static const String idleIconName = 'record';
@@ -314,6 +319,7 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: DabblerSpacing.space1,
               children: <Widget>[
                 if (widget.caption != null)
                   Text(
@@ -333,17 +339,18 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
                   ),
                 Text(
                   widget.title,
-                  style: DabblerType.body
-                      .resolveForDirection(direction)
-                      .copyWith(
-                        color: colors.textPrimary,
-                        fontWeight: DabblerType.medium,
-                      ),
+                  // The hook sets `line-height: 23px` (`:383`); Arabic keeps
+                  // the body's own 24.
+                  style: _rowHook(direction).copyWith(
+                    color: colors.textPrimary,
+                    fontWeight: DabblerType.medium,
+                  ),
                 ),
                 if (widget.subtitle != null)
                   Text(
                     widget.subtitle!,
-                    style: DabblerType.footnote
+                    // `:384` — 14/20, [DabblerType.small].
+                    style: DabblerType.small
                         .resolveForDirection(direction)
                         .copyWith(color: colors.textSecondary),
                   ),
@@ -355,6 +362,13 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
         ],
       ),
     );
+  }
+
+  TextStyle _rowHook(TextDirection direction) {
+    final TextStyle s = DabblerType.body.resolveForDirection(direction);
+    return direction == TextDirection.ltr
+        ? s.copyWith(height: DabblerSelectableCard.rowHookLeading / s.fontSize!)
+        : s;
   }
 
   Widget _radio(_CardPaint paint) => DabblerIcon(
@@ -390,7 +404,8 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
             Expanded(
               child: Text(
                 widget.title,
-                style: DabblerType.callout
+                // `:421` — 17/23 weight 500, [DabblerType.rowTitle].
+                style: DabblerType.rowTitle
                     .resolveForDirection(direction)
                     .copyWith(
                       color: colors.textPrimary,
@@ -432,7 +447,8 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
                 Flexible(
                   child: Text(
                     widget.title,
-                    style: DabblerType.subheadline
+                    // `:363` — 15/21 weight 500, [DabblerType.copy].
+                    style: DabblerType.copy
                         .resolveForDirection(direction)
                         .copyWith(
                           color: colors.textPrimary,
@@ -482,7 +498,8 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: DabblerType.caption2
+                  // `:404` — 11/14 weight 500, [DabblerType.tagTight].
+                  style: DabblerType.tagTight
                       .resolveForDirection(direction)
                       .copyWith(
                         color: colors.textPrimary,

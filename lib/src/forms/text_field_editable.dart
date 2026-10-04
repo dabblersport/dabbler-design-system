@@ -130,9 +130,10 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
                 // follows the value onto the tertiary role — leaving it
                 // secondary would make a disabled empty field text-identical
                 // to an enabled one, which is the outcome D-025 rejects.
-                hintStyle: textStyle.copyWith(
-                  color: disabled ? colors.textTertiary : colors.textSecondary,
-                ),
+                // KAN-426: the design draws the placeholder in `--muted`
+                // (`Auth and Onboarding.dc.html` fields), i.e. the tertiary
+                // role, enabled or not — design wins over D-003(a) here.
+                hintStyle: textStyle.copyWith(color: colors.textTertiary),
                 hintMaxLines: 1,
               ),
             ),

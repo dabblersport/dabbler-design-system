@@ -25,7 +25,7 @@ Static and tappable — see `step_progress_gallery.dart`'s *PageDots* section.
 ## Using it
 
 **Give it `onSelected` when the dots should move the carousel.** Each dot then becomes a button with
-a selected state and a 45px-tall target. Without it the row is a single read-only label.
+a selected state and a 45px-tall target (`compactHitArea: true` draws them only 6px tall, as the frame does, for rows where a swipe or button already carries the action). Without it the row is a single read-only label.
 
 **Pass a localised `semanticLabelBuilder`.** The default reads "Page N of M" in English.
 
@@ -50,6 +50,7 @@ Motion: `base` with `easeOut`.
 ## Change log
 
 - Alpha DS gaps 5 — adds this component.
+- KAN-426 (close) — adds `compactHitArea`: a tappable row drops the 45px target and is exactly as tall as its 6px dots, as the Auth carousel frame draws them. Default off.
 
 ## Source
 

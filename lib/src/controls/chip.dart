@@ -17,7 +17,9 @@ import '../tokens/dabbler_type.dart';
 /// and the package's one 15/20 pill covered only the filter-row chip of
 /// `identity-status.card.html`.
 enum DabblerChipSize {
-  /// The system chip — 15/20 medium, `9 15` padding, 38 tall. The default.
+  /// The system chip — 15/20 medium, `9 15` padding inside a 1px hairline,
+  /// 40 tall (was 38 before 2026-10-04; see [DabblerChip.visualHeight]). The
+  /// default.
   regular,
 
   /// The notification-tab chip — 13/18 medium, 34 tall, `0 13` padding
@@ -284,17 +286,22 @@ class DabblerChip extends StatefulWidget {
   /// (`Profiles.dc.html:160`).
   static const double largeHeight = DabblerSizing.touchTargetMin;
 
-  /// The pill's own painted height with Latin metrics: 20 leading +
-  /// 2 × [verticalPadding] = 38.
+  /// The regular pill's own painted height with Latin metrics: 20 leading +
+  /// 2 × [verticalPadding] + the 1px hairline on each side = 40.
   ///
-  /// The hairline adds nothing to it. [DabblerSurface] paints its border with a
-  /// [DecoratedBox] and applies its padding separately, so the 1px border is
-  /// drawn *inside* the box rather than inflating it — which is CSS
-  /// `box-sizing: border-box`, the behaviour the source's own stylesheet has.
+  /// **Corrected 2026-10-04 (KAN-426): was 38.** The web `Chip.jsx` pads its
+  /// inner span `9px 15px` *inside* the `Surface`, whose 1px border is outside
+  /// that span (`box-sizing: border-box` only binds when the box has an
+  /// explicit height, and the chip has none), so every frame draws the regular
+  /// chip 40 tall and 2px wider than its content plus padding. [DabblerSurface]
+  /// paints its border inside its box, so the padding here is
+  /// `verticalPadding + borderDefault`. The same hairline is kept, transparent,
+  /// on the selected chip, so both states are 40.
   ///
   /// Under Arabic the step takes 23 leading (`arabicLeading`), so the pill is
-  /// 41 — still the source's own metrics, and still inside the touch target.
-  static const double visualHeight = 20 + verticalPadding * 2;
+  /// 43 — still the source's own metrics, and still inside the touch target.
+  static const double visualHeight =
+      20 + (verticalPadding + DabblerSizing.borderDefault) * 2;
 
   /// The label colour for [selected]: [DabblerColors.onBrand] on the brand
   /// fill, [DabblerColors.textPrimary] otherwise (`Chip.jsx:14`).
@@ -335,9 +342,17 @@ class _DabblerChipState extends State<DabblerChip> {
 
   bool get _interactive => widget.onTap != null;
 
-  double get _inlinePadding => widget.size == DabblerChipSize.small
-      ? DabblerChip.smallHorizontalPadding
-      : DabblerChip.horizontalPadding;
+  // The regular chip's CSS padding sits inside its hairline (see
+  // [DabblerChip.visualHeight]), so the paint-inside border is added to it.
+  static const double _regularVertical =
+      DabblerChip.verticalPadding + DabblerSizing.borderDefault;
+
+  double get _inlinePadding => switch (widget.size) {
+    DabblerChipSize.small => DabblerChip.smallHorizontalPadding,
+    DabblerChipSize.regular =>
+      DabblerChip.horizontalPadding + DabblerSizing.borderDefault,
+    DabblerChipSize.large => DabblerChip.horizontalPadding,
+  };
 
   TextStyle _sizedLabelStyle(
     DabblerColors colors,
@@ -564,10 +579,10 @@ class _DabblerChipState extends State<DabblerChip> {
       padding: EdgeInsetsDirectional.only(
         top: widget.compact
             ? DabblerChip.compactVerticalPadding
-            : (pillHeight != null ? 0 : DabblerChip.verticalPadding),
+            : (pillHeight != null ? 0 : _regularVertical),
         bottom: widget.compact
             ? DabblerChip.compactVerticalPadding
-            : (pillHeight != null ? 0 : DabblerChip.verticalPadding),
+            : (pillHeight != null ? 0 : _regularVertical),
         start: widget.compact
             ? DabblerChip.compactHorizontalPadding
             : _inlinePadding,
@@ -582,11 +597,7 @@ class _DabblerChipState extends State<DabblerChip> {
           ? content
           : ConstrainedBox(
               constraints: BoxConstraints(minHeight: pillHeight),
-              child: Center(
-                widthFactor: 1,
-                heightFactor: 1,
-                child: content,
-              ),
+              child: Center(widthFactor: 1, heightFactor: 1, child: content),
             ),
     );
 

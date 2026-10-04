@@ -67,11 +67,17 @@ Widget _dots(BuildContext context) => const GalleryStack(
       child: DabblerPageDots(count: 4, index: 1),
     ),
     GallerySpecimen(label: 'tappable', child: _DotsDemo()),
+    GallerySpecimen(
+      label: 'compactHitArea — 6px tall, as the carousel frame draws it',
+      child: _DotsDemo(compact: true),
+    ),
   ],
 );
 
 class _DotsDemo extends StatefulWidget {
-  const _DotsDemo();
+  const _DotsDemo({this.compact = false});
+
+  final bool compact;
 
   @override
   State<_DotsDemo> createState() => _DotsDemoState();
@@ -84,6 +90,7 @@ class _DotsDemoState extends State<_DotsDemo> {
   Widget build(BuildContext context) => DabblerPageDots(
     count: 4,
     index: _page,
+    compactHitArea: widget.compact,
     onSelected: (int i) => setState(() => _page = i),
   );
 }

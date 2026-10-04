@@ -561,6 +561,39 @@ abstract final class DabblerType {
     fontWeight: regular,
   );
 
+  /// Caption, relaxed — 12/18, weight 400, sans role. `Auth and Onboarding.dc.html:134,175,852` (legal line under the CTA). Arabic leading 20 (`:1096`, `12/20`).
+  static const DabblerTypeStyle captionRelaxed = DabblerTypeStyle(
+    name: 'captionRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 12,
+    arabicFontSize: 11.1,
+    latinLeading: 18,
+    arabicLeading: 20,
+    fontWeight: regular,
+  );
+
+  /// Copy, relaxed — 15/22, weight 400, sans role. `Auth and Onboarding.dc.html:257,553,725,809` (provider and feature sub-copy). Arabic leading 24 (`:1004,1075`, `15/24`).
+  static const DabblerTypeStyle copyRelaxed = DabblerTypeStyle(
+    name: 'copyRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 15,
+    arabicFontSize: 14.1,
+    latinLeading: 22,
+    arabicLeading: 24,
+    fontWeight: regular,
+  );
+
+  /// Body, relaxed — 16/22, weight 400, sans role (weight 500/600 via `DabblerText.weight`). `Auth and Onboarding.dc.html:481,561,874` (option labels). Arabic leading 24 as [body].
+  static const DabblerTypeStyle bodyRelaxed = DabblerTypeStyle(
+    name: 'bodyRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 16,
+    arabicFontSize: 15.1,
+    latinLeading: 22,
+    arabicLeading: 24,
+    fontWeight: regular,
+  );
+
   /// Every role added from the design frames (KAN-426), in declaration order.
   ///
   /// **D-024 (type ramp frozen) is amended: the design is the source of truth.**
@@ -599,6 +632,9 @@ abstract final class DabblerType {
     figureXl,
     displayNameMid,
     displayNameSmall,
+    captionRelaxed,
+    copyRelaxed,
+    bodyRelaxed,
   ];
 
   /// The frame roles that take additional leading in Arabic.
@@ -610,6 +646,9 @@ abstract final class DabblerType {
     'small',
     'smallTight',
     'smallRelaxed',
+    'captionRelaxed',
+    'copyRelaxed',
+    'bodyRelaxed',
   ];
 
   /// Every named style of the ramp, in source order.

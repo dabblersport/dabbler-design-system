@@ -55,6 +55,7 @@ Deviation: the design's step title is 30px, between `title1` (28) and `largeTitl
 ## Change log
 
 - Alpha fidelity rebuild (auth2) — adds this component.
+- KAN-426 (close) — adds `titleGap` (default `space2`; the email, log-in, code and welcome-back frames give `space3`, 9px, between title and subtitle).
 
 ## Source
 
