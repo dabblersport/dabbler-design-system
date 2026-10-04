@@ -20,6 +20,10 @@ Back and share, two pills, the title and a place with a distance, in both direct
 
 @specimen detail-header
 
+The amber tile band the meetup details frame draws:
+
+@specimen detail-header/tile
+
 ## Using it
 
 **Put it first in a `DetailPage`.** The band pads the status bar itself so it can bleed under it.
@@ -43,6 +47,7 @@ A column of rows: buttons, pills and the place line all start at the inline star
 ## Change log
 
 - KAN-426 fidelity rebuild — adds this component.
+- KAN-429 (Meetups) — adds `tile` (paint the band in a decorative tile instead of a section theme, the meetup frame's amber band) and `extra` (a third fact after the meta). Pair `tile` with `OnColorIconButton.onTile`.
 
 ## Source
 

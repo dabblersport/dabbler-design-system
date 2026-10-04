@@ -35,6 +35,15 @@ const List<GalleryEntry> detailGalleryEntries = <GalleryEntry>[
     builder: _header,
   ),
   GalleryEntry(
+    id: 'detail-header/tile',
+    page: 'components/detail-header',
+    group: GalleryPurpose.structure,
+    title: 'DetailHeader — the amber tile band',
+    description:
+        'The meetup details band: ink on the amber tile, a third fact.',
+    builder: _tileHeader,
+  ),
+  GalleryEntry(
     id: 'gallery-hero',
     page: 'components/gallery-hero',
     group: GalleryPurpose.structure,
@@ -125,6 +134,32 @@ Widget _header(BuildContext context) => _both(
     title: 'Tuesday 5-a-side',
     place: 'Dubai Sports City',
     meta: '2.1 km away',
+  ),
+);
+
+Widget _tileHeader(BuildContext context) => _both(
+  () => DabblerDetailHeader(
+    tile: DabblerDetailHeaderTile.amber,
+    leading: DabblerOnColorIconButton(
+      onTile: true,
+      icon: 'arrow-circle-left',
+      mirrorInRtl: true,
+      semanticLabel: 'Back',
+      onPressed: () {},
+    ),
+    actions: <Widget>[
+      DabblerOnColorIconButton(
+        onTile: true,
+        icon: 'share',
+        semanticLabel: 'Share',
+        onPressed: () {},
+      ),
+    ],
+    chips: const <String>['Running', 'Outdoor', 'Beginner friendly'],
+    title: 'Sunrise run',
+    place: 'Kite Beach',
+    meta: '3 km away',
+    extra: 'Today 6:00 AM',
   ),
 );
 

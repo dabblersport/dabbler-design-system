@@ -33,14 +33,8 @@ void main() {
       final Map<DabblerInlineMessageTone, (String, Color)> expected =
           <DabblerInlineMessageTone, (String, Color)>{
             DabblerInlineMessageTone.error: ('danger', c.error.strong),
-            DabblerInlineMessageTone.success: (
-              'tick-circle',
-              c.success.strong,
-            ),
-            DabblerInlineMessageTone.warning: (
-              'warning-2',
-              c.warning.strong,
-            ),
+            DabblerInlineMessageTone.success: ('tick-circle', c.success.strong),
+            DabblerInlineMessageTone.warning: ('warning-2', c.warning.strong),
             DabblerInlineMessageTone.info: ('info-circle', c.info.strong),
           };
       for (final MapEntry<DabblerInlineMessageTone, (String, Color)> e
@@ -73,7 +67,9 @@ void main() {
       expect(text.left - icon.right, DabblerSpacing.iconGap);
       expect(
         text.right,
-        lessThanOrEqualTo(tester.getRect(find.byType(DabblerInlineMessage)).right),
+        lessThanOrEqualTo(
+          tester.getRect(find.byType(DabblerInlineMessage)).right,
+        ),
       );
       expect(text.height, greaterThan(DabblerType.footnote.latinLeading));
     });
@@ -93,10 +89,7 @@ void main() {
         closeTo(icon.right, 0.5),
       );
       // The Arabic step resolves its own size, smaller than the Latin one.
-      expect(
-        _style(tester, ar).fontSize,
-        DabblerType.footnote.arabicFontSize,
-      );
+      expect(_style(tester, ar).fontSize, DabblerType.footnote.arabicFontSize);
     });
 
     testWidgets('an error is a live region; success is not', (

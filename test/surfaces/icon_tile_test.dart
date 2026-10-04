@@ -455,20 +455,33 @@ void main() {
       ]);
     });
 
-    testWidgets('sunken paints the sunken fill with a brand glyph, no hairline',
-        (WidgetTester tester) async {
-      final DabblerColors colors = DabblerColors.resolve(
-        theme: DabblerTheme.main,
-        brightness: Brightness.light,
-      );
-      await tester.pumpWidget(
-        _host(const DabblerIconTile.named('game', tone: DabblerIconTileTone.sunken)),
-      );
-      final DabblerSurface box = _box(tester);
-      expect(box.fill, DabblerIconTile.fillFor(colors, DabblerIconTileTone.sunken));
-      expect(box.borderWidth, 0);
-      expect(DabblerIconTile.inkFor(colors, DabblerIconTileTone.sunken), colors.brandPrimary);
-    });
+    testWidgets(
+      'sunken paints the sunken fill with a brand glyph, no hairline',
+      (WidgetTester tester) async {
+        final DabblerColors colors = DabblerColors.resolve(
+          theme: DabblerTheme.main,
+          brightness: Brightness.light,
+        );
+        await tester.pumpWidget(
+          _host(
+            const DabblerIconTile.named(
+              'game',
+              tone: DabblerIconTileTone.sunken,
+            ),
+          ),
+        );
+        final DabblerSurface box = _box(tester);
+        expect(
+          box.fill,
+          DabblerIconTile.fillFor(colors, DabblerIconTileTone.sunken),
+        );
+        expect(box.borderWidth, 0);
+        expect(
+          DabblerIconTile.inkFor(colors, DabblerIconTileTone.sunken),
+          colors.brandPrimary,
+        );
+      },
+    );
   });
 
   group('AC1 — decorative by default, a button only when asked', () {

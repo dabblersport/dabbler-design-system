@@ -23,6 +23,10 @@ Full, and title-and-time only — see `card_game_gallery.dart`'s *CardGame* sect
 
 @specimen card-game
 
+As a meetup — badges, attendees, an RSVP action and social counts:
+
+@specimen card-game/meetup
+
 ## Using it
 
 **Pass tags as `Chip`s.** The tag row wraps; the card does not model sport, format or skill.
@@ -53,6 +57,7 @@ Deviation: the time is `headline` bold (17) where the design draws 20/26 sans bo
 ## Change log
 
 - Alpha fidelity rebuild (KAN-426) — adds this component.
+- KAN-429 (Meetups) — no change to the card: a meetup is this card with badges as `tags`, `MeetupAttendees` as `progress`, an `RsvpCta` as `action` and `FeedAction`s as `trailing`.
 - KAN-426 (Seat B) — adds `accent`: tints the card fill with a sport's accent at 12% over the card fill. A derivation of the persona-card recipe, not a Listings frame.
 
 ## Source

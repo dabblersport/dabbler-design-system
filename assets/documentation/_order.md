@@ -105,6 +105,9 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardVenue](components/card-venue.md) — a venue in a listing: cover, name, place, tags and price.
 - [CardGame](components/card-game.md) — a game in a listing: title, tags, day and time, progress, price and join.
 - [CardUpcoming](components/card-upcoming.md) — a game you are in, on a tinted tile with a countdown ring.
+- [CardUpcomingRail](components/card-upcoming-rail.md) — the narrow upcoming tile for a rail: date block, title, venue and a small ring.
+- [MeetupAttendees](components/meetup-attendees.md) — who is going to a meetup: avatar stack, going count and capacity.
+- [HostCard](components/host-card.md) — who runs a meetup: avatar, role, name and a pill action.
 - [CardHouse](components/card-house.md) — a house (a recurring room series) as one row.
 - [CardPricing](components/card-pricing.md) — one subscription plan as a selectable tile.
 - [CardTicket](components/card-ticket.md) — a booking as a ticket, with its own type scale.
@@ -190,6 +193,7 @@ lot about the rest.
 - [TextLink](components/text-link.md) — a brand-coloured link, on its own line or inside a sentence.
 - [Inert](components/inert.md) — dims a block and stops it taking input while it is unavailable.
 - [OnColorIconButton](components/on-color-icon-button.md) — a round, translucent icon button on a coloured hero.
+- [RsvpCta](components/rsvp-cta.md) — the call to action for a meetup in every RSVP state.
 - [FavouriteButton](components/favourite-button.md) — the square heart well that saves a venue or listing.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.

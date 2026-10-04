@@ -157,8 +157,9 @@ abstract final class DabblerDateFormat {
   /// The spaced hyphen must stay spaced, or `05-09-2026` would split into
   /// nonsense before [parse] ever saw it.
   static DabblerDateSpan parseSpan(String input) {
-    final List<String> parts = DabblerType.toWesternDigits(input)
-        .split(_rangeSplitPattern);
+    final List<String> parts = DabblerType.toWesternDigits(
+      input,
+    ).split(_rangeSplitPattern);
     return DabblerDateSpan(
       start: parts.isEmpty ? null : parse(parts[0]),
       end: parts.length > 1 ? parse(parts[1]) : null,

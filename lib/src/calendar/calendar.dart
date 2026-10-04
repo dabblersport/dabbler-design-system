@@ -430,11 +430,15 @@ class DabblerCalendar extends StatelessWidget {
 
   /// The previous-month glyph for [direction] — see *RTL* fact 2.
   static String previousIconFor(TextDirection direction) =>
-      direction == TextDirection.rtl ? 'arrow-circle-right' : 'arrow-circle-left';
+      direction == TextDirection.rtl
+      ? 'arrow-circle-right'
+      : 'arrow-circle-left';
 
   /// The next-month glyph for [direction] — see *RTL* fact 2.
   static String nextIconFor(TextDirection direction) =>
-      direction == TextDirection.rtl ? 'arrow-circle-left' : 'arrow-circle-right';
+      direction == TextDirection.rtl
+      ? 'arrow-circle-left'
+      : 'arrow-circle-right';
 
   /// Any date inside the month to display. Only its year and month are read.
   ///

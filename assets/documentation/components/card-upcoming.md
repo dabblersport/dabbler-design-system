@@ -45,6 +45,7 @@ track. Gap `space4`.
 ## Change log
 
 - Alpha fidelity rebuild (KAN-426) — adds this component, and a `fill` override on `Card`.
+- KAN-429 (Meetups) — `CardUpcomingRail` is the multi-tile state of the same Upcoming section.
 
 ## Source
 

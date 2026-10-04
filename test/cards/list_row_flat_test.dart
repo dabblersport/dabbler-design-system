@@ -13,7 +13,10 @@ void main() {
         WidgetTester t,
       ) async {
         await t.pumpWidget(
-          host(DabblerListRow(title: title, subtitle: 'sub'), direction: d),
+          host(
+            DabblerListRow(title: title, subtitle: 'sub'),
+            direction: d,
+          ),
         );
         final Rect padded = t.getRect(find.text(title));
         await t.pumpWidget(

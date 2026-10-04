@@ -75,6 +75,18 @@ Widget _actionRows(BuildContext context) => const GalleryStack(
       ),
     ),
     GallerySpecimen(
+      label: 'selected',
+      child: SizedBox(
+        width: 360,
+        child: DabblerActionRow(
+          icon: 'tick-circle',
+          label: 'Yes, I am going',
+          selected: true,
+          onTap: _noopAction,
+        ),
+      ),
+    ),
+    GallerySpecimen(
       label: 'no note',
       child: SizedBox(
         width: 360,

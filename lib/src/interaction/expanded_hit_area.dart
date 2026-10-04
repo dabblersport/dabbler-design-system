@@ -33,10 +33,7 @@ class DabblerExpandedHitArea extends SingleChildRenderObjectWidget {
       _RenderExpandedHitArea(minimum);
 
   @override
-  void updateRenderObject(
-    BuildContext context,
-    RenderObject renderObject,
-  ) {
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
     (renderObject as _RenderExpandedHitArea).minimum = minimum;
   }
 }

@@ -66,6 +66,7 @@ radius.
 ## Change log
 
 - Alpha DS gaps 6 — adds this component.
+- KAN-429 (Meetups) — adds `onTile`: the page ink at 10% as the fill and the page ink as the glyph, for a decorative-tile band.
 
 ## Source
 

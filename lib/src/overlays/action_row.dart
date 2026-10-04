@@ -34,6 +34,7 @@ class DabblerActionRow extends StatelessWidget {
     required this.label,
     this.note,
     this.destructive = false,
+    this.selected = false,
     this.onTap,
   });
 
@@ -49,6 +50,11 @@ class DabblerActionRow extends StatelessWidget {
   /// Draws glyph and label in the error ink.
   final bool destructive;
 
+  /// Marks the row as the chosen answer: the brand fill, the on-brand ink and a
+  /// bold glyph — the meetup RSVP sheet's picked option
+  /// (`Details.dc.html:344`, `background: BRAND`). Announced as selected.
+  final bool selected;
+
   /// Runs the action. Null leaves the row inert.
   final VoidCallback? onTap;
 
@@ -60,14 +66,18 @@ class DabblerActionRow extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
     TextStyle t(DabblerTypeStyle s) => s.resolveForDirection(dir);
-    final Color ink = destructive ? colors.error.strong : colors.textPrimary;
-    return DabblerFeedTappable(
+    final Color ink = selected
+        ? colors.onBrand
+        : destructive
+        ? colors.error.strong
+        : colors.textPrimary;
+    final Widget row = DabblerFeedTappable(
       onTap: onTap,
       semanticLabel: note == null ? label : '$label. $note',
       excludeChildSemantics: true,
       borderRadius: DabblerRadius.lgAll,
       child: DabblerSurface(
-        fill: colors.surfaceSunken,
+        fill: selected ? colors.brandPrimary : colors.surfaceSunken,
         radius: DabblerRadius.lg,
         padding: const EdgeInsetsDirectional.symmetric(
           horizontal: DabblerSpacing.space5,
@@ -75,7 +85,14 @@ class DabblerActionRow extends StatelessWidget {
         ),
         child: Row(
           children: <Widget>[
-            DabblerIcon(icon, size: glyphSize, color: ink),
+            DabblerIcon(
+              icon,
+              weight: selected
+                  ? DabblerIconWeight.bold
+                  : DabblerIconWeight.linear,
+              size: glyphSize,
+              color: ink,
+            ),
             const SizedBox(width: DabblerSpacing.space4),
             Expanded(
               child: Column(
@@ -91,7 +108,7 @@ class DabblerActionRow extends StatelessWidget {
                       note!,
                       style: t(
                         DabblerType.caption1,
-                      ).copyWith(color: colors.textSecondary),
+                      ).copyWith(color: selected ? ink : colors.textSecondary),
                     ),
                 ],
               ),
@@ -100,5 +117,6 @@ class DabblerActionRow extends StatelessWidget {
         ),
       ),
     );
+    return selected ? Semantics(selected: true, child: row) : row;
   }
 }

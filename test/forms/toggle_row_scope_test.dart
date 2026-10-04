@@ -13,7 +13,10 @@ Widget _host(Widget child, TextDirection dir) => MaterialApp(
       ),
     ],
   ),
-  home: Directionality(textDirection: dir, child: Scaffold(body: child)),
+  home: Directionality(
+    textDirection: dir,
+    child: Scaffold(body: child),
+  ),
 );
 
 void main() {

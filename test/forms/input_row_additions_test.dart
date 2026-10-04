@@ -130,41 +130,42 @@ void main() {
         expect(find.text('2.0'), findsOneWidget);
       });
 
-      testWidgets('destructive colours title, icon and chevron; subtitle stays secondary', (
-        WidgetTester tester,
-      ) async {
-        await tester.pumpWidget(
-          host(
-            DabblerInputRow(
-              title: 'Sign out',
-              subtitle: 'Leave this device',
-              leading: const DabblerIcon('logout'),
-              trailing: const DabblerChevron(),
-              tone: DabblerInputRowTone.destructive,
-              onTap: () {},
+      testWidgets(
+        'destructive colours title, icon and chevron; subtitle stays secondary',
+        (WidgetTester tester) async {
+          await tester.pumpWidget(
+            host(
+              DabblerInputRow(
+                title: 'Sign out',
+                subtitle: 'Leave this device',
+                leading: const DabblerIcon('logout'),
+                trailing: const DabblerChevron(),
+                tone: DabblerInputRowTone.destructive,
+                onTap: () {},
+              ),
+              direction: dir,
             ),
-            direction: dir,
-          ),
-        );
-        final Color danger = colors.error.strong;
-        final Text title = tester.widget<Text>(find.text('Sign out'));
-        expect(title.style!.color, danger);
-        expect(title.style!.fontWeight, DabblerType.semibold);
-        expect(
-          tester.widget<Text>(find.text('Leave this device')).style!.color,
-          colors.textSecondary,
-        );
-        expect(
-          tester.widget<DabblerChevron>(find.byType(DabblerChevron)).color,
-          danger,
-        );
-        final BuildContext iconCtx = tester.element(
-          find.byWidgetPredicate(
-            (Widget w) => w is DabblerIcon && w.name == 'logout',
-          ),
-        );
-        expect(IconTheme.of(iconCtx).color, danger);
-      });
+          );
+          final Color danger = colors.error.strong;
+          final Text title = tester.widget<Text>(find.text('Sign out'));
+          expect(title.style!.color, danger);
+          expect(title.style!.fontWeight, DabblerType.semibold);
+          expect(
+            tester.widget<Text>(find.text('Leave this device')).style!.color,
+            colors.textSecondary,
+          );
+          expect(
+            tester.widget<DabblerChevron>(find.byType(DabblerChevron)).color,
+            danger,
+          );
+          final BuildContext iconCtx = tester.element(
+            find.byWidgetPredicate(
+              (Widget w) => w is DabblerIcon && w.name == 'logout',
+            ),
+          );
+          expect(IconTheme.of(iconCtx).color, danger);
+        },
+      );
 
       testWidgets('selected draws the bold tick and selected semantics', (
         WidgetTester tester,

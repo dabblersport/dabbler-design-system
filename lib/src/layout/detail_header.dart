@@ -8,6 +8,20 @@ import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'detail_page.dart';
 
+/// The decorative tile a [DabblerDetailHeader] can be painted in instead of a
+/// section theme — the meetup frame's amber band (`Details.dc.html:218`,
+/// `background: var(--tile-amber-surface)`).
+enum DabblerDetailHeaderTile {
+  /// `--tile-amber-surface`.
+  amber,
+
+  /// `--tile-info-surface`.
+  info,
+
+  /// `--tile-accent-surface`.
+  accent,
+}
+
 /// DetailHeader — the coloured band that opens a detail screen: a row of round
 /// buttons, a wrap of caption pills, the title, and a place line.
 ///
@@ -75,7 +89,9 @@ class DabblerDetailHeader extends StatelessWidget {
     this.chips = const <String>[],
     this.place,
     this.meta,
+    this.extra,
     this.theme = DabblerTheme.sport,
+    this.tile,
   });
 
   /// The title, in the display face. Up to two lines.
@@ -96,9 +112,30 @@ class DabblerDetailHeader extends StatelessWidget {
   /// The dimmer fact after the place, after a dot.
   final String? meta;
 
+  /// A third fact after [meta], in the full ink and weight 600 — the meetup
+  /// frame's `Today 6:00 AM` (`Details.dc.html:236`).
+  final String? extra;
+
   /// The section theme the band is painted in. Defaults to
-  /// [DabblerTheme.sport].
+  /// [DabblerTheme.sport]. Ignored when [tile] is set.
   final DabblerTheme theme;
+
+  /// Paints the band in a decorative tile instead of [theme]: the page's own
+  /// ink sits on it, the pills are the ink at [tileWashAlpha], and the place
+  /// row is the ink at [tileMetaAlpha]. Pair its buttons with
+  /// [DabblerOnColorIconButton.onTile]. Null keeps the themed band.
+  final DabblerDetailHeaderTile? tile;
+
+  /// The pills' wash over the ink on a tile band — `rgba(20,20,20,0.1)`
+  /// (`Details.dc.html:233`).
+  static const double tileWashAlpha = 0.1;
+
+  /// The place row's ink alpha on a tile band — `rgba(20,20,20,0.7)`
+  /// (`Details.dc.html:233`).
+  static const double tileMetaAlpha = 0.7;
+
+  /// The separator dot's alpha on a tile band — `rgba(20,20,20,0.4)`.
+  static const double tileDotAlpha = 0.4;
 
   /// The translucent pills' fill alpha over the on-colour — `0.2`.
   static const double chipAlpha = 0.2;
@@ -112,13 +149,21 @@ class DabblerDetailHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors outer = DabblerColors.of(context);
-    final DabblerColors band = DabblerColors.resolve(
-      theme: theme,
-      brightness: outer.brightness,
-    );
+    final DabblerColors band = tile != null
+        ? outer
+        : DabblerColors.resolve(theme: theme, brightness: outer.brightness);
+    final DabblerToneColor? tileTone = switch (tile) {
+      DabblerDetailHeaderTile.amber => DabblerColors.tileAmber,
+      DabblerDetailHeaderTile.info => DabblerColors.tileInfo,
+      DabblerDetailHeaderTile.accent => DabblerColors.tileAccent,
+      null => null,
+    };
+    final double wash = tileTone == null ? chipAlpha : tileWashAlpha;
+    final double metaA = tileTone == null ? metaAlpha : tileMetaAlpha;
+    final double dotA = tileTone == null ? 0.5 : tileDotAlpha;
     final TextDirection direction = Directionality.of(context);
     final double top = MediaQuery.paddingOf(context).top;
-    final Color on = band.onBrand;
+    final Color on = tileTone == null ? band.onBrand : band.textPrimary;
 
     final Widget buttons = Row(
       children: <Widget>[
@@ -145,7 +190,7 @@ class DabblerDetailHeader extends StatelessWidget {
             children: <Widget>[
               for (final String c in chips)
                 DabblerSurface(
-                  fill: on.withValues(alpha: chipAlpha),
+                  fill: on.withValues(alpha: wash),
                   borderColor: on.withValues(alpha: 0),
                   borderWidth: 0,
                   radius: DabblerRadius.pill,
@@ -174,7 +219,7 @@ class DabblerDetailHeader extends StatelessWidget {
               .resolveForDirection(direction)
               .copyWith(color: on),
         ),
-        if (place != null || meta != null) ...<Widget>[
+        if (place != null || meta != null || extra != null) ...<Widget>[
           const SizedBox(height: DabblerSpacing.space3),
           Row(
             children: <Widget>[
@@ -183,7 +228,7 @@ class DabblerDetailHeader extends StatelessWidget {
                   child: DabblerIcon(
                     'location',
                     size: DabblerSizing.iconXs + 2,
-                    color: on.withValues(alpha: metaAlpha),
+                    color: on.withValues(alpha: metaA),
                   ),
                 ),
                 const SizedBox(width: DabblerSpacing.space1 + 2),
@@ -205,7 +250,7 @@ class DabblerDetailHeader extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: on.withValues(alpha: 0.5),
+                      color: on.withValues(alpha: dotA),
                     ),
                   ),
                 ),
@@ -219,9 +264,34 @@ class DabblerDetailHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: DabblerType.footnote
                         .resolveForDirection(direction)
-                        .copyWith(color: on.withValues(alpha: metaAlpha)),
+                        .copyWith(color: on.withValues(alpha: metaA)),
                   ),
                 ),
+              if (extra != null) ...<Widget>[
+                if (place != null || meta != null) ...<Widget>[
+                  const SizedBox(width: DabblerSpacing.space2),
+                  SizedBox.square(
+                    dimension: dotSize,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: on.withValues(alpha: dotA),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: DabblerSpacing.space2),
+                ],
+                Flexible(
+                  child: Text(
+                    extra!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: DabblerType.footnote
+                        .resolveForDirection(direction)
+                        .copyWith(color: on, fontWeight: DabblerType.semibold),
+                  ),
+                ),
+              ],
             ],
           ),
         ],
@@ -234,7 +304,7 @@ class DabblerDetailHeader extends StatelessWidget {
         extensions: <DabblerColors>[band],
       ),
       child: ColoredBox(
-        color: band.brandPrimary,
+        color: tileTone?.surface ?? band.brandPrimary,
         child: Padding(
           padding: EdgeInsetsDirectional.fromSTEB(
             DabblerSpacing.space6,

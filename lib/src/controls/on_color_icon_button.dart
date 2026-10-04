@@ -82,11 +82,16 @@ class DabblerOnColorIconButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.onSurface = false,
+    this.onTile = false,
   });
 
   /// The fill's alpha over [DabblerColors.onBrand] — `rgba(255,255,255,0.18)`
   /// at `Details.dc.html:50`.
   static const double fillAlpha = 0.18;
+
+  /// The ink wash of an [onTile] button — `rgba(20,20,20,0.1)`
+  /// (`Details.dc.html:222`).
+  static const double tileFillAlpha = 0.1;
 
   /// The disabled opacity, shared with `DabblerButton.disabledOpacity`.
   static const double disabledOpacity = 0.45;
@@ -126,6 +131,11 @@ class DabblerOnColorIconButton extends StatelessWidget {
   /// var(--surface-page)`). Default false: the translucent on-colour wash.
   final bool onSurface;
 
+  /// Draws the button for a decorative-tile band (the meetup details amber
+  /// header): the fill is the page ink at [tileFillAlpha] and the glyph is the
+  /// page ink. Wins over [onSurface].
+  final bool onTile;
+
   /// An external focus node.
   final FocusNode? focusNode;
 
@@ -143,7 +153,11 @@ class DabblerOnColorIconButton extends StatelessWidget {
 
     Widget circle = DecoratedBox(
       decoration: BoxDecoration(
-        color: onSurface ? colors.bgPrimary : fillOf(colors),
+        color: onTile
+            ? colors.textPrimary.withValues(alpha: tileFillAlpha)
+            : onSurface
+            ? colors.bgPrimary
+            : fillOf(colors),
         borderRadius: DabblerRadius.pillAll,
       ),
       child: SizedBox.square(
@@ -153,7 +167,9 @@ class DabblerOnColorIconButton extends StatelessWidget {
             icon,
             weight: weight,
             size: glyphSize,
-            color: color ?? (onSurface ? colors.textPrimary : colors.onBrand),
+            color:
+                color ??
+                (onSurface || onTile ? colors.textPrimary : colors.onBrand),
             mirrorInRtl: mirrorInRtl,
           ),
         ),

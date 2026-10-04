@@ -14,7 +14,11 @@ void main() {
           host(
             DabblerButton(
               label: d == TextDirection.ltr ? 'Continue' : 'المتابعة',
-              leadingWidget: const SizedBox(key: Key('mark'), width: 30, height: 30),
+              leadingWidget: const SizedBox(
+                key: Key('mark'),
+                width: 30,
+                height: 30,
+              ),
               onPressed: () {},
             ),
             direction: d,

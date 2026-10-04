@@ -473,12 +473,18 @@ void main() {
           DabblerCalendar.previousIconFor(TextDirection.ltr),
           'arrow-circle-left',
         );
-        expect(DabblerCalendar.nextIconFor(TextDirection.ltr), 'arrow-circle-right');
+        expect(
+          DabblerCalendar.nextIconFor(TextDirection.ltr),
+          'arrow-circle-right',
+        );
         expect(
           DabblerCalendar.previousIconFor(TextDirection.rtl),
           'arrow-circle-right',
         );
-        expect(DabblerCalendar.nextIconFor(TextDirection.rtl), 'arrow-circle-left');
+        expect(
+          DabblerCalendar.nextIconFor(TextDirection.rtl),
+          'arrow-circle-left',
+        );
       },
     );
 
@@ -717,24 +723,25 @@ void main() {
       }
     });
 
-    testWidgets('the weekday label is --muted as the frame draws it (textTertiary)', (
-      WidgetTester tester,
-    ) async {
-      // Live `Calendar.jsx:46` — `color: var(--muted)`; the Home Feed frame
-      // draws the weekday header in that grey (CXO close-out ruling), which is
-      // textTertiary in light.
-      await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
-      final Text label = tester.widget<Text>(
-        find.descendant(
-          of: find.byKey(DabblerCalendar.weekdayKey(DateTime.monday)),
-          matching: find.byType(Text),
-        ),
-      );
-      final DabblerColors c = colorsFor();
-      expect(label.style!.color, c.textTertiary);
-      expect(label.style!.fontSize, 11);
-      expect(label.style!.fontWeight, FontWeight.w600);
-    });
+    testWidgets(
+      'the weekday label is --muted as the frame draws it (textTertiary)',
+      (WidgetTester tester) async {
+        // Live `Calendar.jsx:46` — `color: var(--muted)`; the Home Feed frame
+        // draws the weekday header in that grey (CXO close-out ruling), which is
+        // textTertiary in light.
+        await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
+        final Text label = tester.widget<Text>(
+          find.descendant(
+            of: find.byKey(DabblerCalendar.weekdayKey(DateTime.monday)),
+            matching: find.byType(Text),
+          ),
+        );
+        final DabblerColors c = colorsFor();
+        expect(label.style!.color, c.textTertiary);
+        expect(label.style!.fontSize, 11);
+        expect(label.style!.fontWeight, FontWeight.w600);
+      },
+    );
 
     testWidgets('an outside day is the only sub-4.5 foreground, and is inert', (
       WidgetTester tester,

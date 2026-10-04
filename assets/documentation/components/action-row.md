@@ -50,6 +50,7 @@ Surface: sunken, with the 12px large radius. Ink: primary, secondary for the not
 ## Change log
 
 - Added from the Home Feed design file.
+- KAN-429 (Meetups) — adds `selected`: the brand fill, on-brand ink and a bold glyph, the meetup RSVP sheet's chosen answer.
 
 ## Source
 
