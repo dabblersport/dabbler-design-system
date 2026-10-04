@@ -44,7 +44,7 @@ ignores it and selects that card. A null `onChanged` disables the card.
 
 ### Layout
 `row` — glyph, caption, title and subtitle, with a radio-style check at the inline end. `tile` —
-glyph over a short label, with a small check in the top inline-end corner while selected. `listRow` — a one-line option: glyph, one label and the check, centred in a row at least 63 tall (the primary-sport step). `stacked` — a centred glyph over a label with the check after it, at least 96 tall (the gender step).
+glyph over a short label, with a small check in the top inline-end corner while selected. `listRow` — a one-line option: glyph, one label and the check, centred in a row with a minimum height (the primary-sport step). `stacked` — a centred glyph over a label with the check after it, with a larger minimum height (the gender step).
 
 ### Selected
 Idle: a tinted fill with a tinted hairline border and an empty `record` glyph. Selected: a doubled border in

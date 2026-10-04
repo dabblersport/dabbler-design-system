@@ -32,7 +32,7 @@ A running setup and a failed one — see `progress_stages_gallery.dart`'s *Progr
 ## Axes
 
 ### Status
-Pending: a small grey dot and a label faded to 45%. Running: a small spinner and a semibold label. Done: a bold success tick. Failed: a bold danger glyph in the error colour and a semibold label.
+Pending: a small grey dot and a faded label. Running: a small spinner and a semibold label. Done: a bold success tick. Failed: a bold danger glyph in the error colour and a semibold label.
 
 ### Direction
 The glyph sits at the inline start.
