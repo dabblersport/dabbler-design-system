@@ -157,6 +157,7 @@ class DabblerInputRow extends StatelessWidget {
     this.trailingChips,
     this.flat = false,
     this.showDivider = true,
+    this.dense = false,
   }) : assert(
          title == null || titleSpan == null,
          'Pass title or titleSpan, not both.',
@@ -339,6 +340,21 @@ class DabblerInputRow extends StatelessWidget {
   /// its own separators.
   final bool showDivider;
 
+  /// The Settings rhythm (`Settings.dc.html`, the row): a 15/20 title over a
+  /// 12/17 subtitle with a 2-point gap, in a row at least 56 tall. Off by
+  /// default, which keeps the `InputRow.jsx` 22.5/19.5 leading.
+  final bool dense;
+
+  /// `min-height: 56px` of the dense row (`Settings.dc.html`) — border-box, so
+  /// the body floor is 56 less the two 12-point paddings.
+  static const double denseMinHeight = 56 - 2 * DabblerSpacing.space4;
+
+  /// The dense title's line height (`line-height: 20px`).
+  static const double denseTitleLeading = 20;
+
+  /// The dense subtitle's line height (`line-height: 17px`).
+  static const double denseSubtitleLeading = 17;
+
   /// `padding:12px 0` (`Listings.dc.html:330`) — the [flat] row's padding.
   static const EdgeInsetsDirectional flatPadding =
       EdgeInsetsDirectional.symmetric(vertical: DabblerSpacing.space4);
@@ -421,10 +437,20 @@ class DabblerInputRow extends StatelessWidget {
 
     Widget? firstLine;
     if (title != null || titleSpan != null) {
-      final TextStyle style = titleStyleFor(direction).copyWith(
-        color: danger ?? colors.textPrimary,
-        fontWeight: destructive ? DabblerType.semibold : null,
-      );
+      final TextStyle style =
+          (dense
+                  ? DabblerType.subheadline
+                        .resolveForDirection(direction)
+                        .copyWith(
+                          height:
+                              denseTitleLeading /
+                              DabblerType.subheadline.fontSize,
+                        )
+                  : titleStyleFor(direction))
+              .copyWith(
+                color: danger ?? colors.textPrimary,
+                fontWeight: destructive ? DabblerType.semibold : null,
+              );
       firstLine = titleSpan != null
           ? Text.rich(
               TextSpan(style: style, children: <InlineSpan>[titleSpan!]),
@@ -459,7 +485,9 @@ class DabblerInputRow extends StatelessWidget {
       // The floor sits outside the padding for the same reason it does in
       // `field_shell.dart`: the surface's height is its child's height, so 45
       // here is 45 on screen.
-      constraints: const BoxConstraints(minHeight: minHeight),
+      constraints: BoxConstraints(
+        minHeight: dense ? denseMinHeight : minHeight,
+      ),
       child: Row(
         children: <Widget>[
           if (leading != null) ...<Widget>[
@@ -484,13 +512,23 @@ class DabblerInputRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   ?firstLine,
+                  if (dense && subtitle != null && firstLine != null)
+                    const SizedBox(height: 2),
                   if (subtitle != null)
                     Text(
                       subtitle!,
                       // D-003: the source's `--subtle` is not a text colour.
-                      style: subtitleStyleFor(
-                        direction,
-                      ).copyWith(color: danger ?? colors.textSecondary),
+                      style:
+                          (dense
+                                  ? DabblerType.caption1
+                                        .resolveForDirection(direction)
+                                        .copyWith(
+                                          height:
+                                              denseSubtitleLeading /
+                                              DabblerType.caption1.fontSize,
+                                        )
+                                  : subtitleStyleFor(direction))
+                              .copyWith(color: danger ?? colors.textSecondary),
                     ),
                 ],
               ),

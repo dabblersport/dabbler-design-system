@@ -75,6 +75,8 @@ ruled defect, not current behaviour.** The design draws the chevron lighter than
 beside it; the shipped component currently paints both the same weight, which is a real fidelity
 loss pending a fix. See *Change log*.
 
+**Dense is the Settings rhythm.** Pass `dense: true` for the Settings rows: a 15/20 title over a 12/17 subtitle with a 2-point gap, in a row at least 56 tall. It changes the rhythm only; slots, tone and semantics are unchanged.
+
 ## Axes
 
 ### Content
@@ -155,6 +157,7 @@ shared tokens and primitives every other tappable surface reads.
 - DS gaps 6 — `flat` and `showDivider` added. The chevron's glyphs corrected to the bare
   chevron and its measured mirror; the previous pair drew a boxed chevron in one direction and a
   shafted arrow in the other.
+- Added `dense`, the Settings row rhythm.
 
 ## Source
 
