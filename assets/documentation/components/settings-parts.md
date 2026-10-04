@@ -14,6 +14,8 @@ Sources  : lib/src/layout/settings_parts.dart
 
 The two parts a Settings page is built from. SettingsHeader is the tinted hero at the top of the root page; RowGroup is a titled card of rows divided by hairlines.
 
+ColorDots is a row of small round dots for previewing a palette.
+
 ## Specimen
 
 The hero with its version pill, title and identity row, and a group with a toggle row and a destructive row — see `settings_parts_gallery.dart`.
