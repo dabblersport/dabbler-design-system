@@ -81,6 +81,7 @@ class DabblerOnColorIconButton extends StatelessWidget {
     this.selected,
     this.focusNode,
     this.autofocus = false,
+    this.onSurface = false,
   });
 
   /// The fill's alpha over [DabblerColors.onBrand] — `rgba(255,255,255,0.18)`
@@ -119,6 +120,12 @@ class DabblerOnColorIconButton extends StatelessWidget {
   /// the button is not a toggle.
   final bool? selected;
 
+  /// Draws the circle as the page surface with an ink glyph, for a button that
+  /// sits on a photograph rather than on a colour band — the venue gallery's
+  /// back and favourite buttons (`Details.dc.html:405-412`, `background:
+  /// var(--surface-page)`). Default false: the translucent on-colour wash.
+  final bool onSurface;
+
   /// An external focus node.
   final FocusNode? focusNode;
 
@@ -136,7 +143,7 @@ class DabblerOnColorIconButton extends StatelessWidget {
 
     Widget circle = DecoratedBox(
       decoration: BoxDecoration(
-        color: fillOf(colors),
+        color: onSurface ? colors.bgPrimary : fillOf(colors),
         borderRadius: DabblerRadius.pillAll,
       ),
       child: SizedBox.square(
@@ -146,7 +153,7 @@ class DabblerOnColorIconButton extends StatelessWidget {
             icon,
             weight: weight,
             size: glyphSize,
-            color: color ?? colors.onBrand,
+            color: color ?? (onSurface ? colors.textPrimary : colors.onBrand),
             mirrorInRtl: mirrorInRtl,
           ),
         ),

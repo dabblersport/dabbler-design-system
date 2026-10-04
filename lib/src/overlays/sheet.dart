@@ -114,6 +114,7 @@ class DabblerSheet extends StatefulWidget {
     this.detent = DabblerSheetDetent.fractions,
     this.contentMaxFraction = defaultContentMaxFraction,
     this.pageBackground = false,
+    this.showCloseButton = true,
   });
 
   /// The default cap of a [DabblerSheetDetent.content] sheet: 0.8 of the
@@ -229,6 +230,11 @@ class DabblerSheet extends StatefulWidget {
   /// Feed design's sheets all override `background` to `--surface-page`
   /// (`Home Feed.dc.html:3051`, `sheetPAuto`).
   final bool pageBackground;
+
+  /// Draws the header's close button. The Home Feed design's sheets draw none:
+  /// they put their own Done / Cancel button in the body (`:763-770`). The scrim
+  /// and the drag still dismiss.
+  final bool showCloseButton;
 
   @override
   State<DabblerSheet> createState() => _DabblerSheetState();

@@ -66,6 +66,7 @@ warning status base. Hairline: `borderDefault`. Gaps: the 12 stack gap and 6/9 s
 ## Change log
 
 - Alpha DS gaps 6 — adds this component, from `Listings.dc.html:750-820`.
+- Alpha fidelity rebuild (KAN-426) — adds the `sports` and `facilities` rows and `facility()`, from `Listings.dc.html:795-808`.
 
 ## Source
 

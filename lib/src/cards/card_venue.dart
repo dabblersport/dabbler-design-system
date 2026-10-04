@@ -79,6 +79,8 @@ class DabblerCardVenue extends StatelessWidget {
     this.area,
     this.distance,
     this.tags = const <Widget>[],
+    this.sports = const <Widget>[],
+    this.facilities = const <Widget>[],
     this.favourite,
     this.price,
     this.priceCaption,
@@ -104,6 +106,13 @@ class DabblerCardVenue extends StatelessWidget {
 
   /// The tag row: rating, distance and badge chips, sport chips. Wraps.
   final List<Widget> tags;
+
+  /// The sports row under [tags] — outlined chips (`Listings.dc.html:795-799`).
+  final List<Widget> sports;
+
+  /// The facilities row — [facility] entries (`Listings.dc.html:801-808`).
+  /// Wraps.
+  final List<Widget> facilities;
 
   /// The favourite action, at the inline end of the name.
   final Widget? favourite;
@@ -152,6 +161,10 @@ class DabblerCardVenue extends StatelessWidget {
     reviews: reviews,
     semanticLabel: semanticLabel,
   );
+
+  /// One facility: a brand-ink glyph and a caption (`Listings.dc.html:803-806`).
+  static Widget facility({Key? key, required String icon, required String label}) =>
+      _Facility(key: key, icon: icon, label: label);
 
   /// The default accessible name: name, place and price.
   String get defaultSemanticLabel => <String>[
@@ -296,6 +309,20 @@ class DabblerCardVenue extends StatelessWidget {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: tags,
             ),
+          if (sports.isNotEmpty)
+            Wrap(
+              spacing: DabblerSpacing.space2,
+              runSpacing: DabblerSpacing.space2,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: sports,
+            ),
+          if (facilities.isNotEmpty)
+            Wrap(
+              spacing: DabblerSpacing.space5,
+              runSpacing: DabblerSpacing.space2,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: facilities,
+            ),
           ?priceRow,
         ],
       ),
@@ -352,6 +379,32 @@ class _Rating extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _Facility extends StatelessWidget {
+  const _Facility({super.key, required this.icon, required this.label});
+
+  final String icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    final TextDirection direction = Directionality.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: DabblerSpacing.space1,
+      children: <Widget>[
+        DabblerIcon(icon, size: DabblerSizing.iconInline, color: colors.brandPrimary),
+        Text(
+          label,
+          style: DabblerType.caption1
+              .resolveForDirection(direction)
+              .copyWith(color: colors.textSecondary),
+        ),
+      ],
     );
   }
 }

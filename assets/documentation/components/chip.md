@@ -32,6 +32,10 @@ Selected, unselected, and a leading-icon variant — see `chip_gallery.dart`'s *
 
 @specimen chip
 
+**Use `compact` for a static facility tag.** Sunken fill, 13/18 label, brand glyph.
+
+@specimen chip/compact
+
 ## Using it
 
 **Never hardcode white for a selected chip's label.** Use the shared on-brand ink role instead. In

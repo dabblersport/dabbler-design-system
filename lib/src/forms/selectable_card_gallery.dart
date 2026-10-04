@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_hue_tone.dart';
 import 'selectable_card.dart';
 
 /// SelectableCard specimens.
@@ -27,7 +28,7 @@ const List<GalleryEntry> selectableCardGalleryEntries = <GalleryEntry>[
 
 const double _width = 300;
 
-Widget _cards(BuildContext context) => const GalleryStack(
+Widget _cards(BuildContext context) => GalleryStack(
   children: <Widget>[
     GallerySpecimen(
       label: 'row — tap to choose one',
@@ -48,8 +49,71 @@ Widget _cards(BuildContext context) => const GalleryStack(
         ),
       ),
     ),
+    GallerySpecimen(
+      label: 'listRow with a per-sport tone — idle, then selected',
+      child: SizedBox(
+        width: _width,
+        child: Column(
+          children: <Widget>[
+            DabblerSelectableCard(
+              layout: DabblerSelectableCardLayout.listRow,
+              icon: 'game',
+              title: 'Football',
+              tone: _football,
+              selected: true,
+              onChanged: _noop,
+            ),
+            SizedBox(height: DabblerSpacing.space3),
+            DabblerSelectableCard(
+              layout: DabblerSelectableCardLayout.listRow,
+              icon: 'game',
+              title: 'Padel',
+              tone: _padel,
+              onChanged: _noop,
+            ),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'stacked with the gender tones — selected, then idle',
+      child: SizedBox(
+        width: _width,
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: DabblerSelectableCard(
+                layout: DabblerSelectableCardLayout.stacked,
+                icon: 'man',
+                title: 'Male',
+                tone: _male,
+                selected: true,
+                onChanged: _noop,
+              ),
+            ),
+            SizedBox(width: DabblerSpacing.space4),
+            Expanded(
+              child: DabblerSelectableCard(
+                layout: DabblerSelectableCardLayout.stacked,
+                icon: 'woman',
+                title: 'Female',
+                tone: _female,
+                onChanged: _noop,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
   ],
 );
+
+final DabblerHueTone _football = DabblerHueTone.forSportKey('football');
+final DabblerHueTone _padel = DabblerHueTone.forSportKey('padel');
+final DabblerHueTone _male = DabblerHueTone.gender(DabblerHueTone.maleHue);
+final DabblerHueTone _female = DabblerHueTone.gender(DabblerHueTone.femaleHue);
+
+void _noop(bool _) {}
 
 class _PersonaDemo extends StatefulWidget {
   const _PersonaDemo();
