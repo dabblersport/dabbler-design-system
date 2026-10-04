@@ -69,6 +69,7 @@ chosen size. The chosen chip is brought into view without animation.
 
 ## Change log
 
+- KAN-426 (round 2) — the scroll area keeps at least one hairline (`edgeInset`, 1) of inline padding, so a chip's border is never painted on the clip edge and cut (seen on the first chip of an RTL rail). A wider gutter is untouched.
 - KAN-426 (Seat B) — adds this component.
 - KAN-426 (close) — adds `gap` (default 6; the Auth display-name suggestion rail draws 9, `Auth and Onboarding.dc.html:435`).
 - KAN-426 (close) — revealing the chosen chip scrolls only the rail's own viewport; it no longer scrolls the page that holds the rail.

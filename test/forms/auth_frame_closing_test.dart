@@ -36,11 +36,14 @@ void main() {
         expect(s.fontSize, DabblerType.small.resolveForDirection(dir).fontSize);
         expect(s.height! * s.fontSize!, closeTo(rtl ? 22 : 20, 1e-6));
         if (!rtl) {
-          // 21 + 3 + 23 + 3 + 20 = 70, the frame's text column (`:381-384`).
+          // caption (natural leading) + 3 + 23 + 3 + 20, the frame's text
+          // column (`:381-384`); the caption no longer takes the body's 21.
+          final double caption = tester.getRect(find.text('PLAYER')).height;
+          expect(caption, lessThan(21));
           expect(
             tester.getRect(find.text(sub)).bottom -
                 tester.getRect(find.text('PLAYER')).top,
-            closeTo(70, 0.5),
+            closeTo(caption + 3 + 23 + 3 + 20, 0.5),
           );
         }
       });

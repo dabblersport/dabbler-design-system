@@ -335,18 +335,13 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
                 if (widget.caption != null)
                   Text(
                     widget.caption!.toUpperCase(),
-                    // The source sets no size on the caption or the hook, so
-                    // both inherit the 16px body step (`:379-380`). Tracking
-                    // is `0.06em`, dropped under RTL where it breaks joining.
-                    style: DabblerType.body
-                        .resolveForDirection(direction)
-                        .copyWith(
-                          color: paint.glyph,
-                          fontWeight: DabblerType.semibold,
-                          letterSpacing: direction == TextDirection.ltr
-                              ? DabblerSelectableCard.captionTracking
-                              : 0,
-                        ),
+                    // The caption sets no size and no line-height
+                    // (`:379`): it inherits the page's 16px and the
+                    // browser's `normal` leading, which is the font's own
+                    // metrics, not the body step's 21. Latin draws that;
+                    // Arabic keeps the body's 24. Tracking is `0.06em`,
+                    // dropped under RTL where it breaks joining.
+                    style: _caption(direction, paint.glyph),
                   ),
                 Text(
                   widget.title,
@@ -384,6 +379,25 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
                     ? DabblerSizing.borderDefault * 2
                     : DabblerSizing.borderDefault)
       : outer;
+
+  TextStyle _caption(TextDirection direction, Color color) {
+    final TextStyle s = DabblerType.body.resolveForDirection(direction);
+    if (direction == TextDirection.rtl) {
+      return s.copyWith(color: color, fontWeight: DabblerType.semibold);
+    }
+    // `height` left unset is the font's natural line height, CSS `normal`.
+    return TextStyle(
+      inherit: false,
+      color: color,
+      fontFamily: s.fontFamily,
+      fontFamilyFallback: s.fontFamilyFallback,
+      fontSize: s.fontSize,
+      fontWeight: DabblerType.semibold,
+      letterSpacing: DabblerSelectableCard.captionTracking,
+      fontFeatures: s.fontFeatures,
+      leadingDistribution: TextLeadingDistribution.even,
+    );
+  }
 
   TextStyle _rowHook(TextDirection direction) {
     final TextStyle s = DabblerType.body.resolveForDirection(direction);

@@ -45,7 +45,7 @@ void main() {
           .map((Widget w) => tester.getSize(find.byWidget(w)))
           .toList();
       expect(sizes.map((Size s) => s.width).toSet().length, 1);
-      expect(sizes.first.height, DabblerSpacing.space1);
+      expect(sizes.first.height, DabblerStepProgress.defaultSegmentHeight);
     });
 
     testWidgets('semantics reads the label and value', (

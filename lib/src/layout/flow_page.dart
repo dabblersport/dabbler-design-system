@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '../controls/button.dart';
+import '../foundations/icon.dart';
+import '../interaction/focus_ring.dart';
 import '../tokens/dabbler_colors.dart';
 import '../navigation/step_progress.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -318,14 +320,7 @@ class DabblerFlowPage extends StatelessWidget {
             ),
             child: Align(
               alignment: AlignmentDirectional.centerStart,
-              child: DabblerButton.icon(
-                icon: 'arrow-circle-left',
-                mirrorInRtl: true,
-                iconGlyphSize: backGlyphSize,
-                tone: DabblerButtonTone.text,
-                semanticLabel: backLabel!,
-                onPressed: onBack,
-              ),
+              child: _FlowBackButton(label: backLabel!, onPressed: onBack!),
             ),
           ),
         if (!centered) header,
@@ -384,6 +379,50 @@ class DabblerFlowPage extends StatelessWidget {
           background!,
           SafeArea(child: constrained),
         ],
+      ),
+    );
+  }
+}
+
+/// The flow page's back control: exactly a 45x45 square (the frame's
+/// `width:45px;height:45px`) holding the 24px `arrow-circle-left`, with no
+/// horizontal padding, so the glyph is centred 22.5 in from the box edge. The
+/// page seats the box 12 from the screen edge (the frame's `margin-left:-12px`
+/// inside its 24px gutter). It replaces the icon [DabblerButton], whose box
+/// was 64 wide.
+class _FlowBackButton extends StatelessWidget {
+  const _FlowBackButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      onTap: onPressed,
+      child: DabblerFocusRing(
+        enabled: true,
+        canRequestFocus: true,
+        borderRadius: DabblerRadius.pillAll,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onPressed,
+          child: SizedBox(
+            width: DabblerSizing.touchTargetMin,
+            height: DabblerSizing.touchTargetMin,
+            child: Center(
+              child: DabblerIcon(
+                'arrow-circle-left',
+                mirrorInRtl: true,
+                size: DabblerFlowPage.backGlyphSize,
+                color: DabblerColors.of(context).textPrimary,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

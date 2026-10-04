@@ -398,6 +398,15 @@ Widget _textFieldVariants(BuildContext context) => _sections(<Widget>[
         ),
       ),
       _field(
+        'password with mutedPasswordToggle',
+        const DabblerTextField(
+          label: 'Password',
+          variant: DabblerTextFieldVariant.password,
+          initialValue: 'hunter2',
+          mutedPasswordToggle: true,
+        ),
+      ),
+      _field(
         'select shell — open',
         const DabblerTextField(
           label: 'Sport',

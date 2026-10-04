@@ -145,7 +145,12 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
           _PasswordToggle(
             revealed: _reveal,
             enabled: !disabled,
-            color: colors.textSecondary,
+            color: widget.mutedPasswordToggle
+                ? colors.textTertiary
+                : colors.textSecondary,
+            glyphSize: widget.mutedPasswordToggle
+                ? DabblerTextField.mutedPasswordToggleGlyphSize
+                : DabblerSizing.iconMd,
             onPressed: _toggleReveal,
           )
         else if (showLoading)

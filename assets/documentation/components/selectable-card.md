@@ -69,6 +69,7 @@ glyph and a 14px tile check. The nearest tokens are used: the 10%/28% tint,
 
 ## Change log
 
+- KAN-426 (round 2) — the persona row's caption takes the font's natural leading (CSS `normal`, as the frame inherits) instead of the body step's 21, which made the card about 3px taller than the frame. Latin only; Arabic keeps the body's 24. The caption exists only on the row layout, so no other layout moves.
 - KAN-426 (final) — adds `borderOutside` (default false): the persona row and the sport tile grow by twice their border (1px idle, 2px selected, as the frame does); `listRow` and `stacked` keep their outer 63 and 96 minimum, because `min-height` under `border-box` includes the border.
 - Alpha DS gaps 5 — adds this component.
 - KAN-426 (close) — text roles follow the frames: persona subtitle `small` (14/20) with 3px between the lines and the hook at 16/23, list-row title `rowTitle` (17/23), stacked label `copy` medium (15/21), tile label `tagTight` medium (11/14). Previously `footnote`, `callout`, `subheadline` and `caption2`.

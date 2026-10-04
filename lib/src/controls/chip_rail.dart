@@ -139,6 +139,10 @@ class DabblerChipRail extends StatefulWidget {
   /// The fade's width — [DabblerSpacing.space8] (24).
   static const double fadeExtent = DabblerSpacing.space8;
 
+  /// The least inline padding the scroll area keeps, one hairline
+  /// ([DabblerSizing.borderDefault]), so a chip at the rail's edge is not cut.
+  static const double edgeInset = DabblerSizing.borderDefault;
+
   /// Finds the scrollable in a test.
   static const Key scrollKey = ValueKey<String>('dabbler-chip-rail-scroll');
 
@@ -243,6 +247,22 @@ class DabblerChipRailState extends State<DabblerChipRail> {
     return false;
   }
 
+  /// [DabblerChipRail.padding] with at least [DabblerChipRail.edgeInset] on
+  /// each inline side, so a chip's 1px hairline never sits on the scroll
+  /// view's clip (or the fade layer's rounded bounds) and gets cut there. A
+  /// gutter wider than the floor is untouched.
+  EdgeInsets _clipSafe(BuildContext context, EdgeInsetsGeometry padding) {
+    final EdgeInsets p = padding.resolve(Directionality.of(context));
+    return p.copyWith(
+      left: p.left < DabblerChipRail.edgeInset
+          ? DabblerChipRail.edgeInset
+          : p.left,
+      right: p.right < DabblerChipRail.edgeInset
+          ? DabblerChipRail.edgeInset
+          : p.right,
+    );
+  }
+
   Widget _chip(int i) {
     final DabblerChipRailItem item = widget.items[i];
     return KeyedSubtree(
@@ -286,7 +306,7 @@ class DabblerChipRailState extends State<DabblerChipRail> {
       key: DabblerChipRail.scrollKey,
       controller: _controller,
       scrollDirection: Axis.horizontal,
-      padding: widget.padding,
+      padding: _clipSafe(context, widget.padding),
       child: content,
     );
 

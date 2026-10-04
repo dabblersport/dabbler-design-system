@@ -93,9 +93,11 @@ class _PasswordToggle extends StatelessWidget {
     required this.revealed,
     required this.enabled,
     required this.color,
+    required this.glyphSize,
     required this.onPressed,
   });
 
+  final double glyphSize;
   final bool revealed;
   final bool enabled;
   final Color color;
@@ -118,7 +120,7 @@ class _PasswordToggle extends StatelessWidget {
               revealed
                   ? DabblerTextField.concealIconName
                   : DabblerTextField.revealIconName,
-              size: DabblerSizing.iconMd,
+              size: glyphSize,
               color: color,
             ),
           ),

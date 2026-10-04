@@ -131,6 +131,7 @@ class DabblerTextField extends StatefulWidget {
     this.loading = false,
     this.borderOutside = false,
     this.circledSelectArrow = false,
+    this.mutedPasswordToggle = false,
   }) : assert(
          controller == null || initialValue == null,
          'give a controller or an initialValue, not both',
@@ -177,6 +178,18 @@ class DabblerTextField extends StatefulWidget {
   /// field), as the Auth and Onboarding frame draws it. See
   /// [DabblerFieldShell.borderOutside]. Default false.
   final bool borderOutside;
+
+  /// Whether the password variant's visibility toggle is drawn light and
+  /// small, as the Auth frames draw it: the glyph in
+  /// [DabblerColors.textTertiary] at [mutedPasswordToggleGlyphSize] (20)
+  /// instead of [DabblerColors.textSecondary] at 24. The 45x45 target is
+  /// unchanged. The glyph is not text, which is the D-027 carve-out for
+  /// non-informational affordance glyphs. Default false. Ignored by the other
+  /// variants.
+  final bool mutedPasswordToggle;
+
+  /// The glyph size of a [mutedPasswordToggle], `20`.
+  static const double mutedPasswordToggleGlyphSize = 20;
 
   /// Whether a [DabblerTextFieldVariant.select] draws the circled chevron
   /// ([selectArrowCircledName] / [selectArrowOpenCircledName]) instead of the
