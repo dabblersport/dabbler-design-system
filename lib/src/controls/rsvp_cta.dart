@@ -43,8 +43,9 @@ enum DabblerRsvpCtaState {
   /// The viewer cannot see this meetup: inert, the sunken fill.
   notVisible(_Look.inert, null, false),
 
-  /// The viewer's persona cannot join: inert, the sunken fill.
-  notAllowed(_Look.inert, null, false);
+  /// The viewer's persona cannot join: the sunken fill, but still a press — it
+  /// takes the viewer to switch profile.
+  notAllowed(_Look.inert, null, true);
 
   const DabblerRsvpCtaState(this._look, this.glyph, this.interactive);
 

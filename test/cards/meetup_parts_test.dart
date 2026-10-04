@@ -202,7 +202,11 @@ void main() {
         DabblerRsvpCtaState.notAllowed,
       ]) {
         expect(DabblerRsvpCta.fillOf(c, s), c.surfaceSunken, reason: s.name);
-        expect(s.interactive, isFalse);
+        expect(
+          s.interactive,
+          s == DabblerRsvpCtaState.notAllowed,
+          reason: s.name,
+        );
       }
     });
 

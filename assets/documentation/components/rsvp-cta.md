@@ -22,7 +22,7 @@ All eleven states, and the card size — see `meetup_parts_gallery.dart`.
 
 ## Using it
 
-**Pass the state, not a colour.** Going is the success status, interested and full the warning status, pending the info status, cancelled the error status; closed, started, not visible and not allowed are the inert sunken pill.
+**Pass the state, not a colour.** Going is the success status, interested and full the warning status, pending the info status, cancelled the error status; closed, started and not visible are the inert sunken pill, and not allowed is the same pill but still takes a press (it sends the viewer to switch profile).
 
 **Let the label carry the meaning.** The glyph and colour only reinforce it.
 
@@ -31,7 +31,7 @@ All eleven states, and the card size — see `meetup_parts_gallery.dart`.
 ## Axes
 
 ### State
-Eleven, listed above. Six take a press and five are inert.
+Eleven, listed above. Seven take a press and four are inert.
 
 ### Size
 `bar` and `card`: the bar's pill is the full button height, the card's is the touch-target minimum.
