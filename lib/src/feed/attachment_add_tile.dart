@@ -11,7 +11,8 @@ import 'feed_atoms.dart';
 ///
 /// Transcribed from `Post.dc.html` (alpha-plan design set) line 541: 56 wide,
 /// 95 high, `--radius-lg`, 1px dashed `--outline-card`, `gallery` 20 over
-/// `Add` 11/14 600, all `--muted`.
+/// `Add` 11/14 600, all `--muted`; and, with [dashed] false, the 64 x 128
+/// solid add tile of the Create post media rail (`Home Feed.dc.html:523`).
 ///
 /// ## Deviations
 ///
@@ -24,13 +25,30 @@ class DabblerAttachmentAddTile extends StatelessWidget {
   /// An add tile.
   const DabblerAttachmentAddTile({
     super.key,
-    required this.label,
+    required this.semanticLabel,
     required this.onTap,
+    this.label,
     this.icon = 'gallery',
+    this.dashed = true,
+    this.tileWidth = width,
+    this.tileHeight = height,
   });
 
-  /// The word under the glyph, also the button's name.
-  final String label;
+  /// The button's accessible name.
+  final String semanticLabel;
+
+  /// The word under the glyph; null draws the glyph alone.
+  final String? label;
+
+  /// Dashed hairline (`Post.dc.html:541`); false draws the solid card tile of
+  /// `Home Feed.dc.html:523` (card fill, 1px hairline, `add` 22).
+  final bool dashed;
+
+  /// Tile width — 56 dashed, 64 solid in the designs.
+  final double tileWidth;
+
+  /// Tile height — 96 dashed, 128 solid in the designs.
+  final double tileHeight;
 
   /// Adds an attachment; null draws the tile inert.
   final VoidCallback? onTap;
@@ -50,30 +68,48 @@ class DabblerAttachmentAddTile extends StatelessWidget {
     final TextDirection dir = Directionality.of(context);
     return DabblerFeedTappable(
       onTap: onTap,
-      semanticLabel: label,
+      semanticLabel: semanticLabel,
       excludeChildSemantics: true,
       borderRadius: DabblerRadius.lgAll,
       child: CustomPaint(
-        painter: _DashedBorder(colors.borderDefault),
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              DabblerIcon(icon, size: 20, color: colors.textSecondary),
-              const SizedBox(height: DabblerSpacing.space1),
-              Text(
-                label,
-                maxLines: 1,
-                style: DabblerType.caption1
-                    .resolveForDirection(dir)
-                    .copyWith(
-                      color: colors.textSecondary,
-                      fontWeight: DabblerType.semibold,
-                    ),
-              ),
-            ],
+        painter: dashed ? _DashedBorder(colors.borderDefault) : null,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: dashed ? null : colors.surfaceCard,
+            borderRadius: DabblerRadius.lgAll,
+            border: dashed
+                ? null
+                : Border.all(
+                    color: colors.borderDefault,
+                    width: DabblerSizing.borderDefault,
+                  ),
+          ),
+          child: SizedBox(
+            width: tileWidth,
+            height: tileHeight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                DabblerIcon(
+                  icon,
+                  size: label == null ? 22 : 20,
+                  color: colors.textSecondary,
+                ),
+                if (label != null) ...<Widget>[
+                  const SizedBox(height: DabblerSpacing.space1),
+                  Text(
+                    label!,
+                    maxLines: 1,
+                    style: DabblerType.caption1
+                        .resolveForDirection(dir)
+                        .copyWith(
+                          color: colors.textSecondary,
+                          fontWeight: DabblerType.semibold,
+                        ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),

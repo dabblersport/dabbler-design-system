@@ -75,7 +75,11 @@ void main() {
           multiline: true,
           canSendEmpty: true,
           counter: '82/280',
-          attachments: DabblerAttachmentAddTile(label: 'Add', onTap: () {}),
+          attachments: DabblerAttachmentAddTile(
+            semanticLabel: 'Add',
+            label: 'Add',
+            onTap: () {},
+          ),
         ),
       ),
     );

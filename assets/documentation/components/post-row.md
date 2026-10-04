@@ -40,6 +40,10 @@ The open post, `DabblerOpenPost`: the post a detail screen is about, laid out as
 
 @specimen post-row/open
 
+A game in the Link a game sheet, `DabblerGameLinkRow`: a date tile, the title with its sport glyph, the place and time, a status badge and a check when chosen.
+
+@specimen post-row/game-link
+
 A repost, `DabblerRepostRow`: the reposter's header and reposted line, an optional quote, and the original post embedded in a card, or a note when the original is unavailable.
 
 @specimen post-row/repost
