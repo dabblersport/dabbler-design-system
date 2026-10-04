@@ -384,7 +384,7 @@ class DabblerCalendar extends StatelessWidget {
   /// `gap: 4` between a chip's label and its caret (`Calendar.jsx:30`).
   static const double chipGap = 4;
 
-  /// `<Icon name="arrow-down-1" size={14} />` — the caret in a month/year chip
+  /// `<Icon name="arrow-circle-down" size={14} />` — the caret in a month/year chip
   /// (`Calendar.jsx:33`).
   static const double chipCaretSize = 14;
 
@@ -430,11 +430,11 @@ class DabblerCalendar extends StatelessWidget {
 
   /// The previous-month glyph for [direction] — see *RTL* fact 2.
   static String previousIconFor(TextDirection direction) =>
-      direction == TextDirection.rtl ? 'arrow-right-3' : 'arrow-left-2';
+      direction == TextDirection.rtl ? 'arrow-circle-right' : 'arrow-circle-left';
 
   /// The next-month glyph for [direction] — see *RTL* fact 2.
   static String nextIconFor(TextDirection direction) =>
-      direction == TextDirection.rtl ? 'arrow-left-2' : 'arrow-right-3';
+      direction == TextDirection.rtl ? 'arrow-circle-left' : 'arrow-circle-right';
 
   /// Any date inside the month to display. Only its year and month are read.
   ///
@@ -765,7 +765,7 @@ class DabblerCalendar extends StatelessWidget {
             ),
           ),
           DabblerIcon(
-            'arrow-down-1',
+            'arrow-circle-down',
             // `size={14}` (`Calendar.jsx:33`), transcribed at its live value.
             size: chipCaretSize,
             color: colors.textPrimary,

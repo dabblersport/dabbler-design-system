@@ -472,14 +472,14 @@ void main() {
       () {
         expect(
           DabblerCalendar.previousIconFor(TextDirection.ltr),
-          'arrow-left-2',
+          'arrow-circle-left',
         );
-        expect(DabblerCalendar.nextIconFor(TextDirection.ltr), 'arrow-right-3');
+        expect(DabblerCalendar.nextIconFor(TextDirection.ltr), 'arrow-circle-right');
         expect(
           DabblerCalendar.previousIconFor(TextDirection.rtl),
-          'arrow-right-3',
+          'arrow-circle-right',
         );
-        expect(DabblerCalendar.nextIconFor(TextDirection.rtl), 'arrow-left-2');
+        expect(DabblerCalendar.nextIconFor(TextDirection.rtl), 'arrow-circle-left');
       },
     );
 
@@ -971,13 +971,13 @@ void main() {
             .dx;
         if (d == TextDirection.ltr) {
           expect(prevX, lessThan(nextX));
-          expect(prev.name, 'arrow-left-2');
-          expect(next.name, 'arrow-right-3');
+          expect(prev.name, 'arrow-circle-left');
+          expect(next.name, 'arrow-circle-right');
         } else {
           // Previous sits on the right (the start) and its glyph points right.
           expect(prevX, greaterThan(nextX));
-          expect(prev.name, 'arrow-right-3');
-          expect(next.name, 'arrow-left-2');
+          expect(prev.name, 'arrow-circle-right');
+          expect(next.name, 'arrow-circle-left');
         }
       }
     });
