@@ -156,7 +156,16 @@ class DabblerCard extends StatelessWidget {
     this.height,
     this.clipBehavior = Clip.antiAlias,
     this.fill,
+    this.borderOutside = false,
   });
+
+  /// Whether the variant's hairline sits **outside** the padded content, as
+  /// the web card draws it (`box-sizing: border-box` with a padding and no
+  /// explicit height: the border adds to the card). Default false — the
+  /// hairline is painted inside the box, exactly as every existing caller was
+  /// measured. See [DabblerSurface.borderOutside]; a borderless variant is
+  /// unaffected.
+  final bool borderOutside;
 
   /// Overrides the variant's fill — a decorative tint such as the Listings
   /// Upcoming card's tile tone. Null keeps the variant's own fill.
@@ -322,6 +331,7 @@ class DabblerCard extends StatelessWidget {
       fill: paint,
       borderColor: borderOf(colors, variant),
       borderWidth: borderWidthOf(variant),
+      borderOutside: borderOutside,
       radius: resolvedRadius,
       width: width,
       height: height,

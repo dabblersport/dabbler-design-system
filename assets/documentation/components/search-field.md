@@ -71,6 +71,7 @@ and placeholder — is `TextField`'s.
 
 ## Change log
 
+- KAN-426 (fidelity) — adds `borderOutside` (default false), forwarded to the text field: the Auth frame's search field is 47 high because the hairline adds to the box. Existing callers are unchanged.
 - KAN-412 — adds the inline clear button, `onCleared` and `clearLabel`, and this component.
   `TextField` gains `clearable` (off by default, so existing search fields are unchanged); the
   `select` build and the two trailing buttons moved to `text_field_parts.dart` to hold the

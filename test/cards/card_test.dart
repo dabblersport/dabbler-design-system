@@ -515,5 +515,34 @@ void main() {
         expect(DabblerCard.livePadding, isNot(DabblerSpacing.cardPadding));
       },
     );
+
+    for (final TextDirection dir in TextDirection.values) {
+      testWidgets('borderOutside grows a content-sized white card by twice the '
+          'hairline, in $dir', (WidgetTester tester) async {
+        final String label = dir == TextDirection.rtl ? 'مرحبا' : 'Hello';
+        Future<Size> sizeOf(bool outside) async {
+          await tester.pumpWidget(
+            _host(
+              DabblerCard(
+                variant: DabblerCardVariant.white,
+                borderOutside: outside,
+                padding: EdgeInsets.zero,
+                child: Text(label),
+              ),
+              textDirection: dir,
+            ),
+          );
+          return tester.getSize(find.byType(DabblerCard));
+        }
+
+        final Size inside = await sizeOf(false);
+        final Size outside = await sizeOf(true);
+        final double hairline = DabblerCard.borderWidthOf(
+          DabblerCardVariant.white,
+        );
+        expect(outside.height, inside.height + 2 * hairline);
+        expect(outside.width, inside.width + 2 * hairline);
+      });
+    }
   });
 }
