@@ -280,10 +280,10 @@ void main() {
   });
 
   group('AC2 — size, icon, fullWidth, disabled as modifiers', () {
-    test('the size enum is the three the source declares', () {
+    test('the size enum is the three the source declares plus block', () {
       expect(
         DabblerButtonSize.values.map((DabblerButtonSize s) => s.name).toList(),
-        <String>['full', 'medium', 'small'],
+        <String>['full', 'medium', 'small', 'block'],
       );
     });
 
@@ -878,5 +878,31 @@ void main() {
     // Both fit on one line: 9px apart.
     expect(rects[1].top, rects[0].top);
     expect(rects[1].left - rects[0].right, 9);
+  });
+
+  group('DabblerButtonSize.block', () {
+    testWidgets('is 45 tall, as wide as its parent, with the md corner', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const SizedBox(
+            width: 300,
+            child: DabblerButton(
+              label: 'Update email',
+              size: DabblerButtonSize.block,
+            ),
+          ),
+        ),
+      );
+      final Size size = tester.getSize(find.byType(DabblerButton));
+      expect(size.height, DabblerSizing.touchTargetMin);
+      expect(size.width, 300);
+      expect(
+        DabblerButton.radiusFor(DabblerButtonSize.block),
+        DabblerRadius.md,
+      );
+      expect(DabblerButton.fontSizeFor(DabblerButtonSize.block), 15);
+    });
   });
 }
