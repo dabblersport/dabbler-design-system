@@ -157,6 +157,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 
 ## Change log
 
+- Alpha fidelity (Settings, Notifications) — `DabblerNavigationAction.tone` (`neutral`/`brand`/`subtle`: the *Mark all read* tick is brand while something is unread, subtle once nothing is; `Notifications.dc.html:48, 561`), and `heroTint` on the titled bar (brand tint until the scroll controller passes `titleRevealOffset`, then page ground and a hairline; `Settings.dc.html:66, 1190-1191`).
 - `transparent` draws the bar with no ground of its own, so it sits on a tinted hero (Settings fidelity rebuild).
 - D-026 (cxo) — confirms the transcription's narrow anatomy is
   correct as built and refuses widening the API for a greeting-stack variant a different part of the

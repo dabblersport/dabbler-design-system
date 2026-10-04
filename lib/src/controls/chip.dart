@@ -124,10 +124,16 @@ class DabblerChip extends StatefulWidget {
     this.removeSemanticLabel,
     this.vibe,
     this.count,
+    this.trailingIcon,
   });
 
   /// The chip text. `label: string` in `Chip.d.ts`.
   final String label;
+
+  /// A glyph after the label — the quiet-hours pill's `arrow-circle-right`
+  /// (`Notifications.dc.html:226`, 14px). Drawn at 14 in the label's ink and
+  /// mirrored under RTL; the chip's semantics are unchanged.
+  final Widget? trailingIcon;
 
   /// Whether the chip is selected, which switches it to the brand-filled
   /// treatment. `selected?: boolean`, default `false`.
@@ -355,6 +361,15 @@ class _DabblerChipState extends State<DabblerChip> {
                       ),
                 ),
               ),
+            ),
+          ),
+        ],
+        if (widget.trailingIcon != null) ...<Widget>[
+          const SizedBox(width: DabblerChip.iconGap),
+          ExcludeSemantics(
+            child: IconTheme.merge(
+              data: IconThemeData(color: iconColor, size: 14),
+              child: widget.trailingIcon!,
             ),
           ),
         ],
