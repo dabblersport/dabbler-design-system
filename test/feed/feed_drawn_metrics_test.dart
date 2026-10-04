@@ -341,6 +341,43 @@ void main() {
         expect(less.center.dy - list.bottom, closeTo(6 + 16, 3));
       });
 
+      testWidgets('the folded strip fills with the faint step (bgTertiary), '
+          'light and dark', (WidgetTester tester) async {
+        for (final Brightness b in Brightness.values) {
+          final DabblerColors c = DabblerColors.resolve(
+            theme: DabblerTheme.main,
+            brightness: b,
+          );
+          await tester.pumpWidget(
+            MaterialApp(
+              theme: ThemeData(extensions: <ThemeExtension<dynamic>>[c]),
+              home: Directionality(
+                textDirection: dir,
+                child: Scaffold(
+                  body: SizedBox(width: 360, child: reminder(collapsed: true)),
+                ),
+              ),
+            ),
+          );
+          await tester.pump(const Duration(seconds: 1));
+          final Iterable<BoxDecoration> fills = tester
+              .widgetList<DecoratedBox>(
+                find.ancestor(
+                  of: find.byType(DabblerIcon),
+                  matching: find.byType(DecoratedBox),
+                ),
+              )
+              .map((DecoratedBox d) => d.decoration)
+              .whereType<BoxDecoration>();
+          expect(
+            fills.any((BoxDecoration d) => d.color == c.bgTertiary),
+            isTrue,
+            reason:
+                'in $b: ${fills.map((BoxDecoration d) => d.color).toList()} want ${c.bgTertiary}',
+          );
+        }
+      });
+
       testWidgets('the folded strip is 30 high with physical 9 / 6 padding', (
         WidgetTester tester,
       ) async {

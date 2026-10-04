@@ -249,6 +249,9 @@ class DabblerUpcomingReminder extends StatelessWidget {
       semanticLabel: stripLabel,
       excludeChildSemantics: true,
       child: DabblerSurface.grey(
+        // `background:var(--faint)` (`:82`) is `--color-bg-tertiary`, the faint
+        // fill, not the grey inset panel.
+        fill: colors.bgTertiary,
         radius: DabblerRadius.pill,
         // `height:30px` — `--space-9`.
         height: DabblerSpacing.space9,
