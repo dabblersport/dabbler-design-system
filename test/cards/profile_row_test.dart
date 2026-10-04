@@ -40,6 +40,52 @@ void main() {
         expect(rtl ? leadX > tagX : leadX < tagX, isTrue);
       });
 
+      testWidgets('icon tile and the selected state (the switch sheet)', (
+        tester,
+      ) async {
+        int taps = 0;
+        await tester.pumpWidget(
+          threadHost(
+            Column(
+              children: <Widget>[
+                DabblerProfileRow(
+                  title: rtl ? 'لاعب' : 'Player',
+                  subtitle: '@moatazmustapha',
+                  icon: 'activity',
+                  selected: true,
+                  onTap: () => taps++,
+                ),
+                DabblerProfileRow(
+                  title: rtl ? 'منظم' : 'Organiser',
+                  subtitle: '@moatazmustapha',
+                  icon: 'calendar',
+                  onTap: () => taps++,
+                ),
+              ],
+            ),
+            direction: d,
+          ),
+        );
+        expect(tester.takeException(), isNull);
+        // One row has the tick; the icon tile is a 45 square in both.
+        expect(find.byType(DabblerIcon), findsNWidgets(3));
+        final DecoratedBox selectedBox = tester.widget<DecoratedBox>(
+          find
+              .descendant(
+                of: find.byType(DabblerProfileRow).first,
+                matching: find.byType(DecoratedBox),
+              )
+              .first,
+        );
+        final BoxDecoration deco = selectedBox.decoration as BoxDecoration;
+        final Color brand = Theme.of(
+          tester.element(find.byType(DabblerProfileRow).first),
+        ).extension<DabblerColors>()!.brandPrimary;
+        expect(deco.color, brand);
+        await tester.tap(find.byType(DabblerProfileRow).last);
+        expect(taps, 1);
+      });
+
       testWidgets('every tone builds without onTap', (tester) async {
         await tester.pumpWidget(
           threadHost(
