@@ -26,6 +26,8 @@ Idle and copied — see `profile_row_gallery.dart`'s *LinkChip* section.
 
 **Pass `semanticLabel`.** The idle chip has no text, so the label is its only name.
 
+**CounterLink** (`DabblerCounterLink`) is the header's bold figure beside a muted caption (`412 Followers`); with `onTap` it is a button with the shared focus ring and press scale.
+
 ## Axes
 
 ### State

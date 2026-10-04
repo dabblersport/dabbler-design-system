@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../controls/counter_link.dart';
 import '../controls/link_chip.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
@@ -91,6 +92,10 @@ Widget _link(BuildContext context) => GalleryWrap(
         copiedLabel: 'Link copied',
         onTap: () {},
       ),
+    ),
+    GallerySpecimen(
+      label: 'CounterLink',
+      child: DabblerCounterLink(value: '412', label: 'Followers', onTap: () {}),
     ),
   ],
 );

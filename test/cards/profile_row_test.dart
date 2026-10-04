@@ -91,6 +91,23 @@ void main() {
       });
     });
 
+    testWidgets('DabblerCounterLink taps (${d.name})', (tester) async {
+      int taps = 0;
+      await tester.pumpWidget(
+        threadHost(
+          DabblerCounterLink(
+            value: rtl ? '٤١٢' : '412',
+            label: rtl ? 'متابع' : 'Followers',
+            onTap: () => taps++,
+          ),
+          direction: d,
+        ),
+      );
+      await tester.tap(find.byType(DabblerCounterLink));
+      expect(taps, 1);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('DabblerChip dot builds (${d.name})', (tester) async {
       await tester.pumpWidget(
         threadHost(
