@@ -228,6 +228,8 @@ class DabblerUpcomingReminder extends StatelessWidget {
           _card(items.first, colors, t),
           const SizedBox(height: DabblerSpacing.space2),
           _list(colors, t),
+          // The frame's `Show less` row sits 6 under the list (`:140`).
+          if (_drawn) const SizedBox(height: DabblerSpacing.space2),
           _toggle(showLessLabel, 'arrow-circle-up', colors, t),
         ],
       ],
@@ -733,6 +735,10 @@ class DabblerUpcomingReminder extends StatelessWidget {
         .toList();
     return DabblerSurface.card(
       radius: DabblerRadius.lg,
+      // Drawn, the card's own 1px border takes room, as in the frame (`:196`).
+      padding: _drawn
+          ? const EdgeInsets.all(DabblerSizing.borderDefault)
+          : null,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -741,81 +747,111 @@ class DabblerUpcomingReminder extends StatelessWidget {
               onTap: rest[i].onTap,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  border: i == 0
+                  // Drawn, the first row keeps a transparent 1px rule, as the
+                  // frame's rows do (`:198`), so every row is 61.
+                  border: i == 0 && !_drawn
                       ? null
                       : Border(
                           top: BorderSide(
-                            color: colors.bgTertiary,
+                            color: i == 0
+                                ? colors.bgTertiary.withValues(alpha: 0)
+                                : colors.bgTertiary,
                             width: DabblerSizing.borderDefault,
                           ),
                         ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.symmetric(
-                    horizontal: DabblerSpacing.space4,
-                    vertical: DabblerSpacing.space2,
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                        width: DabblerSpacing.space10,
-                        child: DabblerSurface(
-                          fill: colors.surfaceSunken,
-                          radius: DabblerRadius.sm,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: DabblerSpacing.space1,
+                  padding: _drawn
+                      // The 1px rule is part of the row's height (`:198`).
+                      ? const EdgeInsetsDirectional.fromSTEB(
+                          DabblerSpacing.space4,
+                          DabblerHomeFrame.upcomingRowPadV +
+                              DabblerSizing.borderDefault,
+                          DabblerSpacing.space4,
+                          DabblerHomeFrame.upcomingRowPadV,
+                        )
+                      : const EdgeInsetsDirectional.symmetric(
+                          horizontal: DabblerSpacing.space4,
+                          vertical: DabblerSpacing.space2,
+                        ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: _drawn
+                          ? DabblerHomeFrame.upcomingRowMinContent
+                          : 0,
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: _drawn
+                              ? DabblerHomeFrame.upcomingTileWidth
+                              : DabblerSpacing.space10,
+                          child: DabblerSurface(
+                            fill: colors.surfaceSunken,
+                            radius: DabblerRadius.sm,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: DabblerSpacing.space1,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  DabblerType.toWesternDigits(rest[i].month),
+                                  style: t(
+                                    DabblerType.caption2,
+                                  ).copyWith(color: colors.textSecondary),
+                                ),
+                                Text(
+                                  DabblerType.toWesternDigits(rest[i].day),
+                                  style: t(
+                                    DabblerType.subheadline,
+                                  ).copyWith(color: colors.textPrimary),
+                                ),
+                              ],
+                            ),
                           ),
+                        ),
+                        SizedBox(
+                          width: _drawn
+                              ? DabblerHomeFrame.upcomingRowGap
+                              : DabblerSpacing.space3,
+                        ),
+                        Expanded(
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               Text(
-                                DabblerType.toWesternDigits(rest[i].month),
+                                rest[i].title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: t(
+                                  DabblerType.footnote,
+                                ).copyWith(color: colors.textPrimary),
+                              ),
+                              Text(
+                                DabblerType.toWesternDigits(rest[i].detail),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: t(
                                   DabblerType.caption2,
                                 ).copyWith(color: colors.textSecondary),
                               ),
-                              Text(
-                                DabblerType.toWesternDigits(rest[i].day),
-                                style: t(
-                                  DabblerType.subheadline,
-                                ).copyWith(color: colors.textPrimary),
-                              ),
                             ],
                           ),
                         ),
-                      ),
-                      const SizedBox(width: DabblerSpacing.space3),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              rest[i].title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: t(
-                                DabblerType.footnote,
-                              ).copyWith(color: colors.textPrimary),
-                            ),
-                            Text(
-                              DabblerType.toWesternDigits(rest[i].detail),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: t(
-                                DabblerType.caption2,
-                              ).copyWith(color: colors.textSecondary),
-                            ),
-                          ],
+                        if (_drawn)
+                          const SizedBox(
+                            width: DabblerHomeFrame.upcomingRowGap,
+                          ),
+                        Text(
+                          DabblerType.toWesternDigits(rest[i].short),
+                          style: t(
+                            DabblerType.caption1,
+                          ).copyWith(color: colors.brandPrimary),
                         ),
-                      ),
-                      Text(
-                        DabblerType.toWesternDigits(rest[i].short),
-                        style: t(
-                          DabblerType.caption1,
-                        ).copyWith(color: colors.brandPrimary),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -833,7 +869,9 @@ class DabblerUpcomingReminder extends StatelessWidget {
                   ),
                 ),
                 child: SizedBox(
-                  height: DabblerSizing.touchTargetMin,
+                  height: _drawn
+                      ? DabblerSpacing.space10
+                      : DabblerSizing.touchTargetMin,
                   child: Center(
                     child: Text(
                       DabblerType.toWesternDigits(seeAllLabel!),

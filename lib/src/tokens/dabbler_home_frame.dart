@@ -85,6 +85,21 @@ abstract final class DabblerHomeFrame {
   /// Title to venue line in the card's text column: **2** (`gap:2px`).
   static const double reminderTextGap = 2;
 
+  /// The opened list's date tile width: **34** (`Home Feed.dc.html:199`,
+  /// `width:34px`; the default tile is 36 wide).
+  static const double upcomingTileWidth = 34;
+
+  /// Gap between the list row's tile, text and countdown: **10**
+  /// (`:198`, `gap:10px`).
+  static const double upcomingRowGap = 10;
+
+  /// The list row's vertical padding: **8** (`:198`, `padding:8px 12px`).
+  static const double upcomingRowPadV = 8;
+
+  /// The list row's content floor: **44** (`:198`, `min-height:44px`), which
+  /// with the 16 of padding and the 1px top rule makes the row **61**.
+  static const double upcomingRowMinContent = 44;
+
   // --- Post row (section 7a) ---
 
   /// The type pill beside the author: `padding:2px 8px` — **2** above and
@@ -207,6 +222,10 @@ const Map<String, double> homeFrameTokens = <String, double>{
   'reminderSheetNear': DabblerHomeFrame.reminderSheetNear,
   'reminderDateGap': DabblerHomeFrame.reminderDateGap,
   'reminderTextGap': DabblerHomeFrame.reminderTextGap,
+  'upcomingTileWidth': DabblerHomeFrame.upcomingTileWidth,
+  'upcomingRowGap': DabblerHomeFrame.upcomingRowGap,
+  'upcomingRowPadV': DabblerHomeFrame.upcomingRowPadV,
+  'upcomingRowMinContent': DabblerHomeFrame.upcomingRowMinContent,
   'reminderStripDivider': DabblerHomeFrame.reminderStripDivider,
   'reminderStripGap': DabblerHomeFrame.reminderStripGap,
   'postBadgePaddingBlock': DabblerHomeFrame.postBadgePaddingBlock,

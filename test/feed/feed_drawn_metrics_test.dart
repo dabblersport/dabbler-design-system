@@ -288,6 +288,59 @@ void main() {
         }
       });
 
+      testWidgets('the opened list is 124 high: two 61 rows, a 34 x 39 tile, '
+          'a 10 gap, and Show less 6 below', (WidgetTester tester) async {
+        await tester.pumpWidget(
+          threadHost(
+            DabblerUpcomingReminder(
+              metrics: DabblerFeedMetrics.drawn,
+              items: items,
+              title: 'Upcoming · 3',
+              collapsed: false,
+              expanded: true,
+              onDismiss: () {},
+              onExpandStrip: () {},
+              onToggleExpanded: () {},
+              stripLabel: '3 upcoming',
+              moreLabel: '2 more this week',
+              showLessLabel: 'Show less',
+              dismissLabel: 'Hide',
+            ),
+            direction: dir,
+          ),
+        );
+        final Finder tiles = find.ancestor(
+          of: find.text('OCT').at(1),
+          matching: find.byWidgetPredicate(
+            (Widget w) =>
+                w is SizedBox && w.width == DabblerHomeFrame.upcomingTileWidth,
+          ),
+        );
+        final Rect list = tester.getRect(
+          find
+              .ancestor(of: tiles.first, matching: find.byType(DabblerSurface))
+              .first,
+        );
+        expect(list.height, 124);
+        // Arabic leading is 23 on the day figure, so the frame's tile is 42.
+        expect(tester.getSize(tiles.first), Size(34, rtl ? 42 : 39));
+        final Rect tile = tester.getRect(tiles.first);
+        // 1 hairline + 12 padding inside the card, on the reading-start side.
+        if (rtl) {
+          expect(list.right - tile.right, 13);
+        } else {
+          expect(tile.left - list.left, 13);
+        }
+        final Rect title = tester.getRect(find.text(items.first.title).last);
+        if (rtl) {
+          expect(tile.left - title.right, greaterThanOrEqualTo(10));
+        } else {
+          expect(title.left - tile.right, 10);
+        }
+        final Rect less = tester.getRect(find.text('Show less'));
+        expect(less.center.dy - list.bottom, closeTo(6 + 16, 3));
+      });
+
       testWidgets('the folded strip is 30 high with physical 9 / 6 padding', (
         WidgetTester tester,
       ) async {

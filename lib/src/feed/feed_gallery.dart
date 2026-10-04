@@ -572,6 +572,14 @@ Widget _upcoming(BuildContext context) => GalleryStack(
       child: _reminder(items: _games, metrics: DabblerFeedMetrics.drawn),
     ),
     GallerySpecimen(
+      label: 'drawn metrics — opened list, two 61 rows (34 x 39 tile, 10 gap)',
+      child: _reminder(
+        items: _games,
+        expanded: true,
+        metrics: DabblerFeedMetrics.drawn,
+      ),
+    ),
+    GallerySpecimen(
       label: 'drawn metrics — folded strip, 30 high',
       child: _reminder(
         items: _games,

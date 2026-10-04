@@ -58,3 +58,4 @@ Surfaces: card for the game and the peeking sheets, sunken for the second sheet 
 ## Source
 
 `lib/src/feed/upcoming_reminder.dart`
+- KAN-433 (Home fidelity, opened list) — `drawn` also lays the opened list out as the frame measures it (`Home Feed.dc.html:196-216`): each row is **61** (a 1px rule that stays transparent on the first row, 8 / 12 padding, a 44 content floor), a **34 x 39** date tile (42 in Arabic, whose day figure has 23 leading), a 10 gap before the title column and again before the brand countdown, the list's hairline takes its own 1px each side (124 for two rows), the `See all` footer is 36 and `Show less` sits 6 under the list. Named tokens `DabblerHomeFrame.upcomingTileWidth`, `upcomingRowGap`, `upcomingRowPadV`, `upcomingRowMinContent`. Touch is unchanged.
