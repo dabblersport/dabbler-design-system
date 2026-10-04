@@ -114,6 +114,7 @@ class DabblerSheet extends StatefulWidget {
     this.detent = DabblerSheetDetent.fractions,
     this.contentMaxFraction = defaultContentMaxFraction,
     this.pageBackground = false,
+    this.hairlineOutside = false,
     this.showCloseButton = true,
     this.headerDivider = false,
   });
@@ -231,6 +232,11 @@ class DabblerSheet extends StatefulWidget {
   /// Feed design's sheets all override `background` to `--surface-page`
   /// (`Home Feed.dc.html:3051`, `sheetPAuto`).
   final bool pageBackground;
+
+  /// Lays the panel's content out inside its 1px hairline, as the web frame's
+  /// content-box sheet does (content starts 1 in and 1 down). Default false
+  /// keeps the hairline painted inside the padding box.
+  final bool hairlineOutside;
 
   /// Draws the header's close button. The Home Feed design's sheets draw none:
   /// they put their own Done / Cancel button in the body (`:763-770`). The scrim
