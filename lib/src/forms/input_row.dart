@@ -490,7 +490,7 @@ class DabblerInputRow extends StatelessWidget {
                       // D-003: the source's `--subtle` is not a text colour.
                       style: subtitleStyleFor(
                         direction,
-                      ).copyWith(color: danger ?? colors.textSecondary),
+                      ).copyWith(color: colors.textSecondary),
                     ),
                 ],
               ),
