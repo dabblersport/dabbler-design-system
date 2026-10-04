@@ -17,7 +17,7 @@ import '../tokens/dabbler_type.dart';
 ///
 /// | Design | Dart |
 /// | --- | --- |
-/// | tile `--surface-sunken`, radius lg | [DabblerSurface.sunken] `lg` |
+/// | tile `--surface-sunken`, radius lg | [DabblerSurface] filled `surfaceSunken`, `lg` |
 /// | padding 14 / 15 | `space4` block, `space5` inline (nearest steps) |
 /// | glyph 20, gap 12 | [glyphSize], `space4` |
 /// | label `--ink`, or `--color-status-error-strong` | `subheadline`, `textPrimary` / `error.strong` |
@@ -66,7 +66,8 @@ class DabblerActionRow extends StatelessWidget {
       semanticLabel: note == null ? label : '$label. $note',
       excludeChildSemantics: true,
       borderRadius: DabblerRadius.lgAll,
-      child: DabblerSurface.sunken(
+      child: DabblerSurface(
+        fill: colors.surfaceSunken,
         radius: DabblerRadius.lg,
         padding: const EdgeInsetsDirectional.symmetric(
           horizontal: DabblerSpacing.space5,

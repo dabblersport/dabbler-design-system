@@ -41,6 +41,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     this.detent = DabblerSheetDetent.fractions,
     this.contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
     this.pageBackground = false,
+    this.showCloseButton = true,
     super.settings,
   });
 
@@ -52,6 +53,9 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
 
   /// See [DabblerSheet.pageBackground].
   final bool pageBackground;
+
+  /// See [DabblerSheet.showCloseButton].
+  final bool showCloseButton;
 
   /// Builds the scrolling body.
   final WidgetBuilder builder;
@@ -121,6 +125,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
       detent: detent,
       contentMaxFraction: contentMaxFraction,
       pageBackground: pageBackground,
+      showCloseButton: showCloseButton,
       child: builder(context),
     );
   }
@@ -177,6 +182,7 @@ Future<T?> showDabblerSheet<T>({
   DabblerSheetDetent detent = DabblerSheetDetent.fractions,
   double contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
   bool pageBackground = false,
+  bool showCloseButton = true,
 }) {
   return Navigator.of(context, rootNavigator: true).push<T>(
     DabblerSheetRoute<T>(
@@ -194,6 +200,7 @@ Future<T?> showDabblerSheet<T>({
       detent: detent,
       contentMaxFraction: contentMaxFraction,
       pageBackground: pageBackground,
+      showCloseButton: showCloseButton,
     ),
   );
 }

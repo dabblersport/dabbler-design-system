@@ -7,7 +7,11 @@ import 'package:flutter/widgets.dart';
 
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
+import '../tokens/dabbler_colors.dart';
 import 'code_input.dart';
+import 'composer_box.dart';
+import 'select_pill.dart';
+import 'stepper_pill.dart';
 import 'text_field.dart';
 
 /// Form-integration and full-width specimens.
@@ -21,6 +25,16 @@ const List<GalleryEntry> formExtrasGalleryEntries = <GalleryEntry>[
         'Validates as you type after the first edit; a unit suffix at the '
         'trailing edge.',
     builder: _formFields,
+  ),
+  GalleryEntry(
+    id: 'text-field/composer-box',
+    page: 'components/text-field',
+    group: GalleryPurpose.selectionAndInput,
+    title: 'ComposerBox and SelectPill — the post editor',
+    description:
+        'The editor card with its counter and tool row, and the tinted '
+        'pills that open the post type and audience.',
+    builder: _composer,
   ),
   GalleryEntry(
     id: 'code-input/full-width',
@@ -101,3 +115,66 @@ Widget _codes(BuildContext context) => const GalleryStack(
     ),
   ],
 );
+
+Widget _composer(BuildContext context) {
+  final DabblerColors colors = DabblerColors.of(context);
+  return GalleryStack(
+    children: <Widget>[
+      GallerySpecimen(
+        label: 'select pills',
+        child: Wrap(
+          spacing: 6,
+          children: <Widget>[
+            DabblerSelectPill(
+              label: 'Dab',
+              icon: 'like-1',
+              tone: colors.info,
+              onTap: () {},
+            ),
+            DabblerSelectPill(
+              label: 'Public',
+              icon: 'global',
+              tone: colors.success,
+              onTap: () {},
+            ),
+          ],
+        ),
+      ),
+      GallerySpecimen(
+        label: 'stepper pills',
+        child: Wrap(
+          spacing: 6,
+          children: <Widget>[
+            DabblerStepperPill(value: 4, suffix: 'min', onChanged: (_) {}),
+            DabblerStepperPill(value: 10, suffix: 'max', onChanged: (_) {}),
+          ],
+        ),
+      ),
+      GallerySpecimen(
+        label: 'editor',
+        child: SizedBox(
+          width: _width,
+          child: DabblerComposerBox(
+            controller: TextEditingController(),
+            placeholder: "What's on your mind? Use #hashtags",
+            counter: '0/2000',
+            minLines: 3,
+            tools: <DabblerComposerTool>[
+              DabblerComposerTool(
+                icon: 'gallery',
+                label: 'Media',
+                onTap: () {},
+              ),
+              DabblerComposerTool(
+                icon: 'location',
+                label: 'Location',
+                active: true,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}

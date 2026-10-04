@@ -73,6 +73,7 @@ The first thing on most screens, and the reason it comes first here.
   position.
 - [StepProgress](components/step-progress.md) — the segmented bar that says which step of a flow you are on.
 - [PageDots](components/page-dots.md) — the position dots under a carousel.
+- [PageHeader](components/page-header.md) — a listing screen's title, location row and icon actions.
 - [ConversationHeader](components/conversation-header.md) — the top bar of a conversation: back, a
   tappable identity, overflow.
 
@@ -92,6 +93,8 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [Surface](components/surface.md) — the flat container primitive everything with a fill and a
   hairline composes, including `Card` itself.
 - [Section](components/section.md) — a titled group of content, with an optional trailing action.
+- [KeyValueRow](components/key-value-row.md) — a read-only label and its value, with long values wrapping.
+- [TransactionRow](components/transaction-row.md) — one money line in a history list: tile, title, status, amount.
 - [Accordion](components/accordion.md) — collapsible sections for content that's secondary but not
   hidden.
 - [IconTile](components/icon-tile.md) — the tinted square that holds one glyph.
@@ -100,12 +103,17 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardEvent](components/card-event.md) — the event card, in three densities.
 - [CardEventResult](components/card-event-result.md) — a game or meet-up in a search result: date tile, kind, title, place and a pill action.
 - [CardVenue](components/card-venue.md) — a venue in a listing: cover, name, place, tags and price.
+- [CardGame](components/card-game.md) — a game in a listing: title, tags, day and time, progress, price and join.
+- [CardUpcoming](components/card-upcoming.md) — a game you are in, on a tinted tile with a countdown ring.
 - [CardHouse](components/card-house.md) — a house (a recurring room series) as one row.
 - [CardPricing](components/card-pricing.md) — one subscription plan as a selectable tile.
 - [CardTicket](components/card-ticket.md) — a booking as a ticket, with its own type scale.
 - [StatTile](components/stat-tile.md) — the bento stat tile used across the profile screens.
+- [ProfileRow](components/profile-row.md) — the profile list row: lead block, title, sub-line and tag on a card or status tint.
+- [LinkChip](components/link-chip.md) — the small copy-link pill beside a handle.
 - [PanelCard](components/panel-card.md) — the framed panel with a header, an inset body and a footer.
 - [ChecklistPanel](components/checklist-panel.md) — the task rows inside a panel.
+- [IconList](components/icon-list.md) — a short list of lines each led by one glyph, with an optional title.
 - [MemberListPanel](components/member-list-panel.md) — people rows with an add or remove button.
 - [Message](components/message.md) — one message bubble for every ownership, context, content and delivery case.
 - [MessageThread](components/message-thread.md) — the conversation timeline: grouping, rhythm and scroll anchoring.
@@ -148,6 +156,7 @@ lot about the rest.
 - [HighlightedText](components/highlighted-text.md) — a search result's text with the matched part picked out.
 - [SelectableCard](components/selectable-card.md) — a tappable card that is either chosen or not.
 - [SortControl](components/sort-control.md) — how a view-all list lets the reader change its order.
+- [FilterRail](components/filter-rail.md) — the applied filters as removable chips, and a labelled option group for a filter sheet.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
@@ -169,6 +178,7 @@ lot about the rest.
 ### 5 · Date and time — the one input concern too large to fold into the last group
 
 - [DateField](components/date-field.md) — a date, or a date range, typed or picked.
+- [DateColumns](components/date-columns.md) — a date picked from day, month and year lists.
 - [TimeField](components/time-field.md) — a time of day, typed or picked.
 - [Calendar](components/calendar.md) — the month grid, standalone, used as-is by every date picker.
 - [TimePicker](components/time-picker.md) — the hour/minute/meridiem picker that pairs with it.
@@ -196,13 +206,16 @@ lot about the rest.
 ### 8 · Status and feedback — telling the user what happened
 
 - [Banner](components/banner.md) — a persistent, in-flow message about the screen it's on.
+- [ProgressCard](components/progress-card.md) — one stage of a multi-stage goal: badge, tick, count and a bar.
 - [ConversationNotice](components/conversation-notice.md) — a banner inside a message thread.
+- [InlineMessage](components/inline-message.md) — one line of status text with a glyph, under the control it explains.
 - [ReactionGroup](components/reaction-group.md) — the reaction tallies under a message.
 - [Toast](components/toast.md) — a transient, queued notification that survives navigation.
 - [Spinner](components/spinner.md) — the system's only indeterminate loading indicator.
 - [Refresh](components/refresh.md) — pull-to-refresh, drawn with the system Spinner.
 - [ProgressBar](components/progress-bar.md) — progress with a known end, or a busy bar when there
   isn't one.
+- [ProgressStages](components/progress-stages.md) — the named stages of a setup, each pending, running, done or failed.
 - [Skeleton](components/skeleton.md) — placeholder geometry for content that hasn't arrived yet.
 - [EmptyState](components/empty-state.md) — the "nothing here yet" state, and the only one this
   system has.
@@ -214,7 +227,14 @@ lot about the rest.
 ### 9 · Structure — the one thing that separates, and nothing else
 
 - [Page](components/page.md) — the screen scaffold: page background, safe area, top bar, body and bottom bar.
+- [FlowPage](components/flow-page.md) — the onboarding screen template: back, progress, title, body and one primary action.
+- [TileGrid](components/tile-grid.md) — equal tiles in fixed columns, each row as tall as its tallest tile.
 - [Fade](components/fade.md) — the page-colour wash that lets a list run out beneath a bottom bar.
+- [DetailHeader](components/detail-header.md) — the coloured band that opens a detail screen.
+- [GalleryHero](components/gallery-hero.md) — the paged photo hero with captions and dots.
+- [ActionBar](components/action-bar.md) — the price and call to action pinned to a detail screen's bottom.
+- [ListRow](components/list-row.md) — a row (and its rounded group) for squads, contacts and facts.
+- [Headcount](components/headcount.md) — avatars, a headline figure and a fill bar.
 - [Divider](components/divider.md) — the only line this system draws between things.
 - [Gap](components/gap.md) — one spacing step of empty space, the only spacer.
 - [DateSeparator](components/date-separator.md) — the day boundary pill in a conversation timeline.

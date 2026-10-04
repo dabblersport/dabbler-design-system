@@ -56,6 +56,7 @@ class DabblerPage extends StatelessWidget {
     this.bottomOverlay,
     this.overlayFade = true,
     this.overlayPadding,
+    this.maxContentWidth,
   });
 
   /// The side and bottom padding the design wraps the Home Feed bar in:
@@ -104,6 +105,31 @@ class DabblerPage extends StatelessWidget {
   /// and none without it.
   final EdgeInsetsGeometry? overlayPadding;
 
+  /// The widest the top bar, body and bottom bar grow, centred in the page.
+  ///
+  /// Null (the default) lets them fill the page, exactly as before. A phone
+  /// frame never reaches the limit; a wide window shows the phone layout
+  /// rather than stretching it. [DabblerPage.readableWidth] is the width the
+  /// Auth and Onboarding frames are drawn at.
+  final double? maxContentWidth;
+
+  /// `480` — the widest a phone-shaped screen is drawn on a wide window.
+  static const double readableWidth = 480;
+
+  Widget _bounded(Widget child, {required bool fillHeight}) {
+    final double? max = maxContentWidth;
+    if (max == null) return child;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) => Center(
+        child: SizedBox(
+          width: constraints.maxWidth < max ? constraints.maxWidth : max,
+          height: fillHeight ? constraints.maxHeight : null,
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -126,9 +152,9 @@ class DabblerPage extends StatelessWidget {
     final Widget column = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ?topBar,
-        Expanded(child: content),
-        ?bottomBar,
+        if (topBar != null) _bounded(topBar!, fillHeight: false),
+        Expanded(child: _bounded(content, fillHeight: true)),
+        if (bottomBar != null) _bounded(bottomBar!, fillHeight: false),
       ],
     );
 

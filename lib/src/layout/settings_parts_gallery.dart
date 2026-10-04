@@ -93,5 +93,36 @@ Widget _parts(BuildContext context) => GalleryStack(
         ),
       ),
     ),
+    GallerySpecimen(
+      label: 'row action and hint',
+      child: SizedBox(
+        width: 360,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DabblerRowGroup(
+              children: <Widget>[
+                DabblerInputRow(
+                  flat: true,
+                  showDivider: false,
+                  leading: const DabblerAvatar(
+                    seed: 'Youssef El Khatib',
+                    size: DabblerAvatarSize.md,
+                  ),
+                  title: 'Youssef El Khatib',
+                  subtitle: '@youssef.elkhatib',
+                  trailing: const DabblerRowAction(
+                    label: 'Unblock',
+                    onPressed: _noop,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 9),
+            const DabblerRowHint(text: "You haven't blocked anyone."),
+          ],
+        ),
+      ),
+    ),
   ],
 );

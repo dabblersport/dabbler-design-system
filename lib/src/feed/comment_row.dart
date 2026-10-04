@@ -193,12 +193,15 @@ class DabblerCommentRow extends StatelessWidget {
       borderRadius: DabblerRadius.smAll,
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          minWidth: DabblerSizing.touchTargetMin,
           minHeight: DabblerSizing.touchTargetMin,
         ),
-        child: Center(
-          widthFactor: 1,
-          child: Text(label, maxLines: 1, style: style.copyWith(color: ink)),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.only(end: DabblerSpacing.space5),
+          child: Center(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: Text(label, maxLines: 1, style: style.copyWith(color: ink)),
+          ),
         ),
       ),
     );
