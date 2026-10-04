@@ -43,6 +43,15 @@ All eighteen sports at both icon weights, and every sport with registered backgr
 
 ## Using it
 
+**Colour by sport only through `DabblerSportAccent`.** `DabblerSportAccent.of('padel')` returns the
+base, tint and deep palette steps the Profiles frame draws for that sport — padel on the main ramp,
+football on the sport ramp, basketball on the active ramp and tennis on the social ramp — and the
+`All` entry for every other sport, exactly as the design falls back. Pass it as `accent` to a chip,
+badge, game card or venue card; no screen holds a sport colour of its own. The ink on the base fill
+is the theme's on-brand ink. The table grows only from design frames.
+
+@specimen sports/accent
+
 **Never let a sport icon be the only thing on screen that says which sport it is.** No commissioned
 sport-glyph set exists yet — every sport icon today falls back to one of three generic Iconsax
 glyphs (`game`, `activity`, `ticket-2`), and four different sports collapsing onto the same picture
@@ -75,7 +84,7 @@ now, that's a real gap to raise, not a case for quietly substituting `main`.
 ## Axes
 
 ### Sport
-Eighteen: football, basketball, and sixteen more — see `lib/src/foundations/sports.dart` for the
+Eighteen: football, basketball, and sixteen more — see `lib/src/foundations/sports.dart`, `lib/src/foundations/sport_accent.dart` for the
 full enum. The five added sports (handball, baseball, rugby, hockey and squash) take the same
 generic icon fallbacks as their nearest relatives: `game` for the team ball games and `ticket-2`
 for squash, a racket sport.
@@ -96,6 +105,7 @@ through the same registry.
   icon-alone prohibition above and specifies what a real set needs to be before it ships.
 - D-010 (cxo) — rules the fallback-paint and never-sole-carrier requirements above; its
   never-bundled clause is superseded for the eleven main files (see above).
+- KAN-426 (Seat B) — adds `DabblerSportAccent`, the per-sport accent of `Profiles.dc.html:474-480`.
 - KAN-411 — handball, squash, baseball, rugby and hockey added; no background artwork exists for them (see
   *Using it*).
 - D-034 (cxo) — rules the Foundations page template this page

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../foundations/sport_accent.dart';
 import '../foundations/vibes.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
@@ -9,6 +10,24 @@ import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+
+/// The three heights a [DabblerChip] is drawn at.
+///
+/// Additive (KAN-426, Seat B): the design draws chips at more than one size,
+/// and the package's one 15/20 pill covered only the filter-row chip of
+/// `identity-status.card.html`.
+enum DabblerChipSize {
+  /// The system chip — 15/20 medium, `9 15` padding, 38 tall. The default.
+  regular,
+
+  /// The notification-tab chip — 13/18 medium, 34 tall, `0 13` padding
+  /// (`Notifications.dc.html:56-58`).
+  small,
+
+  /// The sport-picker chip — 14/19 semibold, 45 tall, `0 15` padding
+  /// (`Profiles.dc.html:160-163`). The painted pill is itself the 45 target.
+  large,
+}
 
 /// Chip — the pill filter/tag control.
 ///
@@ -127,10 +146,22 @@ class DabblerChip extends StatefulWidget {
     this.compact = false,
     this.count,
     this.trailingIcon,
+    this.accent,
+    this.size = DabblerChipSize.regular,
   });
 
   /// The chip text. `label: string` in `Chip.d.ts`.
   final String label;
+
+  /// Colours the chip by sport (`Profiles.dc.html:605-617`): selected, the
+  /// fill is [DabblerSportAccent.base] with the on-brand ink; idle, the card
+  /// fill with the secondary ink on label and glyph, and the [dot] in
+  /// [DabblerSportAccent.base]. A [vibe] wins over it. Additive.
+  final DabblerSportAccent? accent;
+
+  /// The chip's height class; see [DabblerChipSize]. Additive, default
+  /// [DabblerChipSize.regular]. Ignored by [compact].
+  final DabblerChipSize size;
 
   /// A glyph after the label — the quiet-hours pill's `arrow-circle-right`
   /// (`Notifications.dc.html:226`, 14px). Drawn at 14 in the label's ink and
@@ -243,6 +274,16 @@ class DabblerChip extends StatefulWidget {
   /// 15/20/500 constant, would put a type value outside the ramp.
   static const DabblerTypeStyle labelStyle = DabblerType.subheadline;
 
+  /// [DabblerChipSize.small]'s painted height — `34` (`Notifications.dc.html:58`).
+  static const double smallHeight = 34;
+
+  /// [DabblerChipSize.small]'s inline padding — `13`.
+  static const double smallHorizontalPadding = 13;
+
+  /// [DabblerChipSize.large]'s painted height — `45`, the touch-target floor
+  /// (`Profiles.dc.html:160`).
+  static const double largeHeight = DabblerSizing.touchTargetMin;
+
   /// The pill's own painted height with Latin metrics: 20 leading +
   /// 2 × [verticalPadding] = 38.
   ///
@@ -294,6 +335,42 @@ class _DabblerChipState extends State<DabblerChip> {
 
   bool get _interactive => widget.onTap != null;
 
+  double get _inlinePadding => widget.size == DabblerChipSize.small
+      ? DabblerChip.smallHorizontalPadding
+      : DabblerChip.horizontalPadding;
+
+  TextStyle _sizedLabelStyle(
+    DabblerColors colors,
+    TextDirection direction,
+    Color accentInk,
+    bool accented,
+  ) {
+    final Color color = accented
+        ? accentInk
+        : DabblerChip.labelColorFor(colors, selected: widget.selected);
+    switch (widget.size) {
+      case DabblerChipSize.regular:
+        return DabblerChip.labelStyleFor(
+          colors,
+          direction,
+          selected: widget.selected,
+        ).copyWith(color: color);
+      case DabblerChipSize.small:
+        return DabblerType.footnote
+            .resolveForDirection(direction)
+            .copyWith(fontWeight: DabblerType.medium, color: color);
+      case DabblerChipSize.large:
+        final TextStyle base = DabblerType.subheadline.resolveForDirection(
+          direction,
+        );
+        return base.copyWith(
+          fontSize: (base.fontSize ?? 15) - 1,
+          fontWeight: DabblerType.semibold,
+          color: color,
+        );
+    }
+  }
+
   void _setPressed(bool value) {
     if (_pressed == value) {
       return;
@@ -313,9 +390,17 @@ class _DabblerChipState extends State<DabblerChip> {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     final DabblerVibeColors? vibe = widget.vibe?.resolve(colors);
+    final DabblerSportAccent? accent = vibe == null && !widget.compact
+        ? widget.accent
+        : null;
+    final Color accentInk = widget.selected
+        ? DabblerSportAccent.onColorOf(colors)
+        : colors.textSecondary;
     final Color iconColor =
         vibe?.ink ??
-        DabblerChip.iconColorFor(colors, selected: widget.selected);
+        (accent != null
+            ? accentInk
+            : DabblerChip.iconColorFor(colors, selected: widget.selected));
     final TextStyle labelStyle = widget.compact
         ? DabblerType.footnote
               .resolveForDirection(direction)
@@ -323,11 +408,14 @@ class _DabblerChipState extends State<DabblerChip> {
                 fontWeight: DabblerType.medium,
                 color: colors.textSecondary,
               )
-        : DabblerChip.labelStyleFor(
-            colors,
-            direction,
-            selected: widget.selected,
-          );
+        : _sizedLabelStyle(colors, direction, accentInk, accent != null);
+    final double? pillHeight = widget.compact
+        ? null
+        : switch (widget.size) {
+            DabblerChipSize.regular => null,
+            DabblerChipSize.small => DabblerChip.smallHeight,
+            DabblerChipSize.large => DabblerChip.largeHeight,
+          };
     final double glyph = widget.compact
         ? DabblerSizing.iconInline
         : DabblerSizing.iconSm;
@@ -372,7 +460,7 @@ class _DabblerChipState extends State<DabblerChip> {
                   shape: BoxShape.circle,
                   color: widget.selected
                       ? colors.onBrand.withValues(alpha: 0.7)
-                      : colors.brandPrimary,
+                      : (accent?.base ?? colors.brandPrimary),
                 ),
               ),
             ),
@@ -466,7 +554,7 @@ class _DabblerChipState extends State<DabblerChip> {
       fill: widget.compact
           ? colors.surfaceSunken
           : (vibe == null
-                ? null
+                ? (accent != null && widget.selected ? accent.base : null)
                 : (widget.selected ? vibe.selectedSurface : vibe.surface)),
       borderColor: widget.compact
           ? Colors.transparent
@@ -476,21 +564,30 @@ class _DabblerChipState extends State<DabblerChip> {
       padding: EdgeInsetsDirectional.only(
         top: widget.compact
             ? DabblerChip.compactVerticalPadding
-            : DabblerChip.verticalPadding,
+            : (pillHeight != null ? 0 : DabblerChip.verticalPadding),
         bottom: widget.compact
             ? DabblerChip.compactVerticalPadding
-            : DabblerChip.verticalPadding,
+            : (pillHeight != null ? 0 : DabblerChip.verticalPadding),
         start: widget.compact
             ? DabblerChip.compactHorizontalPadding
-            : DabblerChip.horizontalPadding,
+            : _inlinePadding,
         // The remove box absorbs the trailing padding — see [onRemove].
         end: removable
             ? 0
             : (widget.compact
                   ? DabblerChip.compactHorizontalPadding
-                  : DabblerChip.horizontalPadding),
+                  : _inlinePadding),
       ),
-      child: content,
+      child: pillHeight == null
+          ? content
+          : ConstrainedBox(
+              constraints: BoxConstraints(minHeight: pillHeight),
+              child: Center(
+                widthFactor: 1,
+                heightFactor: 1,
+                child: content,
+              ),
+            ),
     );
 
     // DS-200 supplies both of these. Nothing about the scale, the duration, the

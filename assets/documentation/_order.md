@@ -157,6 +157,7 @@ lot about the rest.
 - [SelectableCard](components/selectable-card.md) — a tappable card that is either chosen or not.
 - [SortControl](components/sort-control.md) — how a view-all list lets the reader change its order.
 - [FilterRail](components/filter-rail.md) — the applied filters as removable chips, and a labelled option group for a filter sheet.
+- [ChipRail](components/chip-rail.md) — a scrolling row of selectable chips, one or two rows, with the chosen chip kept in view.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
@@ -189,6 +190,7 @@ lot about the rest.
 - [TextLink](components/text-link.md) — a brand-coloured link, on its own line or inside a sentence.
 - [Inert](components/inert.md) — dims a block and stops it taking input while it is unavailable.
 - [OnColorIconButton](components/on-color-icon-button.md) — a round, translucent icon button on a coloured hero.
+- [FavouriteButton](components/favourite-button.md) — the square heart well that saves a venue or listing.
 - [Fab](components/fab.md) — the one floating action button, and the one deliberate exception to
   this system's flatness.
 - [Chip](components/chip.md) — filtering and tagging, tappable or static.

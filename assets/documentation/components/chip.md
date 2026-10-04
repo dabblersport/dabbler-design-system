@@ -48,13 +48,24 @@ to reach it, while a tag with no `onTap` stays as dense as it's drawn, because f
 a dense row to touch-target size would buy no accessibility and break the layout rows of tags are
 built for.
 
-**Do not add a removable chip, a trailing icon, or a size variant.** None of the three exists in
-the design source. If the product needs one, that is a design-source change to raise first, not
-something to improvise here.
+**Do not add a trailing icon beyond the design's.** The size classes below and the sport accent were
+added from design frames (KAN-426); anything else the frames do not draw is a design-source change to
+raise first, not something to improvise here.
 
 **A count rides after the label.** Pass `count` for the small count pill the Notifications filter rail draws; it tints with the selection.
 
 ## Axes
+
+### Size
+`size` is `regular` (the default: the system label and pill), `small` (the Activities category chips of
+`Notifications.dc.html:56-58`, a smaller label in a shorter pill) or `large` (the Profiles sport picker of
+`Profiles.dc.html:160-163`, a semibold label in a pill as tall as the touch-target floor). The exact
+metrics are the constants on `DabblerChip`. Ignored by `compact`.
+
+### Sport accent
+`accent` takes a `DabblerSportAccent` (see Sports). Selected, the fill is the accent base with the
+on-brand ink; idle, the card fill with the secondary ink on label and glyph and the primary-sport
+`dot` in the accent base. A `vibe` wins over it.
 
 ### State
 Unselected, selected.
@@ -92,6 +103,7 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 
 ## Change log
 
+- KAN-426 (Seat B) — adds `size` (`small`, `large`) and `accent`, from `Notifications.dc.html:56-58` and `Profiles.dc.html:155-170`.
 - Alpha fidelity (Notifications) — adds `trailingIcon`: a 14px glyph after the label, the quiet-hours pill's `arrow-circle-right` (`Notifications.dc.html:226`).
 - Alpha fidelity (Search) — adds `mutedRemove`: the remove glyph in the muted ink (`Search.dc.html` recent chips).
 

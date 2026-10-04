@@ -83,6 +83,7 @@ opacity — the one badge configuration that carries a border at all.
 
 ## Change log
 
+- KAN-426 (Seat B) — adds `accent`: a sport-coloured decorative fill (`DabblerSportAccent.base`) with the on-brand ink; status wins, and it is ignored when `outlined`.
 - Alpha fidelity rebuild (KAN-426) — adds `outlined`, the quiet card-surface tag of the Venues listing's sports row.
 - D-020 (cxo) — a one-step colour drift in a pricing screen's
   trial pill is not grounds for a fill override on this component; the source is corrected instead.

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../foundations/sport_accent.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -23,7 +24,7 @@ import 'card.dart';
 ///     DabblerCardVenue.rating(rating: '4.8', reviews: '(126)'),
 ///     DabblerChip(label: 'Football'),
 ///   ],
-///   favourite: DabblerButton.icon(icon: 'heart', semanticLabel: 'Save', onPressed: save),
+///   favourite: DabblerFavouriteButton(selected: saved, semanticLabel: 'Save', onPressed: save),
 ///   price: 'AED 120 / hour',
 ///   priceCaption: 'Starting from',
 ///   trailing: DabblerButton(label: 'View venue', onPressed: open),
@@ -89,6 +90,7 @@ class DabblerCardVenue extends StatelessWidget {
     this.enabled = true,
     this.semanticLabel,
     this.width,
+    this.accent,
   });
 
   /// The venue's name. Two lines, then an ellipsis.
@@ -131,6 +133,13 @@ class DabblerCardVenue extends StatelessWidget {
 
   /// Whether a tappable card currently accepts input.
   final bool enabled;
+
+  /// Tints the card by sport: the card fill takes [DabblerSportAccent.base]
+  /// at [DabblerSportAccent.surfaceAlpha] over the card's own fill — the recipe
+  /// the persona and sport cards use (`Auth and Onboarding.dc.html:1999-2016`).
+  /// A derivation, not a frame: no Listings frame tints a card by sport.
+  /// Null keeps the plain card. Additive.
+  final DabblerSportAccent? accent;
 
   /// The accessible label of a tappable card.
   final String? semanticLabel;
@@ -281,6 +290,9 @@ class DabblerCardVenue extends StatelessWidget {
           );
 
     return DabblerCard(
+      fill: accent?.surfaceOver(
+        DabblerCard.fillOf(colors, DabblerCardVariant.standard),
+      ),
       width: width,
       onTap: onTap,
       enabled: enabled,

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../foundations/sport_accent.dart';
 import '../foundations/text.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -72,6 +73,7 @@ class DabblerCardGame extends StatelessWidget {
     this.onTap,
     this.enabled = true,
     this.semanticLabel,
+    this.accent,
   });
 
   /// The game's title. Two lines, then an ellipsis.
@@ -113,6 +115,13 @@ class DabblerCardGame extends StatelessWidget {
 
   /// Whether a tappable card currently accepts input.
   final bool enabled;
+
+  /// Tints the card by sport: the card fill takes [DabblerSportAccent.base]
+  /// at [DabblerSportAccent.surfaceAlpha] over the card's own fill — the recipe
+  /// the persona and sport cards use (`Auth and Onboarding.dc.html:1999-2016`).
+  /// A derivation, not a frame: no Listings frame tints a card by sport.
+  /// Null keeps the plain card. Additive.
+  final DabblerSportAccent? accent;
 
   /// The accessible label of a tappable card.
   final String? semanticLabel;
@@ -260,6 +269,9 @@ class DabblerCardGame extends StatelessWidget {
       action: actionRow,
     );
     return DabblerCard(
+      fill: accent?.surfaceOver(
+        DabblerCard.fillOf(colors, DabblerCardVariant.standard),
+      ),
       onTap: onTap,
       enabled: enabled,
       semanticLabel:

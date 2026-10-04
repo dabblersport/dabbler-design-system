@@ -53,6 +53,7 @@ Deviation: the time is `headline` bold (17) where the design draws 20/26 sans bo
 ## Change log
 
 - Alpha fidelity rebuild (KAN-426) — adds this component.
+- KAN-426 (Seat B) — adds `accent`: tints the card fill with a sport's accent at 12% over the card fill. A derivation of the persona-card recipe, not a Listings frame.
 
 ## Source
 

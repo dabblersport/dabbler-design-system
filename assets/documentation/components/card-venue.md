@@ -66,6 +66,7 @@ warning status base. Hairline: `borderDefault`. Gaps: the 12 stack gap and 6/9 s
 ## Change log
 
 - Alpha DS gaps 6 — adds this component, from `Listings.dc.html:750-820`.
+- KAN-426 (Seat B) — adds `accent` (a sport-tinted card fill, a derivation, not a frame); the `favourite` slot now takes `DabblerFavouriteButton`.
 - Alpha fidelity rebuild (KAN-426) — adds the `sports` and `facilities` rows and `facility()`, from `Listings.dc.html:795-808`.
 
 ## Source
