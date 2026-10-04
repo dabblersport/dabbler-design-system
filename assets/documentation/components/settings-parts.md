@@ -10,7 +10,7 @@ Sources  : lib/src/layout/settings_parts.dart
 -->
 
 # SettingsParts
-### `DabblerSettingsHeader`, `DabblerRowGroup`
+### `DabblerSettingsHeader`, `DabblerRowGroup`, `DabblerColorDots`
 
 The two parts a Settings page is built from. SettingsHeader is the tinted hero at the top of the root page; RowGroup is a titled card of rows divided by hairlines.
 
@@ -25,6 +25,8 @@ The hero with its version pill, title and identity row, and a group with a toggl
 **The hero carries its own top bar.** Pass a titled top bar as `topBar` so the bar sits on the tint.
 
 **The identity row is a flat input row.** Pass a `DabblerInputRow` with `flat: true` and `showDivider: false`; the hero draws the translucent card behind it.
+
+**ColorDots previews a palette.** Pass the colours of another theme's roles; it draws small round dots and is decorative.
 
 **RowGroup separates, it does not style.** Give it flat input rows with `showDivider: false`; it draws the card and the hairlines between them. `header` and `note` sit above the card.
 

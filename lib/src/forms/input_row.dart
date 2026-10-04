@@ -181,9 +181,13 @@ class DabblerInputRow extends StatelessWidget {
     String infoSemanticLabel = DabblerInputRowInfoButton.defaultSemanticLabel,
     String? toggleSemanticLabel,
     DabblerInputRowTone tone = DabblerInputRowTone.standard,
+    bool flat = false,
+    bool showDivider = true,
   }) {
     return DabblerInputRow(
       key: key,
+      flat: flat,
+      showDivider: showDivider,
       title: title,
       titleSpan: titleSpan,
       subtitle: subtitle,

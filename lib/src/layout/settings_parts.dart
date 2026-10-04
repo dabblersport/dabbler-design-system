@@ -217,3 +217,37 @@ class DabblerRowGroup extends StatelessWidget {
     );
   }
 }
+
+/// A row of small round colour dots — a palette preview, drawn from the colours
+/// the caller resolves (another theme's roles, not the active tokens).
+class DabblerColorDots extends StatelessWidget {
+  /// Dots in each of [colors].
+  const DabblerColorDots({super.key, required this.colors});
+
+  /// The dot colours, in reading order.
+  final List<Color> colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (int i = 0; i < colors.length; i++) ...<Widget>[
+            if (i > 0) const SizedBox(width: DabblerSpacing.space2),
+            SizedBox(
+              width: DabblerSizing.swatch,
+              height: DabblerSizing.swatch,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colors[i],
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

@@ -180,6 +180,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.leading,
     this.border = false,
     this.safeArea = true,
+    this.transparent = false,
     this.avatarImageUrl,
   })  : title = null,
         onBack = null,
@@ -216,6 +217,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.actions = const <DabblerNavigationAction>[],
     this.border = false,
     this.safeArea = true,
+    this.transparent = false,
     this.titleOpacity = 1,
     this.scrollController,
     this.titleRevealOffset = defaultTitleRevealOffset,
@@ -234,6 +236,10 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// shows `arrow-circle-right` — pointing at the inline start, where the
   /// button sits and where "back" leads.
   static const String backIcon = 'arrow-circle-left';
+
+  /// Draws no ground of its own, so the bar sits on whatever is behind it — a
+  /// tinted hero (`Settings.dc.html:49`, the root header on the brand tint).
+  final bool transparent;
 
   /// The titled variant's title; null draws an empty title slot.
   final String? title;
@@ -419,7 +425,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
       decoration: BoxDecoration(
         // `backgroundColor: 'var(--neutral-100)'`, which is `--surface-page`
         // (`tokens/colors.css:32`).
-        color: colors.bgPrimary,
+        color: transparent ? null : colors.bgPrimary,
         // Root `borderRadius: 16` (`NavigationTopBar.jsx:14`).
         borderRadius: border ? DabblerRadius.cardAll : null,
         border: border
@@ -441,7 +447,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
           end: barPadding.end,
         ),
         decoration: BoxDecoration(
-          color: colors.bgPrimary,
+          color: transparent ? null : colors.bgPrimary,
           border: Border(
             bottom: BorderSide(
               color: colors.bgTertiary,

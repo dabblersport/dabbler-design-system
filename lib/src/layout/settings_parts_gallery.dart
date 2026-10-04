@@ -9,6 +9,7 @@ import '../foundations/icon.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../surfaces/avatar.dart';
+import '../tokens/dabbler_colors.dart';
 import 'settings_parts.dart';
 
 /// The Settings parts' specimens.
@@ -52,6 +53,16 @@ Widget _parts(BuildContext context) => GalleryStack(
             onTap: _noop,
           ),
         ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'colour dots',
+      child: DabblerColorDots(
+        colors: <Color>[
+          DabblerColors.of(context).brandPrimary,
+          DabblerColors.of(context).accent,
+          DabblerColors.of(context).surfaceGrey,
+        ],
       ),
     ),
     GallerySpecimen(

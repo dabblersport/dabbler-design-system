@@ -68,6 +68,18 @@ void main() {
       expect(find.text('Settings'), findsOneWidget);
     });
 
+    testWidgets('colour dots render — $dir', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerColorDots(
+            colors: <Color>[Color(0xFF111111), Color(0xFF222222)],
+          ),
+          dir,
+        ),
+      );
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('setting stat tile renders — $dir', (tester) async {
       await tester.pumpWidget(
         _host(
