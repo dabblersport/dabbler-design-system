@@ -66,7 +66,10 @@ Widget _games(BuildContext context) => GalleryStack(
       label: 'title and time only',
       child: SizedBox(
         width: _width,
-        child: DabblerCardGame(title: 'Half court pickup', timeLabel: '6:00 PM'),
+        child: DabblerCardGame(
+          title: 'Half court pickup',
+          timeLabel: '6:00 PM',
+        ),
       ),
     ),
   ],

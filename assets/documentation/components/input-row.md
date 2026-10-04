@@ -144,6 +144,7 @@ shared tokens and primitives every other tappable surface reads.
 
 ## Change log
 
+- Alpha fidelity (Search) — adds `titleSemibold`: the title in semibold, as the View all people row draws it.
 - Alpha fidelity (Settings) — `DabblerChevron.circled`: the disclosure glyph inside its ring, which the Settings frames draw (`Settings.dc.html:97, 134, 269`).
 - D-003 (cxo) — the subtitle's colour: text under WCAG, so it
   takes `textSecondary`, never a surface-neutral role.

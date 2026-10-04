@@ -108,7 +108,10 @@ class _DabblerProfileRowState extends State<DabblerProfileRow> {
         .copyWith(color: colors.textPrimary);
     final TextStyle caption = DabblerType.caption2
         .resolveForDirection(dir)
-        .copyWith(color: colors.textSecondary, fontWeight: DabblerType.semibold);
+        .copyWith(
+          color: colors.textSecondary,
+          fontWeight: DabblerType.semibold,
+        );
 
     Widget? leadBlock;
     final String? lead = widget.lead;

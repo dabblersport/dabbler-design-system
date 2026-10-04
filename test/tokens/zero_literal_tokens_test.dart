@@ -83,7 +83,6 @@ void main() {
       'iconRow': 21,
       'iconXl': 36,
       'tileMd': 45,
-      'tileSm': 39,
       'tileLg': 48,
       'illustrationSm': 54,
       'illustrationMd': 72,
@@ -123,6 +122,21 @@ void main() {
     test('every role sits on the base-3 grid', () {
       for (final MapEntry<String, double> e in sizingAppRoles.entries) {
         expect(e.value % 3, 0, reason: e.key);
+      }
+    });
+
+    test('every off-grid ruling is pinned and is not a base-3 multiple', () {
+      const Map<String, double> pinned = <String, double>{
+        'resultTile': 40,
+        'articleHeroHeight': 230,
+        'mediaRailHeight': 128,
+        'mediaRailAddWidth': 64,
+        'mediaRailTileWidth': 104,
+      };
+      expect(sizingOffGridRulings.keys.toSet(), pinned.keys.toSet());
+      for (final MapEntry<String, double> e in pinned.entries) {
+        expect(sizingOffGridRulings[e.key], e.value, reason: e.key);
+        expect(e.value % 3, isNot(0), reason: '${e.key} is a grid step');
       }
     });
 

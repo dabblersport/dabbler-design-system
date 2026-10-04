@@ -16,6 +16,7 @@ import 'attachment_add_tile.dart';
 import 'attachment_chip.dart';
 import 'open_post.dart';
 import 'comment_row.dart';
+import 'game_link_row.dart';
 import 'post_detail.dart';
 import 'post_row.dart';
 import 'reply_composer.dart';
@@ -62,6 +63,15 @@ const List<GalleryEntry> threadGalleryEntries = <GalleryEntry>[
         'The full timestamp, the edited marker and the visibility line, in '
         'LTR and RTL.',
     builder: _detail,
+  ),
+  GalleryEntry(
+    id: 'post-row/game-link',
+    page: 'components/post-row',
+    group: GalleryPurpose.contentContainers,
+    title: 'GameLinkRow — a game in the Link a game sheet',
+    description:
+        'A live game, a joined game that is chosen, and an Arabic row in RTL.',
+    builder: _gameLinks,
   ),
   GalleryEntry(
     id: 'post-row/open',
@@ -495,7 +505,11 @@ Widget _composing(BuildContext context) => GalleryStack(
             runSpacing: DabblerSpacing.space3,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
-              const DabblerAttachmentAddTile(label: 'Add', onTap: _noop),
+              const DabblerAttachmentAddTile(
+                semanticLabel: 'Add',
+                label: 'Add',
+                onTap: _noop,
+              ),
               DabblerAttachmentChip(
                 thumbnail: _media(context),
                 semanticLabel: 'Pitch photo',
@@ -522,6 +536,60 @@ Widget _composing(BuildContext context) => GalleryStack(
               active: true,
             ),
           ],
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _gameLinks(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'live and chosen',
+      child: _frame(
+        Column(
+          children: <Widget>[
+            DabblerGameLinkRow(
+              month: 'Aug',
+              day: '18',
+              title: 'Friday 5-a-side',
+              sportKey: 'football',
+              place: 'Zayed Sports City',
+              time: 'Today · 8:00 PM',
+              status: 'Live',
+              live: true,
+              onTap: _noop,
+            ),
+            const SizedBox(height: DabblerSpacing.space3),
+            DabblerGameLinkRow(
+              month: 'Aug',
+              day: '19',
+              title: 'Padel doubles',
+              sportKey: 'padel',
+              place: 'Meydan',
+              time: 'Tomorrow · 7:00 PM',
+              status: 'Joined',
+              selected: true,
+              onTap: _noop,
+            ),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'RTL',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: _frame(
+          const DabblerGameLinkRow(
+            month: 'أغسطس',
+            day: '18',
+            title: 'خماسي الجمعة',
+            place: 'مدينة زايد',
+            time: '8:00 م',
+            status: 'منضم',
+            onTap: _noop,
+          ),
         ),
       ),
     ),

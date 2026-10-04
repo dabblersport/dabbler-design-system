@@ -150,6 +150,7 @@ class DabblerInputRow extends StatelessWidget {
     this.semanticLabel,
     this.titleSpan,
     this.titleBadge,
+    this.titleSemibold = false,
     this.verified = false,
     this.value,
     this.tone = DabblerInputRowTone.standard,
@@ -274,6 +275,10 @@ class DabblerInputRow extends StatelessWidget {
   /// colour are the span's inherited base, so a plain child [TextSpan] reads
   /// like [title]. The accessible name is the span's plain text.
   final InlineSpan? titleSpan;
+
+  /// Sets the title semibold (600) — the Search people row
+  /// (`Search.dc.html` View all people). A destructive row is always semibold.
+  final bool titleSemibold;
 
   /// A widget drawn right after the first line (inline-end), e.g. a badge.
   /// Takes precedence over [verified].
@@ -449,7 +454,9 @@ class DabblerInputRow extends StatelessWidget {
                   : titleStyleFor(direction))
               .copyWith(
                 color: danger ?? colors.textPrimary,
-                fontWeight: destructive ? DabblerType.semibold : null,
+                fontWeight: (destructive || titleSemibold)
+                    ? DabblerType.semibold
+                    : null,
               );
       firstLine = titleSpan != null
           ? Text.rich(

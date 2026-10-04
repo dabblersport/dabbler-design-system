@@ -106,7 +106,10 @@ class DabblerCardUpcoming extends StatelessWidget {
   final double? width;
 
   /// The ring's diameter — the design's 24-tick ring.
-  static const double ringDiameter = DabblerSizing.touchTargetMin + DabblerSpacing.space3 + DabblerSpacing.space1;
+  static const double ringDiameter =
+      DabblerSizing.touchTargetMin +
+      DabblerSpacing.space3 +
+      DabblerSpacing.space1;
 
   /// The ring's tick count.
   static const int ringTicks = 24;

@@ -3,7 +3,6 @@ import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
-import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -472,14 +471,14 @@ void main() {
       () {
         expect(
           DabblerCalendar.previousIconFor(TextDirection.ltr),
-          'arrow-left-2',
+          'arrow-circle-left',
         );
-        expect(DabblerCalendar.nextIconFor(TextDirection.ltr), 'arrow-right-3');
+        expect(DabblerCalendar.nextIconFor(TextDirection.ltr), 'arrow-circle-right');
         expect(
           DabblerCalendar.previousIconFor(TextDirection.rtl),
-          'arrow-right-3',
+          'arrow-circle-right',
         );
-        expect(DabblerCalendar.nextIconFor(TextDirection.rtl), 'arrow-left-2');
+        expect(DabblerCalendar.nextIconFor(TextDirection.rtl), 'arrow-circle-left');
       },
     );
 
@@ -718,11 +717,12 @@ void main() {
       }
     });
 
-    testWidgets('the weekday label is --muted taken as textSecondary (D-003a)', (
+    testWidgets('the weekday label is --muted as the frame draws it (textTertiary)', (
       WidgetTester tester,
     ) async {
-      // Live `Calendar.jsx:46` — `color: var(--muted)`; D-003(a) maps `--muted`
-      // text to textSecondary, which clears 4.5:1 where raw `--muted` does not.
+      // Live `Calendar.jsx:46` — `color: var(--muted)`; the Home Feed frame
+      // draws the weekday header in that grey (CXO close-out ruling), which is
+      // textTertiary in light.
       await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
       final Text label = tester.widget<Text>(
         find.descendant(
@@ -731,14 +731,9 @@ void main() {
         ),
       );
       final DabblerColors c = colorsFor();
-      expect(label.style!.color, c.textSecondary);
+      expect(label.style!.color, c.textTertiary);
       expect(label.style!.fontSize, 11);
       expect(label.style!.fontWeight, FontWeight.w600);
-      expect(contrastRatio(DabblerPalette.muted, c.surfaceCard), lessThan(4.5));
-      expect(
-        contrastRatio(c.textSecondary, c.surfaceCard),
-        greaterThanOrEqualTo(4.5),
-      );
     });
 
     testWidgets('an outside day is the only sub-4.5 foreground, and is inert', (
@@ -764,7 +759,7 @@ void main() {
           matching: find.byType(Text),
         ),
       );
-      expect(text.style!.color, colorsFor().textSecondary);
+      expect(text.style!.color, colorsFor().textTertiary);
       await tester.tap(
         find.byKey(DabblerCalendar.dayKey(outside.date)),
         warnIfMissed: false,
@@ -971,13 +966,13 @@ void main() {
             .dx;
         if (d == TextDirection.ltr) {
           expect(prevX, lessThan(nextX));
-          expect(prev.name, 'arrow-left-2');
-          expect(next.name, 'arrow-right-3');
+          expect(prev.name, 'arrow-circle-left');
+          expect(next.name, 'arrow-circle-right');
         } else {
           // Previous sits on the right (the start) and its glyph points right.
           expect(prevX, greaterThan(nextX));
-          expect(prev.name, 'arrow-right-3');
-          expect(next.name, 'arrow-left-2');
+          expect(prev.name, 'arrow-circle-right');
+          expect(next.name, 'arrow-circle-left');
         }
       }
     });

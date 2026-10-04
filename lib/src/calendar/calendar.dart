@@ -298,8 +298,8 @@ abstract final class DabblerCalendarMonth {
 /// |---|---|---|---|
 /// | Day in month | `--ink` | [DabblerColors.textPrimary] | 18.1:1 |
 /// | Selected day | `--color-on-brand` on `--color-brand-primary` | same | 8.6:1 (main) |
-/// | Weekday label | `--muted` | [DabblerColors.textSecondary] | D-003(a): `--muted` text is `textSecondary`, which resolves to `--ink-soft` |
-/// | Outside day | `--subtle` | [DabblerColors.textSecondary] | **deviation**; 10.37:1 |
+/// | Weekday label | `--muted` | [DabblerColors.textTertiary] | the design's `--muted` (`#8C8C8C`), as the frame draws it (CXO close-out ruling) |
+/// | Outside day | `--subtle` | [DabblerColors.textTertiary] | nearest muted token; the frame draws adjacent-month days muted |
 ///
 /// **Weekday label.** `Calendar.jsx:46` sets the column labels in `--muted`
 /// (`#8C8C8C`) and so does this: `--muted` text is [DabblerColors.textSecondary]
@@ -384,7 +384,7 @@ class DabblerCalendar extends StatelessWidget {
   /// `gap: 4` between a chip's label and its caret (`Calendar.jsx:30`).
   static const double chipGap = 4;
 
-  /// `<Icon name="arrow-down-1" size={14} />` — the caret in a month/year chip
+  /// `<Icon name="arrow-circle-down" size={14} />` — the caret in a month/year chip
   /// (`Calendar.jsx:33`).
   static const double chipCaretSize = 14;
 
@@ -430,11 +430,11 @@ class DabblerCalendar extends StatelessWidget {
 
   /// The previous-month glyph for [direction] — see *RTL* fact 2.
   static String previousIconFor(TextDirection direction) =>
-      direction == TextDirection.rtl ? 'arrow-right-3' : 'arrow-left-2';
+      direction == TextDirection.rtl ? 'arrow-circle-right' : 'arrow-circle-left';
 
   /// The next-month glyph for [direction] — see *RTL* fact 2.
   static String nextIconFor(TextDirection direction) =>
-      direction == TextDirection.rtl ? 'arrow-left-2' : 'arrow-right-3';
+      direction == TextDirection.rtl ? 'arrow-circle-left' : 'arrow-circle-right';
 
   /// Any date inside the month to display. Only its year and month are read.
   ///
@@ -765,7 +765,7 @@ class DabblerCalendar extends StatelessWidget {
             ),
           ),
           DabblerIcon(
-            'arrow-down-1',
+            'arrow-circle-down',
             // `size={14}` (`Calendar.jsx:33`), transcribed at its live value.
             size: chipCaretSize,
             color: colors.textPrimary,
@@ -834,7 +834,7 @@ class DabblerCalendar extends StatelessWidget {
                       style: DabblerType.caption2
                           .resolveForDirection(direction)
                           .copyWith(
-                            color: colors.textSecondary,
+                            color: colors.textTertiary,
                             fontWeight: DabblerType.semibold,
                           ),
                     ),
@@ -866,7 +866,7 @@ class DabblerCalendar extends StatelessWidget {
     final Color foreground = on
         ? colors.onBrand
         : cell.outside
-        ? colors.textSecondary
+        ? colors.textTertiary
         : colors.textPrimary;
 
     final DabblerCalendarDayStatus status = cell.outside || dayStatus == null
