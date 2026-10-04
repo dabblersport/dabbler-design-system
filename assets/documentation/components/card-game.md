@@ -46,9 +46,9 @@ With `onTap` the whole card is one button; `action` and `trailing` keep their ow
 ## Tokens used
 
 Row gap `space4`, section gap `stackDefault`, tag gap `space2`. Title `headline` semibold, time
-`title3` bold, day `caption1` in brand ink, place line `footnote`.
+`headline` bold, day `caption1` in brand ink, place line `footnote`.
 
-Deviation: the verified tick is `iconInline` (15) where the design draws 16.
+Deviation: the time is `headline` bold (17) where the design draws 20/26 sans bold — the ramp's 20 step is the display face. The verified tick is `iconInline` (15) where the design draws 16.
 
 ## Change log
 

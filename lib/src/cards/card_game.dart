@@ -37,7 +37,7 @@ import 'card_event_listing.dart';
 /// |---|---|---|
 /// | title 17/22 600, verified tick 16 in success | `:212-218` | `.t-headline`, `tick-circle` bold in `success` |
 /// | tag row, gap 6, wraps | `:220-224` | the [tags] slot, a [Wrap] |
-/// | day (12, brand) over time (20 bold), at the end | `:227-230` | [dayLabel] and [timeLabel] |
+/// | day (12, brand) over time (20 bold), at the end | `:227-230` | [dayLabel] and [timeLabel]; the time takes `.t-headline` at bold — the nearest sans step, as the price block does |
 /// | place line: pin, venue, dot-separated distance and duration | `:234-243` | [meta], entries joined by dots |
 /// | progress, price, join | `:245-262` | [DabblerCardEventListing.compose] |
 /// | social counts at the end of the action row | `:263-275` | the [trailing] slot |
@@ -182,7 +182,7 @@ class DabblerCardGame extends StatelessWidget {
         if (timeLabel != null)
           DabblerText(
             timeLabel!,
-            style: DabblerType.title3,
+            style: DabblerType.headline,
             weight: DabblerTextWeight.bold,
             maxLines: 1,
           ),
