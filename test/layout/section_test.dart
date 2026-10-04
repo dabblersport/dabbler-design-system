@@ -1,3 +1,4 @@
+import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/layout/section.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
@@ -332,5 +333,19 @@ void main() {
         expect(paragraph.textDirection, direction);
       }
     });
+  });
+
+  testWidgets('compact + icon draws a brand glyph and a semibold subheadline',
+      (tester) async {
+    await tester.pumpWidget(_host(const DabblerSection(
+      title: 'People',
+      icon: 'people',
+      compact: true,
+      children: <Widget>[SizedBox(height: 10)],
+    )));
+    final Text t = tester.widget<Text>(find.text('People'));
+    expect(t.style!.fontWeight, DabblerType.semibold);
+    expect(t.style!.fontSize, DabblerType.subheadline.fontSize);
+    expect(find.byType(DabblerIcon), findsOneWidget);
   });
 }

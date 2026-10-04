@@ -51,7 +51,7 @@ and the bordered brand tint are two different visual treatments by design, not a
 
 ### Tone
 `brand` (the default — brand tint with the card hairline), `amber`, `info`, `accent` (decorative
-tile roles, flat fill, no hairline), or a free colour through `DabblerIconTile.tinted`.
+tile roles, flat fill, no hairline), `sunken` (sunken neutral fill, brand glyph), or a free colour through `DabblerIconTile.tinted`.
 
 ### Interactivity
 Tappable (gets the shared press scale and focus ring) or inert.
@@ -66,6 +66,7 @@ surface variant, or one of the three decorative tile roles.
 
 - D-018 (cxo) — confirms the 12px corner as the ruled corner
   for a tile nested inside a card, distinct from the card's own 16px corner.
+- Alpha fidelity (Search) — adds the `sunken` tone for the result and shortcut tiles of `Search.dc.html`.
 
 ## Source
 

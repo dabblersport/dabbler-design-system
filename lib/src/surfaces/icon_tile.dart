@@ -46,6 +46,10 @@ enum DabblerIconTileTone {
 
   /// `--tile-accent-surface` / `--tile-accent-ink`.
   accent,
+
+  /// The sunken neutral fill with a brand glyph — the result and shortcut
+  /// tiles of `Search.dc.html:100, 192, 270` (`--surface-sunken`, brand ink).
+  sunken,
 }
 
 /// IconTile — the tinted square that holds one glyph ("Icon Bg").
@@ -203,6 +207,10 @@ class DabblerIconTile extends StatefulWidget {
       DabblerIconTileTone.amber => DabblerColors.tileAmber.surface,
       DabblerIconTileTone.info => DabblerColors.tileInfo.surface,
       DabblerIconTileTone.accent => DabblerColors.tileAccent.surface,
+      DabblerIconTileTone.sunken => DabblerSurface.fillOf(
+        colors,
+        DabblerSurfaceVariant.sunken,
+      ),
     };
   }
 
@@ -225,6 +233,7 @@ class DabblerIconTile extends StatefulWidget {
       DabblerIconTileTone.amber => DabblerColors.tileAmber.ink,
       DabblerIconTileTone.info => DabblerColors.tileInfo.ink,
       DabblerIconTileTone.accent => DabblerColors.tileAccent.ink,
+      DabblerIconTileTone.sunken => colors.brandPrimary,
     };
   }
 
