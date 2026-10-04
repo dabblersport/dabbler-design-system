@@ -182,6 +182,10 @@ class DabblerOpenPost extends StatelessWidget {
   /// Action glyph side — `size="22"` (`:108`).
   static const double actionGlyphSize = 22;
 
+  /// Isolates a left-to-right token (handle, time, date) so a right-to-left
+  /// paragraph does not reorder its `@` or its AM / PM.
+  static String _ltr(String s) => '\u2066$s\u2069';
+
   Widget _dot(DabblerColors colors) => ExcludeSemantics(
     child: Container(
       width: 3,
@@ -307,7 +311,7 @@ class DabblerOpenPost extends StatelessWidget {
               nameLine,
               if (handle != null)
                 Text(
-                  handle!,
+                  _ltr(handle!),
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.ellipsis,
@@ -426,10 +430,10 @@ class DabblerOpenPost extends StatelessWidget {
             spacing: DabblerSpacing.space2,
             children: <Widget>[
               if (timeLabel != null)
-                Text(DabblerType.toWesternDigits(timeLabel!), style: muted),
+                Text(_ltr(DabblerType.toWesternDigits(timeLabel!)), style: muted),
               if (timeLabel != null && dateLabel != null) _dot(colors),
               if (dateLabel != null)
-                Text(DabblerType.toWesternDigits(dateLabel!), style: muted),
+                Text(_ltr(DabblerType.toWesternDigits(dateLabel!)), style: muted),
               if (viewsLabel != null) ...<Widget>[
                 _dot(colors),
                 DabblerIcon('eye', size: 14, color: colors.textTertiary),
