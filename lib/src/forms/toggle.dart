@@ -55,6 +55,21 @@ import '../tokens/dabbler_geometry.dart';
 /// tab order while [disabled], as the source's native `disabled` attribute
 /// does. Semantically it is a switch — [Semantics.toggled], not `checked` —
 /// so assistive technology announces "on"/"off" rather than "ticked".
+/// Tells a [DabblerToggle] below it that a tappable row already supplies the
+/// 45-point touch target, so the switch lays out at its painted 28. Provided
+/// by `DabblerInputRow` when it has an `onTap`.
+class DabblerToggleRowScope extends InheritedWidget {
+  /// Marks [child] as the trailing slot of a row that is itself the target.
+  const DabblerToggleRowScope({super.key, required super.child});
+
+  /// Whether a [DabblerToggleRowScope] is above [context].
+  static bool of(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<DabblerToggleRowScope>() != null;
+
+  @override
+  bool updateShouldNotify(DabblerToggleRowScope oldWidget) => false;
+}
+
 class DabblerToggle extends StatefulWidget {
   /// Creates a controlled switch.
   const DabblerToggle({
@@ -205,7 +220,13 @@ class _DabblerToggleState extends State<DabblerToggle> {
               // so the target clears the floor without the painted geometry
               // moving. The specimen puts Checkbox and Radio "inside a
               // --touch-target-min row" for the same reason.
-              height: DabblerSizing.touchTargetMin,
+              //
+              // Inside a tappable row (see [DabblerToggleRowScope]) the row is
+              // the target, so the switch lays out at its painted height and
+              // the row keeps the design's rhythm.
+              height: DabblerToggleRowScope.of(context)
+                  ? DabblerToggle.trackHeight
+                  : DabblerSizing.touchTargetMin,
               child: Center(widthFactor: 1, child: ringed),
             ),
           ),

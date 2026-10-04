@@ -502,7 +502,9 @@ class DabblerInputRow extends StatelessWidget {
           ],
           if (trailingSlot != null) ...<Widget>[
             const SizedBox(width: slotGap),
-            trailingSlot,
+            tappable
+                ? DabblerToggleRowScope(child: trailingSlot)
+                : trailingSlot,
           ],
         ],
       ),
