@@ -80,6 +80,7 @@ class DabblerFlowPage extends StatelessWidget {
     this.bodyGap = DabblerSpacing.space6,
     this.bodyTopPadding = DabblerSpacing.space6,
     this.footerBottomPadding = DabblerSpacing.space8,
+    this.headerTopPadding,
     this.footerBanner,
     this.primaryLabel,
     this.onPrimary,
@@ -147,6 +148,11 @@ class DabblerFlowPage extends StatelessWidget {
   /// The space under the footer.
   final double footerBottomPadding;
 
+  /// The space above the header. Null is `space2` under a back row and
+  /// `space6` without one; the email, log-in and code frames give `space4`
+  /// (`Auth and Onboarding.dc.html:153`, `padding: 12px 24px 0`).
+  final double? headerTopPadding;
+
   /// A widget above the primary action, usually a `DabblerBanner`.
   final Widget? footerBanner;
 
@@ -213,7 +219,9 @@ class DabblerFlowPage extends StatelessWidget {
         padding: EdgeInsetsDirectional.only(
           start: DabblerSpacing.space8,
           end: DabblerSpacing.space8,
-          top: onBack != null ? DabblerSpacing.space2 : DabblerSpacing.space6,
+          top:
+              headerTopPadding ??
+              (onBack != null ? DabblerSpacing.space2 : DabblerSpacing.space6),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -290,7 +298,7 @@ class DabblerFlowPage extends StatelessWidget {
             child: Align(
               alignment: AlignmentDirectional.centerStart,
               child: DabblerButton.icon(
-                icon: 'arrow-left',
+                icon: 'arrow-circle-left',
                 mirrorInRtl: true,
                 tone: DabblerButtonTone.text,
                 semanticLabel: backLabel!,
