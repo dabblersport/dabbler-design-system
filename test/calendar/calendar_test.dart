@@ -3,7 +3,6 @@ import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
-import 'package:dabbler_design_system/src/tokens/dabbler_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
