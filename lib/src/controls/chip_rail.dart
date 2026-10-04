@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../foundations/sport_accent.dart';
@@ -202,13 +203,23 @@ class DabblerChipRailState extends State<DabblerChipRail> {
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       if (!mounted || selected >= _keys.length) return;
       final BuildContext? target = _keys[selected].currentContext;
-      if (target != null) {
-        Scrollable.ensureVisible(
-          target,
-          alignment: 0.5,
-          duration: Duration.zero,
-        );
-      }
+      if (target == null || !_controller.hasClients) return;
+      // Scroll the rail's own viewport only. `Scrollable.ensureVisible` walks
+      // every ancestor scrollable, which would also scroll the page that
+      // holds the rail.
+      final RenderObject? chip = target.findRenderObject();
+      if (chip == null) return;
+      final RenderAbstractViewport? viewport = RenderAbstractViewport.maybeOf(
+        chip,
+      );
+      if (viewport == null) return;
+      final ScrollPosition position = _controller.position;
+      position.jumpTo(
+        viewport
+            .getOffsetToReveal(chip, 0.5)
+            .offset
+            .clamp(position.minScrollExtent, position.maxScrollExtent),
+      );
     });
   }
 

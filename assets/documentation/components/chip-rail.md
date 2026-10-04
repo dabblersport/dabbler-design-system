@@ -70,6 +70,7 @@ chosen size. The chosen chip is brought into view without animation.
 ## Change log
 
 - KAN-426 (Seat B) — adds this component.
+- KAN-426 (close) — revealing the chosen chip scrolls only the rail's own viewport; it no longer scrolls the page that holds the rail.
 
 ## Source
 

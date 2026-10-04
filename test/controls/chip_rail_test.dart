@@ -118,6 +118,35 @@ void main() {
     expect(host.contains(tester.getCenter(_chip(12))), isTrue);
   });
 
+  testWidgets('revealing the chosen chip never scrolls the page around it', (
+    WidgetTester tester,
+  ) async {
+    final ScrollController page = ScrollController();
+    final ScrollController rail = ScrollController();
+    await tester.pumpWidget(
+      host(
+        ListView(
+          controller: page,
+          children: <Widget>[
+            const SizedBox(height: 600),
+            DabblerChipRail(
+              items: _items(14, selected: 12),
+              controller: rail,
+              padding: const EdgeInsetsDirectional.symmetric(
+                horizontal: DabblerSpacing.space6,
+              ),
+            ),
+            const SizedBox(height: 900),
+          ],
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(rail.offset, greaterThan(0));
+    expect(page.offset, 0);
+  });
+
   testWidgets('moving the selection reveals the new chip', (
     WidgetTester tester,
   ) async {
