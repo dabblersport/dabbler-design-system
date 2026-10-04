@@ -6,6 +6,7 @@ import '../interaction/press_scale.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_hue_tone.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 
@@ -21,6 +22,16 @@ enum DabblerSelectableCardLayout {
   /// `Auth and Onboarding.dc.html:392-406` (`grid-template-columns:
   /// repeat(4,1fr)`).
   tile,
+
+  /// The compact one-line option row — glyph, one label, trailing check —
+  /// vertically centred in a [DabblerSizing.touchTargetMin]-and-a-half
+  /// minimum height. The primary-sport step,
+  /// `Auth and Onboarding.dc.html:418-428`.
+  listRow,
+
+  /// The stacked option — glyph over a label with the check inline after it,
+  /// centred. The gender step, `Auth and Onboarding.dc.html:359-371`.
+  stacked,
 }
 
 /// SelectableCard — a tappable card that is either chosen or not.
@@ -93,6 +104,7 @@ class DabblerSelectableCard extends StatefulWidget {
     this.onChanged,
     this.layout = DabblerSelectableCardLayout.row,
     this.tint,
+    this.tone,
     this.semanticLabel,
   });
 
@@ -123,11 +135,31 @@ class DabblerSelectableCard extends StatefulWidget {
   /// The colour the card is tinted with. Defaults to the brand.
   final Color? tint;
 
+  /// A full four-colour tone (surface, edge, solid, glyph, idle radio) for a
+  /// card that is tinted by hue or ramp instead of by one [tint] — the sport
+  /// tiles and gender cards. When set it overrides [tint]: the fill is the
+  /// tone's `surface`, the idle stroke its `edge`, the selected stroke and
+  /// check its `solid`, the glyph and caption its `deep`, and the unselected
+  /// radio its `idle`.
+  final DabblerHueTone? tone;
+
   /// Overrides the label read by assistive technology.
   final String? semanticLabel;
 
   /// The check glyph shown while selected.
   static const String checkIconName = 'tick-circle';
+
+  /// The row caption's letter spacing, `0.06em` of the 16px step.
+  static const double captionTracking = 0.96;
+
+  /// The [DabblerSelectableCardLayout.listRow] minimum height, `64px`, the nearest step is 63
+  /// (`Auth and Onboarding.dc.html:419`).
+  static const double listRowMinHeight =
+      DabblerSizing.tileLg + DabblerSpacing.space5;
+
+  /// The [DabblerSelectableCardLayout.stacked] minimum height, `96px`
+  /// (`:360`).
+  static const double stackedMinHeight = DabblerSpacing.space11 * 2;
 
   /// The empty radio glyph shown on an idle row.
   static const String idleIconName = 'record';
@@ -155,9 +187,22 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
+    final DabblerHueTone? tone = widget.tone;
     final Color tint = widget.tint ?? colors.brandPrimary;
-    final bool row = widget.layout == DabblerSelectableCardLayout.row;
-    final double radius = row ? DabblerRadius.lg : DabblerRadius.md;
+    final Color solid = tone?.solid ?? tint;
+    final Color glyphColor = tone?.deep ?? tint;
+    final Color idleMark =
+        tone?.idle ?? DabblerSurface.tintedBorderOf(colors, tint);
+    final Color fill =
+        tone?.surface ?? DabblerSurface.tintedFillOf(colors, tint);
+    final Color edge =
+        tone?.edge ?? DabblerSurface.tintedBorderOf(colors, tint);
+    final bool row =
+        widget.layout != DabblerSelectableCardLayout.tile &&
+        widget.layout != DabblerSelectableCardLayout.stacked;
+    final double radius = widget.layout == DabblerSelectableCardLayout.tile
+        ? DabblerRadius.md
+        : DabblerRadius.lg;
     final DabblerIconWeight weight = widget.selected
         ? DabblerIconWeight.bold
         : DabblerIconWeight.linear;
@@ -168,13 +213,36 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
         widget.icon!,
         weight: weight,
         size: row ? DabblerSizing.iconMd : DabblerSizing.iconLg,
-        color: tint,
+        color: glyphColor,
       );
     }
 
-    final Widget body = row
-        ? _row(colors, direction, tint, glyph)
-        : _tile(colors, direction, tint, glyph);
+    final _CardPaint paint = _CardPaint(
+      solid: solid,
+      glyph: glyphColor,
+      idle: idleMark,
+    );
+    final Widget body = switch (widget.layout) {
+      DabblerSelectableCardLayout.row => _row(colors, direction, paint, glyph),
+      DabblerSelectableCardLayout.listRow => _listRow(
+        colors,
+        direction,
+        paint,
+        glyph,
+      ),
+      DabblerSelectableCardLayout.tile => _tile(
+        colors,
+        direction,
+        paint,
+        glyph,
+      ),
+      DabblerSelectableCardLayout.stacked => _stacked(
+        colors,
+        direction,
+        paint,
+        glyph,
+      ),
+    };
 
     final Widget card = AnimatedOpacity(
       opacity: _enabled ? 1 : 0.6,
@@ -183,10 +251,8 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
           : DabblerMotion.base,
       child: DabblerSurface(
         radius: radius,
-        fill: DabblerSurface.tintedFillOf(colors, tint),
-        borderColor: widget.selected
-            ? tint
-            : DabblerSurface.tintedBorderOf(colors, tint),
+        fill: fill,
+        borderColor: widget.selected ? solid : edge,
         borderWidth: widget.selected
             ? DabblerSizing.borderDefault * 2
             : DabblerSizing.borderDefault,
@@ -233,7 +299,7 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
   Widget _row(
     DabblerColors colors,
     TextDirection direction,
-    Color tint,
+    _CardPaint paint,
     Widget? glyph,
   ) {
     return Padding(
@@ -252,18 +318,27 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
                 if (widget.caption != null)
                   Text(
                     widget.caption!.toUpperCase(),
-                    style: DabblerType.caption1
+                    // The source sets no size on the caption or the hook, so
+                    // both inherit the 16px body step (`:379-380`). Tracking
+                    // is `0.06em`, dropped under RTL where it breaks joining.
+                    style: DabblerType.body
                         .resolveForDirection(direction)
                         .copyWith(
-                          color: tint,
+                          color: paint.glyph,
                           fontWeight: DabblerType.semibold,
+                          letterSpacing: direction == TextDirection.ltr
+                              ? DabblerSelectableCard.captionTracking
+                              : 0,
                         ),
                   ),
                 Text(
                   widget.title,
-                  style: DabblerType.callout
+                  style: DabblerType.body
                       .resolveForDirection(direction)
-                      .copyWith(color: colors.textPrimary),
+                      .copyWith(
+                        color: colors.textPrimary,
+                        fontWeight: DabblerType.medium,
+                      ),
                 ),
                 if (widget.subtitle != null)
                   Text(
@@ -276,19 +351,108 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
             ),
           ),
           const SizedBox(width: DabblerSpacing.space4),
-          DabblerIcon(
-            widget.selected
-                ? DabblerSelectableCard.checkIconName
-                : DabblerSelectableCard.idleIconName,
-            weight: widget.selected
-                ? DabblerIconWeight.bold
-                : DabblerIconWeight.linear,
-            size: DabblerSizing.iconMd,
-            color: widget.selected
-                ? tint
-                : DabblerSurface.tintedBorderOf(colors, tint),
-          ),
+          _radio(paint),
         ],
+      ),
+    );
+  }
+
+  Widget _radio(_CardPaint paint) => DabblerIcon(
+    widget.selected
+        ? DabblerSelectableCard.checkIconName
+        : DabblerSelectableCard.idleIconName,
+    weight: widget.selected ? DabblerIconWeight.bold : DabblerIconWeight.linear,
+    size: DabblerSizing.iconMd,
+    color: widget.selected ? paint.solid : paint.idle,
+  );
+
+  Widget _listRow(
+    DabblerColors colors,
+    TextDirection direction,
+    _CardPaint paint,
+    Widget? glyph,
+  ) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: DabblerSelectableCard.listRowMinHeight,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: DabblerSpacing.space4,
+          horizontal: DabblerSpacing.space5,
+        ),
+        child: Row(
+          children: <Widget>[
+            if (glyph != null) ...<Widget>[
+              glyph,
+              const SizedBox(width: DabblerSpacing.space4),
+            ],
+            Expanded(
+              child: Text(
+                widget.title,
+                style: DabblerType.callout
+                    .resolveForDirection(direction)
+                    .copyWith(
+                      color: colors.textPrimary,
+                      fontWeight: DabblerType.medium,
+                    ),
+              ),
+            ),
+            const SizedBox(width: DabblerSpacing.space4),
+            _radio(paint),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _stacked(
+    DabblerColors colors,
+    TextDirection direction,
+    _CardPaint paint,
+    Widget? glyph,
+  ) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: DabblerSelectableCard.stackedMinHeight,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: DabblerSpacing.space5,
+          horizontal: DabblerSpacing.space4,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ?glyph,
+            if (glyph != null) const SizedBox(height: DabblerSpacing.space3),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Flexible(
+                  child: Text(
+                    widget.title,
+                    style: DabblerType.subheadline
+                        .resolveForDirection(direction)
+                        .copyWith(
+                          color: colors.textPrimary,
+                          fontWeight: DabblerType.medium,
+                        ),
+                  ),
+                ),
+                if (widget.selected) ...<Widget>[
+                  const SizedBox(width: DabblerSpacing.space2),
+                  DabblerIcon(
+                    DabblerSelectableCard.checkIconName,
+                    weight: DabblerIconWeight.bold,
+                    size: DabblerSizing.iconInline,
+                    color: colors.textPrimary,
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -296,7 +460,7 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
   Widget _tile(
     DabblerColors colors,
     TextDirection direction,
-    Color tint,
+    _CardPaint paint,
     Widget? glyph,
   ) {
     return Stack(
@@ -337,10 +501,23 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
               DabblerSelectableCard.checkIconName,
               weight: DabblerIconWeight.bold,
               size: DabblerSizing.iconSm,
-              color: tint,
+              color: paint.solid,
             ),
           ),
       ],
     );
   }
+}
+
+/// The resolved colours one card paints with.
+class _CardPaint {
+  const _CardPaint({
+    required this.solid,
+    required this.glyph,
+    required this.idle,
+  });
+
+  final Color solid;
+  final Color glyph;
+  final Color idle;
 }

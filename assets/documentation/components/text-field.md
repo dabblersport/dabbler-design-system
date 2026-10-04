@@ -129,6 +129,9 @@ states, helper/error line — comes from `FieldShell`.
   contrast is never the only signal. Applied to this component's placeholder by KAN-336, which
   settled the variant question this page previously reported as open.
 
+- Alpha fidelity (KAN-426) — the password field is no taller than a standard one: its 45px toggle
+  fills the box instead of adding block padding (`Auth and Onboarding.dc.html:28-30`).
+
 ## Source
 
 `lib/src/forms/text_field.dart`

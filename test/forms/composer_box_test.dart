@@ -1,7 +1,6 @@
 // Pinned values cite "Home Feed.dc.html" (alpha-plan design set) :489-519.
 import 'package:dabbler_design_system/src/forms/composer_box.dart';
 import 'package:dabbler_design_system/src/forms/select_pill.dart';
-import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
