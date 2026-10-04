@@ -52,6 +52,7 @@ Surfaces: card for the game and the peeking sheets, sunken for the second sheet 
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics` (`DabblerFeedMetrics.touch` default, `.drawn`). Drawn lays the block out as the frame measures it: a 25 high title row whose hide button is a 34 box bleeding 8 past the end edge in English and sitting flush in Arabic (the frame's margin is physical), the front card 82 high (56 of content, 12 of padding, the hairline outside), two 42 high sheets peeking out 7 and 14 inset, a 32 toggle 3 under the stack, and the folded strip 30 high with a brand dot, a divider, the ticker line and a chevron inside the frame's physical `0 6 0 9` padding. Touch is unchanged.
 - Added from the Home Feed design file.
 
 ## Source

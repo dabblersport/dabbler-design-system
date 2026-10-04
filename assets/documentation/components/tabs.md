@@ -88,6 +88,7 @@ label.
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `DabblerTabsVariant.feed` and `padding`: the Home Feed's tab rail. Label-wide tabs 21 apart, every label at the regular weight (active differs by ink and the underline only, as the frame's markup draws it), 10 under the label, a 3px brand underline over the 1px faint rail, 33 high (36 under Arabic leading 23), each tab's 45 target kept as a hit-test-only area around it. `padding` insets the tabs while the rail still runs edge to edge. Underline and segmented are unchanged.
 - D-026 (cxo) — confirms the underline-only brand signal is
   correct as built and refuses a competing kit treatment that would triple the signal for one state.
 - DS gaps 6 — `labelFit` (`DabblerTabsLabelFit.ellipsis` default, `.fit`). Additive.

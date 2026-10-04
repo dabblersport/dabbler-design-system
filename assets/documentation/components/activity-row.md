@@ -67,6 +67,7 @@ Surface: the grey inset surface with the default border and the 24px corner. Ink
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics` to the row and to `DabblerActivitySystemTile`. Drawn: the system tile 42 (40 plus its hairline), 5 gaps in the actor and meta lines with the meta line 2 lower, a 9 gap above a 35 high action pill that lays out at its own size (45 target as a hit-test-only area), a 21 high sport badge and a 4 margin under the card. The default is unchanged.
 - Alpha fidelity (Notifications) — `DabblerActivityGroupHeader.count` (the `3 items` caption between label and rule) and `dense` (`padding:9px 0 3px`); `Notifications.dc.html:109-112`.
 - Added from the Home Feed design file.
 

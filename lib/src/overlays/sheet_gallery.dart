@@ -10,6 +10,7 @@ import '../controls/button.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import 'action_row.dart';
 import 'sheet.dart';
 
@@ -54,6 +55,19 @@ Widget _actionRows(BuildContext context) => const GalleryStack(
       child: SizedBox(
         width: 360,
         child: DabblerActionRow(
+          icon: 'eye-slash',
+          label: 'Hide post',
+          note: 'You will see fewer posts like this',
+          onTap: _noopAction,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — 65 high, flat fill, as the post-options sheet',
+      child: SizedBox(
+        width: 360,
+        child: DabblerActionRow(
+          metrics: DabblerFeedMetrics.drawn,
           icon: 'eye-slash',
           label: 'Hide post',
           note: 'You will see fewer posts like this',

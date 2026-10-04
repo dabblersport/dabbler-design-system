@@ -161,6 +161,11 @@ void main() {
       expect(DabblerInsets.listBottom, const EdgeInsets.only(bottom: 24));
       expect(DabblerInsets.underFloatingBar, const EdgeInsets.only(bottom: 96));
       expect(
+        DabblerInsets.feedScreen,
+        const EdgeInsets.symmetric(horizontal: 18),
+      );
+      expect(DabblerInsets.feedBottom, const EdgeInsets.only(bottom: 120));
+      expect(
         DabblerInsets.rowVertical,
         const EdgeInsets.symmetric(vertical: 12),
       );

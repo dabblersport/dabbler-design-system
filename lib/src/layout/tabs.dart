@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
+import '../interaction/expanded_hit_area.dart';
 import '../interaction/focus_ring.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 import 'tabs_label_fit.dart';
 
@@ -21,6 +23,14 @@ enum DabblerTabsVariant {
   /// A `--surface-sunken` pill track whose selected tab is a solid brand
   /// fill. For two or three peer views; always full width.
   segmented,
+
+  /// The Home Feed's tab rail, as the frame measures it
+  /// (`home-design-measure.md` section 5): label-width tabs 21 apart, every
+  /// label at the regular weight (active differs by ink and underline only),
+  /// 10 under the label and a 3px brand underline over the 1px `--faint`
+  /// rail — a 33 tall strip (36 in Arabic, whose leading is 23). The 45px
+  /// target is kept as a hit-test-only area around each label.
+  feed,
 }
 
 /// One tab, transcribed from `TabItem` in `components/layout/Tabs.d.ts`.
@@ -168,7 +178,14 @@ class DabblerTabs extends StatefulWidget {
     this.label,
     this.allowNoSelection = false,
     this.labelFit = DabblerTabsLabelFit.ellipsis,
+    this.padding = EdgeInsets.zero,
   });
+
+  /// Inline padding around the tabs themselves. The 1px rail still spans the
+  /// strip's full extent, so the Home Feed's hairline can run edge to edge
+  /// while its tabs start at the 18 gutter. Underline and
+  /// [DabblerTabsVariant.feed] only; default none.
+  final EdgeInsetsGeometry padding;
 
   /// What a [DabblerTabsVariant.segmented] strip does with labels too long
   /// for their segment. The default, [DabblerTabsLabelFit.ellipsis], is the
@@ -257,6 +274,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
   }
 
   bool get _segmented => widget.variant == DabblerTabsVariant.segmented;
+  bool get _feed => widget.variant == DabblerTabsVariant.feed;
 
   /// Segmented tabs are always full width (`Tabs.prompt.md` — *Responsive*),
   /// and the source never scrolls them.
@@ -536,7 +554,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
       // source's block-level flex container does, so the rail spans it too.
       mainAxisSize: _scrollable ? MainAxisSize.min : MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
-      spacing: _segmented ? DabblerSpacing.space1 : DabblerSpacing.space5,
+      spacing: _segmented
+          ? DabblerSpacing.space1
+          : (_feed ? DabblerSpacing.space7 : DabblerSpacing.space5),
       children: tabs,
     );
 
@@ -626,7 +646,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
             start: _start,
             bottom: 0,
             width: _size,
-            height: _indicatorHeight,
+            height: _feed ? DabblerSpacing.space1 : _indicatorHeight,
             child: ColoredBox(color: colors.brandPrimary),
           ),
       ],
@@ -636,9 +656,12 @@ class _DabblerTabsState extends State<DabblerTabs> {
       content = SingleChildScrollView(
         controller: _scroll,
         scrollDirection: Axis.horizontal,
+        padding: widget.padding,
         // The source hides the scrollbar (`scrollbarWidth: 'none'`).
         child: content,
       );
+    } else if (widget.padding != EdgeInsets.zero) {
+      content = Padding(padding: widget.padding, child: content);
     }
 
     return Stack(
@@ -693,7 +716,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
         .resolveForDirection(direction)
         .copyWith(
           color: foreground,
-          fontWeight: active ? DabblerType.medium : DabblerType.regular,
+          fontWeight: active && !_feed
+              ? DabblerType.medium
+              : DabblerType.regular,
           fontSize: _fitting && _baseLabelSize(direction) != null
               ? _baseLabelSize(direction)! * _fitScale
               : null,
@@ -740,6 +765,14 @@ class _DabblerTabsState extends State<DabblerTabs> {
             ),
             child: content,
           )
+        : _feed
+        ? Padding(
+            // 10 under the label, plus the 3px underline that rides over it.
+            padding: const EdgeInsetsDirectional.only(
+              bottom: DabblerHomeFrame.tabPaddingBottom + DabblerSpacing.space1,
+            ),
+            child: content,
+          )
         : Container(
             constraints: const BoxConstraints(
               minWidth: DabblerSizing.touchTargetMin,
@@ -751,7 +784,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
 
     // The hit box. `HitTestBehavior.opaque` is what lets the segmented tab's
     // target be the full 45 while its pill paints 39.
-    final Widget tappable = GestureDetector(
+    final Widget gesture = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: widget.onChanged == null
           ? null
@@ -759,20 +792,27 @@ class _DabblerTabsState extends State<DabblerTabs> {
               widget.onChanged!.call(item.id);
               _nodes[index].requestFocus();
             },
-      child: SizedBox(
-        height: DabblerSizing.touchTargetMin,
-        child: Center(
-          widthFactor: _fullWidth ? null : 1,
-          child: DabblerFocusRing(
-            focusNode: _nodes[index],
-            borderRadius: _segmented
-                ? DabblerRadius.pillAll
-                : BorderRadius.zero,
-            child: body,
-          ),
-        ),
-      ),
+      child: _feed
+          ? DabblerFocusRing(
+              focusNode: _nodes[index],
+              borderRadius: BorderRadius.zero,
+              child: body,
+            )
+          : SizedBox(
+              height: DabblerSizing.touchTargetMin,
+              child: Center(
+                widthFactor: _fullWidth ? null : 1,
+                child: DabblerFocusRing(
+                  focusNode: _nodes[index],
+                  borderRadius: _segmented
+                      ? DabblerRadius.pillAll
+                      : BorderRadius.zero,
+                  child: body,
+                ),
+              ),
+            ),
     );
+    final Widget tappable = gesture;
 
     final Widget tab = Semantics(
       key: _tabKeys[index],
@@ -792,6 +832,16 @@ class _DabblerTabsState extends State<DabblerTabs> {
 
     if (_fullWidth) {
       return Expanded(child: tab);
+    }
+    // Feed: the tab lays out at the frame's 33 and the 45 target is a
+    // hit-test-only area around the whole tab (every wrapper inside it would
+    // otherwise gate the hit at the label's own bounds).
+    if (_feed) {
+      final Widget wide = DabblerExpandedHitArea(
+        minimum: const Size.square(DabblerSizing.touchTargetMin),
+        child: tab,
+      );
+      return _scrollable ? wide : Flexible(child: wide);
     }
     // **Deviation, documented.** The source's tabs are `flex: 0 0 auto` and a
     // CSS overflow is silent; a Flutter [Row] overflow is a reported error.

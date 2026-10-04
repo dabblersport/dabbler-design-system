@@ -3,7 +3,9 @@ import 'package:flutter/widgets.dart';
 import '../foundations/icon.dart';
 import '../surfaces/badge.dart';
 import '../tokens/dabbler_colors.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 import 'feed_atoms.dart';
 
@@ -77,7 +79,19 @@ class DabblerNewsCard extends StatelessWidget {
     this.likeLabel = 'Like',
     this.commentLabel = 'Comments',
     this.viewsLabel = 'Views',
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] lays the card out as the frame measures it
+  /// (`home-design-measure.md` section 7c): a 210 hero, 9 above and below an
+  /// 18 high action row (glyphs and counts 15 apart, the 45 targets kept as
+  /// hit-test-only areas), a 5 gap between headline and excerpt, 21 plus the
+  /// hairline under the text, a regular-weight 11/13 sport pill pinned to the
+  /// hero's *physical* top left (the frame's `left:12px`, so it does not
+  /// mirror in RTL).
+  final DabblerFeedMetrics metrics;
+
+  bool get _drawn => metrics == DabblerFeedMetrics.drawn;
 
   /// The media block's content (an image, usually). Null leaves the sunken
   /// surface.
@@ -160,7 +174,15 @@ class DabblerNewsCard extends StatelessWidget {
           children: <Widget>[
             ColoredBox(color: colors.surfaceSunken),
             ?media,
-            if (sportLabel != null)
+            if (sportLabel != null && _drawn)
+              Positioned(
+                top: DabblerSpacing.space4,
+                left: DabblerSpacing.space4,
+                child: IgnorePointer(
+                  child: DabblerBadge(label: sportLabel!, metrics: metrics),
+                ),
+              )
+            else if (sportLabel != null)
               PositionedDirectional(
                 top: DabblerSpacing.space4,
                 start: DabblerSpacing.space4,
@@ -172,8 +194,10 @@ class DabblerNewsCard extends StatelessWidget {
     );
 
     final Widget actions = Row(
+      spacing: _drawn ? DabblerSpacing.space5 : 0,
       children: <Widget>[
         DabblerFeedAction(
+          metrics: metrics,
           icon: 'heart',
           count: likes,
           iconSize: actionGlyphSize,
@@ -184,6 +208,7 @@ class DabblerNewsCard extends StatelessWidget {
           semanticLabel: likeLabel,
         ),
         DabblerFeedAction(
+          metrics: metrics,
           icon: 'message-text',
           count: comments,
           iconSize: actionGlyphSize,
@@ -191,8 +216,9 @@ class DabblerNewsCard extends StatelessWidget {
           semanticLabel: commentLabel,
         ),
         if (views != null) ...<Widget>[
-          const SizedBox(width: DabblerSpacing.space5),
+          if (!_drawn) const SizedBox(width: DabblerSpacing.space5),
           DabblerFeedAction(
+            metrics: metrics,
             icon: 'eye',
             count: views,
             iconSize: actionGlyphSize,
@@ -220,7 +246,11 @@ class DabblerNewsCard extends StatelessWidget {
           ),
         ),
         if (excerpt != null) ...<Widget>[
-          const SizedBox(height: DabblerSpacing.space2),
+          SizedBox(
+            height: _drawn
+                ? DabblerHomeFrame.newsTextGap
+                : DabblerSpacing.space2,
+          ),
           Text(
             excerpt!,
             maxLines: 2,
@@ -246,12 +276,27 @@ class DabblerNewsCard extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsetsDirectional.only(
-          bottom: divider ? paddingBottom : 0,
+          // Drawn: the 21, plus the hairline the frame's content-box card
+          // counts in its own height.
+          bottom: divider
+              ? paddingBottom + (_drawn ? DabblerSizing.borderDefault : 0)
+              : 0,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[mediaBlock, actions, text],
+          children: <Widget>[
+            mediaBlock,
+            if (_drawn) const SizedBox(height: DabblerSpacing.space3),
+            _drawn
+                ? DabblerExpandedHitArea(
+                    minimum: const Size(0, DabblerSizing.touchTargetMin),
+                    child: actions,
+                  )
+                : actions,
+            if (_drawn) const SizedBox(height: DabblerSpacing.space3),
+            text,
+          ],
         ),
       ),
     );

@@ -12,9 +12,11 @@ library;
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../interaction/focus_ring.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 
 /// Wraps [child] so the whole of it is one focusable, tappable region.
@@ -121,7 +123,13 @@ class DabblerFeedAction extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.semanticLabel,
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] lays the action out at its drawing — the glyph
+  /// and count only, 20 high in the post row — and keeps the 45px target as a
+  /// hit-test-only area around it. The default keeps the 45 box in layout.
+  final DabblerFeedMetrics metrics;
 
   /// The kebab-case Iconsax name.
   final String icon;
@@ -187,19 +195,30 @@ class DabblerFeedAction extends StatelessWidget {
         child: content,
       );
     }
-    return DabblerFeedTappable(
+    final Widget tappable = DabblerFeedTappable(
       onTap: onTap,
       onLongPress: onLongPress,
       semanticLabel: composedLabel,
       excludeChildSemantics: true,
       borderRadius: DabblerRadius.pillAll,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minWidth: DabblerSizing.touchTargetMin,
-          minHeight: DabblerSizing.touchTargetMin,
-        ),
-        child: Center(widthFactor: 1, heightFactor: 1, child: content),
-      ),
+      child: metrics == DabblerFeedMetrics.drawn
+          ? content
+          : ConstrainedBox(
+              constraints: const BoxConstraints(
+                minWidth: DabblerSizing.touchTargetMin,
+                minHeight: DabblerSizing.touchTargetMin,
+              ),
+              child: Center(widthFactor: 1, heightFactor: 1, child: content),
+            ),
     );
+    // Drawn: the action lays out at its drawing and the 45 target is a
+    // hit-test-only area *around* the gesture (inside it, the gesture's own
+    // bounds would still be the drawing's).
+    return metrics == DabblerFeedMetrics.drawn
+        ? DabblerExpandedHitArea(
+            minimum: const Size.square(DabblerSizing.touchTargetMin),
+            child: tappable,
+          )
+        : tappable;
   }
 }

@@ -12,6 +12,7 @@ import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
+import '../tokens/dabbler_home_frame.dart';
 import 'activity_row.dart';
 import 'news_card.dart';
 import 'notification_row.dart';
@@ -135,6 +136,62 @@ Widget _posts(BuildContext context) => GalleryStack(
       ),
     ),
     GallerySpecimen(
+      label: 'drawn metrics — as the Home Feed frame measures it',
+      child: _frame(
+        const DabblerPostRow(
+          metrics: DabblerFeedMetrics.drawn,
+          name: 'Suraj Mehta',
+          roleLabel: 'Player',
+          distance: 'Dab',
+          time: '2h',
+          place: 'Nad Al Sheba',
+          segments: <DabblerPostSegment>[
+            DabblerPostSegment(
+              'Anyone playing cricket in Dubai this weekend? ',
+            ),
+            DabblerPostSegment('#dabblersport', link: true),
+          ],
+          sportLabel: 'Cricket',
+          likes: 12,
+          replies: 4,
+          onTap: _noop,
+          onLike: _noop,
+          onVibe: _noop,
+          onComment: _noop,
+          onShare: _noop,
+          onMore: _noop,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics, Arabic (the frame\'s own copy)',
+      child: _frame(
+        const Directionality(
+          textDirection: TextDirection.rtl,
+          child: DabblerPostRow(
+            metrics: DabblerFeedMetrics.drawn,
+            name: 'سوراج ميهتا',
+            roleLabel: 'لاعب',
+            distance: 'داب',
+            time: '2h',
+            place: 'ند الشبا',
+            body:
+                'أحد يلعب كريكيت في دبي نهاية الأسبوع؟ نحتاج لاعبَين لإكمال '
+                'الفريق.',
+            sportLabel: 'كريكيت',
+            likes: 12,
+            replies: 4,
+            onTap: _noop,
+            onLike: _noop,
+            onVibe: _noop,
+            onComment: _noop,
+            onShare: _noop,
+            onMore: _noop,
+          ),
+        ),
+      ),
+    ),
+    GallerySpecimen(
       label: 'Arabic, right-to-left',
       child: _frame(
         const Directionality(
@@ -168,6 +225,30 @@ Widget _news(BuildContext context) => GalleryStack(
       label: 'default',
       child: _frame(
         DabblerNewsCard(
+          media: _media(context),
+          sportLabel: 'Football',
+          title:
+              'Dubai adds twelve floodlit community pitches before the winter '
+              'season',
+          excerpt:
+              'The municipality confirmed the first six sites open in '
+              'November, with booking handled inside the same apps residents '
+              'already use for public courts.',
+          time: '3h ago',
+          likes: 128,
+          comments: 24,
+          views: 1902,
+          onTap: _noop,
+          onLike: _noop,
+          onComment: _noop,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — as the Home Feed frame measures it',
+      child: _frame(
+        DabblerNewsCard(
+          metrics: DabblerFeedMetrics.drawn,
           media: _media(context),
           sportLabel: 'Football',
           title:
@@ -269,6 +350,27 @@ Widget _activity(BuildContext context) => GalleryStack(
       child: _frame(
         const DabblerActivityRow(
           leading: DabblerActivitySystemTile('ticket-2'),
+          actor: 'Meydan Padel',
+          verb: 'opened a court for tonight',
+          subject: 'Court 3 free 8:00 - 10:00 PM',
+          place: 'Meydan',
+          when: 'in 2h',
+          distance: '2.6 km',
+          actionLabel: 'Book',
+          onAction: _noop,
+          sportLabel: 'Padel',
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — system tile 42, action 35, badge 21',
+      child: _frame(
+        const DabblerActivityRow(
+          metrics: DabblerFeedMetrics.drawn,
+          leading: DabblerActivitySystemTile(
+            'ticket-2',
+            metrics: DabblerFeedMetrics.drawn,
+          ),
           actor: 'Meydan Padel',
           verb: 'opened a court for tonight',
           subject: 'Court 3 free 8:00 - 10:00 PM',
@@ -429,8 +531,10 @@ Widget _reminder({
   bool collapsed = false,
   bool expanded = false,
   String title = 'Upcoming · 3',
+  DabblerFeedMetrics metrics = DabblerFeedMetrics.touch,
 }) => _frame(
   DabblerUpcomingReminder(
+    metrics: metrics,
     items: items,
     title: title,
     collapsed: collapsed,
@@ -462,6 +566,30 @@ Widget _upcoming(BuildContext context) => GalleryStack(
     GallerySpecimen(
       label: 'folded to the strip',
       child: _reminder(items: _games, collapsed: true),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — stacked, as the frame measures it',
+      child: _reminder(items: _games, metrics: DabblerFeedMetrics.drawn),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — folded strip, 30 high',
+      child: _reminder(
+        items: _games,
+        collapsed: true,
+        metrics: DabblerFeedMetrics.drawn,
+      ),
+    ),
+    GallerySpecimen(
+      label:
+          'drawn metrics, Arabic (hide button flush, frame margin is physical)',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: _reminder(
+          items: _games,
+          title: 'القادمة · 3',
+          metrics: DabblerFeedMetrics.drawn,
+        ),
+      ),
     ),
     GallerySpecimen(
       label: 'Arabic, right-to-left',

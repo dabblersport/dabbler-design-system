@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
 
 import '../feedback/ring.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../foundations/icon.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 import 'feed_atoms.dart';
 
@@ -102,7 +104,19 @@ class DabblerUpcomingReminder extends StatelessWidget {
     required this.dismissLabel,
     this.seeAllLabel,
     this.onSeeAll,
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] lays the block out as the frame measures it
+  /// (`home-design-measure.md` section 4): a 25 title row whose hide button is
+  /// a 34 box bleeding 8 past the end edge (LTR; flush in RTL — the frame's
+  /// margin is physical), 9 below it the front card at its 82 (56 of content,
+  /// 12 padding, 1 hairline outside), two 42 sheets peeking out 7 and 14
+  /// inset, and a 32 toggle 3 under the stack. The 45 targets are kept as
+  /// hit-test-only areas. Default [DabblerFeedMetrics.touch] is unchanged.
+  final DabblerFeedMetrics metrics;
+
+  bool get _drawn => metrics == DabblerFeedMetrics.drawn;
 
   /// The games, soonest first. Empty draws nothing.
   final List<DabblerUpcomingItem> items;
@@ -167,40 +181,48 @@ class DabblerUpcomingReminder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                DabblerType.toWesternDigits(title),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: t(
-                  DabblerType.title3,
-                ).copyWith(color: colors.textPrimary),
-              ),
-            ),
-            if (items.length > 3 && seeAllLabel != null)
-              DabblerFeedTappable(
-                onTap: onSeeAll,
+        if (_drawn) ...<Widget>[
+          DabblerExpandedHitArea(
+            minimum: const Size(0, DabblerSizing.touchTargetMin),
+            child: _drawnTitleRow(colors, t, dir),
+          ),
+          const SizedBox(height: DabblerSpacing.space3),
+        ] else
+          Row(
+            children: <Widget>[
+              Expanded(
                 child: Text(
-                  DabblerType.toWesternDigits(seeAllLabel!),
+                  DabblerType.toWesternDigits(title),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: t(
-                    DabblerType.footnote,
-                  ).copyWith(color: colors.brandPrimary),
+                    DabblerType.title3,
+                  ).copyWith(color: colors.textPrimary),
                 ),
               ),
-            DabblerFeedAction(
-              icon: 'close-circle',
-              iconSize: 18,
-              onTap: onDismiss,
-              semanticLabel: dismissLabel,
-            ),
-          ],
-        ),
+              if (items.length > 3 && seeAllLabel != null)
+                DabblerFeedTappable(
+                  onTap: onSeeAll,
+                  child: Text(
+                    DabblerType.toWesternDigits(seeAllLabel!),
+                    style: t(
+                      DabblerType.footnote,
+                    ).copyWith(color: colors.brandPrimary),
+                  ),
+                ),
+              DabblerFeedAction(
+                icon: 'close-circle',
+                iconSize: 18,
+                onTap: onDismiss,
+                semanticLabel: dismissLabel,
+              ),
+            ],
+          ),
         if (!multi)
           _card(items.first, colors, t)
         else if (!expanded) ...<Widget>[
           _stack(colors, t),
+          if (_drawn) const SizedBox(height: DabblerSpacing.space1),
           _toggle(moreLabel, 'arrow-circle-down', colors, t),
         ] else ...<Widget>[
           _card(items.first, colors, t),
@@ -212,10 +234,270 @@ class DabblerUpcomingReminder extends StatelessWidget {
     );
   }
 
+  /// The collapsed strip as drawn: 30 high, a brand dot and the count, a 1px
+  /// divider, the (static) ticker line and a chevron, `padding:0 6px 0 9px`
+  /// with 9 between the parts.
+  Widget _drawnStrip(
+    DabblerColors colors,
+    TextStyle Function(DabblerTypeStyle) t,
+    String text,
+  ) {
+    return DabblerFeedTappable(
+      onTap: onExpandStrip,
+      semanticLabel: stripLabel,
+      excludeChildSemantics: true,
+      child: DabblerSurface.grey(
+        radius: DabblerRadius.pill,
+        // `height:30px` — `--space-9`.
+        height: DabblerSpacing.space9,
+        // The frame's padding is physical (`0 6px 0 9px`): 9 on the left and 6
+        // on the right in both directions of reading.
+        padding: const EdgeInsets.only(
+          left: DabblerSpacing.space3,
+          right: DabblerSpacing.space2,
+        ),
+        child: Row(
+          spacing: DabblerSpacing.space3,
+          children: <Widget>[
+            Row(
+              spacing: DabblerHomeFrame.reminderStripGap,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SizedBox.square(
+                  dimension: DabblerSpacing.space2,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colors.brandPrimary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Text(
+                  DabblerType.toWesternDigits(stripLabel),
+                  style: t(
+                    DabblerType.caption2,
+                  ).copyWith(color: colors.textPrimary),
+                ),
+              ],
+            ),
+            SizedBox(
+              width: DabblerSizing.borderDefault,
+              height: DabblerHomeFrame.reminderStripDivider,
+              child: ColoredBox(color: colors.borderDefault),
+            ),
+            Expanded(
+              child: Text(
+                DabblerType.toWesternDigits(text),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: t(
+                  DabblerType.caption1,
+                ).copyWith(color: colors.textSecondary),
+              ),
+            ),
+            DabblerIcon(
+              'arrow-circle-down',
+              size: 16,
+              color: colors.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The title row as drawn: 25 high, the title at its own width, the hide
+  /// button a 34 box whose end edge bleeds 8 past the block in LTR.
+  Widget _drawnTitleRow(
+    DabblerColors colors,
+    TextStyle Function(DabblerTypeStyle) t,
+    TextDirection dir,
+  ) {
+    final bool ltr = dir == TextDirection.ltr;
+    final double reserved = ltr
+        ? DabblerHomeFrame.reminderHideBox - DabblerHomeFrame.reminderHideBleed
+        : DabblerHomeFrame.reminderHideBox;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Flexible(
+              child: Text(
+                DabblerType.toWesternDigits(title),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: t(
+                  DabblerType.title3,
+                ).copyWith(color: colors.textPrimary),
+              ),
+            ),
+            const Spacer(),
+            if (items.length > 3 && seeAllLabel != null)
+              DabblerFeedTappable(
+                onTap: onSeeAll,
+                child: Text(
+                  DabblerType.toWesternDigits(seeAllLabel!),
+                  style: t(
+                    DabblerType.footnote,
+                  ).copyWith(color: colors.brandPrimary),
+                ),
+              ),
+            SizedBox(width: reserved),
+          ],
+        ),
+        PositionedDirectional(
+          // The frame's margin is physical (`margin:-6px -8px -6px 0`): the
+          // button bleeds past the right edge, and in RTL sits flush left.
+          end: ltr ? -DabblerHomeFrame.reminderHideBleed : 0,
+          top: 0,
+          bottom: 0,
+          width: DabblerHomeFrame.reminderHideBox,
+          child: OverflowBox(
+            minHeight: DabblerHomeFrame.reminderHideBox,
+            maxHeight: DabblerHomeFrame.reminderHideBox,
+            child: DabblerExpandedHitArea(
+              minimum: const Size.square(DabblerSizing.touchTargetMin),
+              child: DabblerFeedTappable(
+                onTap: onDismiss,
+                semanticLabel: dismissLabel,
+                excludeChildSemantics: true,
+                borderRadius: DabblerRadius.pillAll,
+                child: SizedBox(
+                  width: DabblerHomeFrame.reminderHideBox,
+                  height: DabblerHomeFrame.reminderHideBox,
+                  child: Center(
+                    child: DabblerIcon(
+                      'close-circle',
+                      size: DabblerSizing.iconSm,
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The front card as drawn: 56 of content in 12 of padding inside a hairline,
+  /// 82 high; the date tile and the text stretch to the ring's 56.
+  Widget _drawnCard(
+    DabblerUpcomingItem u,
+    DabblerColors colors,
+    TextStyle Function(DabblerTypeStyle) t,
+  ) {
+    return DabblerFeedTappable(
+      onTap: u.onTap,
+      child: DabblerSurface.card(
+        radius: DabblerRadius.lg,
+        borderOutside: true,
+        padding: const EdgeInsets.all(DabblerSpacing.space4),
+        child: SizedBox(
+          height: ringSize,
+          child: Row(
+            children: <Widget>[
+              SizedBox(
+                width: dateTileWidth,
+                height: ringSize,
+                child: DabblerSurface.brandTint(
+                  radius: DabblerRadius.md,
+                  borderWidth: 0,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: DabblerSpacing.space2,
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: DabblerHomeFrame.reminderDateGap,
+                      children: <Widget>[
+                        Text(
+                          DabblerType.toWesternDigits(u.month),
+                          style: t(
+                            DabblerType.caption2,
+                          ).copyWith(color: colors.brandPrimary),
+                        ),
+                        Text(
+                          DabblerType.toWesternDigits(u.day),
+                          style: t(
+                            DabblerType.headline,
+                          ).copyWith(color: colors.brandPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: DabblerSpacing.space4),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: DabblerHomeFrame.reminderTextGap,
+                    children: <Widget>[
+                      Text(
+                        u.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: t(
+                          DabblerType.subheadline,
+                        ).copyWith(color: colors.textPrimary),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          DabblerType.toWesternDigits(u.detail),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: t(
+                            DabblerType.caption1,
+                          ).copyWith(color: colors.textSecondary),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: DabblerSpacing.space4),
+              DabblerRing.ticks(
+                fraction: u.ringFraction,
+                diameter: ringSize,
+                count: 32,
+                track: DabblerRingTrack.faint,
+                semanticValue: '${u.ringBig} ${u.ringSmall}',
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      DabblerType.toWesternDigits(u.ringBig),
+                      style: t(
+                        DabblerType.title3,
+                      ).copyWith(color: colors.textPrimary),
+                    ),
+                    Text(
+                      u.ringSmall,
+                      style: t(
+                        DabblerType.caption2,
+                      ).copyWith(color: colors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _strip(DabblerColors colors, TextStyle Function(DabblerTypeStyle) t) {
     final String text = items
         .map((DabblerUpcomingItem i) => '${i.title} · ${i.detail} · ${i.short}')
         .join('   ·   ');
+    if (_drawn) return _drawnStrip(colors, t, text);
     return DabblerFeedTappable(
       onTap: onExpandStrip,
       semanticLabel: stripLabel,
@@ -263,6 +545,7 @@ class DabblerUpcomingReminder extends StatelessWidget {
     DabblerColors colors,
     TextStyle Function(DabblerTypeStyle) t,
   ) {
+    if (_drawn) return _drawnCard(u, colors, t);
     return DabblerFeedTappable(
       onTap: u.onTap,
       child: DabblerSurface.card(
@@ -356,6 +639,36 @@ class DabblerUpcomingReminder extends StatelessWidget {
   /// The first game over two sheets peeking out below it (`:141-142`).
   Widget _stack(DabblerColors colors, TextStyle Function(DabblerTypeStyle) t) {
     final Color hairline = colors.borderDefault;
+    if (_drawn) {
+      return Stack(
+        children: <Widget>[
+          PositionedDirectional(
+            start: DabblerHomeFrame.reminderSheetFar,
+            end: DabblerHomeFrame.reminderSheetFar,
+            bottom: DabblerHomeFrame.reminderSheetNear,
+            height: DabblerHomeFrame.reminderSheetHeight,
+            child: const DabblerSurface.card(radius: DabblerRadius.lg),
+          ),
+          PositionedDirectional(
+            start: DabblerHomeFrame.reminderSheetNear,
+            end: DabblerHomeFrame.reminderSheetNear,
+            bottom: 0,
+            height: DabblerHomeFrame.reminderSheetHeight,
+            child: DabblerSurface(
+              fill: colors.surfaceSunken,
+              radius: DabblerRadius.lg,
+              borderColor: hairline,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(
+              bottom: DabblerHomeFrame.reminderStackDepth,
+            ),
+            child: _card(items.first, colors, t),
+          ),
+        ],
+      );
+    }
     return Stack(
       children: <Widget>[
         PositionedDirectional(

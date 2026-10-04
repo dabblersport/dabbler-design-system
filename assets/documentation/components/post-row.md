@@ -95,6 +95,7 @@ Ink: primary for the name, secondary for role, time, place, body and counts, ter
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics`. Drawn lays the row out as the frame measures it: a 2/8 regular-weight 11/13 type pill (17 high), 5 gaps in the meta row with the pin 4 further in, a 32 high sport pill, and a 20 high action row — glyphs and counts only, 18 apart — under 12 of air with 15 below; each action keeps its 45 target as a hit-test-only area, the row's own band reaching the 12 above and below. The deviations above (45px boxes, nearest-step gaps) describe the default, which is unchanged.
 - Added from the Home Feed design file.
 - Gained the opt-in open-post detail line from the Post design file (KAN-412 gaps 5).
 - Alpha final follow-up — adds `DabblerRepostRow`.

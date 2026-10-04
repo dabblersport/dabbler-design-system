@@ -4,7 +4,9 @@ import '../foundations/icon.dart';
 import '../surfaces/avatar.dart' show DabblerAvatar, DabblerAvatarGroup;
 import '../surfaces/badge.dart';
 import '../tokens/dabbler_colors.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 import 'feed_atoms.dart';
 
@@ -17,10 +19,18 @@ import 'feed_atoms.dart';
 /// (`size: sm`) and a group a [DabblerAvatarGroup], both from the barrel.
 class DabblerActivitySystemTile extends StatelessWidget {
   /// A tile drawing the kebab-case Iconsax [icon].
-  const DabblerActivitySystemTile(this.icon, {super.key});
+  const DabblerActivitySystemTile(
+    this.icon, {
+    super.key,
+    this.metrics = DabblerFeedMetrics.touch,
+  });
 
   /// The kebab-case Iconsax name.
   final String icon;
+
+  /// [DabblerFeedMetrics.drawn] draws the tile at the frame's measured 42
+  /// ([DabblerHomeFrame.activityTile]: 40 plus the hairline).
+  final DabblerFeedMetrics metrics;
 
   /// The tile's side — `width:40px;height:40px`.
   static const double size = 40;
@@ -33,8 +43,12 @@ class DabblerActivitySystemTile extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     return ExcludeSemantics(
       child: Container(
-        width: size,
-        height: size,
+        width: metrics == DabblerFeedMetrics.drawn
+            ? DabblerHomeFrame.activityTile
+            : size,
+        height: metrics == DabblerFeedMetrics.drawn
+            ? DabblerHomeFrame.activityTile
+            : size,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: colors.surfaceCard,
@@ -217,7 +231,17 @@ class DabblerActivityRow extends StatelessWidget {
     this.sportLabel,
     this.thumbnail,
     this.onTap,
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] lays the card out as the frame measures it
+  /// (`home-design-measure.md` section 7b): 5 gaps in the actor and meta
+  /// lines, the meta line 2 lower, a 9 gap above a 35 high action pill that
+  /// lays out at its own size (the 45 target is hit-test only), 3/10 sport
+  /// badges and a 4 margin under the card.
+  final DabblerFeedMetrics metrics;
+
+  bool get _drawn => metrics == DabblerFeedMetrics.drawn;
 
   /// The leading widget: a [DabblerAvatar], [DabblerAvatarGroup] or
   /// [DabblerActivitySystemTile].
@@ -302,6 +326,55 @@ class DabblerActivityRow extends StatelessWidget {
     child: DabblerIcon(name, size: metaGlyphSize, color: colors.textTertiary),
   );
 
+  /// The action pill. Touch: a 45 box in layout. Drawn: the pill at its own
+  /// size with the 45 as a hit-test-only area *around* its gesture.
+  Widget _action(DabblerColors colors, TextStyle Function(DabblerTypeStyle) t) {
+    final Widget pill = Container(
+      height: _drawn ? DabblerHomeFrame.activityActionHeight : actionHeight,
+      padding: EdgeInsetsDirectional.symmetric(
+        horizontal:
+            DabblerSpacing.space5 + (_drawn ? DabblerSizing.borderDefault : 0),
+      ),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: actionFilled ? colors.brandPrimary : null,
+        borderRadius: DabblerRadius.pillAll,
+        border: Border.all(
+          color: actionFilled ? colors.brandPrimary : colors.borderDefault,
+          width: DabblerSizing.borderDefault,
+        ),
+      ),
+      child: Text(
+        actionLabel!,
+        maxLines: 1,
+        style: t(
+          DabblerType.footnote,
+        ).copyWith(color: actionFilled ? colors.onBrand : colors.textPrimary),
+      ),
+    );
+    final Widget tappable = DabblerFeedTappable(
+      onTap: onAction,
+      semanticLabel: actionLabel,
+      excludeChildSemantics: true,
+      borderRadius: DabblerRadius.pillAll,
+      child: _drawn
+          ? pill
+          : ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: DabblerSizing.touchTargetMin,
+                minWidth: DabblerSizing.touchTargetMin,
+              ),
+              child: Center(widthFactor: 1, heightFactor: 1, child: pill),
+            ),
+    );
+    return _drawn
+        ? DabblerExpandedHitArea(
+            minimum: const Size.square(DabblerSizing.touchTargetMin),
+            child: tappable,
+          )
+        : tappable;
+  }
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -334,49 +407,7 @@ class DabblerActivityRow extends StatelessWidget {
             spacing: DabblerSpacing.space3,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
-              if (actionLabel != null)
-                DabblerFeedTappable(
-                  onTap: onAction,
-                  semanticLabel: actionLabel,
-                  excludeChildSemantics: true,
-                  borderRadius: DabblerRadius.pillAll,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      minHeight: DabblerSizing.touchTargetMin,
-                      minWidth: DabblerSizing.touchTargetMin,
-                    ),
-                    child: Center(
-                      widthFactor: 1,
-                      heightFactor: 1,
-                      child: Container(
-                        height: actionHeight,
-                        padding: const EdgeInsetsDirectional.symmetric(
-                          horizontal: DabblerSpacing.space5,
-                        ),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: actionFilled ? colors.brandPrimary : null,
-                          borderRadius: DabblerRadius.pillAll,
-                          border: Border.all(
-                            color: actionFilled
-                                ? colors.brandPrimary
-                                : colors.borderDefault,
-                            width: DabblerSizing.borderDefault,
-                          ),
-                        ),
-                        child: Text(
-                          actionLabel!,
-                          maxLines: 1,
-                          style: t(DabblerType.footnote).copyWith(
-                            color: actionFilled
-                                ? colors.onBrand
-                                : colors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              if (actionLabel != null) _action(colors, t),
               if (count != null)
                 Text(DabblerType.toWesternDigits(count!), style: caption),
             ],
@@ -407,26 +438,43 @@ class DabblerActivityRow extends StatelessWidget {
           Text(subject!, style: sub.copyWith(color: colors.textSecondary)),
         ],
         if (metaItems.isNotEmpty) ...<Widget>[
-          const SizedBox(height: DabblerSpacing.space1),
+          SizedBox(
+            height: _drawn
+                ? DabblerSpacing.space1 + DabblerHomeFrame.activityMetaLift
+                : DabblerSpacing.space1,
+          ),
           Wrap(
-            spacing: DabblerSpacing.space2,
-            runSpacing: DabblerSpacing.space1,
+            spacing: _drawn
+                ? DabblerHomeFrame.activityGap
+                : DabblerSpacing.space2,
+            runSpacing: _drawn
+                ? DabblerHomeFrame.activityGap
+                : DabblerSpacing.space1,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: metaItems,
           ),
         ],
         if (actionRow != null)
           Padding(
-            padding: const EdgeInsetsDirectional.only(
-              top: DabblerSpacing.space1,
+            padding: EdgeInsetsDirectional.only(
+              top: _drawn ? DabblerSpacing.space3 : DabblerSpacing.space1,
             ),
-            child: actionRow,
+            child: _drawn
+                ? DabblerExpandedHitArea(
+                    minimum: const Size(0, DabblerSizing.touchTargetMin),
+                    child: actionRow,
+                  )
+                : actionRow,
           ),
       ],
     );
 
     final Widget card = Container(
-      margin: const EdgeInsetsDirectional.only(bottom: DabblerSpacing.space1),
+      margin: EdgeInsetsDirectional.only(
+        bottom: _drawn
+            ? DabblerHomeFrame.activityMarginBottom
+            : DabblerSpacing.space1,
+      ),
       padding: const EdgeInsetsDirectional.all(padding),
       decoration: BoxDecoration(
         color: colors.surfaceGrey,
@@ -463,6 +511,9 @@ class DabblerActivityRow extends StatelessWidget {
             DabblerBadge(
               label: sportLabel!,
               status: DabblerBadge.neutralStatusOf(colors),
+              metrics: metrics,
+              // `padding:3px 10px` inside a hairline: 21 high in all.
+              paddingBlock: _drawn ? DabblerSpacing.space1 : null,
             ),
           ],
           if (thumbnail != null) ...<Widget>[

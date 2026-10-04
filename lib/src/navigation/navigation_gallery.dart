@@ -13,6 +13,7 @@ import 'package:flutter/widgets.dart';
 
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
+import '../tokens/dabbler_home_frame.dart';
 import 'bottom_bar.dart';
 import 'top_bar.dart';
 
@@ -196,6 +197,24 @@ Widget _topBar(BuildContext context) => const GalleryStack(
           actions: <DabblerNavigationAction>[
             DabblerNavigationAction(icon: 'sms', label: 'Messages'),
             DabblerNavigationAction(icon: 'notification-bing', label: 'Alerts'),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — the Home header: 18 gutter, 63 high, 24 glyphs',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationTopBar(
+          metrics: DabblerFeedMetrics.drawn,
+          safeArea: false,
+          actions: <DabblerNavigationAction>[
+            DabblerNavigationAction(icon: 'search-normal', label: 'Search'),
+            DabblerNavigationAction(
+              icon: 'notification-bing',
+              label: 'Notifications',
+              unread: true,
+            ),
           ],
         ),
       ),

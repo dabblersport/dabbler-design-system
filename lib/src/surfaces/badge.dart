@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../foundations/sport_accent.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_neutral_status.dart';
 import '../tokens/dabbler_palette.dart';
 import '../tokens/dabbler_type.dart';
@@ -133,6 +134,8 @@ class DabblerBadge extends StatelessWidget {
     this.outlined = false,
     this.comfortable = false,
     this.accent,
+    this.paddingBlock,
+    this.metrics = DabblerFeedMetrics.touch,
   }) : isDot = false,
        semanticLabel = null;
 
@@ -163,6 +166,8 @@ class DabblerBadge extends StatelessWidget {
        outlined = false,
        comfortable = false,
        accent = null,
+       paddingBlock = null,
+       metrics = DabblerFeedMetrics.touch,
        isDot = true;
 
   /// Whether this is the count-less [DabblerBadge.dot] marker.
@@ -190,6 +195,17 @@ class DabblerBadge extends StatelessWidget {
   /// accepts `style` overrides; `ConversationRow` sets `paddingInline` to
   /// `--space-2` (6) on its unread pill.
   final double? paddingInline;
+
+  /// The block padding, replacing the 4 (or the comfortable 6). Null keeps
+  /// the default. The Home post row's type pill is `padding:2px 8px`.
+  final double? paddingBlock;
+
+  /// [DabblerFeedMetrics.drawn] draws the pill as the Home Feed frame does:
+  /// the 11/13 caption step at the regular weight (the default is bold on a
+  /// 1.5 line), and no status hairline — `home-design-measure.md` sections
+  /// 7a and 7c (type pill 32.89x17, sport pill 53.66x21). Default
+  /// [DabblerFeedMetrics.touch] is unchanged.
+  final DabblerFeedMetrics metrics;
 
   /// A minimum width. Live `ConversationRow` sets `minWidth: 24` on its unread
   /// pill; the badge is `fit-content` otherwise.
@@ -375,11 +391,17 @@ class DabblerBadge extends StatelessWidget {
                   ? foregroundOf(tone, colors)
                   : DabblerSportAccent.onColorOf(colors));
     // `Badge.jsx:41` — decorative tones draw no border at all.
+    final bool drawn = metrics == DabblerFeedMetrics.drawn;
     final Color? hairline = quiet
         ? colors.borderDefault
-        : semantic == null
+        : semantic == null || (drawn && semantic != neutralStatusOf(colors))
         ? null
         : hairlineFor(semantic, colors);
+    // Drawn: the frame's padding is content-box, so a hairline adds to it
+    // rather than eating into it.
+    final double hairlineAdd = drawn && hairline != null
+        ? DabblerSizing.borderDefault
+        : 0;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -393,10 +415,14 @@ class DabblerBadge extends StatelessWidget {
         constraints: BoxConstraints(minWidth: minWidth ?? 0),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: comfortable ? DabblerSpacing.space2 : verticalPadding,
+            vertical:
+                (paddingBlock ??
+                    (comfortable ? DabblerSpacing.space2 : verticalPadding)) +
+                hairlineAdd,
             horizontal:
-                paddingInline ??
-                (comfortable ? DabblerSpacing.space4 : horizontalPadding),
+                (paddingInline ??
+                    (comfortable ? DabblerSpacing.space4 : horizontalPadding)) +
+                hairlineAdd,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -428,6 +454,10 @@ class DabblerBadge extends StatelessWidget {
                             color: foreground,
                             fontWeight: DabblerType.bold,
                           )
+                    : drawn
+                    ? DabblerType.caption2
+                          .resolveForDirection(direction)
+                          .copyWith(color: foreground)
                     : textStyleFor(direction).copyWith(color: foreground),
               ),
             ],

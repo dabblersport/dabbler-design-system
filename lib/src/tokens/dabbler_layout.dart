@@ -29,6 +29,22 @@ abstract final class DabblerInsets {
     bottom: DabblerSpacing.floatingBarClearance,
   );
 
+  /// App role: the Home Feed's side gutter — [DabblerSpacing.space6] (18) on
+  /// both sides (every Home header, tab, reminder and row is drawn at 18, not
+  /// at [screen]'s 24; `home-design-measure.md` section 1).
+  static const EdgeInsets feedScreen = EdgeInsets.symmetric(
+    horizontal: DabblerSpacing.space6,
+  );
+
+  /// App role: a feed list's closing inset under the floating bar and its
+  /// wash — [DabblerSpacing.floatingBarClearance] 96 plus
+  /// [DabblerSpacing.listBottomInset] 24 = 120 (the Home feed scroller's
+  /// `padding: 0 18px 120px`).
+  static const EdgeInsets feedBottom = EdgeInsets.only(
+    bottom:
+        DabblerSpacing.floatingBarClearance + DabblerSpacing.listBottomInset,
+  );
+
   /// App role: a row's vertical breathing room — [DabblerSpacing.space4] top
   /// and bottom. Replaces `EdgeInsets.symmetric(vertical: 12)`.
   static const EdgeInsets rowVertical = EdgeInsets.symmetric(

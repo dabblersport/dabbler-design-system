@@ -157,6 +157,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics` (`DabblerFeedMetrics.touch` default, `.drawn`). Drawn draws the Home header as the frame measures it: an 18 gutter, 6 above and 12 below a 45 row (63 high), 24 glyphs in 45 boxes 6 apart, the 36 avatar flush at the end edge with its 45 target as a hit-test-only area, and the unread dot 13 wide pinned 9 from the top and the *physical* right of the bell's box, so it stays on the right in Arabic as the Arabic frame draws it. The default bar and the titled bar are unchanged.
 - KAN-426 (final) — adds `DabblerWordmark.landingSize` (104 x 20), the size the landing frame draws the mark at; the default stays 100 x 19.
 - Alpha fidelity (Settings, Notifications) — `DabblerNavigationAction.tone` (`neutral`/`brand`/`subtle`: the *Mark all read* tick is brand while something is unread, subtle once nothing is; `Notifications.dc.html:48, 561`), and `heroTint` on the titled bar (brand tint until the scroll controller passes `titleRevealOffset`, then page ground and a hairline; `Settings.dc.html:66, 1190-1191`).
 - `transparent` draws the bar with no ground of its own, so it sits on a tinted hero (Settings fidelity rebuild).

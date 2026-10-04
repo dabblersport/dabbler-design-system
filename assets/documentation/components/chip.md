@@ -103,6 +103,7 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics`. Drawn is the Home sub-chip: 34 high (7 above and below an 18 line, inside the hairline), 14 inline, the 13/18 footnote at the regular weight, a 14 glyph 6 from the label, and the 45 target kept as a hit-test-only area (like `compactHitArea`). Default unchanged.
 - KAN-426 (final) — adds `compactHitArea` (default false): a tappable chip is exactly its 40px pill instead of a 45px box. The target is kept as a hit-tested, not laid-out, area; leave about 2px free above and below.
 - KAN-426 (close) — the regular chip is 40 tall (was 38) and 2px wider: the web `Chip.jsx` pads `9px 15px` inside a 1px hairline that sits outside that padding, so the frames draw 20 + 18 + 2. Both states keep the hairline (transparent when selected).
 - KAN-426 (Seat B) — adds `size` (`small`, `large`) and `accent`, from `Notifications.dc.html:56-58` and `Profiles.dc.html:155-170`.

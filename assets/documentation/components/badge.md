@@ -83,6 +83,7 @@ opacity — the one badge configuration that carries a border at all.
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `paddingBlock` and `metrics`. Drawn draws the 11/13 caption step at the regular weight (the default is bold on a 1.5 line) and no status hairline (a neutral badge keeps its outline), adding a hairline to the padding as the frame's content-box does; the Home post row's type pill is 2/8 (17 high) and its news pill 4/10 (21 high).
 - KAN-426 (Seat B) — adds `accent`: a sport-coloured decorative fill (`DabblerSportAccent.base`) with the on-brand ink; status wins, and it is ignored when `outlined`.
 - Alpha fidelity rebuild (KAN-426) — adds `outlined`, the quiet card-surface tag of the Venues listing's sports row.
 - D-020 (cxo) — a one-step colour drift in a pricing screen's

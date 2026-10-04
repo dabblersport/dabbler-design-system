@@ -7,7 +7,9 @@ import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_motion.dart';
 import '../layout/settings_parts.dart' show DabblerSettingsHeader;
 import '../tokens/dabbler_type.dart';
@@ -215,6 +217,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.safeArea = true,
     this.transparent = false,
     this.avatarImageUrl,
+    this.metrics = DabblerFeedMetrics.touch,
   }) : title = null,
        titleWidget = null,
        plain = false,
@@ -263,12 +266,25 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.heroTint = false,
     this.centerTitle = false,
   }) : _titled = true,
+       metrics = DabblerFeedMetrics.touch,
        avatarSeed = defaultAvatarSeed,
        avatarBadge = null,
        onAvatarPressed = null,
        avatarLabel = 'Account',
        leading = null,
        avatarImageUrl = null;
+
+  /// How the wordmark bar is laid out. [DabblerFeedMetrics.touch] (default) is
+  /// the long-standing bar. [DabblerFeedMetrics.drawn] is the Home Feed
+  /// header as the frame measures it (`home-design-measure.md` section 3):
+  /// an 18 gutter, 6 above and 12 below a 45 row (63 in all), 24 glyphs in 45
+  /// boxes 6 apart, the avatar flush at the end edge with its 45 target kept
+  /// as a hit-test-only area, and the unread dot pinned `top:9; right:9` of
+  /// the bell's box — a *physical* right, so it stays on the right in RTL, as
+  /// the Arabic frame draws it. Ignored by [DabblerNavigationTopBar.titled].
+  final DabblerFeedMetrics metrics;
+
+  bool get _drawn => !isTitled && metrics == DabblerFeedMetrics.drawn;
 
   /// The back button's default accessible name.
   static const String defaultBackLabel = 'Back';
@@ -447,6 +463,10 @@ class DabblerNavigationTopBar extends StatelessWidget {
     final bool transparent = this.transparent || hero;
     final bool border = this.border && !hero;
 
+    if (_drawn) {
+      return _drawnBar(context, colors);
+    }
+
     final Widget row = isTitled
         ? _titledRow(context, colors)
         : Row(
@@ -540,6 +560,52 @@ class DabblerNavigationTopBar extends StatelessWidget {
     return bar;
   }
 
+  /// The Home header as drawn: see [metrics].
+  Widget _drawnBar(BuildContext context, DabblerColors colors) {
+    Widget bar = Container(
+      color: transparent ? null : colors.bgPrimary,
+      padding: const EdgeInsetsDirectional.fromSTEB(
+        DabblerSpacing.space6,
+        DabblerSpacing.space2,
+        DabblerSpacing.space6,
+        DabblerSpacing.space4,
+      ),
+      child: SizedBox(
+        height: DabblerSizing.touchTargetMin,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Flexible(
+              child:
+                  leading ??
+                  DabblerWordmark(
+                    color: colors.brandPrimary,
+                    size: DabblerHomeFrame.logoSize,
+                  ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: DabblerSpacing.space2,
+              children: <Widget>[
+                for (final DabblerNavigationAction action in actions)
+                  _action(colors, action),
+                _avatar(),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    if (safeArea) {
+      bar = Padding(
+        padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+        child: bar,
+      );
+    }
+    return bar;
+  }
+
   /// `Settings.dc.html:66, 1190-1191` — the root bar sits on the hero's brand
   /// tint until the page scrolls past [titleRevealOffset], then drops it for
   /// the page ground and a hairline rule (`navBg` / `navBorder`).
@@ -584,9 +650,13 @@ class DabblerNavigationTopBar extends StatelessWidget {
       return _textAction(action);
     }
     final VoidCallback? onPressed = action.loading ? null : action.onPressed;
-    final Widget body = SizedBox(
-      width: actionTarget.width,
-      height: actionTarget.height,
+    final bool drawn = _drawn;
+    final Size target = drawn
+        ? const Size.square(DabblerSizing.touchTargetMin)
+        : actionTarget;
+    final Widget glyphBody = SizedBox(
+      width: target.width,
+      height: target.height,
       child: Center(
         child: action.loading
             ? IconTheme.merge(
@@ -598,12 +668,13 @@ class DabblerNavigationTopBar extends StatelessWidget {
                 ),
               )
             : DabblerNavigationUnreadDot.wrap(
-                visible: action.unread,
+                // Drawn metrics pin the dot to the box, below.
+                visible: action.unread && !drawn,
                 child: DabblerIcon(
                   action.icon,
                   weight: action.weight,
                   // `size={22}` — transcribed, see [actionGlyphSize].
-                  size: actionGlyphSize,
+                  size: drawn ? DabblerSizing.iconMd : actionGlyphSize,
                   // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary —
                   // unless the action asks for the brand or the subtle ink.
                   color: switch (action.tone) {
@@ -615,6 +686,19 @@ class DabblerNavigationTopBar extends StatelessWidget {
               ),
       ),
     );
+    final Widget body = drawn && action.unread && !action.loading
+        ? Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              glyphBody,
+              const Positioned(
+                top: DabblerSpacing.space3,
+                right: DabblerSpacing.space3,
+                child: _UnreadDot(),
+              ),
+            ],
+          )
+        : glyphBody;
 
     return Semantics(
       container: true,
@@ -828,7 +912,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
       return avatar;
     }
 
-    return Semantics(
+    final Widget tappable = Semantics(
       container: true,
       button: true,
       label: avatarLabel,
@@ -840,16 +924,26 @@ class DabblerNavigationTopBar extends StatelessWidget {
           child: DabblerFocusRing(
             borderRadius: DabblerRadius.pillAll,
             child: DabblerPressScale.gesture(
-              child: SizedBox(
-                width: DabblerSizing.touchTargetMin,
-                height: DabblerSizing.touchTargetMin,
-                child: Center(child: avatar),
-              ),
+              child: _drawn
+                  // The avatar lays out at its own 36; the 45 target is a
+                  // hit-test-only area around the gesture, below.
+                  ? avatar
+                  : SizedBox(
+                      width: DabblerSizing.touchTargetMin,
+                      height: DabblerSizing.touchTargetMin,
+                      child: Center(child: avatar),
+                    ),
             ),
           ),
         ),
       ),
     );
+    return _drawn
+        ? DabblerExpandedHitArea(
+            minimum: const Size.square(DabblerSizing.touchTargetMin),
+            child: tappable,
+          )
+        : tappable;
   }
 }
 

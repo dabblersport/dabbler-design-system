@@ -9,6 +9,7 @@ import '../foundations/text.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import 'dabbler_geometry.dart';
+import 'dabbler_home_frame.dart';
 import 'dabbler_motion.dart';
 import 'dabbler_type.dart';
 
@@ -141,6 +142,11 @@ Widget _sizing(BuildContext context) => _table(<MapEntry<String, String>>[
   for (final MapEntry<String, double> e in sizingOffGridRulings.entries)
     MapEntry<String, String>(
       '${e.key} (off-grid ruling)',
+      e.value.toStringAsFixed(0),
+    ),
+  for (final MapEntry<String, double> e in homeFrameTokens.entries)
+    MapEntry<String, String>(
+      'DabblerHomeFrame.${e.key} (Home Feed frame)',
       e.value.toStringAsFixed(0),
     ),
 ]);

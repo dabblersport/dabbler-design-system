@@ -300,6 +300,7 @@ export 'src/tokens/dabbler_dark_provisional.dart';
 export 'src/tokens/dabbler_direction_gallery.dart';
 export 'src/tokens/dabbler_geometry.dart';
 export 'src/tokens/dabbler_geometry_gallery.dart';
+export 'src/tokens/dabbler_home_frame.dart';
 export 'src/tokens/dabbler_hue_tone.dart';
 export 'src/tokens/dabbler_motion.dart';
 export 'src/tokens/dabbler_motion_gallery.dart';
