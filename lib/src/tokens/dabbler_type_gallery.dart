@@ -70,7 +70,8 @@ const List<GalleryEntry> typeGalleryEntries = <GalleryEntry>[
     page: 'foundations/type',
     group: null,
     title: 'Type — the four faces',
-    description: 'Gloock, Wingx, Glory and Meral Sans, each set in itself, '
+    description:
+        'Gloock, Wingx, Glory and Meral Sans, each set in itself, '
         'with its coverage and its provenance.',
     builder: _faces,
   ),
@@ -79,7 +80,8 @@ const List<GalleryEntry> typeGalleryEntries = <GalleryEntry>[
     page: 'foundations/type',
     group: null,
     title: 'Type — the complete ramp, Latin and Arabic',
-    description: 'All twelve declared styles side by side in both scripts, '
+    description:
+        'All twelve declared styles side by side in both scripts, '
         'each labelled with its size, leading and weight.',
     builder: _scale,
   ),
@@ -88,7 +90,8 @@ const List<GalleryEntry> typeGalleryEntries = <GalleryEntry>[
     page: 'foundations/type',
     group: null,
     title: 'Type — weights, and the values outside the ramp',
-    description: 'The five weight tokens, then Button\'s 16/14/12-at-600 '
+    description:
+        'The five weight tokens, then Button\'s 16/14/12-at-600 '
         'shown as what D-024 says it is: a second ramp, not three steps.',
     builder: _weights,
   ),
@@ -96,7 +99,7 @@ const List<GalleryEntry> typeGalleryEntries = <GalleryEntry>[
 
 /// The four faces, with the coverage table's own verdicts.
 const List<(String, DabblerTypeRole, DabblerTypeScript, String, String)>
-    _faces_ = <(String, DabblerTypeRole, DabblerTypeScript, String, String)>[
+_faces_ = <(String, DabblerTypeRole, DabblerTypeScript, String, String)>[
   (
     'Gloock',
     DabblerTypeRole.display,
@@ -128,36 +131,37 @@ const List<(String, DabblerTypeRole, DabblerTypeScript, String, String)>
 ];
 
 Widget _faces(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**Four faces on two roles.** `--font-display` resolves to Gloock '
+      '(Latin) or Wingx (Arabic); `--font-sans` to Glory or Meral Sans. '
+      '**Coverage is strict:** Wingx must never be set on Latin text and '
+      'Gloock/Glory must never be set on Arabic — the shaping breaks and '
+      'the platform silently substitutes a system face. Going through the '
+      'role tokens avoids this entirely, which is the reason the two role '
+      'tokens exist rather than direct family references.',
+    ),
+    GalleryWrap(
       children: <Widget>[
-        const GalleryUsage(
-          '**Four faces on two roles.** `--font-display` resolves to Gloock '
-          '(Latin) or Wingx (Arabic); `--font-sans` to Glory or Meral Sans. '
-          '**Coverage is strict:** Wingx must never be set on Latin text and '
-          'Gloock/Glory must never be set on Arabic — the shaping breaks and '
-          'the platform silently substitutes a system face. Going through the '
-          'role tokens avoids this entirely, which is the reason the two role '
-          'tokens exist rather than direct family references.',
-        ),
-        GalleryWrap(
-          children: <Widget>[
-            for (final (
-                  String sample,
-                  DabblerTypeRole role,
-                  DabblerTypeScript script,
-                  String provenance,
-                  String coverage,
-                ) in _faces_)
-              _FaceCard(
-                sample: sample,
-                role: role,
-                script: script,
-                provenance: provenance,
-                coverage: coverage,
-              ),
-          ],
-        ),
+        for (final (
+              String sample,
+              DabblerTypeRole role,
+              DabblerTypeScript script,
+              String provenance,
+              String coverage,
+            )
+            in _faces_)
+          _FaceCard(
+            sample: sample,
+            role: role,
+            script: script,
+            provenance: provenance,
+            coverage: coverage,
+          ),
       ],
-    );
+    ),
+  ],
+);
 
 /// The source page's own sample string per style, Latin then Arabic.
 const Map<String, (String, String)> _samples = <String, (String, String)>{
@@ -178,7 +182,10 @@ const Map<String, (String, String)> _samples = <String, (String, String)>{
     'Subheadline — 8 players confirmed',
     'نص ثانوي — 8 لاعبين مؤكدين',
   ),
-  'footnote': ('Footnote — updated 2 minutes ago', 'حاشية — آخر تحديث قبل دقيقتين'),
+  'footnote': (
+    'Footnote — updated 2 minutes ago',
+    'حاشية — آخر تحديث قبل دقيقتين',
+  ),
   'caption1': (
     'Caption 1 — skill level: intermediate',
     'تعليق أول — المستوى: متوسط',
@@ -188,119 +195,118 @@ const Map<String, (String, String)> _samples = <String, (String, String)>{
 };
 
 Widget _scale(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**Eleven styles plus one button/label convenience.** '
+      '**Arabic size is the Latin size less 0.9px on every style** — the '
+      'declared RTL rules in `typography.css` 1.2.0, which govern over that '
+      'file\'s own header (it says "same sizes"; the header contradicts its '
+      'declarations, recorded upstream). Only four text styles take extra '
+      'Arabic leading — '
+      '`headline`, `body`, `callout`, `subheadline`. Titles, footnote and '
+      'the captions inherit Latin\'s leading unchanged, and `.t-label` is '
+      '*not* one of the four exceptions despite sharing headline\'s '
+      'size. Do not assume symmetry across the scale.',
+    ),
+    GalleryGroup(
+      name: 'The ramp — every declared step',
+      wrap: false,
       children: <Widget>[
-        const GalleryUsage(
-          '**Eleven styles plus one button/label convenience.** '
-          '**Arabic size is the Latin size less 0.9px on every style** — the '
-          'declared RTL rules in `typography.css` 1.2.0, which govern over that '
-          'file\'s own header (it says "same sizes"; the header contradicts its '
-          'declarations, recorded upstream). Only four text styles take extra '
-          'Arabic leading — '
-          '`headline`, `body`, `callout`, `subheadline`. Titles, footnote and '
-          'the captions inherit Latin\'s leading unchanged, and `.t-label` is '
-          '*not* one of the four exceptions despite sharing headline\'s '
-          'size. Do not assume symmetry across the scale.',
-        ),
-        GalleryGroup(
-          name: 'The ramp — every declared step',
-          wrap: false,
-          children: <Widget>[
-            for (final DabblerTypeStyle style in DabblerType.styles)
-              _RampRow(style: style),
-          ],
-        ),
-        const GalleryUsage(
-          '**Line heights are set in fixed pixels, not unitless multipliers** '
-          '— each style pins its own leading rather than inheriting a ratio, '
-          'which is why the ratio is not constant down the ramp (1.21 at 34px, '
-          '1.38 at 13px, 1.18 at 11px). Do not compute a new size by '
-          'multiplying an existing leading ratio. **Tracking is 0 on every '
-          'style in both scripts**, and Arabic tracking is never adjusted.',
-        ),
-        const GalleryUsage(
-          '**Numerals are always Western Arabic (0–9) in both scripts, never '
-          'Eastern Arabic-Indic (٠–٩).** Enforced twice: '
-          '`DabblerType.numeralFeatures` disables the OpenType `anum` feature '
-          'and pins lining figures on every resolved style, and '
-          '`DabblerType.toWesternDigits` rewrites the string at the source. '
-          'The Arabic callout and subheadline rows above carry digits, which '
-          'is where to check it.',
-        ),
+        for (final DabblerTypeStyle style in DabblerType.styles)
+          _RampRow(style: style),
       ],
-    );
+    ),
+    const GalleryUsage(
+      '**Line heights are set in fixed pixels, not unitless multipliers** '
+      '— each style pins its own leading rather than inheriting a ratio, '
+      'which is why the ratio is not constant down the ramp (1.21 at 34px, '
+      '1.38 at 13px, 1.18 at 11px). Do not compute a new size by '
+      'multiplying an existing leading ratio. **Tracking is 0 on every '
+      'style in both scripts**, and Arabic tracking is never adjusted.',
+    ),
+    const GalleryUsage(
+      '**Numerals are always Western Arabic (0–9) in both scripts, never '
+      'Eastern Arabic-Indic (٠–٩).** Enforced twice: '
+      '`DabblerType.numeralFeatures` disables the OpenType `anum` feature '
+      'and pins lining figures on every resolved style, and '
+      '`DabblerType.toWesternDigits` rewrites the string at the source. '
+      'The Arabic callout and subheadline rows above carry digits, which '
+      'is where to check it.',
+    ),
+  ],
+);
 
 /// The five weight tokens with the source table's own "where it's used" text.
 const List<(String, FontWeight, String)> _weights_ =
     <(String, FontWeight, String)>[
-  ('--weight-light', DabblerType.light, 'not used by any current style'),
-  (
-    '--weight-regular',
-    DabblerType.regular,
-    'titles, body, subheadline, footnote, captions',
-  ),
-  ('--weight-medium', DabblerType.medium, 'callout, label'),
-  ('--weight-semibold', DabblerType.semibold, 'headline only'),
-  (
-    '--weight-bold',
-    DabblerType.bold,
-    'not assigned to a current style; ad-hoc emphasis only',
-  ),
-];
+      ('--weight-light', DabblerType.light, 'not used by any current style'),
+      (
+        '--weight-regular',
+        DabblerType.regular,
+        'titles, body, subheadline, footnote, captions',
+      ),
+      ('--weight-medium', DabblerType.medium, 'callout, label'),
+      ('--weight-semibold', DabblerType.semibold, 'headline only'),
+      (
+        '--weight-bold',
+        DabblerType.bold,
+        'not assigned to a current style; ad-hoc emphasis only',
+      ),
+    ];
 
 Widget _weights(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**Gloock and Wingx each ship exactly one weight (400)** — every '
+      'title-role style is 400 in both scripts; titles never run Light, '
+      'and there is no bold title. Glory covers 100–800 and Meral Sans '
+      '100–900, but the ramp itself only ever assigns 400 / 500 / 600.',
+    ),
+    GalleryGroup(
+      name: 'Weights',
+      wrap: false,
       children: <Widget>[
-        const GalleryUsage(
-          '**Gloock and Wingx each ship exactly one weight (400)** — every '
-          'title-role style is 400 in both scripts; titles never run Light, '
-          'and there is no bold title. Glory covers 100–800 and Meral Sans '
-          '100–900, but the ramp itself only ever assigns 400 / 500 / 600.',
-        ),
-        GalleryGroup(
-          name: 'Weights',
-          wrap: false,
-          children: <Widget>[
-            for (final (String token, FontWeight weight, String usage)
-                in _weights_)
-              _WeightRow(token: token, weight: weight, usage: usage),
-          ],
-        ),
-        const GalleryRule(),
-        const GallerySectionLabel('Outside the ramp — D-024'),
-        const SizedBox(height: DabblerSpacing.space3),
-        const GalleryUsage(
-          '**These are NOT steps of the ramp above.** `DabblerButton` sets its '
-          'label at 16 / 14 / 12, all at weight 600 '
-          '(`button.dart:365-374`). `tokens/typography.css` **contains no 14 '
-          'at all**, and semibold appears in it only at `headline`\'s 17 — so '
-          'none of these three is expressible as a ramp step, and `cxo` ruling '
-          '**D-024** declined to add them: *"a ramp step earns its place by '
-          'being a role the system names and several unrelated things reach '
-          'for. Three entries justified by one component fail it."*',
-        ),
-        GalleryGroup(
-          name: 'Button label scale — a second ramp, drawn for contrast only',
-          wrap: false,
-          children: <Widget>[
-            for (final DabblerButtonSize size in DabblerButtonSize.values)
-              _OffRampRow(size: size),
-          ],
-        ),
-        const GalleryUsage(
-          '**Where they come from.** D-024 measured the design source: 30 of '
-          'its 79 components specify type with `.t-*` from '
-          '`tokens/typography.css`, 13 with `--font-size-*` from '
-          '`tokens/figma/fig-tokens.css`, and 25 with raw inline literals. The '
-          '13 are a coherent family — cards, navigation and rooms — '
-          'transcribed from the Figma export, **whose body size is 14**. '
-          '`Button.jsx:22` is one of them. D-024(c) extended `D-004` to type: '
-          '`tokens/typography.css` is the sole source of truth and '
-          '`fig-tokens.css` is an export artefact, never transcribed from. '
-          '**The question of what happens to the 13 is open**, which is '
-          'exactly why this band is drawn rather than quietly folded into the '
-          'ramp.',
-        ),
+        for (final (String token, FontWeight weight, String usage) in _weights_)
+          _WeightRow(token: token, weight: weight, usage: usage),
       ],
-    );
+    ),
+    const GalleryRule(),
+    const GallerySectionLabel('Outside the ramp — D-024'),
+    const SizedBox(height: DabblerSpacing.space3),
+    const GalleryUsage(
+      '**These are NOT steps of the ramp above.** `DabblerButton` sets its '
+      'label at 16 / 14 / 12, all at weight 600 '
+      '(`button.dart:365-374`). `tokens/typography.css` **contains no 14 '
+      'at all**, and semibold appears in it only at `headline`\'s 17 — so '
+      'none of these three is expressible as a ramp step, and `cxo` ruling '
+      '**D-024** declined to add them: *"a ramp step earns its place by '
+      'being a role the system names and several unrelated things reach '
+      'for. Three entries justified by one component fail it."*',
+    ),
+    GalleryGroup(
+      name: 'Button label scale — a second ramp, drawn for contrast only',
+      wrap: false,
+      children: <Widget>[
+        for (final DabblerButtonSize size in DabblerButtonSize.values)
+          _OffRampRow(size: size),
+      ],
+    ),
+    const GalleryUsage(
+      '**Where they come from.** D-024 measured the design source: 30 of '
+      'its 79 components specify type with `.t-*` from '
+      '`tokens/typography.css`, 13 with `--font-size-*` from '
+      '`tokens/figma/fig-tokens.css`, and 25 with raw inline literals. The '
+      '13 are a coherent family — cards, navigation and rooms — '
+      'transcribed from the Figma export, **whose body size is 14**. '
+      '`Button.jsx:22` is one of them. D-024(c) extended `D-004` to type: '
+      '`tokens/typography.css` is the sole source of truth and '
+      '`fig-tokens.css` is an export artefact, never transcribed from. '
+      '**The question of what happens to the 13 is open**, which is '
+      'exactly why this band is drawn rather than quietly folded into the '
+      'ramp.',
+    ),
+  ],
+);
 
 /// §Font families' card: the face set in itself, over its provenance lines.
 class _FaceCard extends StatelessWidget {
@@ -340,8 +346,10 @@ class _FaceCard extends StatelessWidget {
               sample,
               style: TextStyle(
                 fontFamily: DabblerType.fontFamilyFor(role, script),
-                fontFamilyFallback:
-                    DabblerType.fontFamilyFallbackFor(role, script),
+                fontFamilyFallback: DabblerType.fontFamilyFallbackFor(
+                  role,
+                  script,
+                ),
                 fontSize: 32,
                 fontWeight: role == DabblerTypeRole.sans
                     ? DabblerType.medium

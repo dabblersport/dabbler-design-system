@@ -25,15 +25,15 @@ const List<GalleryEntry> avatarGalleryEntries = <GalleryEntry>[
     page: 'components/avatar',
     group: GalleryPurpose.identityAndStatus,
     title: 'Avatar — sizes, badges and groups',
-    description: 'Sizes xs 28 · sm 36 · md 48 · lg 64 · xl 80; the three badge '
+    description:
+        'Sizes xs 28 · sm 36 · md 48 · lg 64 · xl 80; the three badge '
         'tones; and AvatarGroup with its +N overflow.',
     builder: _avatars,
   ),
 ];
 
 /// `<Avatar seed="…" size="…" />` — the specimen's five seeds, in its order.
-const List<(String, DabblerAvatarSize)> _people =
-    <(String, DabblerAvatarSize)>[
+const List<(String, DabblerAvatarSize)> _people = <(String, DabblerAvatarSize)>[
   ('Alen Rahman', DabblerAvatarSize.xs),
   ('Bushra Riaz', DabblerAvatarSize.sm),
   ('Carlos Alvarez', DabblerAvatarSize.md),
@@ -43,12 +43,20 @@ const List<(String, DabblerAvatarSize)> _people =
 
 /// The corner-badge row: seed, size, glyph and tone, from the specimen.
 const List<(String, DabblerAvatarSize, String, DabblerAvatarBadgeTone)>
-    _badged = <(String, DabblerAvatarSize, String, DabblerAvatarBadgeTone)>[
-  ('Alen Rahman', DabblerAvatarSize.sm, 'tick-circle',
-      DabblerAvatarBadgeTone.primary),
+_badged = <(String, DabblerAvatarSize, String, DabblerAvatarBadgeTone)>[
+  (
+    'Alen Rahman',
+    DabblerAvatarSize.sm,
+    'tick-circle',
+    DabblerAvatarBadgeTone.primary,
+  ),
   ('Alen Rahman', DabblerAvatarSize.md, 'star', DabblerAvatarBadgeTone.accent),
-  ('Dana Halabi', DabblerAvatarSize.md, 'microphone-2',
-      DabblerAvatarBadgeTone.indigo),
+  (
+    'Dana Halabi',
+    DabblerAvatarSize.md,
+    'microphone-2',
+    DabblerAvatarBadgeTone.indigo,
+  ),
 ];
 
 /// `size={10}` on every badge glyph in the specimen.
@@ -71,8 +79,9 @@ Widget _avatars(BuildContext context) => GalleryStack(
               String seed,
               DabblerAvatarSize size,
               String glyph,
-              DabblerAvatarBadgeTone tone
-            ) in _badged)
+              DabblerAvatarBadgeTone tone,
+            )
+            in _badged)
           GallerySpecimen(
             label: 'badge ${tone.name}',
             child: Builder(

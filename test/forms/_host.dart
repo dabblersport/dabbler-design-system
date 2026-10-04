@@ -9,8 +9,7 @@ const double hostWidth = 320;
 DabblerColors testColors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// A minimal app around [child], at [direction] and [brightness].
 Widget host(
@@ -22,9 +21,7 @@ Widget host(
   return MaterialApp(
     theme: ThemeData(
       brightness: brightness,
-      extensions: <ThemeExtension<dynamic>>[
-        testColors(brightness: brightness),
-      ],
+      extensions: <ThemeExtension<dynamic>>[testColors(brightness: brightness)],
     ),
     home: Directionality(
       textDirection: direction,

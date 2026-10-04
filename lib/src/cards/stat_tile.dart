@@ -27,7 +27,11 @@ enum DabblerStatTileSize {
   /// 11/15 caption in the tone's muted ink. Unlike the profile sizes the
   /// value is not a display numeral, so it reads as a fact ("7:30 PM",
   /// "Open until 11 PM") rather than a score.
-  detail(span: 3, rows: 1, padding: 15, valueSize: 20, valueLeading: 25);
+  detail(span: 3, rows: 1, padding: 15, valueSize: 20, valueLeading: 25),
+
+  /// The Settings bento tile: 3 columns by 1 row, padding 15, a bold sans
+  /// value 20/25 over a regular 11/15 label (`Settings.dc.html:148-153`).
+  setting(span: 3, rows: 1, padding: 15, valueSize: 20, valueLeading: 25);
 
   const DabblerStatTileSize({
     required this.span,
@@ -258,7 +262,7 @@ class DabblerStatTile extends StatefulWidget {
       right: 0.02,
       top: 0.0,
     ),
-    DabblerStatTileSize.detail => (
+    DabblerStatTileSize.detail || DabblerStatTileSize.setting => (
       width: 0.30,
       height: 0.82,
       right: 0.02,
@@ -328,11 +332,21 @@ class DabblerStatTile extends StatefulWidget {
     DabblerStatTileSize size,
     TextDirection direction,
   ) {
+    if (size == DabblerStatTileSize.setting) {
+      return DabblerType.headline
+          .resolveForDirection(direction)
+          .copyWith(
+            fontSize: size.valueSize,
+            height: size.valueLeading / size.valueSize,
+            fontWeight: DabblerType.bold,
+          );
+    }
     final DabblerTypeStyle base = switch (size) {
       DabblerStatTileSize.small => DabblerType.title1,
       DabblerStatTileSize.hero => DabblerType.largeTitle,
       DabblerStatTileSize.wide => DabblerType.title2,
       DabblerStatTileSize.detail => DabblerType.headline,
+      DabblerStatTileSize.setting => DabblerType.headline,
     };
     final TextStyle resolved = base.resolveForDirection(direction);
     if (size == DabblerStatTileSize.wide) return resolved;
@@ -420,7 +434,15 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
               // muted ink (`Details.dc.html:102`).
               ? DabblerType.caption2
                     .resolveForDirection(direction)
-                    .copyWith(color: DabblerStatTile.subFor(colors, widget.tone))
+                    .copyWith(
+                      color: DabblerStatTile.subFor(colors, widget.tone),
+                    )
+              : size == DabblerStatTileSize.setting
+              ? DabblerType.caption1
+                    .resolveForDirection(direction)
+                    .copyWith(
+                      color: DabblerStatTile.subFor(colors, widget.tone),
+                    )
               : DabblerType.footnote
                     .resolveForDirection(direction)
                     .copyWith(

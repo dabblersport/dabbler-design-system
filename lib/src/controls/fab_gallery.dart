@@ -25,7 +25,8 @@ const List<GalleryEntry> fabGalleryEntries = <GalleryEntry>[
     page: 'components/fab',
     group: GalleryPurpose.actions,
     title: 'FAB — tones',
-    description: '56×56 on a 21px squircle corner. The FAB carries the '
+    description:
+        '56×56 on a 21px squircle corner. The FAB carries the '
         "system's one documented shadow exception.",
     builder: _tones,
   ),

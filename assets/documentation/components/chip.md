@@ -52,6 +52,8 @@ built for.
 the design source. If the product needs one, that is a design-source change to raise first, not
 something to improvise here.
 
+**A count rides after the label.** Pass `count` for the small count pill the Notifications filter rail draws; it tints with the selection.
+
 ## Axes
 
 ### State
@@ -87,6 +89,10 @@ Fill and border: the card surface (unselected) or the selected surface variant (
 fill, transparent border rather than none, so the two states stay the same height). Label and icon
 ink: `onBrand` when selected, `textPrimary` / `brandPrimary` when not — never a hardcoded white.
 Focus ring and touch-target minimum are the same shared tokens every interactive control reads.
+
+## Change log
+
+- Alpha fidelity (Search) — adds `mutedRemove`: the remove glyph in the muted ink (`Search.dc.html` recent chips).
 
 ## Source
 

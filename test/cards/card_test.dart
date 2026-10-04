@@ -469,7 +469,10 @@ void main() {
         );
 
         final Color before = _decoration(tester).color!;
-        expect(before, DabblerCard.fillOf(_colors(), DabblerCardVariant.standard));
+        expect(
+          before,
+          DabblerCard.fillOf(_colors(), DabblerCardVariant.standard),
+        );
         final TestGesture gesture = await tester.startGesture(
           tester.getCenter(find.text('b')),
         );
@@ -501,13 +504,16 @@ void main() {
       await gesture.up();
     });
 
-    test('defaultPadding/livePadding is 16; cardPadding stays 18 on purpose', () {
-      // Live `Card.jsx` `padding = 16`; `--card-padding` (18) is still used
-      // by `lib/src/cards/card_ticket.dart:240` (bodyPadding top).
-      expect(DabblerCard.livePadding, 16);
-      expect(DabblerCard.defaultPadding, const EdgeInsets.all(16));
-      expect(DabblerSpacing.cardPadding, 18);
-      expect(DabblerCard.livePadding, isNot(DabblerSpacing.cardPadding));
-    });
+    test(
+      'defaultPadding/livePadding is 16; cardPadding stays 18 on purpose',
+      () {
+        // Live `Card.jsx` `padding = 16`; `--card-padding` (18) is still used
+        // by `lib/src/cards/card_ticket.dart:240` (bodyPadding top).
+        expect(DabblerCard.livePadding, 16);
+        expect(DabblerCard.defaultPadding, const EdgeInsets.all(16));
+        expect(DabblerSpacing.cardPadding, 18);
+        expect(DabblerCard.livePadding, isNot(DabblerSpacing.cardPadding));
+      },
+    );
   });
 }

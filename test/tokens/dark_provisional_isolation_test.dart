@@ -65,8 +65,7 @@ void main() {
       }
     });
 
-    test('every colour a dark instance paints traces back to a token layer',
-        () {
+    test('every colour a dark instance paints traces back to a token layer', () {
       // A stronger form of the same claim: walk every field of all seven dark
       // instances and require each value to be one the provisional file or the
       // primitive palette declares — nothing is synthesised in between.
@@ -80,8 +79,10 @@ void main() {
               .map((RegExpMatch m) => int.parse(m.group(1)!, radix: 16)),
       };
       for (final DabblerTheme t in DabblerTheme.values) {
-        final DabblerColors c =
-            DabblerColors.resolve(theme: t, brightness: Brightness.dark);
+        final DabblerColors c = DabblerColors.resolve(
+          theme: t,
+          brightness: Brightness.dark,
+        );
         for (final (String name, Color v) in <(String, Color)>[
           ('bgPrimary', c.bgPrimary),
           ('bgSecondary', c.bgSecondary),
@@ -105,7 +106,8 @@ void main() {
           expect(
             allowed.contains(v.toARGB32()),
             isTrue,
-            reason: '${t.name} dark $name (${v.toARGB32().toRadixString(16)}) '
+            reason:
+                '${t.name} dark $name (${v.toARGB32().toRadixString(16)}) '
                 'is not declared in a token file',
           );
         }
@@ -121,7 +123,8 @@ void main() {
     };
     final List<String> offenders = <String>[
       for (final File f in _dartFilesUnder('lib/src'))
-        if (!allowlist.contains(f.path) && _hexLiteral.hasMatch(_code(f))) f.path,
+        if (!allowlist.contains(f.path) && _hexLiteral.hasMatch(_code(f)))
+          f.path,
     ];
     expect(offenders, isEmpty);
   });

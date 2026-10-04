@@ -34,9 +34,9 @@ final RegExp _pxToken = RegExp(r'--([a-z0-9-]+):\s*([0-9.]+)px');
 
 /// Every `--name: <n>px` declared anywhere in the source.
 Map<String, double> _pxTokens(String css) => <String, double>{
-      for (final RegExpMatch m in _pxToken.allMatches(css))
-        m.group(1)!: double.parse(m.group(2)!),
-    };
+  for (final RegExpMatch m in _pxToken.allMatches(css))
+    m.group(1)!: double.parse(m.group(2)!),
+};
 
 /// Asserts a shadow colour against the source's `rgba(r, g, b, a)` form.
 void _expectRgba(Color color, int r, int g, int b, double alpha) {
@@ -49,67 +49,80 @@ void _expectRgba(Color color, int r, int g, int b, double alpha) {
 void main() {
   final File? source = _findSpacingCss();
 
-  group('transcription against tokens/spacing.css', () {
-    late Map<String, double> css;
+  group(
+    'transcription against tokens/spacing.css',
+    () {
+      late Map<String, double> css;
 
-    setUpAll(() {
-      // The source is a sibling checkout; when it is absent the source-backed
-      // assertions cannot run, and the group is skipped rather than passing
-      // vacuously.
-      if (source != null) css = _pxTokens(source.readAsStringSync());
-    });
+      setUpAll(() {
+        // The source is a sibling checkout; when it is absent the source-backed
+        // assertions cannot run, and the group is skipped rather than passing
+        // vacuously.
+        if (source != null) css = _pxTokens(source.readAsStringSync());
+      });
 
-    test('the base-3 scale matches --space-1 … --space-11', () {
-      for (int i = 0; i < DabblerSpacing.scale.length; i++) {
+      test('the base-3 scale matches --space-1 … --space-11', () {
+        for (int i = 0; i < DabblerSpacing.scale.length; i++) {
+          expect(
+            DabblerSpacing.scale[i],
+            css['space-${i + 1}'],
+            reason: '--space-${i + 1}',
+          );
+        }
         expect(
-          DabblerSpacing.scale[i],
-          css['space-${i + 1}'],
-          reason: '--space-${i + 1}',
+          css.keys.where((String k) => k.startsWith('space-')),
+          hasLength(11),
         );
-      }
-      expect(css.keys.where((String k) => k.startsWith('space-')), hasLength(11));
-    });
+      });
 
-    test('the radius ramp matches --radius-*', () {
-      expect(DabblerRadius.sm, css['radius-sm']);
-      expect(DabblerRadius.md, css['radius-md']);
-      expect(DabblerRadius.lg, css['radius-lg']);
-      expect(DabblerRadius.xl, css['radius-xl']);
-      expect(DabblerRadius.xxl, css['radius-xxl']);
-      expect(DabblerRadius.pill, css['radius-pill']);
-    });
+      test('the radius ramp matches --radius-*', () {
+        expect(DabblerRadius.sm, css['radius-sm']);
+        expect(DabblerRadius.md, css['radius-md']);
+        expect(DabblerRadius.lg, css['radius-lg']);
+        expect(DabblerRadius.xl, css['radius-xl']);
+        expect(DabblerRadius.xxl, css['radius-xxl']);
+        expect(DabblerRadius.pill, css['radius-pill']);
+      });
 
-    test('sizing matches the source', () {
-      expect(DabblerSizing.touchTargetMin, css['touch-target-min']);
-      expect(DabblerSizing.borderHairline, css['border-hairline']);
-      expect(DabblerSizing.borderDefault, css['border-default']);
-      expect(DabblerSizing.iconSm, css['icon-sm']);
-      expect(DabblerSizing.iconMd, css['icon-md']);
-      expect(DabblerSizing.iconLg, css['icon-lg']);
-    });
+      test('sizing matches the source', () {
+        expect(DabblerSizing.touchTargetMin, css['touch-target-min']);
+        expect(DabblerSizing.borderHairline, css['border-hairline']);
+        expect(DabblerSizing.borderDefault, css['border-default']);
+        expect(DabblerSizing.iconSm, css['icon-sm']);
+        expect(DabblerSizing.iconMd, css['icon-md']);
+        expect(DabblerSizing.iconLg, css['icon-lg']);
+      });
 
-    test('--elevation-0 and --elevation-1 are none in the source', () {
-      final String text = source!.readAsStringSync();
-      expect(text, contains('--elevation-0: none;'));
-      expect(text, contains('--elevation-1: none;'));
-      expect(DabblerElevation.none, isEmpty);
-      expect(DabblerElevation.flat, isEmpty);
-    });
+      test('--elevation-0 and --elevation-1 are none in the source', () {
+        final String text = source!.readAsStringSync();
+        expect(text, contains('--elevation-0: none;'));
+        expect(text, contains('--elevation-1: none;'));
+        expect(DabblerElevation.none, isEmpty);
+        expect(DabblerElevation.flat, isEmpty);
+      });
 
-    test('--elevation-2 is the only shadow declared, in both modes', () {
-      final String text = source!.readAsStringSync();
-      final Iterable<RegExpMatch> shadows =
-          RegExp(r'--elevation-\d: ([^;]+);').allMatches(text);
-      final List<String> nonNone = <String>[
-        for (final RegExpMatch m in shadows)
-          if (m.group(1) != 'none') m.group(0)!,
-      ];
-      // Exactly two declarations carry a value: light and the dark override,
-      // both of them --elevation-2.
-      expect(nonNone, hasLength(2));
-      expect(nonNone.every((String d) => d.startsWith('--elevation-2:')), isTrue);
-    });
-  }, skip: source == null ? 'tokens/spacing.css not found beside the package' : false);
+      test('--elevation-2 is the only shadow declared, in both modes', () {
+        final String text = source!.readAsStringSync();
+        final Iterable<RegExpMatch> shadows = RegExp(
+          r'--elevation-\d: ([^;]+);',
+        ).allMatches(text);
+        final List<String> nonNone = <String>[
+          for (final RegExpMatch m in shadows)
+            if (m.group(1) != 'none') m.group(0)!,
+        ];
+        // Exactly two declarations carry a value: light and the dark override,
+        // both of them --elevation-2.
+        expect(nonNone, hasLength(2));
+        expect(
+          nonNone.every((String d) => d.startsWith('--elevation-2:')),
+          isTrue,
+        );
+      });
+    },
+    skip: source == null
+        ? 'tokens/spacing.css not found beside the package'
+        : false,
+  );
 
   group('semantic aliases are steps of the scale', () {
     test('each alias equals the step the source points it at', () {
@@ -207,15 +220,12 @@ void main() {
       );
     });
 
-    test(
-      'no shadow-bearing token exists outside the dialog pair',
-      () {
-        // The reservation is enforceable only as far as this cut goes: DS-104
-        // declares exactly one shadow value, under a name that says who may
-        // use it. Nothing else in the geometry surface returns a BoxShadow.
-        expect(DabblerElevation.none, isEmpty);
-        expect(DabblerElevation.flat, isEmpty);
-      },
-    );
+    test('no shadow-bearing token exists outside the dialog pair', () {
+      // The reservation is enforceable only as far as this cut goes: DS-104
+      // declares exactly one shadow value, under a name that says who may
+      // use it. Nothing else in the geometry surface returns a BoxShadow.
+      expect(DabblerElevation.none, isEmpty);
+      expect(DabblerElevation.flat, isEmpty);
+    });
   });
 }

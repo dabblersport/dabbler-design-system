@@ -180,8 +180,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.leading,
     this.border = false,
     this.safeArea = true,
+    this.transparent = false,
     this.avatarImageUrl,
   })  : title = null,
+        titleWidget = null,
+        plain = false,
         onBack = null,
         backLabel = defaultBackLabel,
         _titled = false,
@@ -211,11 +214,14 @@ class DabblerNavigationTopBar extends StatelessWidget {
   const DabblerNavigationTopBar.titled({
     super.key,
     this.title,
+    this.titleWidget,
+    this.plain = false,
     this.onBack,
     this.backLabel = defaultBackLabel,
     this.actions = const <DabblerNavigationAction>[],
     this.border = false,
     this.safeArea = true,
+    this.transparent = false,
     this.titleOpacity = 1,
     this.scrollController,
     this.titleRevealOffset = defaultTitleRevealOffset,
@@ -235,8 +241,21 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// button sits and where "back" leads.
   static const String backIcon = 'arrow-circle-left';
 
+  /// Draws no ground of its own, so the bar sits on whatever is behind it — a
+  /// tinted hero (`Settings.dc.html:49`, the root header on the brand tint).
+  final bool transparent;
+
   /// The titled variant's title; null draws an empty title slot.
   final String? title;
+
+  /// A widget that takes the title slot in place of [title] — the search
+  /// header of `Search.dc.html:158-174`, where the slot holds the search field
+  /// beside the back button. Titled variant only.
+  final Widget? titleWidget;
+
+  /// The plain titled bar of `Results.dc.html`: the back glyph without its
+  /// bordered disc, and the title centred between equal-width ends.
+  final bool plain;
 
   /// The titled variant's back action. Null hides the back button.
   final VoidCallback? onBack;
@@ -419,7 +438,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
       decoration: BoxDecoration(
         // `backgroundColor: 'var(--neutral-100)'`, which is `--surface-page`
         // (`tokens/colors.css:32`).
-        color: colors.bgPrimary,
+        color: transparent ? null : colors.bgPrimary,
         // Root `borderRadius: 16` (`NavigationTopBar.jsx:14`).
         borderRadius: border ? DabblerRadius.cardAll : null,
         border: border
@@ -441,7 +460,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
           end: barPadding.end,
         ),
         decoration: BoxDecoration(
-          color: colors.bgPrimary,
+          color: transparent ? null : colors.bgPrimary,
           border: Border(
             bottom: BorderSide(
               color: colors.bgTertiary,
@@ -628,7 +647,9 @@ class DabblerNavigationTopBar extends StatelessWidget {
                         child: Container(
                           width: backButtonSide,
                           height: backButtonSide,
-                          decoration: BoxDecoration(
+                          decoration: plain
+                              ? null
+                              : BoxDecoration(
                             // `background:var(--surface-card);
                             // border:1px solid var(--outline-card)`.
                             color: colors.surfaceCard,
@@ -662,9 +683,10 @@ class DabblerNavigationTopBar extends StatelessWidget {
           const SizedBox(width: DabblerSpacing.space3),
         ],
         Expanded(
-          child: Semantics(
+          child: titleWidget ?? Semantics(
             header: true,
             child: _TopBarTitle(
+              centered: plain,
               text: title ?? '',
               opacity: titleOpacity,
               controller: scrollController,
@@ -680,6 +702,10 @@ class DabblerNavigationTopBar extends StatelessWidget {
             ),
           ),
         ),
+        if (plain && actions.isEmpty && back != null)
+          const SizedBox(
+            width: DabblerSizing.touchTargetMin + DabblerSpacing.space3,
+          ),
         for (final DabblerNavigationAction action in actions)
           _action(colors, action),
       ],

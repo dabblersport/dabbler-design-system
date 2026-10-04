@@ -92,11 +92,11 @@ void main() {
       final DabblerCheckMarkPainter painter =
           paint.painter! as DabblerCheckMarkPainter;
       expect(painter.color, testColors().onBrand);
-      expect(
-        DabblerCheckMarkPainter.points,
-        const <Offset>[Offset(20, 6), Offset(9, 17), Offset(4, 12)],
-        reason: 'Checkbox.jsx:14 — d="M20 6 9 17l-5-5"',
-      );
+      expect(DabblerCheckMarkPainter.points, const <Offset>[
+        Offset(20, 6),
+        Offset(9, 17),
+        Offset(4, 12),
+      ], reason: 'Checkbox.jsx:14 — d="M20 6 9 17l-5-5"');
       expect(paint.size, const Size.square(DabblerCheckbox.markSize));
       expect(DabblerCheckbox.markSize, DabblerSizing.iconSm);
     });
@@ -132,8 +132,9 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
-      final DabblerFocusRing ring =
-          tester.widget<DabblerFocusRing>(find.byType(DabblerFocusRing));
+      final DabblerFocusRing ring = tester.widget<DabblerFocusRing>(
+        find.byType(DabblerFocusRing),
+      );
       expect(ring.visible, isTrue);
       expect(ring.borderRadius, DabblerRadius.smAll);
 
@@ -200,11 +201,7 @@ void main() {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
         host(
-          DabblerCheckbox(
-            checked: true,
-            label: 'Notify me',
-            onChanged: (_) {},
-          ),
+          DabblerCheckbox(checked: true, label: 'Notify me', onChanged: (_) {}),
         ),
       );
 

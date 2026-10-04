@@ -40,7 +40,10 @@ final RegExp _bareNumber = RegExp(r'(?<![A-Za-z0-9_.$])[0-9]+(?:\.[0-9]+)?');
 
 /// Strips `///`, `//` and `/* … */` so only executable Dart is scanned.
 String _stripComments(String source) {
-  final String noBlock = source.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '');
+  final String noBlock = source.replaceAll(
+    RegExp(r'/\*.*?\*/', dotAll: true),
+    '',
+  );
   return noBlock
       .split('\n')
       .map((String line) {
@@ -116,7 +119,7 @@ void main() {
           );
           return _stripComments(file.readAsStringSync());
         }(),
-      };
+    };
   });
 
   group('KAN-228 AC1 — spacing comes from DS-104 tokens, never from a '
@@ -127,7 +130,8 @@ void main() {
           expect(
             _bareNumber.hasMatch(_directArgs(call)),
             isFalse,
-            reason: '$path: literal EdgeInsets value in `$call` — '
+            reason:
+                '$path: literal EdgeInsets value in `$call` — '
                 'use a DabblerSpacing constant',
           );
         }
@@ -141,7 +145,8 @@ void main() {
           expect(
             call.startsWith('EdgeInsetsDirectional'),
             isTrue,
-            reason: '$path: `$call` is not RTL-safe — '
+            reason:
+                '$path: `$call` is not RTL-safe — '
                 'use EdgeInsetsDirectional',
           );
         }
@@ -161,7 +166,8 @@ void main() {
             expect(
               _bareNumber.hasMatch(_directArgs(call)),
               isFalse,
-              reason: '$path: bare number in `$call` — '
+              reason:
+                  '$path: bare number in `$call` — '
                   'use a DabblerSpacing/DabblerSizing constant',
             );
           }

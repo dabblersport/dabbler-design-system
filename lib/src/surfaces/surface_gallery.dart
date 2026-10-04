@@ -15,7 +15,8 @@ const List<GalleryEntry> surfaceGalleryEntries = <GalleryEntry>[
     page: 'components/surface',
     group: GalleryPurpose.contentContainers,
     title: 'Surface — variants',
-    description: 'Every DabblerSurfaceVariant. Flat throughout: no shadow, '
+    description:
+        'Every DabblerSurfaceVariant. Flat throughout: no shadow, '
         'no gradient, no blur.',
     builder: _variants,
   ),

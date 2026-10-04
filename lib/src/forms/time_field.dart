@@ -222,8 +222,9 @@ class DabblerTimeField extends StatefulWidget {
 }
 
 class _DabblerTimeFieldState extends State<DabblerTimeField> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.displayText);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.displayText,
+  );
 
   @override
   void didUpdateWidget(DabblerTimeField oldWidget) {

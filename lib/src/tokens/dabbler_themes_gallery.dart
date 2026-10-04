@@ -72,7 +72,8 @@ const List<GalleryEntry> themesGalleryEntries = <GalleryEntry>[
     page: 'foundations/themes',
     group: null,
     title: 'Themes — one control across all fourteen palettes',
-    description: 'The same card rendered simultaneously under seven themes at '
+    description:
+        'The same card rendered simultaneously under seven themes at '
         'both brightnesses. Not the header switcher: every cell holds its own '
         'palette at once.',
     builder: _component,
@@ -82,7 +83,8 @@ const List<GalleryEntry> themesGalleryEntries = <GalleryEntry>[
     page: 'foundations/themes',
     group: null,
     title: 'Themes — paper shared, brand retinted',
-    description: 'The invariant as hex, read live: thirteen paper roles '
+    description:
+        'The invariant as hex, read live: thirteen paper roles '
         'identical down every row, three brand roles different in every cell.',
     builder: _invariant,
   ),
@@ -166,10 +168,7 @@ class _Specimen extends StatelessWidget {
             spacing: DabblerSpacing.space2,
             runSpacing: DabblerSpacing.space2,
             children: const <Widget>[
-              DabblerButton(
-                label: 'Join',
-                size: DabblerButtonSize.small,
-              ),
+              DabblerButton(label: 'Join', size: DabblerButtonSize.small),
               DabblerButton(
                 label: 'Details',
                 tone: DabblerButtonTone.outlined,
@@ -210,7 +209,8 @@ Widget _shared(Brightness brightness) {
   return _RoleTable(
     name: '${_brightnessName(brightness)} — paper: identical across all seven',
     brightness: brightness,
-    usage: 'Every hex repeats seven times. That repetition is the invariant: '
+    usage:
+        'Every hex repeats seven times. That repetition is the invariant: '
         'a theme is a **brand**, not a skin, so a card, a page, an ink and a '
         'hairline are the same pixels in `sport` as in `shade`.',
     roles: const <_Role>[
@@ -235,7 +235,8 @@ Widget _retinted(Brightness brightness) {
   return _RoleTable(
     name: '${_brightnessName(brightness)} — brand: different in every theme',
     brightness: brightness,
-    usage: 'No hex repeats along a row. These three roles are the entire '
+    usage:
+        'No hex repeats along a row. These three roles are the entire '
         'difference between one theme and another — `brandPrimary` fills the '
         'primary button, `accent` the secondary, `focusRing` the focus '
         'indicator.',
@@ -336,10 +337,7 @@ class _RoleTable extends StatelessWidget {
       children: <Widget>[
         const SizedBox(width: _labelWidth),
         for (final DabblerTheme theme in _themes)
-          SizedBox(
-            width: _columnWidth,
-            child: GalleryMono(theme.name),
-          ),
+          SizedBox(width: _columnWidth, child: GalleryMono(theme.name)),
       ],
     );
   }

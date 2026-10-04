@@ -4,14 +4,17 @@ import 'package:dabbler_design_system/src/forms/time_field.dart';
 import 'package:dabbler_design_system/src/surfaces/surface.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
-import 'package:flutter/cupertino.dart' show CupertinoLocalizations, DefaultCupertinoLocalizations;
+import 'package:flutter/cupertino.dart'
+    show CupertinoLocalizations, DefaultCupertinoLocalizations;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const double hostWidth = 320;
 
-DabblerColors _colors() =>
-    DabblerColors.resolve(theme: DabblerTheme.main, brightness: Brightness.light);
+DabblerColors _colors() => DabblerColors.resolve(
+  theme: DabblerTheme.main,
+  brightness: Brightness.light,
+);
 
 Widget _host(
   Widget child, {
@@ -38,13 +41,13 @@ Widget _host(
 }
 
 DabblerSurface _box(WidgetTester tester) => tester.widget<DabblerSurface>(
-      find
-          .descendant(
-            of: find.byType(DabblerFieldShell),
-            matching: find.byType(DabblerSurface),
-          )
-          .first,
-    );
+  find
+      .descendant(
+        of: find.byType(DabblerFieldShell),
+        matching: find.byType(DabblerSurface),
+      )
+      .first,
+);
 
 const String easternDigits = '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹';
 
@@ -123,7 +126,10 @@ void main() {
 
   group('DabblerTimeFormat.parse — the source regexp (AC1)', () {
     test('accepts every form the specimen lists', () {
-      expect(DabblerTimeFormat.parse('6pm'), const TimeOfDay(hour: 18, minute: 0));
+      expect(
+        DabblerTimeFormat.parse('6pm'),
+        const TimeOfDay(hour: 18, minute: 0),
+      );
       expect(
         DabblerTimeFormat.parse('6:00 PM'),
         const TimeOfDay(hour: 18, minute: 0),
@@ -188,8 +194,9 @@ void main() {
 
   group('AC2 — Western Arabic numerals regardless of locale', () {
     test('format emits ASCII 0-9 and the literal AM/PM', () {
-      final String out =
-          DabblerTimeFormat.format(const TimeOfDay(hour: 18, minute: 0));
+      final String out = DabblerTimeFormat.format(
+        const TimeOfDay(hour: 18, minute: 0),
+      );
       expect(out, '6:00 PM');
       for (final int rune in easternDigits.runes) {
         expect(out.contains(String.fromCharCode(rune)), isFalse);
@@ -222,8 +229,9 @@ void main() {
         ),
       );
 
-      final EditableText editable =
-          tester.widget<EditableText>(find.byType(EditableText));
+      final EditableText editable = tester.widget<EditableText>(
+        find.byType(EditableText),
+      );
       expect(editable.controller.text, '6:00 PM');
       for (final int rune in easternDigits.runes) {
         expect(
@@ -337,7 +345,9 @@ void main() {
                 DabblerPickerFieldShell.defaultCloseSemanticsLabel,
               ),
             )
-            .flagsCollection.isExpanded.toBoolOrNull(),
+            .flagsCollection
+            .isExpanded
+            .toBoolOrNull(),
         isTrue,
       );
     });
@@ -413,18 +423,25 @@ void main() {
       );
       for (final (String raw, TimeOfDay want, String shown)
           in <(String, TimeOfDay, String)>[
-        ('8:59 AM', const TimeOfDay(hour: 9, minute: 0), '9:00 AM'), // 12h
-        ('5:31 PM', const TimeOfDay(hour: 17, minute: 30), '5:30 PM'), // 12h
-        ('07:15', const TimeOfDay(hour: 9, minute: 0), '9:00 AM'), // 24h
-        ('23:00', const TimeOfDay(hour: 17, minute: 30), '5:30 PM'), // 24h
-      ]) {
+            ('8:59 AM', const TimeOfDay(hour: 9, minute: 0), '9:00 AM'), // 12h
+            (
+              '5:31 PM',
+              const TimeOfDay(hour: 17, minute: 30),
+              '5:30 PM',
+            ), // 12h
+            ('07:15', const TimeOfDay(hour: 9, minute: 0), '9:00 AM'), // 24h
+            ('23:00', const TimeOfDay(hour: 17, minute: 30), '5:30 PM'), // 24h
+          ]) {
         committed.clear();
         await tester.enterText(find.byType(EditableText), raw);
         await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pump();
         expect(committed, <TimeOfDay?>[want], reason: raw);
         expect(
-          tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+          tester
+              .widget<EditableText>(find.byType(EditableText))
+              .controller
+              .text,
           shown,
           reason: raw,
         );
@@ -457,7 +474,10 @@ void main() {
         await tester.pump();
         expect(committed, isEmpty, reason: raw);
         expect(
-          tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+          tester
+              .widget<EditableText>(find.byType(EditableText))
+              .controller
+              .text,
           '6:00 PM',
           reason: '$raw reverts to the current value',
         );
@@ -499,7 +519,10 @@ void main() {
         const TimeOfDay(hour: 23, minute: 59),
       );
       expect(DabblerTimeFormat.parse('24:00'), isNull);
-      expect(DabblerTimeFormat.parse('12:00 am'), const TimeOfDay(hour: 0, minute: 0));
+      expect(
+        DabblerTimeFormat.parse('12:00 am'),
+        const TimeOfDay(hour: 0, minute: 0),
+      );
     });
 
     testWidgets('public API: existing caller parameters still compile', (
@@ -582,8 +605,9 @@ void main() {
           locale: const Locale('ar'),
         ),
       );
-      final EditableText editable =
-          tester.widget<EditableText>(find.byType(EditableText));
+      final EditableText editable = tester.widget<EditableText>(
+        find.byType(EditableText),
+      );
       expect(editable.textDirection, TextDirection.ltr);
       expect(editable.controller.text, '6:00 PM');
     });

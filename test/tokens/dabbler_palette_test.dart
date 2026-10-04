@@ -58,8 +58,9 @@ Map<String, String> _rootHexTokens(String css) {
   final int end = css.indexOf('\n}', start);
   final String root = css.substring(start, end);
   return <String, String>{
-    for (final RegExpMatch m
-        in RegExp(r'--([a-z0-9-]+):#([0-9A-Fa-f]{6})').allMatches(root))
+    for (final RegExpMatch m in RegExp(
+      r'--([a-z0-9-]+):#([0-9A-Fa-f]{6})',
+    ).allMatches(root))
       m.group(1)!: m.group(2)!.toUpperCase(),
   };
 }
@@ -73,81 +74,86 @@ List<File> _dartFilesUnder(String dir) => Directory(dir)
 void main() {
   final File? source = _findColorsCss();
 
-  group('DabblerPalette transcribes colors.css', () {
-    late Map<String, String> tokens;
+  group(
+    'DabblerPalette transcribes colors.css',
+    () {
+      late Map<String, String> tokens;
 
-    setUpAll(() {
-      // The source is a sibling checkout; when it is absent the source-backed
-      // assertions cannot run, and the group is skipped rather than passing
-      // vacuously.
-      if (source != null) tokens = _rootHexTokens(source.readAsStringSync());
-    });
+      setUpAll(() {
+        // The source is a sibling checkout; when it is absent the source-backed
+        // assertions cannot run, and the group is skipped rather than passing
+        // vacuously.
+        if (source != null) tokens = _rootHexTokens(source.readAsStringSync());
+      });
 
-    test('declares one const Color per :root hex token', () {
-      final String source =
-          File('lib/src/tokens/dabbler_palette.dart').readAsStringSync();
+      test('declares one const Color per :root hex token', () {
+        final String source = File(
+          'lib/src/tokens/dabbler_palette.dart',
+        ).readAsStringSync();
 
-      // Each token's doc comment records its CSS name; the constant below it
-      // must carry that token's exact hex.
-      for (final MapEntry<String, String> entry in tokens.entries) {
-        final RegExp decl = RegExp(
-          '/// `--${RegExp.escape(entry.key)}` — `#${entry.value}`\\.\\n'
-          r'  static const Color \w+ = '
-          'Color\\(0xFF${entry.value}\\);',
-        );
-        expect(
-          decl.hasMatch(source),
-          isTrue,
-          reason: 'no constant for --${entry.key} (#${entry.value})',
-        );
-      }
-
-      // One literal is NOT in `tokens/colors.css`: `--accent-indigo` (#5C50E6),
-      // which the live project declares only under `tokens/figma/fig-tokens.css`
-      // and which `Avatar.jsx` / `Badge.jsx` / `Button.jsx` consume. Named here
-      // so the count stays an exact statement rather than a tolerance.
-      expect(tokens.containsKey('accent-indigo'), isFalse);
-      expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
-      expect(_hexLiteral.allMatches(source).length, tokens.length + 1);
-    });
-
-    test('covers all seven theme palettes and their p/s ramps', () {
-      const List<String> brandRamps = <String>[
-        'main',
-        'social',
-        'sport',
-        'active',
-        'bright',
-      ];
-      for (final String theme in brandRamps) {
-        for (final String ramp in <String>['p', 's']) {
-          final Iterable<String> shades =
-              tokens.keys.where((String k) => k.startsWith('$theme-$ramp-'));
-          expect(shades, isNotEmpty, reason: '$theme-$ramp ramp missing');
+        // Each token's doc comment records its CSS name; the constant below it
+        // must carry that token's exact hex.
+        for (final MapEntry<String, String> entry in tokens.entries) {
+          final RegExp decl = RegExp(
+            '/// `--${RegExp.escape(entry.key)}` — `#${entry.value}`\\.\\n'
+            r'  static const Color \w+ = '
+            'Color\\(0xFF${entry.value}\\);',
+          );
+          expect(
+            decl.hasMatch(source),
+            isTrue,
+            reason: 'no constant for --${entry.key} (#${entry.value})',
+          );
         }
-      }
-      // `simple` and `shade` carry no brand ramp — they resolve through ink.
-      expect(DabblerPalette.ink900, const Color(0xFF1B1B1B));
-      expect(DabblerPalette.ink300, const Color(0xFFC2BFCB));
-    });
 
-    test('spot-checks primitives against the source hexes', () {
-      expect(DabblerPalette.mainP600, const Color(0xFF7328CE));
-      expect(DabblerPalette.socialP600, const Color(0xFF3473D7));
-      expect(DabblerPalette.sportP600, const Color(0xFF348638));
-      expect(DabblerPalette.activeP600, const Color(0xFFCF3989));
-      expect(DabblerPalette.brightP600, const Color(0xFFF6AA4F));
-      expect(DabblerPalette.surfacePage, const Color(0xFFF5F0E6));
-      expect(DabblerPalette.spotlight500, const Color(0xFFFF5A1F));
-    });
-  }, skip: source == null
-      ? 'tokens/colors.css not found beside the package'
-      : false);
+        // One literal is NOT in `tokens/colors.css`: `--accent-indigo` (#5C50E6),
+        // which the live project declares only under `tokens/figma/fig-tokens.css`
+        // and which `Avatar.jsx` / `Badge.jsx` / `Button.jsx` consume. Named here
+        // so the count stays an exact statement rather than a tolerance.
+        expect(tokens.containsKey('accent-indigo'), isFalse);
+        expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
+        expect(_hexLiteral.allMatches(source).length, tokens.length + 1);
+      });
+
+      test('covers all seven theme palettes and their p/s ramps', () {
+        const List<String> brandRamps = <String>[
+          'main',
+          'social',
+          'sport',
+          'active',
+          'bright',
+        ];
+        for (final String theme in brandRamps) {
+          for (final String ramp in <String>['p', 's']) {
+            final Iterable<String> shades = tokens.keys.where(
+              (String k) => k.startsWith('$theme-$ramp-'),
+            );
+            expect(shades, isNotEmpty, reason: '$theme-$ramp ramp missing');
+          }
+        }
+        // `simple` and `shade` carry no brand ramp — they resolve through ink.
+        expect(DabblerPalette.ink900, const Color(0xFF1B1B1B));
+        expect(DabblerPalette.ink300, const Color(0xFFC2BFCB));
+      });
+
+      test('spot-checks primitives against the source hexes', () {
+        expect(DabblerPalette.mainP600, const Color(0xFF7328CE));
+        expect(DabblerPalette.socialP600, const Color(0xFF3473D7));
+        expect(DabblerPalette.sportP600, const Color(0xFF348638));
+        expect(DabblerPalette.activeP600, const Color(0xFFCF3989));
+        expect(DabblerPalette.brightP600, const Color(0xFFF6AA4F));
+        expect(DabblerPalette.surfacePage, const Color(0xFFF5F0E6));
+        expect(DabblerPalette.spotlight500, const Color(0xFFFF5A1F));
+      });
+    },
+    skip: source == null
+        ? 'tokens/colors.css not found beside the package'
+        : false,
+  );
 
   // Known-failing group: the pin records the SOURCE's 4.40:1 (below AA 4.5:1),
   // not a pass. It moves to the gate only after `colors.css` is re-exported.
-  group(
-      'known-failing: tag-pending-ink AA (DECISIONS.md:11942-11946: pins '
+  group('known-failing: tag-pending-ink AA (DECISIONS.md:11942-11946: pins '
       'record the source; moves to the gate only after re-export)', () {
     test('tagPendingInk on tagPendingSurface is 4.40:1', () {
       expect(
@@ -171,8 +177,9 @@ void main() {
   });
 
   test('no palette symbol names a "profile" theme', () {
-    final String source =
-        File('lib/src/tokens/dabbler_palette.dart').readAsStringSync();
+    final String source = File(
+      'lib/src/tokens/dabbler_palette.dart',
+    ).readAsStringSync();
     expect(
       RegExp('profile', caseSensitive: false).hasMatch(source),
       isFalse,

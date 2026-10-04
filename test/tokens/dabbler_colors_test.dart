@@ -12,9 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 double _luminance(Color c) {
   double channel(double v) =>
       v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
-  return 0.2126 * channel(c.r) +
-      0.7152 * channel(c.g) +
-      0.0722 * channel(c.b);
+  return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
 }
 
 double contrast(Color a, Color b) {
@@ -27,7 +25,10 @@ double contrast(Color a, Color b) {
 Iterable<(String, DabblerColors)> get _every sync* {
   for (final DabblerTheme t in DabblerTheme.values) {
     for (final Brightness b in Brightness.values) {
-      yield ('${t.name}/${b.name}', DabblerColors.resolve(theme: t, brightness: b));
+      yield (
+        '${t.name}/${b.name}',
+        DabblerColors.resolve(theme: t, brightness: b),
+      );
     }
   }
 }
@@ -37,27 +38,34 @@ void main() {
     test('7 themes x 2 brightnesses resolve to 14 distinct instances', () {
       expect(DabblerColors.all, hasLength(14));
       final Set<(DabblerTheme, Brightness)> keys = <(DabblerTheme, Brightness)>{
-        for (final DabblerColors c in DabblerColors.all) (c.theme, c.brightness),
+        for (final DabblerColors c in DabblerColors.all)
+          (c.theme, c.brightness),
       };
       expect(keys, hasLength(14));
     });
 
-    test('no two instances paint the same set of brand roles at a brightness',
-        () {
-      for (final Brightness b in Brightness.values) {
-        final Set<String> fingerprints = <String>{
-          for (final DabblerTheme t in DabblerTheme.values)
-            () {
-              final DabblerColors c = DabblerColors.resolve(theme: t, brightness: b);
-              return '${c.brandPrimary}|${c.accent}|${c.focusRing}';
-            }(),
-        };
-        expect(fingerprints, hasLength(7), reason: 'brand collision in $b');
-      }
-    });
+    test(
+      'no two instances paint the same set of brand roles at a brightness',
+      () {
+        for (final Brightness b in Brightness.values) {
+          final Set<String> fingerprints = <String>{
+            for (final DabblerTheme t in DabblerTheme.values)
+              () {
+                final DabblerColors c = DabblerColors.resolve(
+                  theme: t,
+                  brightness: b,
+                );
+                return '${c.brandPrimary}|${c.accent}|${c.focusRing}';
+              }(),
+          };
+          expect(fingerprints, hasLength(7), reason: 'brand collision in $b');
+        }
+      },
+    );
 
-    testWidgets('Theme.of(context).extension<DabblerColors>() resolves each',
-        (WidgetTester tester) async {
+    testWidgets('Theme.of(context).extension<DabblerColors>() resolves each', (
+      WidgetTester tester,
+    ) async {
       for (final (String label, DabblerColors expected) in _every) {
         late DabblerColors seen;
         await tester.pumpWidget(
@@ -89,8 +97,10 @@ void main() {
         theme: DabblerTheme.main,
         brightness: Brightness.light,
       );
-      final DabblerColors sportDark =
-          main.copyWith(theme: DabblerTheme.sport, brightness: Brightness.dark);
+      final DabblerColors sportDark = main.copyWith(
+        theme: DabblerTheme.sport,
+        brightness: Brightness.dark,
+      );
       expect(sportDark.brandPrimary, DabblerPalette.sportP400);
       expect(main.lerp(sportDark, 0.49), same(main));
       expect(main.lerp(sportDark, 0.5), same(sportDark));
@@ -106,8 +116,14 @@ void main() {
           final DabblerTheme a = DabblerTheme.values[i];
           final DabblerTheme z = DabblerTheme.values[j];
           test('${a.name} vs ${z.name} @ ${b.name}: paper identical', () {
-            final DabblerColors x = DabblerColors.resolve(theme: a, brightness: b);
-            final DabblerColors y = DabblerColors.resolve(theme: z, brightness: b);
+            final DabblerColors x = DabblerColors.resolve(
+              theme: a,
+              brightness: b,
+            );
+            final DabblerColors y = DabblerColors.resolve(
+              theme: z,
+              brightness: b,
+            );
             expect(x.bgPrimary, y.bgPrimary);
             expect(x.bgSecondary, y.bgSecondary);
             expect(x.bgTertiary, y.bgTertiary);
@@ -126,37 +142,50 @@ void main() {
       }
     }
 
-    test('brand roles differ for every pair of themes at both brightnesses', () {
-      for (final Brightness b in Brightness.values) {
-        for (int i = 0; i < DabblerTheme.values.length; i++) {
-          for (int j = i + 1; j < DabblerTheme.values.length; j++) {
-            final DabblerColors x =
-                DabblerColors.resolve(theme: DabblerTheme.values[i], brightness: b);
-            final DabblerColors y =
-                DabblerColors.resolve(theme: DabblerTheme.values[j], brightness: b);
-            expect(
-              x.brandPrimary == y.brandPrimary && x.accent == y.accent,
-              isFalse,
-              reason: '${x.theme.name} and ${y.theme.name} share a brand @ $b',
-            );
+    test(
+      'brand roles differ for every pair of themes at both brightnesses',
+      () {
+        for (final Brightness b in Brightness.values) {
+          for (int i = 0; i < DabblerTheme.values.length; i++) {
+            for (int j = i + 1; j < DabblerTheme.values.length; j++) {
+              final DabblerColors x = DabblerColors.resolve(
+                theme: DabblerTheme.values[i],
+                brightness: b,
+              );
+              final DabblerColors y = DabblerColors.resolve(
+                theme: DabblerTheme.values[j],
+                brightness: b,
+              );
+              expect(
+                x.brandPrimary == y.brandPrimary && x.accent == y.accent,
+                isFalse,
+                reason:
+                    '${x.theme.name} and ${y.theme.name} share a brand @ $b',
+              );
+            }
           }
         }
-      }
-    });
+      },
+    );
 
     test('only sport/social/active/bright override a status tone', () {
       const Map<DabblerTheme, DabblerStatusTone> overrides =
           <DabblerTheme, DabblerStatusTone>{
-        DabblerTheme.sport: DabblerStatusTone.success,
-        DabblerTheme.social: DabblerStatusTone.info,
-        DabblerTheme.active: DabblerStatusTone.error,
-        DabblerTheme.bright: DabblerStatusTone.warning,
-      };
+            DabblerTheme.sport: DabblerStatusTone.success,
+            DabblerTheme.social: DabblerStatusTone.info,
+            DabblerTheme.active: DabblerStatusTone.error,
+            DabblerTheme.bright: DabblerStatusTone.warning,
+          };
       for (final Brightness b in Brightness.values) {
-        final DabblerColors base =
-            DabblerColors.resolve(theme: DabblerTheme.main, brightness: b);
+        final DabblerColors base = DabblerColors.resolve(
+          theme: DabblerTheme.main,
+          brightness: b,
+        );
         for (final DabblerTheme t in DabblerTheme.values) {
-          final DabblerColors c = DabblerColors.resolve(theme: t, brightness: b);
+          final DabblerColors c = DabblerColors.resolve(
+            theme: t,
+            brightness: b,
+          );
           for (final DabblerStatusTone tone in DabblerStatusTone.values) {
             final bool shouldDiffer = overrides[t] == tone;
             expect(
@@ -249,7 +278,10 @@ void main() {
 
     test('a DabblerToneColor is never == a plain Color', () {
       // ignore: unrelated_type_equality_checks
-      expect(DabblerColors.tagPending == DabblerPalette.tagPendingSurface, isFalse);
+      expect(
+        DabblerColors.tagPending == DabblerPalette.tagPendingSurface,
+        isFalse,
+      );
       expect(DabblerColors.tileAmber, isNot(isA<Color>()));
     });
 

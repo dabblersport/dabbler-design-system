@@ -41,8 +41,9 @@ void main() {
       expect(DabblerNavigationTabBar.iconSize, 24);
     });
 
-    testWidgets('four equal slots; height is 12 + 24 + 12',
-        (WidgetTester tester) async {
+    testWidgets('four equal slots; height is 12 + 24 + 12', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationTabBar()));
       final Size bar = tester.getSize(find.byType(DabblerNavigationTabBar));
       expect(bar.width, 384);

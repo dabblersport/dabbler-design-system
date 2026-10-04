@@ -1,3 +1,4 @@
+import 'package:dabbler_design_system/src/foundations/icon.dart';
 import 'package:dabbler_design_system/src/layout/section.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
@@ -13,8 +14,7 @@ const double hostWidth = 320;
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// The minimum a section needs: a [ThemeData] carrying [DabblerColors], a
 /// direction, and a bounded width.
@@ -53,7 +53,9 @@ List<double> _gapHeights(WidgetTester tester) {
           matching: find.byType(SizedBox),
         ),
       )
-      .where((SizedBox b) => b.key == null && b.height != null && b.width == null)
+      .where(
+        (SizedBox b) => b.key == null && b.height != null && b.width == null,
+      )
       .map((SizedBox b) => b.height!)
       .toList();
 }
@@ -201,8 +203,9 @@ void main() {
         ),
       );
       final DabblerColors colors = _colors();
-      final TextStyle title =
-          tester.widget<Text>(find.text('Upcoming games')).style!;
+      final TextStyle title = tester
+          .widget<Text>(find.text('Upcoming games'))
+          .style!;
       expect(title.fontSize, DabblerType.title3.fontSize);
       expect(title.height! * title.fontSize!, DabblerType.title3.latinLeading);
       // D-013: `.t-title-3` at its own weight 400, never Light (KAN-367).
@@ -211,8 +214,9 @@ void main() {
       expect(title.fontWeight, isNot(DabblerType.light));
       expect(title.color, colors.textPrimary);
 
-      final TextStyle subtitle =
-          tester.widget<Text>(find.text('only friends can join')).style!;
+      final TextStyle subtitle = tester
+          .widget<Text>(find.text('only friends can join'))
+          .style!;
       expect(subtitle.fontSize, DabblerType.footnote.fontSize);
       expect(subtitle.color, colors.textSecondary);
     });
@@ -264,8 +268,7 @@ void main() {
     testWidgets('LTR: title leads on the left, action trails on the right', (
       WidgetTester tester,
     ) async {
-      final (Rect title, Rect action) =
-          await header(tester, TextDirection.ltr);
+      final (Rect title, Rect action) = await header(tester, TextDirection.ltr);
       final Rect section = _rectOf(tester, find.byType(DabblerSection));
       expect(title.left, section.left);
       expect(action.right, section.right);
@@ -275,8 +278,7 @@ void main() {
     testWidgets('RTL: title leads on the right, action trails on the left', (
       WidgetTester tester,
     ) async {
-      final (Rect title, Rect action) =
-          await header(tester, TextDirection.rtl);
+      final (Rect title, Rect action) = await header(tester, TextDirection.rtl);
       final Rect section = _rectOf(tester, find.byType(DabblerSection));
       expect(title.right, section.right);
       expect(action.left, section.left);
@@ -300,8 +302,10 @@ void main() {
           ),
         );
         final Rect section = _rectOf(tester, find.byType(DabblerSection));
-        final Rect action =
-            _rectOf(tester, find.byKey(const ValueKey<String>('action')));
+        final Rect action = _rectOf(
+          tester,
+          find.byKey(const ValueKey<String>('action')),
+        );
         expect(
           direction == TextDirection.ltr ? action.right : action.left,
           direction == TextDirection.ltr ? section.right : section.left,
@@ -329,5 +333,19 @@ void main() {
         expect(paragraph.textDirection, direction);
       }
     });
+  });
+
+  testWidgets('compact + icon draws a brand glyph and a semibold subheadline',
+      (tester) async {
+    await tester.pumpWidget(_host(const DabblerSection(
+      title: 'People',
+      icon: 'people',
+      compact: true,
+      children: <Widget>[SizedBox(height: 10)],
+    )));
+    final Text t = tester.widget<Text>(find.text('People'));
+    expect(t.style!.fontWeight, DabblerType.semibold);
+    expect(t.style!.fontSize, DabblerType.subheadline.fontSize);
+    expect(find.byType(DabblerIcon), findsOneWidget);
   });
 }

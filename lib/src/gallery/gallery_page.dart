@@ -113,14 +113,19 @@ class GalleryPaper extends StatelessWidget {
 
   /// The body padding, exposed because a body that scrolls itself applies it.
   static const EdgeInsets bodyPadding = EdgeInsets.fromLTRB(
-      DabblerSpacing.space8, DabblerSpacing.space6,
-      DabblerSpacing.space8, DabblerSpacing.space11);
+    DabblerSpacing.space8,
+    DabblerSpacing.space6,
+    DabblerSpacing.space8,
+    DabblerSpacing.space11,
+  );
 
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final Widget body =
-        Align(alignment: AlignmentDirectional.topStart, child: child);
+    final Widget body = Align(
+      alignment: AlignmentDirectional.topStart,
+      child: child,
+    );
     return DefaultTextStyle(
       style: galleryTextStyle(context),
       child: ColoredBox(

@@ -38,28 +38,32 @@ Widget _host(
   );
 }
 
-Rect _rectOf(WidgetTester tester, Finder finder) => tester.getRect(finder.first);
+Rect _rectOf(WidgetTester tester, Finder finder) =>
+    tester.getRect(finder.first);
 
 /// The shell's box, as the widget that was configured — so border colour and
 /// width are read as values rather than inferred from pixels.
 DabblerSurface _box(WidgetTester tester) => tester.widget<DabblerSurface>(
-      find
-          .descendant(
-            of: find.byType(DabblerFieldShell),
-            matching: find.byType(DabblerSurface),
-          )
-          .first,
-    );
+  find
+      .descendant(
+        of: find.byType(DabblerFieldShell),
+        matching: find.byType(DabblerSurface),
+      )
+      .first,
+);
 
 /// The global rect of the caret at [offset] inside the field's editable.
 ///
 /// Measured off [RenderEditable], not guessed: this is the real insertion
 /// point the user sees.
 Rect _caretRect(WidgetTester tester, {int offset = 0}) {
-  final EditableTextState state =
-      tester.state<EditableTextState>(find.byType(EditableText).first);
+  final EditableTextState state = tester.state<EditableTextState>(
+    find.byType(EditableText).first,
+  );
   final RenderEditable editable = state.renderEditable;
-  final Rect local = editable.getLocalRectForCaret(TextPosition(offset: offset));
+  final Rect local = editable.getLocalRectForCaret(
+    TextPosition(offset: offset),
+  );
   final Offset origin = editable.localToGlobal(local.topLeft);
   return origin & local.size;
 }
@@ -118,8 +122,10 @@ void main() {
         ),
       );
       final Rect box = _rectOf(tester, find.byType(DabblerSurface));
-      final Rect lead =
-          _rectOf(tester, find.byKey(const ValueKey<String>('lead')));
+      final Rect lead = _rectOf(
+        tester,
+        find.byKey(const ValueKey<String>('lead')),
+      );
       expect(lead.left - box.left, DabblerSpacing.space4);
     });
 
@@ -128,7 +134,10 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          const DabblerTextField(label: 'Email', helperText: 'we never share it'),
+          const DabblerTextField(
+            label: 'Email',
+            helperText: 'we never share it',
+          ),
         ),
       );
       final Rect label = _rectOf(tester, find.text('Email'));
@@ -150,8 +159,10 @@ void main() {
           ),
         ),
       );
-      final Rect trail =
-          _rectOf(tester, find.byKey(const ValueKey<String>('trail')));
+      final Rect trail = _rectOf(
+        tester,
+        find.byKey(const ValueKey<String>('trail')),
+      );
       final Rect editable = _rectOf(tester, find.byType(EditableText));
       expect(trail.left - editable.right, DabblerSpacing.iconGap);
       expect(DabblerSpacing.iconGap, 6);
@@ -430,20 +441,21 @@ void main() {
   });
 
   group('variants', () {
-    testWidgets('search supplies its own leading glyph and ignores prefixIcon', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        _host(
-          const DabblerTextField(
-            variant: DabblerTextFieldVariant.search,
-            prefixIcon: Icon(Icons.abc, key: ValueKey<String>('lead')),
+    testWidgets(
+      'search supplies its own leading glyph and ignores prefixIcon',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(
+            const DabblerTextField(
+              variant: DabblerTextFieldVariant.search,
+              prefixIcon: Icon(Icons.abc, key: ValueKey<String>('lead')),
+            ),
           ),
-        ),
-      );
-      expect(find.byKey(const ValueKey<String>('lead')), findsNothing);
-      expect(DabblerTextField.searchIconName, 'search-normal');
-    });
+        );
+        expect(find.byKey(const ValueKey<String>('lead')), findsNothing);
+        expect(DabblerTextField.searchIconName, 'search-normal');
+      },
+    );
 
     testWidgets('password obscures, and the toggle reveals on a 45px target', (
       WidgetTester tester,
@@ -461,7 +473,10 @@ void main() {
         isTrue,
       );
       final Finder toggle = find.bySemanticsLabel('Show password');
-      expect(tester.getSize(toggle), const Size.square(DabblerSizing.touchTargetMin));
+      expect(
+        tester.getSize(toggle),
+        const Size.square(DabblerSizing.touchTargetMin),
+      );
 
       await tester.tap(toggle);
       await tester.pumpAndSettle();
@@ -483,8 +498,9 @@ void main() {
           ),
         ),
       );
-      final DabblerFieldShell shell =
-          tester.widget<DabblerFieldShell>(find.byType(DabblerFieldShell));
+      final DabblerFieldShell shell = tester.widget<DabblerFieldShell>(
+        find.byType(DabblerFieldShell),
+      );
       expect(shell.align, DabblerFieldAlign.start);
       expect(
         tester.widget<EditableText>(find.byType(EditableText)).maxLines,
@@ -508,8 +524,9 @@ void main() {
         ),
       );
       expect(find.byType(EditableText), findsNothing);
-      final DabblerFieldShell shell =
-          tester.widget<DabblerFieldShell>(find.byType(DabblerFieldShell));
+      final DabblerFieldShell shell = tester.widget<DabblerFieldShell>(
+        find.byType(DabblerFieldShell),
+      );
       expect(shell.focused, isTrue, reason: 'open holds the focus state');
       expect(
         tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns,
@@ -535,24 +552,25 @@ void main() {
       expect(taps, 0);
     });
 
-    testWidgets('a select with no value shows the placeholder in textSecondary', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        _host(
-          const DabblerTextField(
-            variant: DabblerTextFieldVariant.select,
-            placeholder: 'pick a sport',
+    testWidgets(
+      'a select with no value shows the placeholder in textSecondary',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(
+            const DabblerTextField(
+              variant: DabblerTextFieldVariant.select,
+              placeholder: 'pick a sport',
+            ),
           ),
-        ),
-      );
-      // D-003(a): a placeholder is text under WCAG, so it takes the
-      // ink-soft-backed secondary role — never a surface neutral.
-      expect(
-        tester.widget<Text>(find.text('pick a sport')).style!.color,
-        _colors().textSecondary,
-      );
-    });
+        );
+        // D-003(a): a placeholder is text under WCAG, so it takes the
+        // ink-soft-backed secondary role — never a surface neutral.
+        expect(
+          tester.widget<Text>(find.text('pick a sport')).style!.color,
+          _colors().textSecondary,
+        );
+      },
+    );
 
     // KAN-317 pinned these; KAN-336 inverted the third of them. The rule is
     // now uniform: a placeholder is textSecondary enabled, textTertiary
@@ -603,15 +621,14 @@ void main() {
       // was text-identical to an enabled field — the outcome D-025's own
       // reasoning rejects. The select variant was already correct.
       await tester.pumpWidget(
-        _host(
-          const DabblerTextField(placeholder: 'your name', enabled: false),
-        ),
+        _host(const DabblerTextField(placeholder: 'your name', enabled: false)),
       );
       final TextField field = tester.widget<TextField>(find.byType(TextField));
       expect(
         field.decoration!.hintStyle!.color,
         _colors().textTertiary,
-        reason: 'D-025: a disabled placeholder follows the value onto the '
+        reason:
+            'D-025: a disabled placeholder follows the value onto the '
             'tertiary role, in every variant',
       );
       expect(
@@ -627,14 +644,9 @@ void main() {
       // may never be the only carrier of disabled-ness. Pinned here so the
       // colour change cannot outlive the thing that licenses it.
       await tester.pumpWidget(
-        _host(
-          const DabblerTextField(placeholder: 'your name', enabled: false),
-        ),
+        _host(const DabblerTextField(placeholder: 'your name', enabled: false)),
       );
-      expect(
-        tester.widget<TextField>(find.byType(TextField)).enabled,
-        isFalse,
-      );
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
       expect(_box(tester).fill, DabblerFieldShell.disabledFill(_colors()));
     });
   });
@@ -651,29 +663,33 @@ void main() {
       );
     });
 
-    test('no ring geometry or press constant is declared in the forms files',
-        () {
-      for (final String path in <String>[
-        'lib/src/forms/field_shell.dart',
-        'lib/src/forms/text_field.dart',
-      ]) {
-        final String source = File(path).readAsStringSync();
-        final String code = source
-            .split('\n')
-            .where((String l) => !l.trimLeft().startsWith('///'))
-            .where((String l) => !l.trimLeft().startsWith('//'))
-            .join('\n');
-        expect(
-          RegExp(r'Color\(0x').hasMatch(code),
-          isFalse,
-          reason: '$path must take every colour from the tokens',
-        );
-        expect(
-          RegExp(r'outlineOffset|ringWidth\s*=|pressScale\s*=').hasMatch(code),
-          isFalse,
-          reason: '$path must not restate an interaction constant',
-        );
-      }
-    });
+    test(
+      'no ring geometry or press constant is declared in the forms files',
+      () {
+        for (final String path in <String>[
+          'lib/src/forms/field_shell.dart',
+          'lib/src/forms/text_field.dart',
+        ]) {
+          final String source = File(path).readAsStringSync();
+          final String code = source
+              .split('\n')
+              .where((String l) => !l.trimLeft().startsWith('///'))
+              .where((String l) => !l.trimLeft().startsWith('//'))
+              .join('\n');
+          expect(
+            RegExp(r'Color\(0x').hasMatch(code),
+            isFalse,
+            reason: '$path must take every colour from the tokens',
+          );
+          expect(
+            RegExp(
+              r'outlineOffset|ringWidth\s*=|pressScale\s*=',
+            ).hasMatch(code),
+            isFalse,
+            reason: '$path must not restate an interaction constant',
+          );
+        }
+      },
+    );
   });
 }

@@ -101,6 +101,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 
 **Composed cards**
 - [CardEvent](components/card-event.md) — the event card, in three densities.
+- [CardEventResult](components/card-event-result.md) — a game or meet-up in a search result: date tile, kind, title, place and a pill action.
 - [CardVenue](components/card-venue.md) — a venue in a listing: cover, name, place, tags and price.
 - [CardGame](components/card-game.md) — a game in a listing: title, tags, day and time, progress, price and join.
 - [CardUpcoming](components/card-upcoming.md) — a game you are in, on a tinted tile with a countdown ring.
@@ -128,6 +129,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [SharedObjectCard](components/shared-object-card.md) — a game, venue or player shared in a thread.
 - [PostRow](components/post-row.md) — one post in the Home Feed: author, place, body and the like, reply and share actions.
 - [NewsCard](components/news-card.md) — one story in the News tab: media, figures, title and excerpt.
+- [UpcomingReminder](components/upcoming-reminder.md) — the next games on the Home Feed: a card with a countdown ring, a stack, a list or a strip.
 - [Image](components/image.md) — a network photo in a token-radius frame, with placeholder, error state and optional scrim.
 - [ActivityRow](components/activity-row.md) — one entry in the Active tab: who, what, where, when and an action.
 - [CommentRow](components/comment-row.md) — one reply under a post: author, time, body, an optional attachment and the like and reply actions.
@@ -196,6 +198,7 @@ lot about the rest.
 
 - [Dialog](components/dialog.md) — the modal that interrupts to get one decision.
 - [Sheet](components/sheet.md) — the canonical bottom sheet.
+- [ActionRow](components/action-row.md) — one action in a sheet: a glyph, a name and a note on a sunken tile.
 - [SheetList](components/sheet-list.md) — a bounded, scrolling list for the body of a sheet.
 - [Menu](components/menu.md) — the anchored popover for a list of actions or options.
 - [Tooltip](components/tooltip.md) — a short label for a control that carries no visible text.

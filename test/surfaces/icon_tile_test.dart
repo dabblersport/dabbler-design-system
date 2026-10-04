@@ -168,12 +168,21 @@ void main() {
         _host(DabblerIconTile.tinted(const SizedBox(), color: tint)),
       );
       final DabblerSurface box = _box(tester);
-      expect(box.fill, Color.alphaBlend(tint.withValues(alpha: 0.10), colors.surfaceCard));
-      expect(box.borderColor,
-          Color.alphaBlend(tint.withValues(alpha: 0.28), colors.surfaceCard));
+      expect(
+        box.fill,
+        Color.alphaBlend(tint.withValues(alpha: 0.10), colors.surfaceCard),
+      );
+      expect(
+        box.borderColor,
+        Color.alphaBlend(tint.withValues(alpha: 0.28), colors.surfaceCard),
+      );
       expect(DabblerSurface.tintFillAlpha, 0.10);
       expect(DabblerSurface.tintBorderAlpha, 0.28);
-      expect(box.borderWidth, isNull, reason: 'the variant\'s 1px hairline stays');
+      expect(
+        box.borderWidth,
+        isNull,
+        reason: 'the variant\'s 1px hairline stays',
+      );
       expect(box.radius, DabblerRadius.lg);
     });
 
@@ -186,10 +195,7 @@ void main() {
       await tester.pumpWidget(
         _host(DabblerIconTile.tinted(const Icon(Icons.add), color: tint)),
       );
-      expect(
-        IconTheme.of(tester.element(find.byIcon(Icons.add))).color,
-        tint,
-      );
+      expect(IconTheme.of(tester.element(find.byIcon(Icons.add))).color, tint);
     });
 
     testWidgets('enum tones are unchanged by the new constructor', (
@@ -200,10 +206,15 @@ void main() {
         brightness: Brightness.light,
       );
       await tester.pumpWidget(
-        _host(const DabblerIconTile.named('game', tone: DabblerIconTileTone.amber)),
+        _host(
+          const DabblerIconTile.named('game', tone: DabblerIconTileTone.amber),
+        ),
       );
       final DabblerSurface box = _box(tester);
-      expect(box.fill, DabblerIconTile.fillFor(colors, DabblerIconTileTone.amber));
+      expect(
+        box.fill,
+        DabblerIconTile.fillFor(colors, DabblerIconTileTone.amber),
+      );
       expect(box.borderWidth, 0);
       expect(box.borderColor, isNull);
     });
@@ -274,7 +285,10 @@ void main() {
       );
       final DabblerSurface box = _box(tester);
       expect(box.fill, DabblerSurface.tintedFillOf(colors, tint));
-      expect(box.fill, isNot(DabblerSurface.tintedFillOf(colors, colors.brandPrimary)));
+      expect(
+        box.fill,
+        isNot(DabblerSurface.tintedFillOf(colors, colors.brandPrimary)),
+      );
       expect(box.borderColor, DabblerSurface.tintedBorderOf(colors, tint));
       expect(IconTheme.of(tester.element(find.byIcon(Icons.add))).color, tint);
       // `.tinted` fixes `tone` to brand; the colour is what is painted.
@@ -437,7 +451,23 @@ void main() {
         DabblerIconTileTone.amber,
         DabblerIconTileTone.info,
         DabblerIconTileTone.accent,
+        DabblerIconTileTone.sunken,
       ]);
+    });
+
+    testWidgets('sunken paints the sunken fill with a brand glyph, no hairline',
+        (WidgetTester tester) async {
+      final DabblerColors colors = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      await tester.pumpWidget(
+        _host(const DabblerIconTile.named('game', tone: DabblerIconTileTone.sunken)),
+      );
+      final DabblerSurface box = _box(tester);
+      expect(box.fill, DabblerIconTile.fillFor(colors, DabblerIconTileTone.sunken));
+      expect(box.borderWidth, 0);
+      expect(DabblerIconTile.inkFor(colors, DabblerIconTileTone.sunken), colors.brandPrimary);
     });
   });
 

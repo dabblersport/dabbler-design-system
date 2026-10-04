@@ -52,6 +52,8 @@ carry the meaning.
 
 @specimen stat-tile/detail
 
+**The Settings tile is its own size.** `DabblerStatTileSize.setting` is 3 columns by 1 row with a bold sans value over a regular caption, the way the Settings root draws its bento.
+
 ## Axes
 
 ### Size

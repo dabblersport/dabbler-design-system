@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundations/icon.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -101,6 +102,10 @@ class DabblerSection extends StatelessWidget {
     this.action,
     this.children = const <Widget>[],
     this.style = DabblerSectionStyle.heading,
+    this.icon,
+    this.iconWeight = DabblerIconWeight.bold,
+    this.iconColor,
+    this.compact = false,
   });
 
   /// The section heading. Set in [DabblerType.title3].
@@ -116,6 +121,21 @@ class DabblerSection extends StatelessWidget {
   /// it still sits trailing: the source keeps an empty flexing spacer in the
   /// title's place (`Section.jsx:20`).
   final Widget? action;
+
+  /// A bold brand-coloured glyph before the [title] — the list headings of
+  /// `Search.dc.html` (`people`, `hashtag`, `game`…). Null draws none.
+  final String? icon;
+
+  /// The weight of [icon]. Default bold.
+  final DabblerIconWeight iconWeight;
+
+  /// The colour of [icon]. Null is the brand colour.
+  final Color? iconColor;
+
+  /// The compact heading: [title] in [DabblerType.subheadline] at semibold
+  /// instead of [DabblerType.title3] — the result-list headings of
+  /// `Search.dc.html:216-224`. Default `false`.
+  final bool compact;
 
   /// The section's content, stacked with [DabblerSpacing.stackDefault] gaps.
   final List<Widget> children;
@@ -144,16 +164,33 @@ class DabblerSection extends StatelessWidget {
           children: <Widget>[
             // `flex: 1` on the title, or on an empty span when there is none,
             // so the action stays on the trailing edge either way.
+            if (icon != null) ...<Widget>[
+              DabblerIcon(
+                icon!,
+                weight: iconWeight,
+                size: DabblerSizing.iconSm,
+                color: iconColor ?? colors.brandPrimary,
+              ),
+              const SizedBox(width: DabblerSpacing.stackTight),
+            ],
             Expanded(
               child: title == null
                   ? const SizedBox.shrink()
                   : Text(
                       title,
                       // `.t-title-3` at its own weight 400 — never Light. See
-                      // the D-013 note in the class dartdoc above.
-                      style: DabblerType.title3
-                          .resolveForDirection(direction)
-                          .copyWith(color: colors.textPrimary),
+                      // the D-013 note in the class dartdoc above. Compact:
+                      // subheadline semibold.
+                      style: compact
+                          ? DabblerType.subheadline
+                                .resolveForDirection(direction)
+                                .copyWith(
+                                  color: colors.textPrimary,
+                                  fontWeight: DabblerType.semibold,
+                                )
+                          : DabblerType.title3
+                                .resolveForDirection(direction)
+                                .copyWith(color: colors.textPrimary),
                     ),
             ),
             if (action != null) ...<Widget>[

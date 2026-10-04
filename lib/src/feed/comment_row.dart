@@ -193,12 +193,17 @@ class DabblerCommentRow extends StatelessWidget {
       borderRadius: DabblerRadius.smAll,
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          minWidth: DabblerSizing.touchTargetMin,
           minHeight: DabblerSizing.touchTargetMin,
         ),
-        child: Center(
-          widthFactor: 1,
-          child: Text(label, maxLines: 1, style: style.copyWith(color: ink)),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.only(
+            end: DabblerSpacing.space5,
+          ),
+          child: Center(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: Text(label, maxLines: 1, style: style.copyWith(color: ink)),
+          ),
         ),
       ),
     );
@@ -231,7 +236,7 @@ class DabblerCommentRow extends StatelessWidget {
       ),
     );
 
-    final Widget header = Row(
+    final Widget lead = Row(
       children: <Widget>[
         Flexible(
           child: DabblerFeedTappable(
@@ -271,17 +276,21 @@ class DabblerCommentRow extends StatelessWidget {
               maxLines: 1,
               style: caption,
             ),
-        if (onMore != null) ...<Widget>[
-          const Spacer(),
-          DabblerFeedAction(
-            icon: 'more-circle',
-            iconSize: actionGlyphSize,
-            onTap: onMore,
-            semanticLabel: moreLabel,
-          ),
-        ],
       ],
     );
+    final Widget header = onMore == null
+        ? lead
+        : Row(
+            children: <Widget>[
+              Expanded(child: lead),
+              DabblerFeedAction(
+                icon: 'more-circle',
+                iconSize: actionGlyphSize,
+                onTap: onMore,
+                semanticLabel: moreLabel,
+              ),
+            ],
+          );
 
     final TextStyle bodyStyle = t(
       textRole,
@@ -334,6 +343,7 @@ class DabblerCommentRow extends StatelessWidget {
         padding: EdgeInsetsDirectional.only(
           start: indentStep * depth,
           top: nested ? DabblerSpacing.space4 : DabblerSpacing.space5,
+          bottom: nested ? DabblerSpacing.space3 : 0,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

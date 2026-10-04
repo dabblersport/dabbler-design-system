@@ -353,8 +353,11 @@ void main() {
       );
       await tester.tap(find.byKey(DabblerDialog.secondaryActionKey));
       await tester.pump();
-      expect(closed, 1,
-          reason: 'a secondary with no callback of its own closes the dialog');
+      expect(
+        closed,
+        1,
+        reason: 'a secondary with no callback of its own closes the dialog',
+      );
     });
 
     testWidgets('both actions stretch full width when stacked', (
@@ -371,7 +374,10 @@ void main() {
         ),
       );
       // `fullWidth={stack}` — Dialog.jsx:100 and :104.
-      expect(buttonAt(tester, DabblerDialog.primaryActionKey).fullWidth, isTrue);
+      expect(
+        buttonAt(tester, DabblerDialog.primaryActionKey).fullWidth,
+        isTrue,
+      );
       expect(
         buttonAt(tester, DabblerDialog.secondaryActionKey).fullWidth,
         isTrue,
@@ -382,8 +388,13 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        host(const DabblerDialog(title: 'leave?',
-              secondaryAction: stay, primaryAction: leave)),
+        host(
+          const DabblerDialog(
+            title: 'leave?',
+            secondaryAction: stay,
+            primaryAction: leave,
+          ),
+        ),
       );
       final Row row = tester.widget<Row>(find.byKey(DabblerDialog.actionsKey));
       expect(row.mainAxisAlignment, MainAxisAlignment.end);
@@ -395,8 +406,11 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const DabblerDialog(title: 'leave?',
-              secondaryAction: stay, primaryAction: leave),
+          const DabblerDialog(
+            title: 'leave?',
+            secondaryAction: stay,
+            primaryAction: leave,
+          ),
           size: const Size(359, 600),
         ),
       );
@@ -411,8 +425,11 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const DabblerDialog(title: 'leave?',
-              secondaryAction: stay, primaryAction: leave),
+          const DabblerDialog(
+            title: 'leave?',
+            secondaryAction: stay,
+            primaryAction: leave,
+          ),
           size: const Size(360, 600),
         ),
       );
@@ -425,8 +442,11 @@ void main() {
     ) async {
       await tester.pumpWidget(
         host(
-          const DabblerDialog(title: 'leave?',
-              secondaryAction: stay, primaryAction: leave),
+          const DabblerDialog(
+            title: 'leave?',
+            secondaryAction: stay,
+            primaryAction: leave,
+          ),
           textDirection: TextDirection.rtl,
         ),
       );
@@ -537,9 +557,13 @@ void main() {
       );
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
-      expect(confirmed, 1,
-          reason: 'Enter must reach the action itself, not a parallel '
-              'onConfirm callback');
+      expect(
+        confirmed,
+        1,
+        reason:
+            'Enter must reach the action itself, not a parallel '
+            'onConfirm callback',
+      );
     });
 
     testWidgets('Enter does nothing when there is no primary action', (

@@ -14,7 +14,8 @@ const List<GalleryEntry> skeletonGalleryEntries = <GalleryEntry>[
     page: 'components/skeleton',
     group: GalleryPurpose.statusAndFeedback,
     title: 'Skeleton — variants',
-    description: 'Text, rect, circle and card. Decorative: the whole widget '
+    description:
+        'Text, rect, circle and card. Decorative: the whole widget '
         'is wrapped in ExcludeSemantics.',
     builder: _skeletons,
   ),

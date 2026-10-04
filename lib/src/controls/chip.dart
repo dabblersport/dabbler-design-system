@@ -120,10 +120,12 @@ class DabblerChip extends StatefulWidget {
     this.leadingIcon,
     this.onLongPress,
     this.onRemove,
+    this.mutedRemove = false,
     this.removeSemanticLabel,
     this.vibe,
     this.dot = false,
     this.compact = false,
+    this.count,
   });
 
   /// The chip text. `label: string` in `Chip.d.ts`.
@@ -162,6 +164,11 @@ class DabblerChip extends StatefulWidget {
   /// `45 - iconGap - iconSm` (21) rather than [horizontalPadding] (15).
   final VoidCallback? onRemove;
 
+  /// Paints the remove glyph in the muted ink instead of the leading-icon
+  /// colour — the recent-search chips of `Search.dc.html:60`. Ignored while
+  /// [selected] or under a vibe.
+  final bool mutedRemove;
+
   /// The remove glyph's accessible name. Null reads `Remove <label>`.
   final String? removeSemanticLabel;
 
@@ -189,6 +196,10 @@ class DabblerChip extends StatefulWidget {
 
   /// [compact]'s horizontal padding — `14`.
   static const double compactHorizontalPadding = 14;
+
+  /// A small count pill after the label (`Notifications.dc.html:58`), already
+  /// localised. Omitted when null.
+  final String? count;
 
   /// The trailing remove glyph — `close-circle`, the same glyph
   /// `DabblerTextField`'s inline clear uses.
@@ -306,7 +317,11 @@ class _DabblerChipState extends State<DabblerChip> {
                 fontWeight: DabblerType.medium,
                 color: colors.textSecondary,
               )
-        : DabblerChip.labelStyleFor(colors, direction, selected: widget.selected);
+        : DabblerChip.labelStyleFor(
+            colors,
+            direction,
+            selected: widget.selected,
+          );
     final double glyph = widget.compact
         ? DabblerSizing.iconInline
         : DabblerSizing.iconSm;
@@ -357,6 +372,35 @@ class _DabblerChipState extends State<DabblerChip> {
             ),
           ),
         ],
+        if (widget.count != null) ...<Widget>[
+          const SizedBox(width: DabblerChip.iconGap),
+          ExcludeSemantics(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: widget.selected
+                    ? colors.onBrand.withValues(alpha: 0.22)
+                    : colors.surfaceSunken,
+                borderRadius: DabblerRadius.pillAll,
+              ),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: DabblerSpacing.space2,
+                ),
+                child: Text(
+                  DabblerType.toWesternDigits(widget.count!),
+                  style: DabblerType.caption1
+                      .resolveForDirection(direction)
+                      .copyWith(
+                        fontWeight: DabblerType.semibold,
+                        color: widget.selected
+                            ? colors.onBrand
+                            : colors.textSecondary,
+                      ),
+                ),
+              ),
+            ),
+          ),
+        ],
         if (removable)
           Semantics(
             container: true,
@@ -381,7 +425,10 @@ class _DabblerChipState extends State<DabblerChip> {
                     child: DabblerIcon(
                       DabblerChip.removeIconName,
                       size: DabblerSizing.iconSm,
-                      color: iconColor,
+                      color:
+                          widget.mutedRemove && vibe == null && !widget.selected
+                          ? colors.textTertiary
+                          : iconColor,
                     ),
                   ),
                 ),

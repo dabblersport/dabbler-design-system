@@ -107,8 +107,8 @@ class _DocOrderGroup {
 
   /// Every entry in this group, bands flattened, in authored order.
   List<_DocOrderEntry> get entries => <_DocOrderEntry>[
-        for (final _DocOrderBand band in bands) ...band.entries,
-      ];
+    for (final _DocOrderBand band in bands) ...band.entries,
+  ];
 }
 
 /// One `## ` section — `Foundations`, `Components`, `Patterns`, and the
@@ -132,8 +132,8 @@ class _DocOrderSection {
 
   /// Every entry under this section, in authored order.
   List<_DocOrderEntry> get entries => <_DocOrderEntry>[
-        for (final _DocOrderGroup group in groups) ...group.entries,
-      ];
+    for (final _DocOrderGroup group in groups) ...group.entries,
+  ];
 }
 
 /// The parsed reading order.
@@ -151,11 +151,11 @@ class _DocOrder {
   ///
   /// Renders as a visible reason rather than an empty navigation tree.
   factory _DocOrder.unavailable(String reason) => _DocOrder(
-        title: 'Reading order',
-        lead: const <String>[],
-        sections: const <_DocOrderSection>[],
-        unavailableReason: reason,
-      );
+    title: 'Reading order',
+    lead: const <String>[],
+    sections: const <_DocOrderSection>[],
+    unavailableReason: reason,
+  );
 
   /// The `# ` title.
   final String title;
@@ -182,10 +182,9 @@ class _DocOrder {
 
   /// Every entry in the whole order, in authored order, [startHere] first.
   List<_DocOrderEntry> get entries => <_DocOrderEntry>[
-        ?startHere,
-        for (final _DocOrderSection section in sections)
-          ...section.entries,
-      ];
+    ?startHere,
+    for (final _DocOrderSection section in sections) ...section.entries,
+  ];
 
   /// The section a page belongs to, or `null` where nothing links it.
   _DocOrderSection? sectionOf(String page) {
@@ -205,8 +204,9 @@ class _DocOrder {
   /// Never throws: an input with no `# ` title or no sections comes back as
   /// [_DocOrder.unavailable].
   static _DocOrder parse(String raw) {
-    final List<String> lines =
-        DabblerDocSplitter.stripProvenanceComment(raw).split('\n');
+    final List<String> lines = DabblerDocSplitter.stripProvenanceComment(
+      raw,
+    ).split('\n');
     final _OrderBuilder builder = _OrderBuilder();
     for (final String line in lines) {
       builder.add(line);
@@ -225,8 +225,9 @@ final RegExp _inlineLink = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
 final RegExp _bandLabel = RegExp(r'^\*\*(.+)\*\*$');
 
 /// `### 1 · Navigation — orienting the user…`, ordinal and tagline optional.
-final RegExp _groupHeading =
-    RegExp(r'^(?:(\d+)\s*·\s*)?(.*?)(?:\s+—\s+(.*))?$');
+final RegExp _groupHeading = RegExp(
+  r'^(?:(\d+)\s*·\s*)?(.*?)(?:\s+—\s+(.*))?$',
+);
 
 /// Accumulates the line-by-line walk. Kept out of [_DocOrder] so the
 /// model stays immutable and has no parse state on it.
@@ -280,8 +281,9 @@ class _OrderBuilder {
       _pending = _PendingEntry(
         title: link.group(1)!.trim(),
         page: link.group(2)!.trim(),
-        description: <String>[if (link.group(3)?.isNotEmpty ?? false)
-          link.group(3)!.trim()],
+        description: <String>[
+          if (link.group(3)?.isNotEmpty ?? false) link.group(3)!.trim(),
+        ],
       );
       return;
     }
@@ -306,7 +308,9 @@ class _OrderBuilder {
   void _heading(String trimmed) {
     if (trimmed.startsWith('### ')) {
       _closeGroup();
-      final RegExpMatch m = _groupHeading.firstMatch(trimmed.substring(4).trim())!;
+      final RegExpMatch m = _groupHeading.firstMatch(
+        trimmed.substring(4).trim(),
+      )!;
       _groupNumber = int.tryParse(m.group(1) ?? '');
       _groupName = m.group(2)?.trim();
       _groupTagline = m.group(3)?.trim();
@@ -331,9 +335,7 @@ class _OrderBuilder {
 
   void _closeBand() {
     if (_entries.isEmpty && _bandLabelText == null) return;
-    _bands.add(
-      _DocOrderBand(label: _bandLabelText, entries: _entries),
-    );
+    _bands.add(_DocOrderBand(label: _bandLabelText, entries: _entries));
     _bandLabelText = null;
     _entries = <_DocOrderEntry>[];
   }

@@ -101,8 +101,7 @@ class DabblerPickerField extends StatefulWidget {
   static const List<double> defaultDetents = <double>[0.62];
 
   /// The key the trailing target carries; [DabblerPickerFieldShell]'s.
-  static const Key trailingButtonKey =
-      DabblerPickerFieldShell.pickerButtonKey;
+  static const Key trailingButtonKey = DabblerPickerFieldShell.pickerButtonKey;
 
   /// The label above the box.
   final String? label;

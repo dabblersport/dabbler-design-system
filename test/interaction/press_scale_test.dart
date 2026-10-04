@@ -10,10 +10,12 @@ import 'interaction_host.dart';
 double _scaleOf(WidgetTester tester) {
   final Matrix4 m = tester
       .widget<Transform>(
-        find.ancestor(
-          of: find.byKey(const Key('child')),
-          matching: find.byType(Transform),
-        ).first,
+        find
+            .ancestor(
+              of: find.byKey(const Key('child')),
+              matching: find.byType(Transform),
+            )
+            .first,
       )
       .transform;
   return m.storage[0];
@@ -52,8 +54,9 @@ void main() {
       expect(_scaleOf(tester), 1);
     });
 
-    testWidgets('settles at the press-scale token when pressed',
-        (WidgetTester tester) async {
+    testWidgets('settles at the press-scale token when pressed', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(const DabblerPressScale(pressed: true, child: _child)),
       );
@@ -61,7 +64,9 @@ void main() {
       expect(_scaleOf(tester), closeTo(DabblerMotion.pressScale, 0.0001));
     });
 
-    testWidgets('takes --motion-fast to get there', (WidgetTester tester) async {
+    testWidgets('takes --motion-fast to get there', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(const DabblerPressScale(pressed: false, child: _child)),
       );
@@ -77,18 +82,17 @@ void main() {
 
     testWidgets('a disabled control never scales', (WidgetTester tester) async {
       await tester.pumpWidget(
-        host(const DabblerPressScale(
-          pressed: true,
-          enabled: false,
-          child: _child,
-        )),
+        host(
+          const DabblerPressScale(pressed: true, enabled: false, child: _child),
+        ),
       );
       await tester.pumpAndSettle();
       expect(_scaleOf(tester), 1);
     });
 
-    testWidgets('reduced motion keeps the scale but drops the transition',
-        (WidgetTester tester) async {
+    testWidgets('reduced motion keeps the scale but drops the transition', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(
           const DabblerPressScale(pressed: false, child: _child),
@@ -108,14 +112,16 @@ void main() {
   });
 
   group('DabblerPressScale.gesture (self-driven)', () {
-    testWidgets('scales while the pointer is down and releases after',
-        (WidgetTester tester) async {
+    testWidgets('scales while the pointer is down and releases after', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(const DabblerPressScale.gesture(child: _child)),
       );
 
-      final TestGesture gesture =
-          await tester.startGesture(tester.getCenter(find.byKey(const Key('child'))));
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.byKey(const Key('child'))),
+      );
       await tester.pumpAndSettle();
       expect(_scaleOf(tester), closeTo(DabblerMotion.pressScale, 0.0001));
 
@@ -124,8 +130,9 @@ void main() {
       expect(_scaleOf(tester), 1);
     });
 
-    testWidgets('does not steal the tap from a child gesture recogniser',
-        (WidgetTester tester) async {
+    testWidgets('does not steal the tap from a child gesture recogniser', (
+      WidgetTester tester,
+    ) async {
       int taps = 0;
       await tester.pumpWidget(
         host(
@@ -143,13 +150,15 @@ void main() {
       expect(taps, 1);
     });
 
-    testWidgets('a disabled control ignores the pointer',
-        (WidgetTester tester) async {
+    testWidgets('a disabled control ignores the pointer', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         host(const DabblerPressScale.gesture(enabled: false, child: _child)),
       );
-      final TestGesture gesture =
-          await tester.startGesture(tester.getCenter(find.byKey(const Key('child'))));
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.byKey(const Key('child'))),
+      );
       await tester.pumpAndSettle();
       expect(_scaleOf(tester), 1);
       await gesture.up();

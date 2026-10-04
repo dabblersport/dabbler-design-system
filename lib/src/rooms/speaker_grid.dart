@@ -97,8 +97,7 @@ class DabblerSpeakerGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int rows = (speakers.length + columns - 1) ~/ columns;
-    final double height =
-        rows == 0 ? 0 : rows * rowHeight + (rows - 1) * gap;
+    final double height = rows == 0 ? 0 : rows * rowHeight + (rows - 1) * gap;
     return SizedBox(
       width: columns * cellWidth + (columns - 1) * gap,
       height: height,

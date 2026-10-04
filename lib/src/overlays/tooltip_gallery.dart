@@ -19,51 +19,52 @@ const List<GalleryEntry> tooltipGalleryEntries = <GalleryEntry>[
     page: 'components/tooltip',
     group: GalleryPurpose.presentation,
     title: 'Tooltip — the label for a control with no visible text',
-    description: 'Hover or focus a trigger. Never the only carrier of '
+    description:
+        'Hover or focus a trigger. Never the only carrier of '
         'essential information.',
     builder: _tooltips,
   ),
 ];
 
 Widget _tooltips(BuildContext context) => const GalleryWrap(
-      children: <Widget>[
-        GallerySpecimen(
-          label: 'top',
-          child: DabblerTooltip(
-            message: 'share game',
-            child: DabblerButton(
-              label: '',
-              icon: 'share',
-              size: DabblerButtonSize.small,
-              tone: DabblerButtonTone.neutral,
-            ),
-          ),
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'top',
+      child: DabblerTooltip(
+        message: 'share game',
+        child: DabblerButton(
+          label: '',
+          icon: 'share',
+          size: DabblerButtonSize.small,
+          tone: DabblerButtonTone.neutral,
         ),
-        GallerySpecimen(
-          label: 'bottom',
-          child: DabblerTooltip(
-            message: 'more actions',
-            placement: DabblerTooltipPlacement.bottom,
-            child: DabblerButton(
-              label: '',
-              icon: 'more',
-              size: DabblerButtonSize.small,
-              tone: DabblerButtonTone.neutral,
-            ),
-          ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'bottom',
+      child: DabblerTooltip(
+        message: 'more actions',
+        placement: DabblerTooltipPlacement.bottom,
+        child: DabblerButton(
+          label: '',
+          icon: 'more',
+          size: DabblerButtonSize.small,
+          tone: DabblerButtonTone.neutral,
         ),
-        GallerySpecimen(
-          label: 'inline end',
-          child: DabblerTooltip(
-            message: 'copy link',
-            placement: DabblerTooltipPlacement.end,
-            child: DabblerButton(
-              label: '',
-              icon: 'link',
-              size: DabblerButtonSize.small,
-              tone: DabblerButtonTone.neutral,
-            ),
-          ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'inline end',
+      child: DabblerTooltip(
+        message: 'copy link',
+        placement: DabblerTooltipPlacement.end,
+        child: DabblerButton(
+          label: '',
+          icon: 'link',
+          size: DabblerButtonSize.small,
+          tone: DabblerButtonTone.neutral,
         ),
-      ],
-    );
+      ),
+    ),
+  ],
+);

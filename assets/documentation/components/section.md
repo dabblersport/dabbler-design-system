@@ -55,7 +55,7 @@ instant it sits beside one that wasn't.
 ## Axes
 
 ### Header
-None, title only, title with a trailing action, title with a subtitle — subtitle alone (no title)
+None, title only, title with a trailing action, compact title with a leading icon, title with a subtitle — subtitle alone (no title)
 does not open the header-to-children gap the way a title does.
 
 ## Tokens used
@@ -68,6 +68,8 @@ fill, border or radius of its own — Section draws no surface at all.
 - D-013 (cxo) — the title's type style and weight, correcting
   a one-off inline style in the design source that no other title-bearing component in the system
   followed.
+- Alpha fidelity (Search) — adds `icon` (a bold brand glyph before the title) and `compact` (title at
+  subheadline semibold) for the result-list headings of `Search.dc.html`.
 
 - KAN-426 — adds `DabblerSectionStyle.label`.
 

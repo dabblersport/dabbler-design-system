@@ -157,6 +157,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 
 ## Change log
 
+- `transparent` draws the bar with no ground of its own, so it sits on a tinted hero (Settings fidelity rebuild).
 - D-026 (cxo) — confirms the transcription's narrow anatomy is
   correct as built and refuses widening the API for a greeting-stack variant a different part of the
   design kit draws.
@@ -170,6 +171,9 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 - Alpha DS gaps 6 — adds the scrolled title (`titleOpacity`, `scrollController`,
   `titleRevealOffset`) and fixes the titled bar falling back to the wordmark when it had neither a
   title nor a back action.
+- Alpha fidelity (Search) — adds `titleWidget` to the titled variant: a widget that takes the title slot
+  beside the back button, for the search header of `Search.dc.html`.
+- Alpha fidelity (Results) — adds `plain` to the titled variant: the back glyph without its bordered disc and a centred title (`Results.dc.html`).
 
 ## Source
 

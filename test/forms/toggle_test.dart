@@ -27,9 +27,7 @@ void main() {
     testWidgets('the track is 48×28 and the knob 24, at a 2px inset', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        host(const DabblerToggle(checked: false)),
-      );
+      await tester.pumpWidget(host(const DabblerToggle(checked: false)));
 
       final Size track = tester.getSize(
         find
@@ -51,10 +49,7 @@ void main() {
       );
       expect(knob, const Size(24, 24));
       // 28 − 24 = 2 above and below: the source's `padding: 2`.
-      expect(
-        (track.height - knob.height) / 2,
-        DabblerToggle.knobInset,
-      );
+      expect((track.height - knob.height) / 2, DabblerToggle.knobInset);
     });
 
     testWidgets('the hit area clears the 45px floor without moving the track', (
@@ -71,25 +66,27 @@ void main() {
   });
 
   group('Toggle colour comes from the tokens', () {
-    testWidgets('on is brandPrimary, off is borderDefault, knob is surfaceCard',
-        (WidgetTester tester) async {
-      final DabblerColors colors = testColors();
+    testWidgets(
+      'on is brandPrimary, off is borderDefault, knob is surfaceCard',
+      (WidgetTester tester) async {
+        final DabblerColors colors = testColors();
 
-      await tester.pumpWidget(host(const DabblerToggle(checked: true)));
-      expect(_trackColor(tester), colors.brandPrimary);
+        await tester.pumpWidget(host(const DabblerToggle(checked: true)));
+        expect(_trackColor(tester), colors.brandPrimary);
 
-      await tester.pumpWidget(host(const DabblerToggle(checked: false)));
-      await tester.pumpAndSettle();
-      expect(_trackColor(tester), colors.borderDefault);
+        await tester.pumpWidget(host(const DabblerToggle(checked: false)));
+        await tester.pumpAndSettle();
+        expect(_trackColor(tester), colors.borderDefault);
 
-      final Container knob = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(AnimatedAlign),
-          matching: find.byType(Container),
-        ),
-      );
-      expect((knob.decoration! as BoxDecoration).color, colors.surfaceCard);
-    });
+        final Container knob = tester.widget<Container>(
+          find.descendant(
+            of: find.byType(AnimatedAlign),
+            matching: find.byType(Container),
+          ),
+        );
+        expect((knob.decoration! as BoxDecoration).color, colors.surfaceCard);
+      },
+    );
   });
 
   group('Toggle behaviour', () {

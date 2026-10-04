@@ -4,7 +4,8 @@ import 'package:dabbler_design_system/src/forms/field_shell.dart';
 import 'package:dabbler_design_system/src/surfaces/surface.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_geometry.dart';
-import 'package:flutter/cupertino.dart' show CupertinoLocalizations, DefaultCupertinoLocalizations;
+import 'package:flutter/cupertino.dart'
+    show CupertinoLocalizations, DefaultCupertinoLocalizations;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,9 +34,7 @@ Widget _host(
       _AnyLocaleCupertinoLocalizations(),
       DefaultWidgetsLocalizations.delegate,
     ],
-    theme: ThemeData(
-      extensions: <ThemeExtension<dynamic>>[_colors()],
-    ),
+    theme: ThemeData(extensions: <ThemeExtension<dynamic>>[_colors()]),
     home: Directionality(
       textDirection: direction,
       child: Align(
@@ -47,13 +46,13 @@ Widget _host(
 }
 
 DabblerSurface _box(WidgetTester tester) => tester.widget<DabblerSurface>(
-      find
-          .descendant(
-            of: find.byType(DabblerFieldShell),
-            matching: find.byType(DabblerSurface),
-          )
-          .first,
-    );
+  find
+      .descendant(
+        of: find.byType(DabblerFieldShell),
+        matching: find.byType(DabblerSurface),
+      )
+      .first,
+);
 
 /// Every Arabic-Indic and extended Arabic-Indic digit, for the containment
 /// assertions AC2 turns on.
@@ -114,7 +113,10 @@ void main() {
     test('a span joins on an en dash and drops an unset end', () {
       expect(
         DabblerDateFormat.formatSpan(
-          DabblerDateSpan(start: DateTime(2026, 9, 5), end: DateTime(2026, 9, 12)),
+          DabblerDateSpan(
+            start: DateTime(2026, 9, 5),
+            end: DateTime(2026, 9, 12),
+          ),
         ),
         '05/09/2026 – 12/09/2026',
       );
@@ -162,11 +164,17 @@ void main() {
     test('a range splits on en dash, em dash and a SPACED hyphen only', () {
       expect(
         DabblerDateFormat.parseSpan('05/09/2026 – 12/09/2026'),
-        DabblerDateSpan(start: DateTime(2026, 9, 5), end: DateTime(2026, 9, 12)),
+        DabblerDateSpan(
+          start: DateTime(2026, 9, 5),
+          end: DateTime(2026, 9, 12),
+        ),
       );
       expect(
         DabblerDateFormat.parseSpan('05/09/2026 — 12/09/2026'),
-        DabblerDateSpan(start: DateTime(2026, 9, 5), end: DateTime(2026, 9, 12)),
+        DabblerDateSpan(
+          start: DateTime(2026, 9, 5),
+          end: DateTime(2026, 9, 12),
+        ),
       );
       // The unspaced hyphen is a separator inside a single date, so it must
       // not split — `05-09-2026` is one date.
@@ -212,7 +220,10 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _host(
-          DabblerDateField(label: 'تاريخ المباراة', value: DateTime(2026, 9, 5)),
+          DabblerDateField(
+            label: 'تاريخ المباراة',
+            value: DateTime(2026, 9, 5),
+          ),
           direction: TextDirection.rtl,
           locale: const Locale('ar'),
         ),
@@ -258,7 +269,9 @@ void main() {
     testWidgets('paints exactly one DabblerFieldShell at --radius-xxl', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_host(const DabblerDateField(label: 'game date')));
+      await tester.pumpWidget(
+        _host(const DabblerDateField(label: 'game date')),
+      );
 
       expect(find.byType(DabblerFieldShell), findsOneWidget);
       expect(_box(tester).radius, DabblerRadius.xxl);
@@ -349,9 +362,7 @@ void main() {
     ) async {
       int opens = 0;
       await tester.pumpWidget(
-        _host(
-          DabblerDateField(enabled: false, onOpenPicker: () => opens++),
-        ),
+        _host(DabblerDateField(enabled: false, onOpenPicker: () => opens++)),
       );
       await tester.tap(
         find.bySemanticsLabel(
@@ -507,7 +518,10 @@ void main() {
 
       expect(
         committed,
-        DabblerDateSpan(start: DateTime(2026, 9, 5), end: DateTime(2026, 9, 12)),
+        DabblerDateSpan(
+          start: DateTime(2026, 9, 5),
+          end: DateTime(2026, 9, 12),
+        ),
       );
     });
 

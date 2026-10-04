@@ -162,11 +162,7 @@ final RegExp _orderedMarker = RegExp(r'^\s*(\d+)\.\s+(.*)$');
 /// indent of [DabblerSpacing.space4] (12) and [DabblerSpacing.space2] (6)
 /// between items — the same tight-binding step D-050(c) gives a sub-heading
 /// and its own prose.
-Widget _listBody(
-  List<_ListItem> items,
-  TextStyle base,
-  DabblerColors colors,
-) {
+Widget _listBody(List<_ListItem> items, TextStyle base, DabblerColors colors) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,

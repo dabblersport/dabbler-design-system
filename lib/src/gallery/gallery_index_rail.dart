@@ -133,8 +133,7 @@ class _DocRail extends StatelessWidget {
   /// under it does — otherwise a filter would hide the only row that says
   /// where the matches live.
   bool _sectionVisible(_DocOrderSection section) =>
-      _matches(section.title) ||
-      section.groups.any(_groupVisible);
+      _matches(section.title) || section.groups.any(_groupVisible);
 
   bool _groupVisible(_DocOrderGroup group) =>
       _matches(group.name) ||
