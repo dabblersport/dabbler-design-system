@@ -97,11 +97,11 @@ class DabblerPickerFieldShell extends StatefulWidget {
   /// three sides stay at [DabblerFieldShell.defaultInnerPadding]'s `9px 12px`.
   static const EdgeInsetsDirectional innerPadding =
       EdgeInsetsDirectional.fromSTEB(
-    DabblerSpacing.space4,
-    DabblerSpacing.space3,
-    DabblerSpacing.space1,
-    DabblerSpacing.space3,
-  );
+        DabblerSpacing.space4,
+        DabblerSpacing.space3,
+        DabblerSpacing.space1,
+        DabblerSpacing.space3,
+      );
 
   /// The text being edited. Owned by the composing field, which keeps it in
   /// sync with the typed value — the port of `text` + `onTextChange`.
@@ -171,8 +171,9 @@ class _DabblerPickerFieldShellState extends State<DabblerPickerFieldShell> {
   void didUpdateWidget(DabblerPickerFieldShell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.focusNode != oldWidget.focusNode) {
-      (oldWidget.focusNode ?? _ownedFocusNode)
-          ?.removeListener(_handleFocusChange);
+      (oldWidget.focusNode ?? _ownedFocusNode)?.removeListener(
+        _handleFocusChange,
+      );
       _focusNode.addListener(_handleFocusChange);
       _focused = _focusNode.hasFocus;
     }

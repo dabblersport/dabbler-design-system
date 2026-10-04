@@ -161,9 +161,9 @@ class DabblerStepper extends StatefulWidget {
   /// the 44 floor, which is why [DabblerStepperSize.sm] is documented as
   /// unsuitable for a primary form.
   static double boxSizeFor(DabblerStepperSize size) => switch (size) {
-        DabblerStepperSize.sm => 39,
-        DabblerStepperSize.md => DabblerSizing.touchTargetMin,
-      };
+    DabblerStepperSize.sm => 39,
+    DabblerStepperSize.md => DabblerSizing.touchTargetMin,
+  };
 
   /// The Iconsax glyph on the decrement button (`Stepper.jsx:58`).
   static const String decreaseIcon = 'minus';
@@ -181,8 +181,9 @@ class DabblerStepper extends StatefulWidget {
 }
 
 class _DabblerStepperState extends State<DabblerStepper> {
-  late final TextEditingController _controller =
-      TextEditingController(text: '${widget.value}');
+  late final TextEditingController _controller = TextEditingController(
+    text: '${widget.value}',
+  );
   late final FocusNode _fieldNode = FocusNode()..addListener(_handleFocus);
 
   // One shared ring for three controls (`value-controls.card.html:133,138` (unverified: file not mirrored)):
@@ -238,8 +239,11 @@ class _DabblerStepperState extends State<DabblerStepper> {
     if (!_enabled) {
       return;
     }
-    final int next =
-        DabblerStepper.clamp(raw, min: widget.min, max: widget.max);
+    final int next = DabblerStepper.clamp(
+      raw,
+      min: widget.min,
+      max: widget.max,
+    );
     if (next != widget.value) {
       widget.onChanged!(next);
     }
@@ -307,11 +311,7 @@ class _DabblerStepperState extends State<DabblerStepper> {
   /// The centred numeric field: `.t-callout` at weight 500
   /// (`Stepper.jsx:74` — `fontSize: 17, lineHeight: '22px', fontWeight:
   /// 500`, which is the `.t-callout` step), tertiary while disabled.
-  Widget _numeral(
-    DabblerColors colors,
-    TextDirection direction,
-    double box,
-  ) {
+  Widget _numeral(DabblerColors colors, TextDirection direction, double box) {
     final TextStyle style = DabblerType.callout
         .resolveForDirection(direction)
         .copyWith(

@@ -128,7 +128,10 @@ void main() {
         _host(const DabblerCodeInput(length: 4, value: '4207')),
       );
       for (int i = 0; i < 4; i++) {
-        expect(tester.widget<EditableText>(_field(i)).controller.text, '4207'[i]);
+        expect(
+          tester.widget<EditableText>(_field(i)).controller.text,
+          '4207'[i],
+        );
       }
     });
 
@@ -242,9 +245,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final List<String> changes = <String>[];
-      await tester.pumpWidget(
-        _host(DabblerCodeInput(onChanged: changes.add)),
-      );
+      await tester.pumpWidget(_host(DabblerCodeInput(onChanged: changes.add)));
       await tester.tap(_field(0));
       await tester.pump();
 
@@ -262,29 +263,31 @@ void main() {
       }
     });
 
-    testWidgets('a paste from the middle fills from box 0, truncated to length', (
-      WidgetTester tester,
-    ) async {
-      final List<String> changes = <String>[];
-      await tester.pumpWidget(
-        _host(
-          DabblerCodeInput(length: 4, value: '9', onChanged: changes.add),
-        ),
-      );
-      await tester.enterText(_field(1), '12345');
-      await tester.pumpAndSettle();
-      // `CodeInput.jsx:67`: `pasted.slice(0, length)`, from box 0.
-      expect(changes.last, '1234');
-      expect(tester.widget<EditableText>(_field(3)).focusNode.hasFocus, isTrue);
-    });
+    testWidgets(
+      'a paste from the middle fills from box 0, truncated to length',
+      (WidgetTester tester) async {
+        final List<String> changes = <String>[];
+        await tester.pumpWidget(
+          _host(
+            DabblerCodeInput(length: 4, value: '9', onChanged: changes.add),
+          ),
+        );
+        await tester.enterText(_field(1), '12345');
+        await tester.pumpAndSettle();
+        // `CodeInput.jsx:67`: `pasted.slice(0, length)`, from box 0.
+        expect(changes.last, '1234');
+        expect(
+          tester.widget<EditableText>(_field(3)).focusNode.hasFocus,
+          isTrue,
+        );
+      },
+    );
 
     testWidgets('KAN-365: a paste into box 3 of 6 fills from box 0', (
       WidgetTester tester,
     ) async {
       final List<String> changes = <String>[];
-      await tester.pumpWidget(
-        _host(DabblerCodeInput(onChanged: changes.add)),
-      );
+      await tester.pumpWidget(_host(DabblerCodeInput(onChanged: changes.add)));
       await tester.tap(_field(3));
       await tester.pump();
       await tester.enterText(_field(3), '4815');
@@ -391,10 +394,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(
-          const DabblerCodeInput(length: 3),
-          direction: TextDirection.rtl,
-        ),
+        _host(const DabblerCodeInput(length: 3), direction: TextDirection.rtl),
       );
       final Directionality pinned = tester.widget<Directionality>(
         find
@@ -440,8 +440,7 @@ void main() {
       await tester.pumpWidget(
         _host(const DabblerCodeInput(length: 4, value: '9182', error: true)),
       );
-      final Color expected =
-          _colors().status(DabblerStatusTone.error).base;
+      final Color expected = _colors().status(DabblerStatusTone.error).base;
       for (final DabblerSurface box in _boxes(tester)) {
         expect(box.borderColor, expected);
       }
@@ -464,9 +463,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(
-          const DabblerCodeInput(length: 4, value: '4207', enabled: false),
-        ),
+        _host(const DabblerCodeInput(length: 4, value: '4207', enabled: false)),
       );
       for (final DabblerSurface box in _boxes(tester)) {
         expect(box.fill, _colors().bgSecondary);
@@ -648,8 +645,9 @@ void main() {
         reason: '$path must take every colour from the tokens',
       );
       expect(
-        RegExp(r'ringWidth\s*=|ringOffset\s*=|pressScale\s*=|outlineOffset')
-            .hasMatch(code),
+        RegExp(
+          r'ringWidth\s*=|ringOffset\s*=|pressScale\s*=|outlineOffset',
+        ).hasMatch(code),
         isFalse,
         reason: '$path must not restate an interaction constant',
       );
@@ -659,8 +657,9 @@ void main() {
         reason: '$path has no animation, so it declares no duration',
       );
       expect(
-        RegExp(r'BoxShadow|LinearGradient|ImageFilter|BackdropFilter')
-            .hasMatch(code),
+        RegExp(
+          r'BoxShadow|LinearGradient|ImageFilter|BackdropFilter',
+        ).hasMatch(code),
         isFalse,
         reason: 'the system is flat',
       );

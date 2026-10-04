@@ -203,14 +203,14 @@ class _DabblerCheckboxState extends State<DabblerCheckbox> {
               },
             ),
           },
-          mouseCursor:
-              _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+          mouseCursor: _enabled
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _enabled ? _toggle : null,
             child: Opacity(
-              opacity:
-                  widget.disabled ? DabblerCheckbox.disabledOpacity : 1,
+              opacity: widget.disabled ? DabblerCheckbox.disabledOpacity : 1,
               child: ConstrainedBox(
                 // `minHeight: var(--touch-target-min)` (`Checkbox.jsx:27`).
                 constraints: const BoxConstraints(

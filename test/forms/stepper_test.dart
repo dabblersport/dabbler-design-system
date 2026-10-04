@@ -11,11 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '_host.dart';
 
 Finder _button(String icon) => find.ancestor(
-      of: find.byWidgetPredicate(
-        (Widget w) => w is DabblerIcon && w.name == icon,
-      ),
-      matching: find.byType(SizedBox),
-    );
+  of: find.byWidgetPredicate((Widget w) => w is DabblerIcon && w.name == icon),
+  matching: find.byType(SizedBox),
+);
 
 void main() {
   group('Stepper composes the FieldShell rather than forking it', () {
@@ -29,8 +27,9 @@ void main() {
       );
 
       expect(find.byType(DabblerFieldShell), findsOneWidget);
-      final DabblerFieldShell shell =
-          tester.widget<DabblerFieldShell>(find.byType(DabblerFieldShell));
+      final DabblerFieldShell shell = tester.widget<DabblerFieldShell>(
+        find.byType(DabblerFieldShell),
+      );
       expect(shell.radius, DabblerRadius.xxl);
       expect(
         shell.innerPadding,
@@ -101,8 +100,10 @@ void main() {
           .widgetList<DabblerIcon>(find.byType(DabblerIcon))
           .toList();
       expect(icons.map((DabblerIcon i) => i.name), <String>['minus', 'add']);
-      expect(icons.every((DabblerIcon i) => i.size == DabblerSizing.iconMd),
-          isTrue);
+      expect(
+        icons.every((DabblerIcon i) => i.size == DabblerSizing.iconMd),
+        isTrue,
+      );
     });
   });
 
@@ -140,11 +141,15 @@ void main() {
 
       final DabblerColors colors = testColors();
       final DabblerIcon minus = tester.widget<DabblerIcon>(
-        find.byWidgetPredicate((Widget w) => w is DabblerIcon && w.name == 'minus'),
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'minus',
+        ),
       );
       expect(minus.color, colors.textTertiary);
       final DabblerIcon add = tester.widget<DabblerIcon>(
-        find.byWidgetPredicate((Widget w) => w is DabblerIcon && w.name == 'add'),
+        find.byWidgetPredicate(
+          (Widget w) => w is DabblerIcon && w.name == 'add',
+        ),
       );
       expect(add.color, colors.textPrimary);
 
@@ -180,12 +185,7 @@ void main() {
       final List<int> reported = <int>[];
       await tester.pumpWidget(
         host(
-          DabblerStepper(
-            value: 10,
-            min: 4,
-            max: 22,
-            onChanged: reported.add,
-          ),
+          DabblerStepper(value: 10, min: 4, max: 22, onChanged: reported.add),
         ),
       );
 
@@ -234,10 +234,8 @@ void main() {
       );
     }
 
-    bool numeralFocused(WidgetTester tester) => tester
-        .widget<TextField>(find.byType(TextField))
-        .focusNode!
-        .hasFocus;
+    bool numeralFocused(WidgetTester tester) =>
+        tester.widget<TextField>(find.byType(TextField)).focusNode!.hasFocus;
 
     testWidgets('decrement, numeral and increment each activate the shell '
         'border, and it clears when focus leaves all three', (
@@ -297,11 +295,11 @@ void main() {
           StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) =>
                 DabblerStepper(
-              value: value,
-              min: 4,
-              max: 22,
-              onChanged: (int v) => setState(() => value = v),
-            ),
+                  value: value,
+                  min: 4,
+                  max: 22,
+                  onChanged: (int v) => setState(() => value = v),
+                ),
           ),
         ),
       );
@@ -344,19 +342,23 @@ void main() {
       await tester.pumpWidget(
         host(const DabblerStepper(value: 12), direction: TextDirection.ltr),
       );
-      final double minusLtr =
-          tester.getRect(_button(DabblerStepper.decreaseIcon).first).left;
-      final double addLtr =
-          tester.getRect(_button(DabblerStepper.increaseIcon).first).left;
+      final double minusLtr = tester
+          .getRect(_button(DabblerStepper.decreaseIcon).first)
+          .left;
+      final double addLtr = tester
+          .getRect(_button(DabblerStepper.increaseIcon).first)
+          .left;
       expect(minusLtr, lessThan(addLtr));
 
       await tester.pumpWidget(
         host(const DabblerStepper(value: 12), direction: TextDirection.rtl),
       );
-      final double minusRtl =
-          tester.getRect(_button(DabblerStepper.decreaseIcon).first).left;
-      final double addRtl =
-          tester.getRect(_button(DabblerStepper.increaseIcon).first).left;
+      final double minusRtl = tester
+          .getRect(_button(DabblerStepper.decreaseIcon).first)
+          .left;
+      final double addRtl = tester
+          .getRect(_button(DabblerStepper.increaseIcon).first)
+          .left;
       expect(minusRtl, greaterThan(addRtl), reason: 'flow order, mirrored');
 
       // The numeral itself is pinned to ltr so the digits never reorder.

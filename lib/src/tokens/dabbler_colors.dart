@@ -12,16 +12,22 @@ import 'dabbler_palette.dart';
 enum DabblerTheme {
   /// `[data-theme]` unset — the `:root` default. Purple.
   main,
+
   /// `[data-theme="sport"]`. Green.
   sport,
+
   /// `[data-theme="social"]`. Blue.
   social,
+
   /// `[data-theme="active"]`. Pink.
   active,
+
   /// `[data-theme="bright"]`. Amber.
   bright,
+
   /// `[data-theme="simple"]`. Near-black on paper.
   simple,
+
   /// `[data-theme="shade"]`. Low-contrast grey, for de-emphasised surfaces.
   shade,
 }
@@ -30,10 +36,13 @@ enum DabblerTheme {
 enum DabblerStatusTone {
   /// `--color-status-success-*`.
   success,
+
   /// `--color-status-warning-*`.
   warning,
+
   /// `--color-status-error-*`.
   error,
+
   /// `--color-status-info-*`.
   info,
 }
@@ -160,19 +169,37 @@ class DabblerToneColor {
 @immutable
 class DabblerColors extends ThemeExtension<DabblerColors> {
   const DabblerColors._({
-    required this.theme, required this.brightness, required this.brandPrimary,
-    required this.brandPrimaryHover, required this.onBrand, required this.accent,
-    required this.accentHover, required this.onAccent, required this.focusRing,
-    required this.bgPrimary, required this.bgSecondary, required this.bgTertiary,
-    required this.surfaceCard, required this.surfaceSunken, required this.surfaceGrey,
-    required this.textPrimary, required this.textSecondary, required this.textTertiary,
-    required this.borderDefault, required this.borderStrong, required this.success,
-    required this.warning, required this.error, required this.info,
-    required this.spotlight, required this.scrim,
+    required this.theme,
+    required this.brightness,
+    required this.brandPrimary,
+    required this.brandPrimaryHover,
+    required this.onBrand,
+    required this.accent,
+    required this.accentHover,
+    required this.onAccent,
+    required this.focusRing,
+    required this.bgPrimary,
+    required this.bgSecondary,
+    required this.bgTertiary,
+    required this.surfaceCard,
+    required this.surfaceSunken,
+    required this.surfaceGrey,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
+    required this.borderDefault,
+    required this.borderStrong,
+    required this.success,
+    required this.warning,
+    required this.error,
+    required this.info,
+    required this.spotlight,
+    required this.scrim,
   });
 
   /// The section theme this instance resolves.
   final DabblerTheme theme;
+
   /// The brightness this instance resolves.
   final Brightness brightness;
 
@@ -180,16 +207,22 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
 
   /// `--color-brand-primary`.
   final Color brandPrimary;
+
   /// `--color-brand-primary-hover`.
   final Color brandPrimaryHover;
+
   /// `--color-on-brand` — the ink that sits on [brandPrimary].
   final Color onBrand;
+
   /// `--color-accent` (the source's `--t-secondary`).
   final Color accent;
+
   /// `--color-accent-hover`.
   final Color accentHover;
+
   /// `--color-on-accent` — the ink that sits on [accent].
   final Color onAccent;
+
   /// `--color-focus-ring` — the visible focus indicator.
   final Color focusRing;
 
@@ -197,18 +230,25 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
 
   /// `--color-bg-primary` — the app background.
   final Color bgPrimary;
+
   /// `--color-bg-secondary` — tonal background.
   final Color bgSecondary;
+
   /// `--color-bg-tertiary` — faint fill / divider.
   final Color bgTertiary;
+
   /// `--color-surface-card` — elevated card, sheet, tab bar.
   final Color surfaceCard;
+
   /// `--color-surface-sunken` — tonal card, list row.
   final Color surfaceSunken;
+
   /// `--color-surface-grey` — neutral inset panel.
   final Color surfaceGrey;
+
   /// `--color-text-primary`.
   final Color textPrimary;
+
   /// `--color-text-secondary` — **the only secondary body-text role.**
   ///
   /// Light resolves to [DabblerPalette.inkSoft] (`--ink-soft`, `#404040`), not
@@ -218,6 +258,7 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
   /// (a placeholder is text under WCAG), belongs here — 9.13:1 on
   /// [bgPrimary], 10.37:1 on [surfaceCard].
   final Color textSecondary;
+
   /// `--color-text-tertiary` — de-emphasis for **large text, icons and
   /// inactive controls only. Never body text and never a placeholder.**
   ///
@@ -230,8 +271,10 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
   /// any text role at light brightness at all; see
   /// `test/tokens/no_subtle_as_text_test.dart`, which enforces that.
   final Color textTertiary;
+
   /// `--color-border-default` — the card border outline.
   final Color borderDefault;
+
   /// `--color-border-strong` — emphasised outline.
   final Color borderStrong;
 
@@ -239,14 +282,19 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
 
   /// `--color-status-success-*`. Overridden by the `sport` theme.
   final DabblerStatusColor success;
+
   /// `--color-status-warning-*`. Overridden by the `bright` theme.
   final DabblerStatusColor warning;
+
   /// `--color-status-error-*`. Overridden by the `active` theme.
   final DabblerStatusColor error;
+
   /// `--color-status-info-*`. Overridden by the `social` theme.
   final DabblerStatusColor info;
+
   /// `--color-spotlight` — the single attention accent. Never a status.
   final Color spotlight;
+
   /// `--color-scrim` — the wash behind every overlay (Sheet, Dialog, mobile
   /// Menu). Ink at 45% in light, `--ink-950` at 65% in dark. Overlays consume
   /// this and never invent their own opacity.
@@ -264,45 +312,65 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
 
   /// `--tag-pending-*`.
   static const DabblerToneColor tagPending = DabblerToneColor(
-      surface: DabblerPalette.tagPendingSurface, ink: DabblerPalette.tagPendingInk);
+    surface: DabblerPalette.tagPendingSurface,
+    ink: DabblerPalette.tagPendingInk,
+  );
 
   /// `--tag-progress-*`.
   static const DabblerToneColor tagProgress = DabblerToneColor(
-      surface: DabblerPalette.tagProgressSurface, ink: DabblerPalette.tagProgressInk);
+    surface: DabblerPalette.tagProgressSurface,
+    ink: DabblerPalette.tagProgressInk,
+  );
 
   /// `--tag-submitted-*`.
   static const DabblerToneColor tagSubmitted = DabblerToneColor(
-      surface: DabblerPalette.tagSubmittedSurface, ink: DabblerPalette.tagSubmittedInk);
+    surface: DabblerPalette.tagSubmittedSurface,
+    ink: DabblerPalette.tagSubmittedInk,
+  );
 
   /// `--tag-review-*`.
   static const DabblerToneColor tagReview = DabblerToneColor(
-      surface: DabblerPalette.tagReviewSurface, ink: DabblerPalette.tagReviewInk);
+    surface: DabblerPalette.tagReviewSurface,
+    ink: DabblerPalette.tagReviewInk,
+  );
 
   /// `--tag-success-*`.
   static const DabblerToneColor tagSuccess = DabblerToneColor(
-      surface: DabblerPalette.tagSuccessSurface, ink: DabblerPalette.tagSuccessInk);
+    surface: DabblerPalette.tagSuccessSurface,
+    ink: DabblerPalette.tagSuccessInk,
+  );
 
   /// `--tag-failed-*`.
   static const DabblerToneColor tagFailed = DabblerToneColor(
-      surface: DabblerPalette.tagFailedSurface, ink: DabblerPalette.tagFailedInk);
+    surface: DabblerPalette.tagFailedSurface,
+    ink: DabblerPalette.tagFailedInk,
+  );
 
   /// `--tag-expired-*`.
   static const DabblerToneColor tagExpired = DabblerToneColor(
-      surface: DabblerPalette.tagExpiredSurface, ink: DabblerPalette.tagExpiredInk);
+    surface: DabblerPalette.tagExpiredSurface,
+    ink: DabblerPalette.tagExpiredInk,
+  );
 
   // --- Decorative tiles. Carry no state meaning. ---
 
   /// `--tile-amber-*`.
   static const DabblerToneColor tileAmber = DabblerToneColor(
-      surface: DabblerPalette.tileAmberSurface, ink: DabblerPalette.ink);
+    surface: DabblerPalette.tileAmberSurface,
+    ink: DabblerPalette.ink,
+  );
 
   /// `--tile-info-*`.
   static const DabblerToneColor tileInfo = DabblerToneColor(
-      surface: DabblerPalette.tileInfoSurface, ink: DabblerPalette.socialP700);
+    surface: DabblerPalette.tileInfoSurface,
+    ink: DabblerPalette.socialP700,
+  );
 
   /// `--tile-accent-*`.
   static const DabblerToneColor tileAccent = DabblerToneColor(
-      surface: DabblerPalette.tileAccentSurface, ink: DabblerPalette.activeP700);
+    surface: DabblerPalette.tileAccentSurface,
+    ink: DabblerPalette.activeP700,
+  );
 
   /// The resolved colours for the enclosing theme.
   ///
@@ -331,27 +399,41 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
       accentHover: b.accentHover,
       onAccent: b.onAccent,
       focusRing: b.focus,
-      bgPrimary: dark ? DabblerProvisionalDark.bgPrimary : DabblerPalette.surfacePage,
-      bgSecondary: dark ? DabblerProvisionalDark.bgSecondary
+      bgPrimary: dark
+          ? DabblerProvisionalDark.bgPrimary
+          : DabblerPalette.surfacePage,
+      bgSecondary: dark
+          ? DabblerProvisionalDark.bgSecondary
           : DabblerPalette.surfaceSunken,
-      bgTertiary: dark ? DabblerProvisionalDark.bgTertiary : DabblerPalette.faint,
-      surfaceCard: dark ? DabblerProvisionalDark.surfaceCard
+      bgTertiary: dark
+          ? DabblerProvisionalDark.bgTertiary
+          : DabblerPalette.faint,
+      surfaceCard: dark
+          ? DabblerProvisionalDark.surfaceCard
           : DabblerPalette.surfaceCard,
-      surfaceSunken: dark ? DabblerProvisionalDark.surfaceSunken
+      surfaceSunken: dark
+          ? DabblerProvisionalDark.surfaceSunken
           : DabblerPalette.surfaceSunken,
-      surfaceGrey: dark ? DabblerProvisionalDark.surfaceGrey
+      surfaceGrey: dark
+          ? DabblerProvisionalDark.surfaceGrey
           : DabblerPalette.surfaceGrey,
-      textPrimary: dark ? DabblerProvisionalDark.textPrimary : DabblerPalette.ink,
+      textPrimary: dark
+          ? DabblerProvisionalDark.textPrimary
+          : DabblerPalette.ink,
       // D-003(a). Light secondary text is `--ink-soft`, not `--muted`; light
       // tertiary is `--muted`, not `--subtle`. The dark values are untouched —
       // the dark ramp's structure is D-003(c) and is not actionable yet.
-      textSecondary: dark ? DabblerProvisionalDark.textSecondary
+      textSecondary: dark
+          ? DabblerProvisionalDark.textSecondary
           : DabblerPalette.inkSoft,
-      textTertiary: dark ? DabblerProvisionalDark.textTertiary
+      textTertiary: dark
+          ? DabblerProvisionalDark.textTertiary
           : DabblerPalette.muted,
-      borderDefault: dark ? DabblerProvisionalDark.borderDefault
+      borderDefault: dark
+          ? DabblerProvisionalDark.borderDefault
           : DabblerPalette.outlineCard,
-      borderStrong: dark ? DabblerProvisionalDark.borderStrong
+      borderStrong: dark
+          ? DabblerProvisionalDark.borderStrong
           : DabblerPalette.outlineStrong,
       success: _success(theme, dark),
       warning: _warning(theme, dark),
@@ -417,95 +499,177 @@ typedef _Brand = ({
 /// 500-line limit; `dart format` would expand each to nine lines.
 _Brand _brandOf(DabblerTheme theme, bool dark) => switch ((theme, dark)) {
   (DabblerTheme.main, false) => (
-    primary: DabblerPalette.mainP600, primaryHover: DabblerPalette.mainP700,
-    accent: DabblerPalette.mainS600, accentHover: DabblerPalette.mainS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.paper, focus: DabblerPalette.mainP400),
+    primary: DabblerPalette.mainP600,
+    primaryHover: DabblerPalette.mainP700,
+    accent: DabblerPalette.mainS600,
+    accentHover: DabblerPalette.mainS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.paper,
+    focus: DabblerPalette.mainP400,
+  ),
   (DabblerTheme.main, true) => (
-    primary: DabblerPalette.mainP400, primaryHover: DabblerPalette.mainP300,
-    accent: DabblerPalette.mainS400, accentHover: DabblerPalette.mainS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.paper, focus: DabblerPalette.mainP400),
+    primary: DabblerPalette.mainP400,
+    primaryHover: DabblerPalette.mainP300,
+    accent: DabblerPalette.mainS400,
+    accentHover: DabblerPalette.mainS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.paper,
+    focus: DabblerPalette.mainP400,
+  ),
   (DabblerTheme.sport, false) => (
-    primary: DabblerPalette.sportP600, primaryHover: DabblerPalette.sportP700,
-    accent: DabblerPalette.sportS600, accentHover: DabblerPalette.sportS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.ink900, focus: DabblerPalette.sportP400),
+    primary: DabblerPalette.sportP600,
+    primaryHover: DabblerPalette.sportP700,
+    accent: DabblerPalette.sportS600,
+    accentHover: DabblerPalette.sportS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.ink900,
+    focus: DabblerPalette.sportP400,
+  ),
   (DabblerTheme.sport, true) => (
-    primary: DabblerPalette.sportP400, primaryHover: DabblerPalette.sportP300,
-    accent: DabblerPalette.sportS400, accentHover: DabblerPalette.sportS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.ink900, focus: DabblerPalette.sportP400),
+    primary: DabblerPalette.sportP400,
+    primaryHover: DabblerPalette.sportP300,
+    accent: DabblerPalette.sportS400,
+    accentHover: DabblerPalette.sportS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.ink900,
+    focus: DabblerPalette.sportP400,
+  ),
   (DabblerTheme.social, false) => (
-    primary: DabblerPalette.socialP600, primaryHover: DabblerPalette.socialP700,
-    accent: DabblerPalette.socialS600, accentHover: DabblerPalette.socialS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.ink900, focus: DabblerPalette.socialP400),
+    primary: DabblerPalette.socialP600,
+    primaryHover: DabblerPalette.socialP700,
+    accent: DabblerPalette.socialS600,
+    accentHover: DabblerPalette.socialS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.ink900,
+    focus: DabblerPalette.socialP400,
+  ),
   (DabblerTheme.social, true) => (
-    primary: DabblerPalette.socialP400, primaryHover: DabblerPalette.socialP300,
-    accent: DabblerPalette.socialS400, accentHover: DabblerPalette.socialS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.ink900, focus: DabblerPalette.socialP400),
+    primary: DabblerPalette.socialP400,
+    primaryHover: DabblerPalette.socialP300,
+    accent: DabblerPalette.socialS400,
+    accentHover: DabblerPalette.socialS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.ink900,
+    focus: DabblerPalette.socialP400,
+  ),
   (DabblerTheme.active, false) => (
-    primary: DabblerPalette.activeP600, primaryHover: DabblerPalette.activeP700,
-    accent: DabblerPalette.activeS600, accentHover: DabblerPalette.activeS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.paper, focus: DabblerPalette.activeP400),
+    primary: DabblerPalette.activeP600,
+    primaryHover: DabblerPalette.activeP700,
+    accent: DabblerPalette.activeS600,
+    accentHover: DabblerPalette.activeS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.paper,
+    focus: DabblerPalette.activeP400,
+  ),
   (DabblerTheme.active, true) => (
-    primary: DabblerPalette.activeP400, primaryHover: DabblerPalette.activeP300,
-    accent: DabblerPalette.activeS400, accentHover: DabblerPalette.activeS700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.paper, focus: DabblerPalette.activeP400),
+    primary: DabblerPalette.activeP400,
+    primaryHover: DabblerPalette.activeP300,
+    accent: DabblerPalette.activeS400,
+    accentHover: DabblerPalette.activeS700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.paper,
+    focus: DabblerPalette.activeP400,
+  ),
   (DabblerTheme.bright, false) => (
-    primary: DabblerPalette.brightP600, primaryHover: DabblerPalette.brightP700,
-    accent: DabblerPalette.brightS600, accentHover: DabblerPalette.brightS700,
-    onBrand: DabblerPalette.ink900, onAccent: DabblerPalette.paper, focus: DabblerPalette.brightP400),
+    primary: DabblerPalette.brightP600,
+    primaryHover: DabblerPalette.brightP700,
+    accent: DabblerPalette.brightS600,
+    accentHover: DabblerPalette.brightS700,
+    onBrand: DabblerPalette.ink900,
+    onAccent: DabblerPalette.paper,
+    focus: DabblerPalette.brightP400,
+  ),
   (DabblerTheme.bright, true) => (
-    primary: DabblerPalette.brightP400, primaryHover: DabblerPalette.brightP300,
-    accent: DabblerPalette.brightS400, accentHover: DabblerPalette.brightS700,
-    onBrand: DabblerPalette.ink900, onAccent: DabblerPalette.paper, focus: DabblerPalette.brightP400),
+    primary: DabblerPalette.brightP400,
+    primaryHover: DabblerPalette.brightP300,
+    accent: DabblerPalette.brightS400,
+    accentHover: DabblerPalette.brightS700,
+    onBrand: DabblerPalette.ink900,
+    onAccent: DabblerPalette.paper,
+    focus: DabblerPalette.brightP400,
+  ),
   (DabblerTheme.simple, false) => (
-    primary: DabblerPalette.ink900, primaryHover: DabblerPalette.ink700,
-    accent: DabblerPalette.ink600, accentHover: DabblerPalette.ink700,
-    onBrand: DabblerPalette.paper, onAccent: DabblerPalette.paper, focus: DabblerPalette.ink700),
+    primary: DabblerPalette.ink900,
+    primaryHover: DabblerPalette.ink700,
+    accent: DabblerPalette.ink600,
+    accentHover: DabblerPalette.ink700,
+    onBrand: DabblerPalette.paper,
+    onAccent: DabblerPalette.paper,
+    focus: DabblerPalette.ink700,
+  ),
   (DabblerTheme.simple, true) => (
-    primary: DabblerPalette.ink50, primaryHover: DabblerPalette.ink200,
-    accent: DabblerPalette.ink300, accentHover: DabblerPalette.ink200,
-    onBrand: DabblerPalette.ink900, onAccent: DabblerPalette.ink900, focus: DabblerPalette.ink300),
+    primary: DabblerPalette.ink50,
+    primaryHover: DabblerPalette.ink200,
+    accent: DabblerPalette.ink300,
+    accentHover: DabblerPalette.ink200,
+    onBrand: DabblerPalette.ink900,
+    onAccent: DabblerPalette.ink900,
+    focus: DabblerPalette.ink300,
+  ),
   (DabblerTheme.shade, false) => (
-    primary: DabblerPalette.ink300, primaryHover: DabblerPalette.ink400,
-    accent: DabblerPalette.ink200, accentHover: DabblerPalette.ink300,
-    onBrand: DabblerPalette.ink600, onAccent: DabblerPalette.ink600, focus: DabblerPalette.ink600),
+    primary: DabblerPalette.ink300,
+    primaryHover: DabblerPalette.ink400,
+    accent: DabblerPalette.ink200,
+    accentHover: DabblerPalette.ink300,
+    onBrand: DabblerPalette.ink600,
+    onAccent: DabblerPalette.ink600,
+    focus: DabblerPalette.ink600,
+  ),
   (DabblerTheme.shade, true) => (
-    primary: DabblerPalette.ink600, primaryHover: DabblerPalette.ink500,
-    accent: DabblerPalette.ink700, accentHover: DabblerPalette.ink600,
-    onBrand: DabblerPalette.ink200, onAccent: DabblerPalette.ink300, focus: DabblerPalette.ink500),
+    primary: DabblerPalette.ink600,
+    primaryHover: DabblerPalette.ink500,
+    accent: DabblerPalette.ink700,
+    accentHover: DabblerPalette.ink600,
+    onBrand: DabblerPalette.ink200,
+    onAccent: DabblerPalette.ink300,
+    focus: DabblerPalette.ink500,
+  ),
 };
 
 DabblerStatusColor _success(DabblerTheme theme, bool dark) {
   if (theme == DabblerTheme.sport) {
     return DabblerStatusColor(
-        base: DabblerPalette.sportSuccess,
-        surface: dark ? DabblerProvisionalDark.sportSuccessSurface
-                      : DabblerThemeStatusTints.sportSuccessSurface,
-        strong: dark ? DabblerProvisionalDark.sportSuccessInk
-                     : DabblerThemeStatusTints.sportSuccessInk,
-        solid: DabblerPalette.success700);
+      base: DabblerPalette.sportSuccess,
+      surface: dark
+          ? DabblerProvisionalDark.sportSuccessSurface
+          : DabblerThemeStatusTints.sportSuccessSurface,
+      strong: dark
+          ? DabblerProvisionalDark.sportSuccessInk
+          : DabblerThemeStatusTints.sportSuccessInk,
+      solid: DabblerPalette.success700,
+    );
   }
   return DabblerStatusColor(
-      base: DabblerPalette.success500,
-      surface: dark ? DabblerProvisionalDark.successSurface : DabblerPalette.success100,
-      strong: dark ? DabblerPalette.success100 : DabblerPalette.success700,
-      solid: DabblerPalette.success700);
+    base: DabblerPalette.success500,
+    surface: dark
+        ? DabblerProvisionalDark.successSurface
+        : DabblerPalette.success100,
+    strong: dark ? DabblerPalette.success100 : DabblerPalette.success700,
+    solid: DabblerPalette.success700,
+  );
 }
 
 DabblerStatusColor _warning(DabblerTheme theme, bool dark) {
   if (theme == DabblerTheme.bright) {
     return DabblerStatusColor(
-        base: DabblerPalette.brightWarning,
-        surface: dark ? DabblerProvisionalDark.brightWarningSurface
-                      : DabblerThemeStatusTints.brightWarningSurface,
-        strong: dark ? DabblerProvisionalDark.brightWarningInk
-                     : DabblerThemeStatusTints.brightWarningInk,
-        solid: DabblerPalette.warning700);
+      base: DabblerPalette.brightWarning,
+      surface: dark
+          ? DabblerProvisionalDark.brightWarningSurface
+          : DabblerThemeStatusTints.brightWarningSurface,
+      strong: dark
+          ? DabblerProvisionalDark.brightWarningInk
+          : DabblerThemeStatusTints.brightWarningInk,
+      solid: DabblerPalette.warning700,
+    );
   }
   return DabblerStatusColor(
-      base: DabblerPalette.warning500,
-      surface: dark ? DabblerProvisionalDark.warningSurface : DabblerPalette.warning100,
-      strong: dark ? DabblerPalette.warning100 : DabblerPalette.warning700,
-      solid: DabblerPalette.warning700);
+    base: DabblerPalette.warning500,
+    surface: dark
+        ? DabblerProvisionalDark.warningSurface
+        : DabblerPalette.warning100,
+    strong: dark ? DabblerPalette.warning100 : DabblerPalette.warning700,
+    solid: DabblerPalette.warning700,
+  );
 }
 
 DabblerStatusColor _error(DabblerTheme theme, bool dark) => DabblerStatusColor(
@@ -522,16 +686,20 @@ DabblerStatusColor _error(DabblerTheme theme, bool dark) => DabblerStatusColor(
 DabblerStatusColor _info(DabblerTheme theme, bool dark) {
   if (theme == DabblerTheme.social) {
     return DabblerStatusColor(
-        base: DabblerPalette.socialInfo,
-        surface: dark ? DabblerProvisionalDark.socialInfoSurface
-                      : DabblerThemeStatusTints.socialInfoSurface,
-        strong: dark ? DabblerProvisionalDark.socialInfoInk
-                     : DabblerThemeStatusTints.socialInfoInk,
-        solid: DabblerPalette.info700);
+      base: DabblerPalette.socialInfo,
+      surface: dark
+          ? DabblerProvisionalDark.socialInfoSurface
+          : DabblerThemeStatusTints.socialInfoSurface,
+      strong: dark
+          ? DabblerProvisionalDark.socialInfoInk
+          : DabblerThemeStatusTints.socialInfoInk,
+      solid: DabblerPalette.info700,
+    );
   }
   return DabblerStatusColor(
-      base: DabblerPalette.info500,
-      surface: dark ? DabblerProvisionalDark.infoSurface : DabblerPalette.info100,
-      strong: dark ? DabblerPalette.info100 : DabblerPalette.info700,
-      solid: DabblerPalette.info700);
+    base: DabblerPalette.info500,
+    surface: dark ? DabblerProvisionalDark.infoSurface : DabblerPalette.info100,
+    strong: dark ? DabblerPalette.info100 : DabblerPalette.info700,
+    solid: DabblerPalette.info700,
+  );
 }

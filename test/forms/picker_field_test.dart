@@ -59,7 +59,9 @@ void main() {
       WidgetTester tester,
     ) async {
       int pressed = 0;
-      await tester.pumpWidget(shell(controller, onOpenPressed: () => pressed++));
+      await tester.pumpWidget(
+        shell(controller, onOpenPressed: () => pressed++),
+      );
 
       buttonFocusNode(tester).requestFocus();
       await tester.pumpAndSettle();
@@ -74,7 +76,9 @@ void main() {
       WidgetTester tester,
     ) async {
       int pressed = 0;
-      await tester.pumpWidget(shell(controller, onOpenPressed: () => pressed++));
+      await tester.pumpWidget(
+        shell(controller, onOpenPressed: () => pressed++),
+      );
 
       buttonFocusNode(tester).requestFocus();
       await tester.pumpAndSettle();
@@ -115,7 +119,9 @@ void main() {
       WidgetTester tester,
     ) async {
       int pressed = 0;
-      await tester.pumpWidget(shell(controller, onOpenPressed: () => pressed++));
+      await tester.pumpWidget(
+        shell(controller, onOpenPressed: () => pressed++),
+      );
 
       await tester.tap(find.byKey(DabblerPickerFieldShell.pickerButtonKey));
       await tester.pump();
@@ -211,7 +217,8 @@ void main() {
       expect(
         hintField(tester).decoration!.hintStyle!.color,
         testColors().textTertiary,
-        reason: 'D-025 applies at this site too — fixing only '
+        reason:
+            'D-025 applies at this site too — fixing only '
             'text_field.dart would leave the contradiction in place',
       );
     });

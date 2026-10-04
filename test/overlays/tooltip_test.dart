@@ -19,10 +19,10 @@ Widget _host(Widget child, {TextDirection direction = TextDirection.ltr}) {
 }
 
 Widget _target() => const ColoredBox(
-      key: Key('target'),
-      color: Color(0xFF888888),
-      child: SizedBox(width: 60, height: 45),
-    );
+  key: Key('target'),
+  color: Color(0xFF888888),
+  child: SizedBox(width: 60, height: 45),
+);
 
 Future<TestGesture> _hover(WidgetTester tester) async {
   final TestGesture mouse = await tester.createGesture(
@@ -38,8 +38,10 @@ void main() {
   group('DabblerTooltip — Tooltip.jsx', () {
     test('the source constants', () {
       expect(DabblerTooltip.defaultDelay, const Duration(milliseconds: 400));
-      expect(DabblerTooltip.defaultTouchDelay,
-          const Duration(milliseconds: 450));
+      expect(
+        DabblerTooltip.defaultTouchDelay,
+        const Duration(milliseconds: 450),
+      );
       expect(DabblerTooltip.maxWidth, 220);
       expect(DabblerTooltip.gap, 6);
     });
@@ -127,8 +129,10 @@ void main() {
         ),
       );
       expect(panel, findsOneWidget);
-      expect(tester.getSize(panel).width,
-          lessThanOrEqualTo(DabblerTooltip.maxWidth));
+      expect(
+        tester.getSize(panel).width,
+        lessThanOrEqualTo(DabblerTooltip.maxWidth),
+      );
       final DabblerColors colors = DabblerColors.resolve(
         theme: DabblerTheme.main,
         brightness: Brightness.light,
@@ -188,10 +192,11 @@ void main() {
       handle.dispose();
     });
 
-    for (final (DabblerTooltipPlacement, bool) c in <(DabblerTooltipPlacement, bool)>[
-      (DabblerTooltipPlacement.top, true),
-      (DabblerTooltipPlacement.bottom, false),
-    ]) {
+    for (final (DabblerTooltipPlacement, bool) c
+        in <(DabblerTooltipPlacement, bool)>[
+          (DabblerTooltipPlacement.top, true),
+          (DabblerTooltipPlacement.bottom, false),
+        ]) {
       testWidgets('placement ${c.$1.name} sits ${c.$2 ? 'above' : 'below'} '
           'the control', (WidgetTester tester) async {
         await tester.pumpWidget(
@@ -204,7 +209,9 @@ void main() {
             ),
           ),
         );
-        final double controlY = tester.getCenter(find.byKey(const Key('target'))).dy;
+        final double controlY = tester
+            .getCenter(find.byKey(const Key('target')))
+            .dy;
         await _hover(tester);
         await tester.pump(const Duration(milliseconds: 10));
         final double panelY = tester.getCenter(find.text('Tip')).dy;

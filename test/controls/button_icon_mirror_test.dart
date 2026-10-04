@@ -6,19 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(Widget child, TextDirection dir) => Directionality(
-      textDirection: dir,
-      child: Theme(
-        data: ThemeData(
-          extensions: <ThemeExtension<dynamic>>[
-            DabblerColors.resolve(
-              theme: DabblerTheme.main,
-              brightness: Brightness.light,
-            ),
-          ],
+  textDirection: dir,
+  child: Theme(
+    data: ThemeData(
+      extensions: <ThemeExtension<dynamic>>[
+        DabblerColors.resolve(
+          theme: DabblerTheme.main,
+          brightness: Brightness.light,
         ),
-        child: Center(child: child),
-      ),
-    );
+      ],
+    ),
+    child: Center(child: child),
+  ),
+);
 
 IconData _g(String name) => DabblerIconRegistry.resolve(name).glyph!;
 
@@ -26,36 +26,42 @@ void main() {
   test('defaults are off (additive)', () {
     expect(const DabblerButton(label: 'Next').mirrorIconInRtl, isFalse);
     expect(
-      const DabblerButton.icon(icon: 'arrow-left', semanticLabel: 'Back')
-          .mirrorIconInRtl,
+      const DabblerButton.icon(
+        icon: 'arrow-left',
+        semanticLabel: 'Back',
+      ).mirrorIconInRtl,
       isFalse,
     );
   });
 
-  final Map<String, Widget Function(bool)> cases = <String, Widget Function(bool)>{
-    'labelled': (bool m) => DabblerButton(
+  final Map<String, Widget Function(bool)> cases =
+      <String, Widget Function(bool)>{
+        'labelled': (bool m) => DabblerButton(
           label: 'Next',
           icon: 'arrow-right-1',
           onPressed: () {},
           mirrorIconInRtl: m,
         ),
-    'icon-only': (bool m) => DabblerButton.icon(
+        'icon-only': (bool m) => DabblerButton.icon(
           icon: 'arrow-right-1',
           semanticLabel: 'Next',
           onPressed: () {},
           mirrorInRtl: m,
         ),
-  };
+      };
 
   for (final MapEntry<String, Widget Function(bool)> c in cases.entries) {
     testWidgets('${c.key}: LTR draws the passed glyph', (t) async {
       await t.pumpWidget(_host(c.value(true), TextDirection.ltr));
       expect(t.widget<Icon>(find.byType(Icon)).icon, _g('arrow-right-1'));
-      expect(t.widget<DabblerIcon>(find.byType(DabblerIcon)).mirrorInRtl,
-          isTrue);
+      expect(
+        t.widget<DabblerIcon>(find.byType(DabblerIcon)).mirrorInRtl,
+        isTrue,
+      );
     });
-    testWidgets('${c.key}: RTL draws the measured mirror, not a flip',
-        (t) async {
+    testWidgets('${c.key}: RTL draws the measured mirror, not a flip', (
+      t,
+    ) async {
       await t.pumpWidget(_host(c.value(true), TextDirection.rtl));
       // `arrow-left` is the pixel mirror of `arrow-right-1` (icon_mirror_test).
       expect(t.widget<Icon>(find.byType(Icon)).icon, _g('arrow-left'));

@@ -53,10 +53,7 @@ void main() {
           .length;
       if (n == 0) continue;
       banded += n;
-      expect(
-        find.text('${purpose.label.toUpperCase()} ($n)'),
-        findsOneWidget,
-      );
+      expect(find.text('${purpose.label.toUpperCase()} ($n)'), findsOneWidget);
     }
     expect(banded, galleryEntries.length);
   });
@@ -93,9 +90,9 @@ void main() {
       await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
       await tester.pumpAndSettle();
 
-      final GalleryEntry entry =
-          tester.widget<GalleryIndexTile>(find.byType(GalleryIndexTile).first)
-              .entry;
+      final GalleryEntry entry = tester
+          .widget<GalleryIndexTile>(find.byType(GalleryIndexTile).first)
+          .entry;
       await tester.tap(find.byType(GalleryIndexTile).first);
       // The page loads from the bundle a frame after the tap.
       await tester.pump();

@@ -125,11 +125,11 @@ class DabblerFieldShell extends StatelessWidget {
   /// `--space-4` inline. Directional so it mirrors in RTL.
   static const EdgeInsetsDirectional defaultInnerPadding =
       EdgeInsetsDirectional.fromSTEB(
-    DabblerSpacing.space4,
-    DabblerSpacing.space3,
-    DabblerSpacing.space4,
-    DabblerSpacing.space3,
-  );
+        DabblerSpacing.space4,
+        DabblerSpacing.space3,
+        DabblerSpacing.space4,
+        DabblerSpacing.space3,
+      );
 
   /// `paddingInlineStart: 12` on the helper / error line
   /// (`TextField.jsx:73`), so it lines up with the text inside the box.
@@ -240,10 +240,9 @@ class DabblerFieldShell extends StatelessWidget {
     required bool disabled,
     required bool hasError,
     required bool focused,
-  }) =>
-      !disabled && !hasError && focused
-          ? DabblerFocusRing.ringWidth
-          : DabblerSizing.borderDefault;
+  }) => !disabled && !hasError && focused
+      ? DabblerFocusRing.ringWidth
+      : DabblerSizing.borderDefault;
 
   @override
   Widget build(BuildContext context) {
@@ -251,15 +250,13 @@ class DabblerFieldShell extends StatelessWidget {
     final TextDirection direction = Directionality.of(context);
     final bool hasError = errorText != null;
 
-    final BorderRadius borderRadius =
-        BorderRadius.all(Radius.circular(radius));
+    final BorderRadius borderRadius = BorderRadius.all(Radius.circular(radius));
 
     Widget box = DabblerSurface(
       radius: radius,
-      fill: disabled ? disabledFill(colors) : DabblerSurface.fillOf(
-        colors,
-        DabblerSurfaceVariant.card,
-      ),
+      fill: disabled
+          ? disabledFill(colors)
+          : DabblerSurface.fillOf(colors, DabblerSurfaceVariant.card),
       borderColor: borderColorFor(
         colors,
         disabled: disabled,
@@ -325,7 +322,9 @@ class DabblerFieldShell extends StatelessWidget {
         if (label != null) ...<Widget>[
           Text(
             label!,
-            style: DabblerType.subheadline.resolveForDirection(direction).copyWith(
+            style: DabblerType.subheadline
+                .resolveForDirection(direction)
+                .copyWith(
                   color: focused ? colors.brandPrimary : colors.textSecondary,
                 ),
           ),

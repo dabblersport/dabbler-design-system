@@ -157,6 +157,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 
 ## Change log
 
+- `transparent` draws the bar with no ground of its own, so it sits on a tinted hero (Settings fidelity rebuild).
 - D-026 (cxo) — confirms the transcription's narrow anatomy is
   correct as built and refuses widening the API for a greeting-stack variant a different part of the
   design kit draws.

@@ -38,8 +38,10 @@ Widget _bar(List<DabblerNavigationAction> actions) =>
 
 void main() {
   test('loading defaults to false and is part of equality', () {
-    const DabblerNavigationAction a =
-        DabblerNavigationAction(icon: 'sms', label: 'Messages');
+    const DabblerNavigationAction a = DabblerNavigationAction(
+      icon: 'sms',
+      label: 'Messages',
+    );
     const DabblerNavigationAction b = DabblerNavigationAction(
       icon: 'sms',
       label: 'Messages',
@@ -52,34 +54,44 @@ void main() {
 
   for (final TextDirection dir in TextDirection.values) {
     group('${dir.name}: icon action loading', () {
-      testWidgets('spinner replaces glyph inside the 45 target, inert',
-          (t) async {
+      testWidgets('spinner replaces glyph inside the 45 target, inert', (
+        t,
+      ) async {
         int taps = 0;
-        await t.pumpWidget(_host(
-          _bar(<DabblerNavigationAction>[
-            DabblerNavigationAction(
-              icon: 'tick-circle',
-              label: 'Save',
-              loading: true,
-              onPressed: () => taps++,
-            ),
-          ]),
-          dir: dir,
-        ));
+        await t.pumpWidget(
+          _host(
+            _bar(<DabblerNavigationAction>[
+              DabblerNavigationAction(
+                icon: 'tick-circle',
+                label: 'Save',
+                loading: true,
+                onPressed: () => taps++,
+              ),
+            ]),
+            dir: dir,
+          ),
+        );
         final Finder spinner = find.byType(DabblerSpinner);
         expect(spinner, findsOneWidget);
-        expect(find.byWidgetPredicate(
-          (Widget w) => w is DabblerIcon && w.name == 'tick-circle',
-        ), findsNothing);
+        expect(
+          find.byWidgetPredicate(
+            (Widget w) => w is DabblerIcon && w.name == 'tick-circle',
+          ),
+          findsNothing,
+        );
         expect(t.widget<DabblerSpinner>(spinner).size, DabblerSpinnerSize.md);
         final Finder target = find.ancestor(
           of: spinner,
-          matching: find.byWidgetPredicate((Widget w) =>
-              w is SizedBox &&
-              w.width == DabblerNavigationTopBar.actionTarget.width),
+          matching: find.byWidgetPredicate(
+            (Widget w) =>
+                w is SizedBox &&
+                w.width == DabblerNavigationTopBar.actionTarget.width,
+          ),
         );
-        expect(t.getSize(target.first).height,
-            greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
+        expect(
+          t.getSize(target.first).height,
+          greaterThanOrEqualTo(DabblerSizing.touchTargetMin),
+        );
         await t.tap(spinner);
         expect(taps, 0);
         final SemanticsHandle h = t.ensureSemantics();
@@ -98,16 +110,18 @@ void main() {
 
       testWidgets('not loading: glyph drawn and taps fire', (t) async {
         int taps = 0;
-        await t.pumpWidget(_host(
-          _bar(<DabblerNavigationAction>[
-            DabblerNavigationAction(
-              icon: 'tick-circle',
-              label: 'Save',
-              onPressed: () => taps++,
-            ),
-          ]),
-          dir: dir,
-        ));
+        await t.pumpWidget(
+          _host(
+            _bar(<DabblerNavigationAction>[
+              DabblerNavigationAction(
+                icon: 'tick-circle',
+                label: 'Save',
+                onPressed: () => taps++,
+              ),
+            ]),
+            dir: dir,
+          ),
+        );
         expect(find.byType(DabblerSpinner), findsNothing);
         await t.tap(find.byType(DabblerIcon).last);
         expect(taps, 1);
@@ -115,8 +129,9 @@ void main() {
     });
 
     group('${dir.name}: text action loading', () {
-      testWidgets('spinner replaces label, width kept, inert, name kept',
-          (t) async {
+      testWidgets('spinner replaces label, width kept, inert, name kept', (
+        t,
+      ) async {
         int taps = 0;
         DabblerNavigationAction action(bool loading) =>
             DabblerNavigationAction.text(
@@ -126,10 +141,12 @@ void main() {
               onPressed: () => taps++,
             );
         await t.pumpWidget(
-            _host(_bar(<DabblerNavigationAction>[action(false)]), dir: dir));
+          _host(_bar(<DabblerNavigationAction>[action(false)]), dir: dir),
+        );
         final Rect idle = t.getRect(find.text('Save'));
         await t.pumpWidget(
-            _host(_bar(<DabblerNavigationAction>[action(true)]), dir: dir));
+          _host(_bar(<DabblerNavigationAction>[action(true)]), dir: dir),
+        );
         await t.pump();
         final Finder spinner = find.byType(DabblerSpinner);
         expect(spinner, findsOneWidget);
@@ -138,15 +155,11 @@ void main() {
         expect(t.widget<Visibility>(hidden.last).visible, isFalse);
         expect(t.getRect(find.text('Save', skipOffstage: false)), idle);
         // Spinner centred over where the label was, in either direction.
-        expect((t.getCenter(spinner).dx - idle.center.dx).abs(),
-            lessThan(1.0));
+        expect((t.getCenter(spinner).dx - idle.center.dx).abs(), lessThan(1.0));
         await t.tap(spinner);
         expect(taps, 0);
         final SemanticsHandle h = t.ensureSemantics();
-        expect(
-          find.bySemanticsLabel('Save profile'),
-          findsOneWidget,
-        );
+        expect(find.bySemanticsLabel('Save profile'), findsOneWidget);
         expect(
           t.getSemantics(find.bySemanticsLabel('Save profile')),
           matchesSemantics(

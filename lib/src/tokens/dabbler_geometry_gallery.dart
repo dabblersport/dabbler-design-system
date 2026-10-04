@@ -56,7 +56,8 @@ const List<GalleryEntry> geometryGalleryEntries = <GalleryEntry>[
     page: 'foundations/spacing-geometry',
     group: null,
     title: 'Spacing — the base-3 scale and its aliases',
-    description: 'All eleven steps drawn at their literal pixel width, then '
+    description:
+        'All eleven steps drawn at their literal pixel width, then '
         'the six semantic aliases and the step each one IS.',
     builder: _spacing,
   ),
@@ -65,7 +66,8 @@ const List<GalleryEntry> geometryGalleryEntries = <GalleryEntry>[
     page: 'foundations/spacing-geometry',
     group: null,
     title: 'Radius — the ramp, and the 16-versus-12 card corner',
-    description: 'Seven steps including D-018\'s 16px card corner, then the '
+    description:
+        'Seven steps including D-018\'s 16px card corner, then the '
         'nested figure that shows why 16 and 12 are different corners.',
     builder: _radius,
   ),
@@ -74,7 +76,8 @@ const List<GalleryEntry> geometryGalleryEntries = <GalleryEntry>[
     page: 'foundations/spacing-geometry',
     group: null,
     title: 'Sizing — touch target, borders, icon sizes',
-    description: 'The 45px floor, the two stroke widths at real thickness, '
+    description:
+        'The 45px floor, the two stroke widths at real thickness, '
         'and the three icon sizes.',
     builder: _sizing,
   ),
@@ -83,7 +86,8 @@ const List<GalleryEntry> geometryGalleryEntries = <GalleryEntry>[
     page: 'foundations/spacing-geometry',
     group: null,
     title: 'Elevation — the no-shadow law and its one exception',
-    description: 'Flat by default. --elevation-2 is the only legal shadow and '
+    description:
+        'Flat by default. --elevation-2 is the only legal shadow and '
         'is reserved for Dialog.',
     builder: _elevation,
   ),
@@ -108,68 +112,73 @@ const List<(String, double)> _spacingSteps = <(String, double)>[
 /// page gives it.
 const List<(String, String, double, String)> _spacingAliases =
     <(String, String, double, String)>[
-  (
-    '--card-padding',
-    '--space-6',
-    DabblerSpacing.cardPadding,
-    'padding inside a card',
-  ),
-  (
-    '--screen-gutter',
-    '--space-8',
-    DabblerSpacing.screenGutter,
-    'screen edge gutter',
-  ),
-  (
-    '--section-gap',
-    '--space-9',
-    DabblerSpacing.sectionGap,
-    'gap between sections',
-  ),
-  (
-    '--stack-default',
-    '--space-4',
-    DabblerSpacing.stackDefault,
-    'default vertical stack gap',
-  ),
-  ('--stack-tight', '--space-2', DabblerSpacing.stackTight, 'tight stack gap'),
-  ('--icon-gap', '--space-2', DabblerSpacing.iconGap, 'icon → label gap'),
-];
+      (
+        '--card-padding',
+        '--space-6',
+        DabblerSpacing.cardPadding,
+        'padding inside a card',
+      ),
+      (
+        '--screen-gutter',
+        '--space-8',
+        DabblerSpacing.screenGutter,
+        'screen edge gutter',
+      ),
+      (
+        '--section-gap',
+        '--space-9',
+        DabblerSpacing.sectionGap,
+        'gap between sections',
+      ),
+      (
+        '--stack-default',
+        '--space-4',
+        DabblerSpacing.stackDefault,
+        'default vertical stack gap',
+      ),
+      (
+        '--stack-tight',
+        '--space-2',
+        DabblerSpacing.stackTight,
+        'tight stack gap',
+      ),
+      ('--icon-gap', '--space-2', DabblerSpacing.iconGap, 'icon → label gap'),
+    ];
 
 Widget _spacing(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**Every dimension comes off a base-3 grid** — 3 · 6 · 9 · 12 · 15 · '
+      '18 · 21 · 24 · 30 · 36 · 48. *"Prefer 12 / 24 / 30 / 36 / 48 for '
+      'structural values"* (`measurements.html`): they are multiples of '
+      'both 3 and 4, so they line up with 24px icons and with platform '
+      'components. Each bar below is drawn at **its own value in logical '
+      'pixels**, the way the source page draws it — the bar IS the token.',
+    ),
+    GalleryGroup(
+      name: 'The scale',
+      wrap: false,
       children: <Widget>[
-        const GalleryUsage(
-          '**Every dimension comes off a base-3 grid** — 3 · 6 · 9 · 12 · 15 · '
-          '18 · 21 · 24 · 30 · 36 · 48. *"Prefer 12 / 24 / 30 / 36 / 48 for '
-          'structural values"* (`measurements.html`): they are multiples of '
-          'both 3 and 4, so they line up with 24px icons and with platform '
-          'components. Each bar below is drawn at **its own value in logical '
-          'pixels**, the way the source page draws it — the bar IS the token.',
-        ),
-        GalleryGroup(
-          name: 'The scale',
-          wrap: false,
-          children: <Widget>[
-            for (final (String token, double value) in _spacingSteps)
-              _ScaleRow(token: token, value: value),
-          ],
-        ),
-        const GalleryUsage(
-          '**Reach for the semantic alias when one exists** — it carries the '
-          'intent, and changing the alias changes every consumer. Each alias '
-          '**is** a step of the scale, never a new value.',
-        ),
-        GalleryGroup(
-          name: 'Semantic aliases',
-          wrap: false,
-          children: <Widget>[
-            for (final (String alias, String step, double value, String role)
-                in _spacingAliases)
-              _AliasRow(alias: alias, step: step, value: value, role: role),
-          ],
-        ),
+        for (final (String token, double value) in _spacingSteps)
+          _ScaleRow(token: token, value: value),
       ],
-    );
+    ),
+    const GalleryUsage(
+      '**Reach for the semantic alias when one exists** — it carries the '
+      'intent, and changing the alias changes every consumer. Each alias '
+      '**is** a step of the scale, never a new value.',
+    ),
+    GalleryGroup(
+      name: 'Semantic aliases',
+      wrap: false,
+      children: <Widget>[
+        for (final (String alias, String step, double value, String role)
+            in _spacingAliases)
+          _AliasRow(alias: alias, step: step, value: value, role: role),
+      ],
+    ),
+  ],
+);
 
 /// The radius ramp with the role `measurements.html` documents for each step.
 ///
@@ -194,108 +203,108 @@ const List<(String, double, String)> _radiusSteps = <(String, double, String)>[
 ];
 
 Widget _radius(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**Rounded and generous.** Seven steps: `sm` 6 · `md` 9 · `lg` 12 · '
+      '**`card` 16** · `xl` 18 · `xxl` 24 · `pill` 999. A component that '
+      'needs a corner picks the token whose *role* it matches rather than '
+      'a new value.',
+    ),
+    GalleryWrap(
       children: <Widget>[
-        const GalleryUsage(
-          '**Rounded and generous.** Seven steps: `sm` 6 · `md` 9 · `lg` 12 · '
-          '**`card` 16** · `xl` 18 · `xxl` 24 · `pill` 999. A component that '
-          'needs a corner picks the token whose *role* it matches rather than '
-          'a new value.',
-        ),
-        GalleryWrap(
-          children: <Widget>[
-            for (final (String name, double value, _) in _radiusSteps)
-              _RadiusTile(name: name, value: value),
-          ],
-        ),
-        GalleryGroup(
-          name: 'Documented application',
-          wrap: false,
-          children: <Widget>[
-            for (final (String name, double value, String role) in _radiusSteps)
-              _RadiusRow(name: name, value: value, role: role),
-          ],
-        ),
-        const GalleryUsage(
-          '**16 and 12 are two different corners, and this is the specimen '
-          'that has to show it.** `cxo` ruling **D-018**: all nine top-level '
-          'card shells in the design source draw `borderRadius: 16` and not '
-          'one draws 12, while `--radius-lg` (12) is the corner of a tile '
-          '*inside* a card. `CardHouse.jsx` draws both, in the same file — 16 '
-          'at `:9` for the shell and 12 at `:36` for the icon tile. Where a '
-          'comment and nine drawings disagree, the drawings are the design '
-          'system.',
-        ),
-        const GallerySpecimen(
-          label: 'card 16 outside, lg 12 inside — the nesting D-018 fixes',
-          child: _NestedCorners(),
-        ),
-        const GalleryUsage(
-          '**What the wrong version looks like** is the right-hand figure: a '
-          'well and its containing card sharing one corner value read as a '
-          'single surface, and the nesting disappears. That was a real bug, '
-          'not a theoretical one. `--radius-xl` (18) was considered instead of '
-          '16 — it is base-3 — and rejected, because 18 is the corner sheets '
-          'and modals draw and snapping the specimen\'s 16 onto it is a '
-          'visible change.',
-        ),
+        for (final (String name, double value, _) in _radiusSteps)
+          _RadiusTile(name: name, value: value),
       ],
-    );
+    ),
+    GalleryGroup(
+      name: 'Documented application',
+      wrap: false,
+      children: <Widget>[
+        for (final (String name, double value, String role) in _radiusSteps)
+          _RadiusRow(name: name, value: value, role: role),
+      ],
+    ),
+    const GalleryUsage(
+      '**16 and 12 are two different corners, and this is the specimen '
+      'that has to show it.** `cxo` ruling **D-018**: all nine top-level '
+      'card shells in the design source draw `borderRadius: 16` and not '
+      'one draws 12, while `--radius-lg` (12) is the corner of a tile '
+      '*inside* a card. `CardHouse.jsx` draws both, in the same file — 16 '
+      'at `:9` for the shell and 12 at `:36` for the icon tile. Where a '
+      'comment and nine drawings disagree, the drawings are the design '
+      'system.',
+    ),
+    const GallerySpecimen(
+      label: 'card 16 outside, lg 12 inside — the nesting D-018 fixes',
+      child: _NestedCorners(),
+    ),
+    const GalleryUsage(
+      '**What the wrong version looks like** is the right-hand figure: a '
+      'well and its containing card sharing one corner value read as a '
+      'single surface, and the nesting disappears. That was a real bug, '
+      'not a theoretical one. `--radius-xl` (18) was considered instead of '
+      '16 — it is base-3 — and rejected, because 18 is the corner sheets '
+      'and modals draw and snapping the specimen\'s 16 onto it is a '
+      'visible change.',
+    ),
+  ],
+);
 
 Widget _sizing(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**45×45 is the minimum interactive size** — base-3, and it clears '
+      'Apple\'s 44pt floor. *"Every interactive element clears 45px and '
+      'uses the shared focus ring and press scale — no component invents '
+      'its own"* (`measurements.html`).',
+    ),
+    const GalleryWrap(
       children: <Widget>[
-        const GalleryUsage(
-          '**45×45 is the minimum interactive size** — base-3, and it clears '
-          'Apple\'s 44pt floor. *"Every interactive element clears 45px and '
-          'uses the shared focus ring and press scale — no component invents '
-          'its own"* (`measurements.html`).',
-        ),
-        const GalleryWrap(
-          children: <Widget>[
-            GallerySpecimen(
-              label: '--touch-target-min · 45px',
-              child: _TouchTarget(),
-            ),
-          ],
-        ),
-        const GalleryUsage(
-          '**Every surface is an opaque fill plus a 1px solid hairline.** '
-          '`--border-default` is the standard line; `--border-hairline` (0.5) '
-          'is the sub-pixel form. Both are drawn below at their real '
-          'thickness, which is the only way to tell them apart.',
-        ),
-        GalleryWrap(
-          children: <Widget>[
-            for (final (String token, double width) in <(String, double)>[
-              ('--border-default', DabblerSizing.borderDefault),
-              ('--border-hairline', DabblerSizing.borderHairline),
-            ])
-              GallerySpecimen(
-                label: '$token · ${_trim(width)}px',
-                child: _StrokeSample(width: width),
-              ),
-          ],
-        ),
-        const GalleryUsage(
-          '**24px is the native Iconsax grid**, and the reason the structural '
-          'spacing values are multiples of 4 as well as 3. `Icon` and '
-          '`SportIcon` both default to 24. Avatar sizes are a component-level '
-          'scale documented with `Avatar`, not a global token.',
-        ),
-        GalleryWrap(
-          children: <Widget>[
-            for (final (String name, double size) in <(String, double)>[
-              ('--icon-sm', DabblerSizing.iconSm),
-              ('--icon-md', DabblerSizing.iconMd),
-              ('--icon-lg', DabblerSizing.iconLg),
-            ])
-              GallerySpecimen(
-                label: '$name · ${_trim(size)}',
-                child: _IconSquare(size: size),
-              ),
-          ],
+        GallerySpecimen(
+          label: '--touch-target-min · 45px',
+          child: _TouchTarget(),
         ),
       ],
-    );
+    ),
+    const GalleryUsage(
+      '**Every surface is an opaque fill plus a 1px solid hairline.** '
+      '`--border-default` is the standard line; `--border-hairline` (0.5) '
+      'is the sub-pixel form. Both are drawn below at their real '
+      'thickness, which is the only way to tell them apart.',
+    ),
+    GalleryWrap(
+      children: <Widget>[
+        for (final (String token, double width) in <(String, double)>[
+          ('--border-default', DabblerSizing.borderDefault),
+          ('--border-hairline', DabblerSizing.borderHairline),
+        ])
+          GallerySpecimen(
+            label: '$token · ${_trim(width)}px',
+            child: _StrokeSample(width: width),
+          ),
+      ],
+    ),
+    const GalleryUsage(
+      '**24px is the native Iconsax grid**, and the reason the structural '
+      'spacing values are multiples of 4 as well as 3. `Icon` and '
+      '`SportIcon` both default to 24. Avatar sizes are a component-level '
+      'scale documented with `Avatar`, not a global token.',
+    ),
+    GalleryWrap(
+      children: <Widget>[
+        for (final (String name, double size) in <(String, double)>[
+          ('--icon-sm', DabblerSizing.iconSm),
+          ('--icon-md', DabblerSizing.iconMd),
+          ('--icon-lg', DabblerSizing.iconLg),
+        ])
+          GallerySpecimen(
+            label: '$name · ${_trim(size)}',
+            child: _IconSquare(size: size),
+          ),
+      ],
+    ),
+  ],
+);
 
 Widget _elevation(BuildContext context) {
   final DabblerColors colors = DabblerColors.of(context);
@@ -404,10 +413,7 @@ class _AliasRow extends StatelessWidget {
         children: <Widget>[
           const SizedBox(width: 0),
           SizedBox(width: 132, child: GalleryMono(alias)),
-          SizedBox(
-            width: 132,
-            child: GalleryMono('$step · ${_trim(value)}px'),
-          ),
+          SizedBox(width: 132, child: GalleryMono('$step · ${_trim(value)}px')),
           Text(
             role,
             style: DabblerType.caption1
@@ -485,7 +491,8 @@ class _RadiusRow extends StatelessWidget {
             ),
             Expanded(
               child: Text(
-                addedByRuling ? '$role · not yet in spacing.css (KAN-261)'
+                addedByRuling
+                    ? '$role · not yet in spacing.css (KAN-261)'
                     : role,
                 style: DabblerType.caption1
                     .resolveForDirection(Directionality.of(context))
@@ -509,17 +516,17 @@ class _NestedCorners extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const GalleryWrap(
-        children: <Widget>[
-          GallerySpecimen(
-            label: 'CORRECT — shell 16, inner tile 12',
-            child: _CardWithTile(shell: DabblerRadius.card),
-          ),
-          GallerySpecimen(
-            label: 'WRONG — shell 12, inner tile 12',
-            child: _CardWithTile(shell: DabblerRadius.lg),
-          ),
-        ],
-      );
+    children: <Widget>[
+      GallerySpecimen(
+        label: 'CORRECT — shell 16, inner tile 12',
+        child: _CardWithTile(shell: DabblerRadius.card),
+      ),
+      GallerySpecimen(
+        label: 'WRONG — shell 12, inner tile 12',
+        child: _CardWithTile(shell: DabblerRadius.lg),
+      ),
+    ],
+  );
 }
 
 /// A card shell at [shell] with a sunken tile at [DabblerRadius.lg] inside it.
@@ -681,15 +688,15 @@ class _Panel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: 132,
-        height: 76,
-        decoration: BoxDecoration(
-          color: colors.surfaceCard,
-          border: Border.all(color: colors.borderDefault),
-          borderRadius: DabblerRadius.cardAll,
-          boxShadow: shadows,
-        ),
-      );
+    width: 132,
+    height: 76,
+    decoration: BoxDecoration(
+      color: colors.surfaceCard,
+      border: Border.all(color: colors.borderDefault),
+      borderRadius: DabblerRadius.cardAll,
+      boxShadow: shadows,
+    ),
+  );
 }
 
 /// `24.0` reads as `24`, `0.5` stays `0.5` — the source page prints integers.

@@ -152,55 +152,55 @@ void main() {
       }
     });
 
-    test('AC2 — every AC1 type is reachable and usable from this one import',
-        () {
-      // Tokens.
-      expect(DabblerPalette.paper, isA<Color>());
-      const DabblerTheme theme = DabblerTheme.main;
-      const DabblerStatusTone tone = DabblerStatusTone.success;
-      final DabblerColors colors = DabblerColors.resolve(
-        theme: theme,
-        brightness: Brightness.light,
-      );
-      expect(colors.status(tone), isA<DabblerStatusColor>());
-      expect(
-        const DabblerStatusColor(
-          base: DabblerPalette.paper,
-          surface: DabblerPalette.paper,
-          strong: DabblerPalette.paper,
-          solid: DabblerPalette.paper,
-        ),
-        isA<DabblerStatusColor>(),
-      );
-      expect(
-        const DabblerToneColor(
-          surface: DabblerPalette.paper,
-          ink: DabblerPalette.paper,
-        ),
-        isA<DabblerToneColor>(),
-      );
-      expect(dabblerNeutralStatus(colors), isA<DabblerStatusColor>());
+    test(
+      'AC2 — every AC1 type is reachable and usable from this one import',
+      () {
+        // Tokens.
+        expect(DabblerPalette.paper, isA<Color>());
+        const DabblerTheme theme = DabblerTheme.main;
+        const DabblerStatusTone tone = DabblerStatusTone.success;
+        final DabblerColors colors = DabblerColors.resolve(
+          theme: theme,
+          brightness: Brightness.light,
+        );
+        expect(colors.status(tone), isA<DabblerStatusColor>());
+        expect(
+          const DabblerStatusColor(
+            base: DabblerPalette.paper,
+            surface: DabblerPalette.paper,
+            strong: DabblerPalette.paper,
+            solid: DabblerPalette.paper,
+          ),
+          isA<DabblerStatusColor>(),
+        );
+        expect(
+          const DabblerToneColor(
+            surface: DabblerPalette.paper,
+            ink: DabblerPalette.paper,
+          ),
+          isA<DabblerToneColor>(),
+        );
+        expect(dabblerNeutralStatus(colors), isA<DabblerStatusColor>());
 
-      const DabblerTypeStyle style = DabblerType.body;
-      expect(style.role, isA<DabblerTypeRole>());
-      expect(
-        DabblerType.bareFamilyFor(style.role, DabblerTypeScript.arabic),
-        isA<String>(),
-      );
+        const DabblerTypeStyle style = DabblerType.body;
+        expect(style.role, isA<DabblerTypeRole>());
+        expect(
+          DabblerType.bareFamilyFor(style.role, DabblerTypeScript.arabic),
+          isA<String>(),
+        );
 
-      expect(DabblerSpacing.space4, isA<double>());
-      expect(DabblerRadius.mdAll, isA<BorderRadius>());
-      expect(DabblerSizing.touchTargetMin, isA<double>());
-      expect(
-        DabblerElevation.dialogFor(Brightness.light),
-        isA<List<BoxShadow>>(),
-      );
-      expect(DabblerMotion.fast, isA<Duration>());
+        expect(DabblerSpacing.space4, isA<double>());
+        expect(DabblerRadius.mdAll, isA<BorderRadius>());
+        expect(DabblerSizing.touchTargetMin, isA<double>());
+        expect(
+          DabblerElevation.dialogFor(Brightness.light),
+          isA<List<BoxShadow>>(),
+        );
+        expect(DabblerMotion.fast, isA<Duration>());
 
-      // Components — constructed, not merely named.
-      const Widget child = SizedBox.shrink();
-      expect(
-        const <Widget>[
+        // Components — constructed, not merely named.
+        const Widget child = SizedBox.shrink();
+        expect(const <Widget>[
           DabblerFocusRing.visible(visible: false, child: child),
           DabblerPressScale(pressed: false, child: child),
           DabblerScrim(child: child),
@@ -210,10 +210,9 @@ void main() {
           DabblerProgressBar(value: 0.5),
           DabblerSpinner(),
           DabblerSkeleton.text(),
-        ],
-        hasLength(9),
-      );
-    });
+        ], hasLength(9));
+      },
+    );
 
     test('exports no file twice and no part file', () {
       final List<String> paths = _exportPaths(barrel);
@@ -293,12 +292,14 @@ List<String> _exportPaths(File barrel) => _exportDirective
 /// The barrel's export directives, keyed by the exported path.
 Map<String, _ExportClause> _parseExports(File barrel) {
   final Map<String, _ExportClause> exports = <String, _ExportClause>{};
-  for (final RegExpMatch match
-      in _exportDirective.allMatches(barrel.readAsStringSync())) {
+  for (final RegExpMatch match in _exportDirective.allMatches(
+    barrel.readAsStringSync(),
+  )) {
     final String combinators = match.group(2) ?? '';
     exports[match.group(1)!] = _ExportClause(
       shown: _names(_showClause.firstMatch(combinators)?.group(1)),
-      hidden: _names(_hideClause.firstMatch(combinators)?.group(1)) ??
+      hidden:
+          _names(_hideClause.firstMatch(combinators)?.group(1)) ??
           const <String>{},
     );
   }
@@ -334,10 +335,11 @@ List<_Declaration> _scanSource(Directory packageRoot) {
   final Directory source = Directory('${packageRoot.path}/lib/src');
   final List<_Declaration> declarations = <_Declaration>[];
 
-  for (final File file in source
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((File f) => f.path.endsWith('.dart'))) {
+  for (final File file
+      in source
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((File f) => f.path.endsWith('.dart'))) {
     final String contents = file.readAsStringSync();
     final String relative = file.path
         .substring('${packageRoot.path}/lib/'.length)
@@ -356,7 +358,8 @@ List<_Declaration> _scanSource(Directory packageRoot) {
       if (line.startsWith('///') || line.trimLeft().startsWith('//')) {
         continue;
       }
-      final String? name = _declaration.firstMatch(line)?.group(1) ??
+      final String? name =
+          _declaration.firstMatch(line)?.group(1) ??
           _function.firstMatch(line)?.group(1);
       if (name == null || name.startsWith('_')) {
         continue;
@@ -364,7 +367,9 @@ List<_Declaration> _scanSource(Directory packageRoot) {
       declarations.add(_Declaration(name, owner, relative, i + 1));
     }
   }
-  declarations.sort((_Declaration a, _Declaration b) => a.name.compareTo(b.name));
+  declarations.sort(
+    (_Declaration a, _Declaration b) => a.name.compareTo(b.name),
+  );
   return declarations;
 }
 

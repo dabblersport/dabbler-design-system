@@ -36,11 +36,17 @@ The open-post detail line: the full timestamp, the edited marker and the visibil
 
 @specimen post-row/detail
 
+The open post, `DabblerOpenPost`: the post a detail screen is about, laid out as in `Post.dc.html` lines 58-126 — the author header with a Follow pill, the body at reading size, a sport pill and a place pill, the time, date and views line with the audience at the end, and the like, vibe, reply and share row.
+
+@specimen post-row/open
+
 A repost, `DabblerRepostRow`: the reposter's header and reposted line, an optional quote, and the original post embedded in a card, or a note when the original is unavailable.
 
 @specimen post-row/repost
 
 ## Using it
+
+**An open post is its own component.** Give `DabblerOpenPost` the facts as strings and counts, pass `followLabel` to show the Follow pill, and own the like and vibe states. Every pill and line is omitted when its text is null.
 
 **Give it the post's facts, already formatted.** Name, time, place and distance are strings; likes and replies are integers, drawn with Western digits in either direction.
 

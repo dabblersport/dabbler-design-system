@@ -19,11 +19,7 @@ void main() {
     await tester.pumpWidget(threadHost(DabblerReplyComposer(onSend: sent.add)));
     expect(
       tester.getSemantics(_send()),
-      isSemantics(
-        isButton: true,
-        hasEnabledState: true,
-        isEnabled: false,
-      ),
+      isSemantics(isButton: true, hasEnabledState: true, isEnabled: false),
     );
     await tester.tap(_send());
     expect(sent, isEmpty);

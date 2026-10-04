@@ -31,14 +31,15 @@ DabblerColors _colorsAt(WidgetTester tester, Finder finder) =>
 /// helper silently returned an empty set for that entry. The band is part of
 /// the chrome and is therefore always there.
 Set<Color?> _paintedFills(WidgetTester tester) => <Color?>{
-      for (final Element element in find
+  for (final Element element
+      in find
           .descendant(
             of: find.byType(GalleryGroup),
             matching: find.byType(DecoratedBox),
           )
           .evaluate())
-        ((element.widget as DecoratedBox).decoration as BoxDecoration).color,
-    };
+    ((element.widget as DecoratedBox).decoration as BoxDecoration).color,
+};
 
 /// Opens the first catalogue entry for the component named [component],
 /// scrolling the catalogue to reach it.
@@ -54,7 +55,8 @@ Future<void> _openEntry(WidgetTester tester, String component) async {
   final Finder tile = find
       .byWidgetPredicate(
         (Widget w) =>
-            w is GalleryIndexTile && w.entry.title.split(' — ').first == component,
+            w is GalleryIndexTile &&
+            w.entry.title.split(' — ').first == component,
       )
       .first;
   await tester.scrollUntilVisible(tile, 200);
@@ -84,9 +86,9 @@ Future<void> _openSpecimen(WidgetTester tester, String component) async {
   Navigator.of(tester.element(find.byType(GalleryHomeScreen))).push(
     PageRouteBuilder<void>(
       transitionDuration: Duration.zero,
-      pageBuilder: (BuildContext context, Animation<double> a,
-              Animation<double> b) =>
-          GalleryEntryScreen(entry: entry),
+      pageBuilder:
+          (BuildContext context, Animation<double> a, Animation<double> b) =>
+              GalleryEntryScreen(entry: entry),
     ),
   );
   await tester.pump();
@@ -131,37 +133,43 @@ void main() {
     );
   });
 
-  testWidgets('switching theme changes what a rendered component paints (AC8)',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
-    await tester.pumpAndSettle();
-    await _openSpecimen(tester, 'Button');
+  testWidgets(
+    'switching theme changes what a rendered component paints (AC8)',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
+      await tester.pumpAndSettle();
+      await _openSpecimen(tester, 'Button');
 
-    Color brandOf(DabblerTheme theme) => DabblerColors.resolve(
-          theme: theme,
-          brightness: Brightness.light,
-        ).brandPrimary;
+      Color brandOf(DabblerTheme theme) => DabblerColors.resolve(
+        theme: theme,
+        brightness: Brightness.light,
+      ).brandPrimary;
 
-    expect(
-      _paintedFills(tester),
-      contains(brandOf(DabblerTheme.main)),
-      reason: 'the primary button paints --color-brand-primary of the theme',
-    );
-    expect(_paintedFills(tester), isNot(contains(brandOf(DabblerTheme.sport))));
+      expect(
+        _paintedFills(tester),
+        contains(brandOf(DabblerTheme.main)),
+        reason: 'the primary button paints --color-brand-primary of the theme',
+      );
+      expect(
+        _paintedFills(tester),
+        isNot(contains(brandOf(DabblerTheme.sport))),
+      );
 
-    await _choose(tester, 'Main', 'Sport');
+      await _choose(tester, 'Main', 'Sport');
 
-    expect(
-      _paintedFills(tester),
-      contains(brandOf(DabblerTheme.sport)),
-      reason: 'AC8 — the specimen must actually repaint, not merely be told to',
-    );
-    expect(
-      _paintedFills(tester),
-      isNot(contains(brandOf(DabblerTheme.main))),
-      reason: 'the old theme\'s brand must be gone from the paint',
-    );
-  });
+      expect(
+        _paintedFills(tester),
+        contains(brandOf(DabblerTheme.sport)),
+        reason:
+            'AC8 — the specimen must actually repaint, not merely be told to',
+      );
+      expect(
+        _paintedFills(tester),
+        isNot(contains(brandOf(DabblerTheme.main))),
+        reason: 'the old theme\'s brand must be gone from the paint',
+      );
+    },
+  );
 
   testWidgets('choosing a theme changes the colours components render with', (
     WidgetTester tester,
@@ -170,10 +178,13 @@ void main() {
     await tester.pumpAndSettle();
 
     final Finder screen = find.byType(GalleryHomeScreen);
-    expect(_colorsAt(tester, screen).brandPrimary,
-        DabblerColors.resolve(theme: DabblerTheme.main,
-                brightness: Brightness.light)
-            .brandPrimary);
+    expect(
+      _colorsAt(tester, screen).brandPrimary,
+      DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      ).brandPrimary,
+    );
 
     await _choose(tester, 'Main', 'Sport');
 
@@ -214,8 +225,9 @@ void main() {
     );
   });
 
-  testWidgets('the choice survives opening a component and coming back (AC9)',
-      (WidgetTester tester) async {
+  testWidgets('the choice survives opening a component and coming back (AC9)', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const GalleryApp(entries: galleryEntries));
     await tester.pumpAndSettle();
 

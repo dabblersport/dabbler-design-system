@@ -23,11 +23,17 @@ void main() {
       expect(find.bySemanticsLabel(RegExp('^Like')), findsNothing);
     });
 
-    testWidgets('showLike defaults to true ($dir)', (WidgetTester tester) async {
+    testWidgets('showLike defaults to true ($dir)', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
         threadHost(
-          const DabblerCommentRow(name: 'Karim', time: '1h', body: 'Count me in'),
+          const DabblerCommentRow(
+            name: 'Karim',
+            time: '1h',
+            body: 'Count me in',
+          ),
           direction: dir,
         ),
       );

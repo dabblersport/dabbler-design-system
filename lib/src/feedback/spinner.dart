@@ -29,10 +29,10 @@ enum DabblerSpinnerSize {
   /// `SIZES = { sm: 18, md: 24, lg: 30 }` in `Spinner.jsx`, which is
   /// [DabblerSizing.iconSm], [DabblerSizing.iconMd] and [DabblerSizing.iconLg].
   double get diameter => switch (this) {
-        DabblerSpinnerSize.sm => DabblerSizing.iconSm,
-        DabblerSpinnerSize.md => DabblerSizing.iconMd,
-        DabblerSpinnerSize.lg => DabblerSizing.iconLg,
-      };
+    DabblerSpinnerSize.sm => DabblerSizing.iconSm,
+    DabblerSpinnerSize.md => DabblerSizing.iconMd,
+    DabblerSpinnerSize.lg => DabblerSizing.iconLg,
+  };
 }
 
 /// Where [DabblerSpinner] takes its indicator colour from.
@@ -196,14 +196,15 @@ class _DabblerSpinnerState extends State<DabblerSpinner>
 
   /// The indicator colour for [DabblerSpinner.tone].
   Color _indicator(BuildContext context) => switch (widget.tone) {
-        DabblerSpinnerTone.brand => DabblerColors.of(context).brandPrimary,
-        DabblerSpinnerTone.onBrand => DabblerColors.of(context).onBrand,
-        // `currentColor`. IconTheme first — a spinner standing in for an icon
-        // should match that icon — then the ambient text colour.
-        DabblerSpinnerTone.inherit => IconTheme.of(context).color ??
-            DefaultTextStyle.of(context).style.color ??
-            DabblerColors.of(context).textPrimary,
-      };
+    DabblerSpinnerTone.brand => DabblerColors.of(context).brandPrimary,
+    DabblerSpinnerTone.onBrand => DabblerColors.of(context).onBrand,
+    // `currentColor`. IconTheme first — a spinner standing in for an icon
+    // should match that icon — then the ambient text colour.
+    DabblerSpinnerTone.inherit =>
+      IconTheme.of(context).color ??
+          DefaultTextStyle.of(context).style.color ??
+          DabblerColors.of(context).textPrimary,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +260,6 @@ class _DabblerSpinnerState extends State<DabblerSpinner>
     );
   }
 }
-
 
 /// Paints the track circle and the indicator arc, both inset by half the stroke
 /// so the ring sits entirely inside the size's box — the source's

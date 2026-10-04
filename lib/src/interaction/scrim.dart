@@ -127,7 +127,10 @@ class DabblerScrim extends StatelessWidget {
     }
     return Stack(
       fit: StackFit.passthrough,
-      children: <Widget>[Positioned.fill(child: faded), child!],
+      children: <Widget>[
+        Positioned.fill(child: faded),
+        child!,
+      ],
     );
   }
 }

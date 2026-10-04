@@ -38,21 +38,25 @@ void main() {
       expect(DabblerMiniPlayer.glyphSize, 18);
       expect(DabblerMiniPlayer.captionWeight, FontWeight.w600);
       final DabblerColors c = _c();
-      expect(DabblerMiniPlayer.toneColor(c, DabblerMiniPlayerTone.brand),
-          c.brandPrimary);
-      expect(DabblerMiniPlayer.toneColor(c, DabblerMiniPlayerTone.muted),
-          c.textSecondary);
-      expect(DabblerMiniPlayer.toneColor(c, DabblerMiniPlayerTone.accent),
-          c.accent);
+      expect(
+        DabblerMiniPlayer.toneColor(c, DabblerMiniPlayerTone.brand),
+        c.brandPrimary,
+      );
+      expect(
+        DabblerMiniPlayer.toneColor(c, DabblerMiniPlayerTone.muted),
+        c.textSecondary,
+      );
+      expect(
+        DabblerMiniPlayer.toneColor(c, DabblerMiniPlayerTone.accent),
+        c.accent,
+      );
     });
 
     testWidgets('the caption is caption-1 12 at weight 600 on one line', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(
-          const DabblerMiniPlayer(caption: 'Design room · 134 listening'),
-        ),
+        _host(const DabblerMiniPlayer(caption: 'Design room · 134 listening')),
       );
       final Text t = tester.widget<Text>(find.textContaining('Design room'));
       expect(t.style!.fontSize, 12);
@@ -60,39 +64,49 @@ void main() {
       expect(t.maxLines, 1);
     });
 
-    testWidgets('actions are icons at 18, the tap area is 45, and onTap fires',
-        (WidgetTester tester) async {
-      final SemanticsHandle h = tester.ensureSemantics();
-      int liked = 0;
-      await tester.pumpWidget(
-        _host(
-          DabblerMiniPlayer(
-            caption: 'c',
-            actions: <DabblerMiniPlayerAction>[
-              DabblerMiniPlayerAction(
-                icon: 'heart',
-                label: 'Like',
-                weight: DabblerIconWeight.bold,
-                tone: DabblerMiniPlayerTone.accent,
-                onTap: () => liked++,
-              ),
-              const DabblerMiniPlayerAction(icon: 'sms', label: 'Chat'),
-            ],
+    testWidgets(
+      'actions are icons at 18, the tap area is 45, and onTap fires',
+      (WidgetTester tester) async {
+        final SemanticsHandle h = tester.ensureSemantics();
+        int liked = 0;
+        await tester.pumpWidget(
+          _host(
+            DabblerMiniPlayer(
+              caption: 'c',
+              actions: <DabblerMiniPlayerAction>[
+                DabblerMiniPlayerAction(
+                  icon: 'heart',
+                  label: 'Like',
+                  weight: DabblerIconWeight.bold,
+                  tone: DabblerMiniPlayerTone.accent,
+                  onTap: () => liked++,
+                ),
+                const DabblerMiniPlayerAction(icon: 'sms', label: 'Chat'),
+              ],
+            ),
           ),
-        ),
-      );
-      expect(tester.getSize(find.byType(DabblerIcon).first), const Size(18, 18));
-      expect(tester.getSize(find.bySemanticsLabel('Like')).width,
-          greaterThanOrEqualTo(45));
-      await tester.tap(find.bySemanticsLabel('Like'));
-      expect(liked, 1);
-      final SemanticsNode chat = tester.getSemantics(
-        find.bySemanticsLabel('Chat'),
-      );
-      expect(chat.flagsCollection.isButton, isFalse,
-          reason: 'no onTap: decorative');
-      h.dispose();
-    });
+        );
+        expect(
+          tester.getSize(find.byType(DabblerIcon).first),
+          const Size(18, 18),
+        );
+        expect(
+          tester.getSize(find.bySemanticsLabel('Like')).width,
+          greaterThanOrEqualTo(45),
+        );
+        await tester.tap(find.bySemanticsLabel('Like'));
+        expect(liked, 1);
+        final SemanticsNode chat = tester.getSemantics(
+          find.bySemanticsLabel('Chat'),
+        );
+        expect(
+          chat.flagsCollection.isButton,
+          isFalse,
+          reason: 'no onTap: decorative',
+        );
+        h.dispose();
+      },
+    );
 
     testWidgets('avatars overlap by 6 (step 22 on 28)', (
       WidgetTester tester,
@@ -153,10 +167,14 @@ void main() {
 
     test('badge fills', () {
       final DabblerColors c = _c();
-      expect(DabblerSpeakerGrid.badgeFillFor(c, DabblerSpeakerBadge.speaking),
-          c.brandPrimary);
-      expect(DabblerSpeakerGrid.badgeFillFor(c, DabblerSpeakerBadge.invite),
-          DabblerPalette.activeP600);
+      expect(
+        DabblerSpeakerGrid.badgeFillFor(c, DabblerSpeakerBadge.speaking),
+        c.brandPrimary,
+      );
+      expect(
+        DabblerSpeakerGrid.badgeFillFor(c, DabblerSpeakerBadge.invite),
+        DabblerPalette.activeP600,
+      );
       expect(DabblerSpeakerGrid.badgeFillFor(c, DabblerSpeakerBadge.none).a, 0);
     });
 
@@ -185,13 +203,17 @@ void main() {
           ),
         ),
       );
-      expect(tester.getSize(find.byType(DabblerSpeakerGrid)).height,
-          3 * 88 + 2 * 16);
+      expect(
+        tester.getSize(find.byType(DabblerSpeakerGrid)).height,
+        3 * 88 + 2 * 16,
+      );
       final double a = tester.getCenter(find.text('Alen')).dx;
       final double m = tester.getCenter(find.text('Maya')).dx;
       expect(m - a, 96 + 16);
-      expect(tester.getTopLeft(find.text('Josh')).dy,
-          greaterThan(tester.getTopLeft(find.text('Alen')).dy));
+      expect(
+        tester.getTopLeft(find.text('Josh')).dy,
+        greaterThan(tester.getTopLeft(find.text('Alen')).dy),
+      );
     });
 
     testWidgets('names are caption-1 12 at 600; avatars are the 64 size', (
@@ -201,8 +223,10 @@ void main() {
       final Text t = tester.widget<Text>(find.text('Alen'));
       expect(t.style!.fontSize, 12);
       expect(t.style!.fontWeight, FontWeight.w600);
-      expect(tester.getSize(find.byType(DabblerAvatar).first),
-          const Size(64, 64));
+      expect(
+        tester.getSize(find.byType(DabblerAvatar).first),
+        const Size(64, 64),
+      );
     });
 
     testWidgets('a speaking cell is announced as speaking', (

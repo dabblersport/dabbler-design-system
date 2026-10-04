@@ -129,10 +129,7 @@ class _DabblerRadioState extends State<DabblerRadio> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: DabblerRadio.ringColorFor(
-              colors,
-              selected: widget.selected,
-            ),
+            color: DabblerRadio.ringColorFor(colors, selected: widget.selected),
             width: DabblerRadio.ringWidthFor(selected: widget.selected),
           ),
         ),
@@ -194,8 +191,9 @@ class _DabblerRadioState extends State<DabblerRadio> {
               },
             ),
           },
-          mouseCursor:
-              _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+          mouseCursor: _enabled
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _enabled ? _select : null,

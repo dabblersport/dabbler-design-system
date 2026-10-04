@@ -122,6 +122,7 @@ class DabblerChip extends StatefulWidget {
     this.onRemove,
     this.removeSemanticLabel,
     this.vibe,
+    this.count,
   });
 
   /// The chip text. `label: string` in `Chip.d.ts`.
@@ -169,6 +170,10 @@ class DabblerChip extends StatefulWidget {
   /// selected, with the label (and icon) in [DabblerVibeColors.ink] in both
   /// states. Resolved through [DabblerVibe.resolve]; no new colour values.
   final DabblerVibe? vibe;
+
+  /// A small count pill after the label (`Notifications.dc.html:58`), already
+  /// localised. Omitted when null.
+  final String? count;
 
   /// The trailing remove glyph — `close-circle`, the same glyph
   /// `DabblerTextField`'s inline clear uses.
@@ -318,6 +323,35 @@ class _DabblerChipState extends State<DabblerChip> {
             softWrap: false,
           ),
         ),
+        if (widget.count != null) ...<Widget>[
+          const SizedBox(width: DabblerChip.iconGap),
+          ExcludeSemantics(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: widget.selected
+                    ? colors.onBrand.withValues(alpha: 0.22)
+                    : colors.surfaceSunken,
+                borderRadius: DabblerRadius.pillAll,
+              ),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: DabblerSpacing.space2,
+                ),
+                child: Text(
+                  DabblerType.toWesternDigits(widget.count!),
+                  style: DabblerType.caption1
+                      .resolveForDirection(direction)
+                      .copyWith(
+                        fontWeight: DabblerType.semibold,
+                        color: widget.selected
+                            ? colors.onBrand
+                            : colors.textSecondary,
+                      ),
+                ),
+              ),
+            ),
+          ),
+        ],
         if (removable)
           Semantics(
             container: true,

@@ -398,10 +398,7 @@ class _DabblerDialogState extends State<DabblerDialog> {
     // While an action is loading the system back is refused too — in the
     // [showDabblerDialog] route this blocks the route's own pop; inline, it
     // keeps back from leaving the host page mid-request.
-    return PopScope(
-      canPop: !_busy,
-      child: _stack(trapped),
-    );
+    return PopScope(canPop: !_busy, child: _stack(trapped));
   }
 
   Widget _stack(Widget trapped) {

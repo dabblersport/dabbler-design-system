@@ -97,15 +97,16 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _host(
-          DabblerAccordion(items: _items, value: 'a', onChanged: (_) {}),
-        ),
+        _host(DabblerAccordion(items: _items, value: 'a', onChanged: (_) {})),
       );
       expect(find.text('body-a'), findsOneWidget);
       await tester.tap(find.text('Rules'));
       await tester.pumpAndSettle();
-      expect(find.text('body-b'), findsNothing,
-          reason: 'a controlled accordion waits for its parent');
+      expect(
+        find.text('body-b'),
+        findsNothing,
+        reason: 'a controlled accordion waits for its parent',
+      );
     });
 
     testWidgets('card variant and RTL both render', (

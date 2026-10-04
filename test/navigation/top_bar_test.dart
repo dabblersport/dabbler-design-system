@@ -23,8 +23,7 @@ const List<DabblerNavigationAction> _actions = <DabblerNavigationAction>[
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 Widget _host(
   Widget child, {
@@ -55,19 +54,22 @@ Widget _host(
 }
 
 List<Element> _hitBoxes(WidgetTester tester) => tester
-    .elementList(find.descendant(
-      of: find.byType(DabblerNavigationTopBar),
-      matching: find.byWidgetPredicate(
-        (Widget w) =>
-            w is GestureDetector && w.behavior == HitTestBehavior.opaque,
+    .elementList(
+      find.descendant(
+        of: find.byType(DabblerNavigationTopBar),
+        matching: find.byWidgetPredicate(
+          (Widget w) =>
+              w is GestureDetector && w.behavior == HitTestBehavior.opaque,
+        ),
       ),
-    ))
+    )
     .toList();
 
 void main() {
   group('anatomy transcribed from the export', () {
-    testWidgets('the wordmark leads and the avatar trails',
-        (WidgetTester tester) async {
+    testWidgets('the wordmark leads and the avatar trails', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationTopBar(actions: _actions)),
       );
@@ -80,8 +82,9 @@ void main() {
       );
     });
 
-    testWidgets('the wordmark is the export box, 100 x 19',
-        (WidgetTester tester) async {
+    testWidgets('the wordmark is the export box, 100 x 19', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationTopBar()));
       expect(
         tester.getSize(find.byType(DabblerWordmark)),
@@ -89,8 +92,9 @@ void main() {
       );
     });
 
-    testWidgets('the wordmark path fills its own 100 x 19 box',
-        (WidgetTester tester) async {
+    testWidgets('the wordmark path fills its own 100 x 19 box', (
+      WidgetTester tester,
+    ) async {
       final ui.Path path = DabblerWordmark.buildPath();
       final Rect bounds = path.getBounds();
       // The export's leftmost glyph starts at x 0 and its tallest at y 0;
@@ -102,15 +106,17 @@ void main() {
       expect(path.fillType, PathFillType.evenOdd);
     });
 
-    testWidgets('the wordmark takes the section brand',
-        (WidgetTester tester) async {
+    testWidgets('the wordmark takes the section brand', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in <DabblerTheme>[
         DabblerTheme.main,
         DabblerTheme.social,
       ]) {
         await tester.pumpWidget(const SizedBox());
-        await tester
-            .pumpWidget(_host(const DabblerNavigationTopBar(), theme: theme));
+        await tester.pumpWidget(
+          _host(const DabblerNavigationTopBar(), theme: theme),
+        );
         expect(
           tester.widget<DabblerWordmark>(find.byType(DabblerWordmark)).color,
           _colors(theme: theme).brandPrimary,
@@ -118,39 +124,51 @@ void main() {
       }
     });
 
-    testWidgets('the avatar defaults to the export seed and is 36',
-        (WidgetTester tester) async {
+    testWidgets('the avatar defaults to the export seed and is 36', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationTopBar()));
-      final DabblerAvatar avatar =
-          tester.widget<DabblerAvatar>(find.byType(DabblerAvatar));
+      final DabblerAvatar avatar = tester.widget<DabblerAvatar>(
+        find.byType(DabblerAvatar),
+      );
       expect(avatar.seed, DabblerNavigationTopBar.defaultAvatarSeed);
       expect(avatar.size, DabblerAvatarSize.sm);
       expect(avatar.size.diameter, 36);
     });
 
-    testWidgets('a `leading` slot replaces the wordmark',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerNavigationTopBar(leading: Text('Dabbler')),
-      ));
+    testWidgets('a `leading` slot replaces the wordmark', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const DabblerNavigationTopBar(leading: Text('Dabbler'))),
+      );
       expect(find.byType(DabblerWordmark), findsNothing);
       expect(find.text('Dabbler'), findsOneWidget);
     });
   });
 
   group('AC1 — touch targets, measured', () {
-    testWidgets('each trailing action is the ruled 34x45 box — D-032',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(DabblerNavigationTopBar(
-        actions: <DabblerNavigationAction>[
-          DabblerNavigationAction(
-              icon: 'sms', label: 'Messages', onPressed: () {}),
-          DabblerNavigationAction(
-              icon: 'notification-bing',
-              label: 'Notifications',
-              onPressed: () {}),
-        ],
-      )));
+    testWidgets('each trailing action is the ruled 34x45 box — D-032', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          DabblerNavigationTopBar(
+            actions: <DabblerNavigationAction>[
+              DabblerNavigationAction(
+                icon: 'sms',
+                label: 'Messages',
+                onPressed: () {},
+              ),
+              DabblerNavigationAction(
+                icon: 'notification-bing',
+                label: 'Notifications',
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ),
+      );
 
       final List<Element> boxes = _hitBoxes(tester);
       expect(boxes.length, 2);
@@ -173,33 +191,34 @@ void main() {
       }
     });
 
-    testWidgets('a tappable avatar gets a target too, while still painting 36',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(DabblerNavigationTopBar(
-        onAvatarPressed: () {},
-      )));
+    testWidgets(
+      'a tappable avatar gets a target too, while still painting 36',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(DabblerNavigationTopBar(onAvatarPressed: () {})),
+        );
 
-      final List<Element> boxes = _hitBoxes(tester);
-      expect(boxes.length, 1);
-      final Size target = tester.getSize(
-        find.byElementPredicate((Element e) => identical(e, boxes.single)),
-      );
-      expect(target.width, greaterThanOrEqualTo(kTargetFloor));
-      expect(target.height, greaterThanOrEqualTo(kTargetFloor));
-      expect(
-        tester.getSize(find.byType(DabblerAvatar)),
-        const Size(36, 36),
-      );
-    });
+        final List<Element> boxes = _hitBoxes(tester);
+        expect(boxes.length, 1);
+        final Size target = tester.getSize(
+          find.byElementPredicate((Element e) => identical(e, boxes.single)),
+        );
+        expect(target.width, greaterThanOrEqualTo(kTargetFloor));
+        expect(target.height, greaterThanOrEqualTo(kTargetFloor));
+        expect(tester.getSize(find.byType(DabblerAvatar)), const Size(36, 36));
+      },
+    );
 
-    testWidgets('a decorative avatar is no target at all',
-        (WidgetTester tester) async {
+    testWidgets('a decorative avatar is no target at all', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerNavigationTopBar()));
       expect(_hitBoxes(tester), isEmpty);
     });
 
-    testWidgets('the bar is at least the export height',
-        (WidgetTester tester) async {
+    testWidgets('the bar is at least the export height', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationTopBar(actions: _actions)),
       );
@@ -211,15 +230,19 @@ void main() {
   });
 
   group('AC1 — DS-300 icons and DS-200 focus/press', () {
-    testWidgets('every glyph is the drawn 22 and linear by default',
-        (WidgetTester tester) async {
+    testWidgets('every glyph is the drawn 22 and linear by default', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationTopBar(actions: _actions)),
       );
-      final List<DabblerIcon> icons =
-          tester.widgetList<DabblerIcon>(find.byType(DabblerIcon)).toList();
-      expect(icons.map((DabblerIcon i) => i.name),
-          <String>['sms', 'notification-bing']);
+      final List<DabblerIcon> icons = tester
+          .widgetList<DabblerIcon>(find.byType(DabblerIcon))
+          .toList();
+      expect(icons.map((DabblerIcon i) => i.name), <String>[
+        'sms',
+        'notification-bing',
+      ]);
       for (final DabblerIcon icon in icons) {
         // `size={22}` (`NavigationTopBar.jsx:139,160`) — OFF the 18/24/30 icon
         // ramp, transcribed literally. This test previously asserted
@@ -231,34 +254,41 @@ void main() {
       }
     });
 
-    testWidgets('an action can ask for the bold weight',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerNavigationTopBar(
-        actions: <DabblerNavigationAction>[
-          DabblerNavigationAction(
-            icon: 'notification-bing',
-            label: 'Notifications',
-            weight: DabblerIconWeight.bold,
+    testWidgets('an action can ask for the bold weight', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerNavigationTopBar(
+            actions: <DabblerNavigationAction>[
+              DabblerNavigationAction(
+                icon: 'notification-bing',
+                label: 'Notifications',
+                weight: DabblerIconWeight.bold,
+              ),
+            ],
           ),
-        ],
-      )));
+        ),
+      );
       expect(
         tester.widget<DabblerIcon>(find.byType(DabblerIcon)).weight,
         DabblerIconWeight.bold,
       );
     });
 
-    testWidgets('every action carries the shared focus ring',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(DabblerNavigationTopBar(
-        actions: _actions,
-        onAvatarPressed: () {},
-      )));
+    testWidgets('every action carries the shared focus ring', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          DabblerNavigationTopBar(actions: _actions, onAvatarPressed: () {}),
+        ),
+      );
       // two actions + the tappable avatar
       expect(find.byType(DabblerFocusRing), findsNWidgets(3));
-      for (final DabblerFocusRing ring
-          in tester.widgetList<DabblerFocusRing>(
-              find.byType(DabblerFocusRing))) {
+      for (final DabblerFocusRing ring in tester.widgetList<DabblerFocusRing>(
+        find.byType(DabblerFocusRing),
+      )) {
         expect(ring.width, DabblerFocusRing.ringWidth);
         expect(ring.offset, DabblerFocusRing.ringOffset);
       }
@@ -266,16 +296,20 @@ void main() {
 
     testWidgets('tapping an action fires it', (WidgetTester tester) async {
       final List<String> taps = <String>[];
-      await tester.pumpWidget(_host(DabblerNavigationTopBar(
-        actions: <DabblerNavigationAction>[
-          DabblerNavigationAction(
-            icon: 'sms',
-            label: 'Messages',
-            onPressed: () => taps.add('sms'),
+      await tester.pumpWidget(
+        _host(
+          DabblerNavigationTopBar(
+            actions: <DabblerNavigationAction>[
+              DabblerNavigationAction(
+                icon: 'sms',
+                label: 'Messages',
+                onPressed: () => taps.add('sms'),
+              ),
+            ],
+            onAvatarPressed: () => taps.add('avatar'),
           ),
-        ],
-        onAvatarPressed: () => taps.add('avatar'),
-      )));
+        ),
+      );
 
       await tester.tap(find.byType(DabblerIcon));
       await tester.tap(find.byType(DabblerAvatar));
@@ -295,14 +329,17 @@ void main() {
   });
 
   group('RTL', () {
-    testWidgets('the wordmark and the trailing group swap sides',
-        (WidgetTester tester) async {
+    testWidgets('the wordmark and the trailing group swap sides', (
+      WidgetTester tester,
+    ) async {
       Future<bool> wordmarkLeadsAvatar(TextDirection direction) async {
         await tester.pumpWidget(const SizedBox());
-        await tester.pumpWidget(_host(
-          const DabblerNavigationTopBar(actions: _actions),
-          direction: direction,
-        ));
+        await tester.pumpWidget(
+          _host(
+            const DabblerNavigationTopBar(actions: _actions),
+            direction: direction,
+          ),
+        );
         return tester.getRect(find.byType(DabblerWordmark)).center.dx <
             tester.getRect(find.byType(DabblerAvatar)).center.dx;
       }
@@ -311,24 +348,31 @@ void main() {
       expect(await wordmarkLeadsAvatar(TextDirection.rtl), isFalse);
     });
 
-    testWidgets('the actions keep their own order within the trailing group',
-        (WidgetTester tester) async {
+    testWidgets('the actions keep their own order within the trailing group', (
+      WidgetTester tester,
+    ) async {
       Future<bool> smsBeforeBell(TextDirection direction) async {
         await tester.pumpWidget(const SizedBox());
-        await tester.pumpWidget(_host(
-          const DabblerNavigationTopBar(actions: _actions),
-          direction: direction,
-        ));
+        await tester.pumpWidget(
+          _host(
+            const DabblerNavigationTopBar(actions: _actions),
+            direction: direction,
+          ),
+        );
         final double sms = tester
-            .getRect(find.byWidgetPredicate(
-              (Widget w) => w is DabblerIcon && w.name == 'sms',
-            ))
+            .getRect(
+              find.byWidgetPredicate(
+                (Widget w) => w is DabblerIcon && w.name == 'sms',
+              ),
+            )
             .center
             .dx;
         final double bell = tester
-            .getRect(find.byWidgetPredicate(
-              (Widget w) => w is DabblerIcon && w.name == 'notification-bing',
-            ))
+            .getRect(
+              find.byWidgetPredicate(
+                (Widget w) => w is DabblerIcon && w.name == 'notification-bing',
+              ),
+            )
             .center
             .dx;
         return sms < bell;
@@ -367,10 +411,12 @@ void main() {
     testWidgets('pads the top inset', (WidgetTester tester) async {
       Future<double> heightWith({required bool safeArea}) async {
         await tester.pumpWidget(const SizedBox());
-        await tester.pumpWidget(_host(
-          DabblerNavigationTopBar(safeArea: safeArea, actions: _actions),
-          padding: const EdgeInsets.only(top: 59),
-        ));
+        await tester.pumpWidget(
+          _host(
+            DabblerNavigationTopBar(safeArea: safeArea, actions: _actions),
+            padding: const EdgeInsets.only(top: 59),
+          ),
+        );
         return tester.getSize(find.byType(DabblerNavigationTopBar)).height;
       }
 
@@ -380,30 +426,40 @@ void main() {
       );
     });
 
-    testWidgets('does not double-apply under an ancestor SafeArea',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const SafeArea(child: DabblerNavigationTopBar(actions: _actions)),
-        padding: const EdgeInsets.only(top: 59),
-      ));
-      final Padding pad = tester.widget<Padding>(find.descendant(
-        of: find.byType(DabblerNavigationTopBar),
-        matching: find.byType(Padding),
-      ).first);
+    testWidgets('does not double-apply under an ancestor SafeArea', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const SafeArea(child: DabblerNavigationTopBar(actions: _actions)),
+          padding: const EdgeInsets.only(top: 59),
+        ),
+      );
+      final Padding pad = tester.widget<Padding>(
+        find
+            .descendant(
+              of: find.byType(DabblerNavigationTopBar),
+              matching: find.byType(Padding),
+            )
+            .first,
+      );
       expect(pad.padding, EdgeInsets.zero);
     });
   });
 
   group('flat, and no hardcoded colour', () {
-    testWidgets('the bar paints no shadow and no gradient',
-        (WidgetTester tester) async {
+    testWidgets('the bar paints no shadow and no gradient', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationTopBar(actions: _actions, border: true)),
       );
-      for (final Container box in tester.widgetList<Container>(find.descendant(
-        of: find.byType(DabblerNavigationTopBar),
-        matching: find.byType(Container),
-      ))) {
+      for (final Container box in tester.widgetList<Container>(
+        find.descendant(
+          of: find.byType(DabblerNavigationTopBar),
+          matching: find.byType(Container),
+        ),
+      )) {
         final Decoration? decoration = box.decoration;
         if (decoration is BoxDecoration) {
           expect(decoration.boxShadow ?? const <BoxShadow>[], isEmpty);
@@ -412,15 +468,20 @@ void main() {
       }
     });
 
-    testWidgets('the row sits on --neutral-100 and takes the export padding',
-        (WidgetTester tester) async {
+    testWidgets('the row sits on --neutral-100 and takes the export padding', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationTopBar(actions: _actions)),
       );
-      final Container bar = tester.widget<Container>(find.descendant(
-        of: find.byType(DabblerNavigationTopBar),
-        matching: find.byType(Container),
-      ).first);
+      final Container bar = tester.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(DabblerNavigationTopBar),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
       final BoxDecoration decoration = bar.decoration! as BoxDecoration;
       // `--neutral-100` is `--surface-page` — tokens/colors.css:32.
       expect(decoration.color, _colors().bgPrimary);
@@ -437,38 +498,51 @@ void main() {
           end: DabblerNavigationTopBar.barPadding.end,
         ),
       );
-      expect(DabblerNavigationTopBar.barPadding.top, 12,
-          reason: 'the drawn padding constant is unchanged');
-      expect(bar.constraints?.maxHeight, DabblerNavigationTopBar.barHeight,
-          reason: 'D-039: 62 is a fixed height, not a minimum');
+      expect(
+        DabblerNavigationTopBar.barPadding.top,
+        12,
+        reason: 'the drawn padding constant is unchanged',
+      );
+      expect(
+        bar.constraints?.maxHeight,
+        DabblerNavigationTopBar.barHeight,
+        reason: 'D-039: 62 is a fixed height, not a minimum',
+      );
     });
 
-    testWidgets('`border: true` restores the specimen outline',
-        (WidgetTester tester) async {
+    testWidgets('`border: true` restores the specimen outline', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(const DabblerNavigationTopBar(border: true)),
       );
-      final Container bar = tester.widget<Container>(find.descendant(
-        of: find.byType(DabblerNavigationTopBar),
-        matching: find.byType(Container),
-      ).first);
+      final Container bar = tester.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(DabblerNavigationTopBar),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
       final BoxDecoration decoration = bar.decoration! as BoxDecoration;
       // Mirrored live NavigationTopBar.jsx:14: root `borderRadius: 16`.
       expect(decoration.borderRadius, DabblerRadius.cardAll);
       expect(DabblerRadius.card, 16);
-      expect(
-        (decoration.border! as Border).top.color,
-        _colors().borderDefault,
-      );
+      expect((decoration.border! as Border).top.color, _colors().borderDefault);
     });
   });
 
-  testWidgets('value equality on the action model',
-      (WidgetTester tester) async {
-    const DabblerNavigationAction a =
-        DabblerNavigationAction(icon: 'sms', label: 'Messages');
-    const DabblerNavigationAction b =
-        DabblerNavigationAction(icon: 'sms', label: 'Messages');
+  testWidgets('value equality on the action model', (
+    WidgetTester tester,
+  ) async {
+    const DabblerNavigationAction a = DabblerNavigationAction(
+      icon: 'sms',
+      label: 'Messages',
+    );
+    const DabblerNavigationAction b = DabblerNavigationAction(
+      icon: 'sms',
+      label: 'Messages',
+    );
     expect(a, b);
     expect(a.hashCode, b.hashCode);
   });

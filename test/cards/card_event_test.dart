@@ -29,8 +29,7 @@ import 'package:flutter_test/flutter_test.dart';
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// The minimum a card needs: a [ThemeData] carrying [DabblerColors], and a
 /// direction.
@@ -40,9 +39,7 @@ Widget _host(
   double width = 400,
 }) {
   return MaterialApp(
-    theme: ThemeData(
-      extensions: <ThemeExtension<dynamic>>[_colors()],
-    ),
+    theme: ThemeData(extensions: <ThemeExtension<dynamic>>[_colors()]),
     home: Directionality(
       textDirection: direction,
       child: Align(
@@ -68,8 +65,8 @@ const String _longTitleAr =
 /// The script a direction implies, for the leading a measured line should have.
 DabblerTypeScript _scriptOf(TextDirection direction) =>
     direction == TextDirection.rtl
-        ? DabblerTypeScript.arabic
-        : DabblerTypeScript.latin;
+    ? DabblerTypeScript.arabic
+    : DabblerTypeScript.latin;
 
 /// A live [BuildContext] under the host theme, for calling the family's
 /// statics directly.
@@ -83,10 +80,16 @@ DabblerTypeScript _scriptOf(TextDirection direction) =>
 /// returned tree tests the resolution order exactly, with nothing to load.
 Future<BuildContext> _context(WidgetTester tester) async {
   late BuildContext captured;
-  await tester.pumpWidget(_host(Builder(builder: (BuildContext context) {
-    captured = context;
-    return const SizedBox.shrink();
-  })));
+  await tester.pumpWidget(
+    _host(
+      Builder(
+        builder: (BuildContext context) {
+          captured = context;
+          return const SizedBox.shrink();
+        },
+      ),
+    ),
+  );
   return captured;
 }
 
@@ -96,8 +99,8 @@ Widget _artworkLayer(Widget media) => (media as Stack).children.first;
 /// A thumbnail of [side], found by its own box rather than by a [ClipRRect]
 /// that the card's chrome also uses.
 Finder _thumb(double side) => find.byWidgetPredicate(
-      (Widget w) => w is SizedBox && w.width == side && w.height == side,
-    );
+  (Widget w) => w is SizedBox && w.width == side && w.height == side,
+);
 
 /// The paragraph the title is painted into.
 RenderParagraph _titleParagraph(WidgetTester tester, String title) =>
@@ -107,56 +110,69 @@ void main() {
   setUp(DabblerSportBackgroundRegistry.reset);
   tearDown(DabblerSportBackgroundRegistry.reset);
 
-  group('AC1 — Large establishes the pattern: it composes Card and adds no chrome', () {
-    testWidgets('draws on the standard shell, which is what the source paints',
+  group(
+    'AC1 — Large establishes the pattern: it composes Card and adds no chrome',
+    () {
+      testWidgets(
+        'draws on the standard shell, which is what the source paints',
         (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(title: 'Five-a-side'),
-      ));
+          await tester.pumpWidget(
+            _host(const DabblerCardEventLarge(title: 'Five-a-side')),
+          );
+
+          final DabblerCard card = tester.widget<DabblerCard>(
+            find.byType(DabblerCard),
+          );
+          // `backgroundColor: var(--neutral-200)`, no border — every exported
+          // CardEvent node paints exactly this, and it is Card's `standard`.
+          expect(card.variant, DabblerCardVariant.standard);
+          // No chrome restated locally: radius and padding are left to Card.
+          expect(card.radius, isNull);
+          expect(card.padding, isNull);
+        },
+      );
+
+      testWidgets(
+        'is inert without onTap and gains the system affordances with it',
+        (WidgetTester tester) async {
+          await tester.pumpWidget(
+            _host(const DabblerCardEventLarge(title: 'Five-a-side')),
+          );
+          expect(find.byType(DabblerFocusRing), findsNothing);
+          expect(find.byType(DabblerPressScale), findsNothing);
+
+          int taps = 0;
+          await tester.pumpWidget(
+            _host(
+              DabblerCardEventLarge(title: 'Five-a-side', onTap: () => taps++),
+            ),
+          );
+          expect(find.byType(DabblerFocusRing), findsOneWidget);
+          expect(find.byType(DabblerPressScale), findsOneWidget);
+
+          await tester.tap(find.byType(DabblerCardEventLarge));
+          expect(taps, 1);
+        },
+      );
+    },
+  );
+
+  group('AC1 — image treatment', () {
+    testWidgets('the cover goes in Card.media at 16:9, full-bleed', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          DabblerCardEventLarge(
+            title: 'Five-a-side',
+            cover: Container(key: const Key('cover')),
+          ),
+        ),
+      );
 
       final DabblerCard card = tester.widget<DabblerCard>(
         find.byType(DabblerCard),
       );
-      // `backgroundColor: var(--neutral-200)`, no border — every exported
-      // CardEvent node paints exactly this, and it is Card's `standard`.
-      expect(card.variant, DabblerCardVariant.standard);
-      // No chrome restated locally: radius and padding are left to Card.
-      expect(card.radius, isNull);
-      expect(card.padding, isNull);
-    });
-
-    testWidgets('is inert without onTap and gains the system affordances with it',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(title: 'Five-a-side'),
-      ));
-      expect(find.byType(DabblerFocusRing), findsNothing);
-      expect(find.byType(DabblerPressScale), findsNothing);
-
-      int taps = 0;
-      await tester.pumpWidget(_host(
-        DabblerCardEventLarge(title: 'Five-a-side', onTap: () => taps++),
-      ));
-      expect(find.byType(DabblerFocusRing), findsOneWidget);
-      expect(find.byType(DabblerPressScale), findsOneWidget);
-
-      await tester.tap(find.byType(DabblerCardEventLarge));
-      expect(taps, 1);
-    });
-  });
-
-  group('AC1 — image treatment', () {
-    testWidgets('the cover goes in Card.media at 16:9, full-bleed',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        DabblerCardEventLarge(
-          title: 'Five-a-side',
-          cover: Container(key: const Key('cover')),
-        ),
-      ));
-
-      final DabblerCard card =
-          tester.widget<DabblerCard>(find.byType(DabblerCard));
       expect(card.media, isNotNull);
 
       final AspectRatio ratio = tester.widget<AspectRatio>(
@@ -169,22 +185,26 @@ void main() {
       expect(find.byKey(const Key('cover')), findsOneWidget);
     });
 
-    testWidgets('an explicit cover wins over the sport artwork',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        DabblerCardEventLarge(
-          title: 'Five-a-side',
-          sport: DabblerSport.football,
-          cover: Container(key: const Key('cover')),
+    testWidgets('an explicit cover wins over the sport artwork', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          DabblerCardEventLarge(
+            title: 'Five-a-side',
+            sport: DabblerSport.football,
+            cover: Container(key: const Key('cover')),
+          ),
         ),
-      ));
+      );
 
       expect(find.byKey(const Key('cover')), findsOneWidget);
       expect(find.byType(DabblerSportBackground), findsNothing);
     });
 
-    testWidgets('with no cover it falls back to the sport artwork',
-        (WidgetTester tester) async {
+    testWidgets('with no cover it falls back to the sport artwork', (
+      WidgetTester tester,
+    ) async {
       // football is one of the eleven DS-400 pre-registers `main` artwork for.
       expect(
         DabblerSportBackgroundRegistry.resolve(DabblerSport.football),
@@ -193,85 +213,104 @@ void main() {
 
       final BuildContext context = await _context(tester);
       expect(
-        _artworkLayer(DabblerCardEventLarge.mediaContent(
-          context,
-          sport: DabblerSport.football,
-        )),
+        _artworkLayer(
+          DabblerCardEventLarge.mediaContent(
+            context,
+            sport: DabblerSport.football,
+          ),
+        ),
         isA<DabblerSportBackground>(),
       );
-    });
-
-    testWidgets('the resolution order is cover, then artwork, then a flat well',
-        (WidgetTester tester) async {
-      final BuildContext context = await _context(tester);
-      final Widget cover = Container(key: const Key('cover'));
-
-      // 1. an explicit cover wins outright.
-      expect(
-        _artworkLayer(DabblerCardEventLarge.mediaContent(
-          context,
-          cover: cover,
-          sport: DabblerSport.football,
-        )),
-        same(cover),
-      );
-      // 2. the sport's artwork, where there is any.
-      expect(
-        _artworkLayer(DabblerCardEventLarge.mediaContent(
-          context,
-          sport: DabblerSport.football,
-        )),
-        isA<DabblerSportBackground>(),
-      );
-      // 3. the flat well — for an unpopulated sport, and for no sport at all.
-      for (final DabblerSport? sport in <DabblerSport?>[
-        DabblerSport.golf,
-        null,
-      ]) {
-        expect(
-          _artworkLayer(
-              DabblerCardEventLarge.mediaContent(context, sport: sport)),
-          isA<ColoredBox>().having(
-              (ColoredBox b) => b.color, 'color', _colors().surfaceGrey),
-        );
-      }
     });
 
     testWidgets(
-        'a sport with no registered artwork is a normal case, not an error',
-        (WidgetTester tester) async {
-      // DS-400 ships no `main` artwork for golf or table-tennis, by design,
-      // and `resolve` returns null without throwing.
-      for (final DabblerSport sport in <DabblerSport>[
-        DabblerSport.golf,
-        DabblerSport.tableTennis,
-      ]) {
-        expect(DabblerSportBackgroundRegistry.resolve(sport), isNull,
-            reason: '${sport.key} is expected to be unpopulated');
+      'the resolution order is cover, then artwork, then a flat well',
+      (WidgetTester tester) async {
+        final BuildContext context = await _context(tester);
+        final Widget cover = Container(key: const Key('cover'));
 
-        await tester.pumpWidget(_host(
-          DabblerCardEventLarge(title: 'Match', sport: sport),
-        ));
-
-        expect(tester.takeException(), isNull);
-        expect(find.byType(DabblerSportBackground), findsNothing);
-        // The flat well is what a miss resolves to.
+        // 1. an explicit cover wins outright.
         expect(
-          find.descendant(
-            of: find.byType(DabblerCardEventLarge),
-            matching: find.byWidgetPredicate((Widget w) =>
-                w is ColoredBox && w.color == _colors().surfaceGrey),
+          _artworkLayer(
+            DabblerCardEventLarge.mediaContent(
+              context,
+              cover: cover,
+              sport: DabblerSport.football,
+            ),
           ),
-          findsOneWidget,
+          same(cover),
         );
-        // The overlay still draws: the mark is registered even when the
-        // artwork is not.
-        expect(find.byType(DabblerSportIcon), findsOneWidget);
-      }
-    });
+        // 2. the sport's artwork, where there is any.
+        expect(
+          _artworkLayer(
+            DabblerCardEventLarge.mediaContent(
+              context,
+              sport: DabblerSport.football,
+            ),
+          ),
+          isA<DabblerSportBackground>(),
+        );
+        // 3. the flat well — for an unpopulated sport, and for no sport at all.
+        for (final DabblerSport? sport in <DabblerSport?>[
+          DabblerSport.golf,
+          null,
+        ]) {
+          expect(
+            _artworkLayer(
+              DabblerCardEventLarge.mediaContent(context, sport: sport),
+            ),
+            isA<ColoredBox>().having(
+              (ColoredBox b) => b.color,
+              'color',
+              _colors().surfaceGrey,
+            ),
+          );
+        }
+      },
+    );
 
-    testWidgets('the whole matchDay variant being unpopulated does not throw',
-        (WidgetTester tester) async {
+    testWidgets(
+      'a sport with no registered artwork is a normal case, not an error',
+      (WidgetTester tester) async {
+        // DS-400 ships no `main` artwork for golf or table-tennis, by design,
+        // and `resolve` returns null without throwing.
+        for (final DabblerSport sport in <DabblerSport>[
+          DabblerSport.golf,
+          DabblerSport.tableTennis,
+        ]) {
+          expect(
+            DabblerSportBackgroundRegistry.resolve(sport),
+            isNull,
+            reason: '${sport.key} is expected to be unpopulated',
+          );
+
+          await tester.pumpWidget(
+            _host(DabblerCardEventLarge(title: 'Match', sport: sport)),
+          );
+
+          expect(tester.takeException(), isNull);
+          expect(find.byType(DabblerSportBackground), findsNothing);
+          // The flat well is what a miss resolves to.
+          expect(
+            find.descendant(
+              of: find.byType(DabblerCardEventLarge),
+              matching: find.byWidgetPredicate(
+                (Widget w) =>
+                    w is ColoredBox && w.color == _colors().surfaceGrey,
+              ),
+            ),
+            findsOneWidget,
+          );
+          // The overlay still draws: the mark is registered even when the
+          // artwork is not.
+          expect(find.byType(DabblerSportIcon), findsOneWidget);
+        }
+      },
+    );
+
+    testWidgets('the whole matchDay variant being unpopulated does not throw', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerSport sport in <DabblerSport>[
         DabblerSport.football,
         DabblerSport.golf,
@@ -285,20 +324,23 @@ void main() {
         );
       }
 
-      await tester.pumpWidget(_host(
-        const DabblerCardEventSmall(
-          title: 'Match',
-          sport: DabblerSport.tableTennis,
+      await tester.pumpWidget(
+        _host(
+          const DabblerCardEventSmall(
+            title: 'Match',
+            sport: DabblerSport.tableTennis,
+          ),
         ),
-      ));
+      );
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('no sport and no cover is still a card, not a hole',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(title: 'Five-a-side'),
-      ));
+    testWidgets('no sport and no cover is still a card, not a hole', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const DabblerCardEventLarge(title: 'Five-a-side')),
+      );
 
       expect(tester.takeException(), isNull);
       expect(find.byType(DabblerSportIcon), findsNothing);
@@ -307,14 +349,14 @@ void main() {
   });
 
   group('AC1 — the sport-icon overlay', () {
-    testWidgets('D-022: Large draws it and neither row size does',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(
-          title: 'Match',
-          sport: DabblerSport.golf,
+    testWidgets('D-022: Large draws it and neither row size does', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerCardEventLarge(title: 'Match', sport: DabblerSport.golf),
         ),
-      ));
+      );
       expect(find.byType(DabblerSportIcon), findsOneWidget);
 
       // D-006 ruled one overlay geometry and did not carve out the row sizes;
@@ -331,20 +373,22 @@ void main() {
       }
     });
 
-    testWidgets('it is a flat circular well on the token surface',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(
-          title: 'Match',
-          sport: DabblerSport.golf,
+    testWidgets('it is a flat circular well on the token surface', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerCardEventLarge(title: 'Match', sport: DabblerSport.golf),
         ),
-      ));
+      );
 
       final Container well = tester.widget<Container>(
-        find.ancestor(
-          of: find.byType(DabblerSportIcon),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.byType(DabblerSportIcon),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       final BoxDecoration decoration = well.decoration! as BoxDecoration;
 
@@ -361,13 +405,16 @@ void main() {
       );
       expect(
         tester.getSize(find.byWidget(well)),
-        const Size(DabblerCardEventGeometry.overlayWellSide,
-            DabblerCardEventGeometry.overlayWellSide),
+        const Size(
+          DabblerCardEventGeometry.overlayWellSide,
+          DabblerCardEventGeometry.overlayWellSide,
+        ),
       );
     });
 
-    testWidgets('it follows the reading order, not a fixed edge',
-        (WidgetTester tester) async {
+    testWidgets('it follows the reading order, not a fixed edge', (
+      WidgetTester tester,
+    ) async {
       const Widget card = DabblerCardEventLarge(
         title: 'Match',
         sport: DabblerSport.golf,
@@ -382,8 +429,7 @@ void main() {
       final Rect rtlCard = tester.getRect(find.byType(DabblerCardEventLarge));
 
       // Start edge in LTR is the left; in RTL it is the right.
-      expect(ltr.left - ltrCard.left,
-          closeTo(rtlCard.right - rtl.right, 0.01));
+      expect(ltr.left - ltrCard.left, closeTo(rtlCard.right - rtl.right, 0.01));
       expect(ltr.left, lessThan(rtl.left));
       // Bottom-anchored in both.
       expect(ltr.top, closeTo(rtl.top, 0.01));
@@ -392,15 +438,16 @@ void main() {
 
   group('AC1 — title truncation', () {
     for (final TextDirection direction in TextDirection.values) {
-      final String title =
-          direction == TextDirection.rtl ? _longTitleAr : _longTitle;
+      final String title = direction == TextDirection.rtl
+          ? _longTitleAr
+          : _longTitle;
 
-      testWidgets('Large caps at two lines and ellipses (${direction.name})',
-          (WidgetTester tester) async {
-        await tester.pumpWidget(_host(
-          DabblerCardEventLarge(title: title),
-          direction: direction,
-        ));
+      testWidgets('Large caps at two lines and ellipses (${direction.name})', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(DabblerCardEventLarge(title: title), direction: direction),
+        );
 
         final RenderParagraph paragraph = _titleParagraph(tester, title);
         expect(paragraph.maxLines, DabblerCardEventLarge.titleMaxLines);
@@ -416,12 +463,12 @@ void main() {
         expect(paragraph.textDirection, direction);
       });
 
-      testWidgets('Medium caps at one line and ellipses (${direction.name})',
-          (WidgetTester tester) async {
-        await tester.pumpWidget(_host(
-          DabblerCardEventMedium(title: title),
-          direction: direction,
-        ));
+      testWidgets('Medium caps at one line and ellipses (${direction.name})', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(DabblerCardEventMedium(title: title), direction: direction),
+        );
 
         final RenderParagraph paragraph = _titleParagraph(tester, title);
         expect(paragraph.maxLines, DabblerCardEventMedium.titleMaxLines);
@@ -430,17 +477,16 @@ void main() {
         expect(paragraph.didExceedMaxLines, isTrue);
         expect(
           paragraph.size.height,
-          closeTo(
-              DabblerType.subheadline.leadingFor(_scriptOf(direction)), 1),
+          closeTo(DabblerType.subheadline.leadingFor(_scriptOf(direction)), 1),
         );
       });
 
-      testWidgets('Small caps at one line and ellipses (${direction.name})',
-          (WidgetTester tester) async {
-        await tester.pumpWidget(_host(
-          DabblerCardEventSmall(title: title),
-          direction: direction,
-        ));
+      testWidgets('Small caps at one line and ellipses (${direction.name})', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(DabblerCardEventSmall(title: title), direction: direction),
+        );
 
         final RenderParagraph paragraph = _titleParagraph(tester, title);
         expect(paragraph.maxLines, DabblerCardEventSmall.titleMaxLines);
@@ -449,14 +495,14 @@ void main() {
         expect(paragraph.didExceedMaxLines, isTrue);
         expect(
           paragraph.size.height,
-          closeTo(
-              DabblerType.subheadline.leadingFor(_scriptOf(direction)), 1),
+          closeTo(DabblerType.subheadline.leadingFor(_scriptOf(direction)), 1),
         );
       });
     }
 
-    testWidgets('a short title is not truncated at any size',
-        (WidgetTester tester) async {
+    testWidgets('a short title is not truncated at any size', (
+      WidgetTester tester,
+    ) async {
       for (final Widget card in <Widget>[
         const DabblerCardEventLarge(title: 'Padel'),
         const DabblerCardEventMedium(title: 'Padel'),
@@ -467,11 +513,15 @@ void main() {
       }
     });
 
-    testWidgets('a long title does not overflow the card at any size',
-        (WidgetTester tester) async {
+    testWidgets('a long title does not overflow the card at any size', (
+      WidgetTester tester,
+    ) async {
       for (final Widget card in <Widget>[
         const DabblerCardEventLarge(title: _longTitle, dateTime: 'Sun · 18:00'),
-        const DabblerCardEventMedium(title: _longTitle, dateTime: 'Sun · 18:00'),
+        const DabblerCardEventMedium(
+          title: _longTitle,
+          dateTime: 'Sun · 18:00',
+        ),
         const DabblerCardEventSmall(title: _longTitle, dateTime: 'Sun · 18:00'),
       ]) {
         await tester.pumpWidget(_host(card));
@@ -481,34 +531,42 @@ void main() {
   });
 
   group('AC1 — date/time and place (the DS-602 seam)', () {
-    testWidgets('both entries draw, each with its own mark',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(
-          title: 'Five-a-side',
-          dateTime: 'Sun 21 Sep · 18:00',
-          location: 'Al Barsha Pond Park',
+    testWidgets('both entries draw, each with its own mark', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerCardEventLarge(
+            title: 'Five-a-side',
+            dateTime: 'Sun 21 Sep · 18:00',
+            location: 'Al Barsha Pond Park',
+          ),
         ),
-      ));
+      );
 
       expect(find.text('Sun 21 Sep · 18:00'), findsOneWidget);
       expect(find.text('Al Barsha Pond Park'), findsOneWidget);
 
-      final Iterable<DabblerIcon> icons =
-          tester.widgetList<DabblerIcon>(find.byType(DabblerIcon));
-      expect(icons.map((DabblerIcon i) => i.name), containsAll(
-        <String>['calendar', 'location'],
-      ));
+      final Iterable<DabblerIcon> icons = tester.widgetList<DabblerIcon>(
+        find.byType(DabblerIcon),
+      );
+      expect(
+        icons.map((DabblerIcon i) => i.name),
+        containsAll(<String>['calendar', 'location']),
+      );
     });
 
-    testWidgets('either entry alone is a valid line',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(
-          title: 'Five-a-side',
-          dateTime: 'Sun 21 Sep · 18:00',
+    testWidgets('either entry alone is a valid line', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerCardEventLarge(
+            title: 'Five-a-side',
+            dateTime: 'Sun 21 Sep · 18:00',
+          ),
         ),
-      ));
+      );
       expect(find.text('Sun 21 Sep · 18:00'), findsOneWidget);
       expect(
         tester
@@ -519,9 +577,9 @@ void main() {
     });
 
     testWidgets('neither drops the line entirely', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventLarge(title: 'Five-a-side'),
-      ));
+      await tester.pumpWidget(
+        _host(const DabblerCardEventLarge(title: 'Five-a-side')),
+      );
       expect(find.byType(DabblerIcon), findsNothing);
     });
 
@@ -530,10 +588,7 @@ void main() {
       // sizes render the already-formatted strings, so wiring DS-602 in
       // touches exactly this function and the three String parameters.
       expect(
-        DabblerCardEventLarge.metaRow(
-          TextDirection.ltr,
-          _colors(),
-        ),
+        DabblerCardEventLarge.metaRow(TextDirection.ltr, _colors()),
         isNull,
         reason: 'no entries means no line, rather than empty reserved height',
       );
@@ -541,15 +596,17 @@ void main() {
   });
 
   group('AC2 — Medium and Small derive from Large', () {
-    testWidgets('both compose Card on the same shell, adding no chrome',
-        (WidgetTester tester) async {
+    testWidgets('both compose Card on the same shell, adding no chrome', (
+      WidgetTester tester,
+    ) async {
       for (final Widget card in <Widget>[
         const DabblerCardEventMedium(title: 'Padel'),
         const DabblerCardEventSmall(title: 'Padel'),
       ]) {
         await tester.pumpWidget(_host(card));
-        final DabblerCard shell =
-            tester.widget<DabblerCard>(find.byType(DabblerCard));
+        final DabblerCard shell = tester.widget<DabblerCard>(
+          find.byType(DabblerCard),
+        );
         expect(shell.variant, DabblerCardVariant.standard);
         expect(shell.radius, isNull);
         expect(shell.padding, isNull);
@@ -558,8 +615,9 @@ void main() {
       }
     });
 
-    testWidgets('both take Large\'s metadata row verbatim',
-        (WidgetTester tester) async {
+    testWidgets('both take Large\'s metadata row verbatim', (
+      WidgetTester tester,
+    ) async {
       for (final Widget card in <Widget>[
         const DabblerCardEventMedium(
           title: 'Padel',
@@ -584,8 +642,9 @@ void main() {
       }
     });
 
-    testWidgets('both take Large\'s image resolution order',
-        (WidgetTester tester) async {
+    testWidgets('both take Large\'s image resolution order', (
+      WidgetTester tester,
+    ) async {
       // An explicit cover wins at both row sizes...
       for (final Widget card in <Widget>[
         DabblerCardEventMedium(
@@ -613,29 +672,33 @@ void main() {
         await tester.pumpWidget(_host(card));
         expect(tester.takeException(), isNull);
         expect(
-          find.byWidgetPredicate((Widget w) =>
-              w is ColoredBox && w.color == _colors().surfaceGrey),
+          find.byWidgetPredicate(
+            (Widget w) => w is ColoredBox && w.color == _colors().surfaceGrey,
+          ),
           findsOneWidget,
         );
       }
     });
 
     test('the two row sizes share one title style, and it is a ramp step', () {
-      final TextStyle medium =
-          DabblerCardEventLarge.compactTitleStyleFor(TextDirection.ltr);
+      final TextStyle medium = DabblerCardEventLarge.compactTitleStyleFor(
+        TextDirection.ltr,
+      );
       expect(medium.fontSize, DabblerType.subheadline.fontSize);
       expect(medium.fontWeight, DabblerType.bold);
 
       // Large's own title is the headline step, carrying its own weight.
-      final TextStyle large =
-          DabblerCardEventLarge.titleStyleFor(TextDirection.ltr);
+      final TextStyle large = DabblerCardEventLarge.titleStyleFor(
+        TextDirection.ltr,
+      );
       expect(large.fontSize, DabblerType.headline.fontSize);
       expect(large.fontWeight, DabblerType.headline.fontWeight);
     });
 
     test('the metadata style is the footnote step, unmodified', () {
-      final TextStyle meta =
-          DabblerCardEventLarge.metaStyleFor(TextDirection.ltr);
+      final TextStyle meta = DabblerCardEventLarge.metaStyleFor(
+        TextDirection.ltr,
+      );
       expect(meta.fontSize, DabblerType.footnote.fontSize);
       expect(meta.fontWeight, DabblerType.footnote.fontWeight);
     });
@@ -654,8 +717,10 @@ void main() {
 
       // 45 is gone: cxo rejected it as a hit-target floor rather than a
       // thumbnail scale, and 48 is on the 4dp grid where 45 is not.
-      expect(DabblerCardEventGeometry.smallThumbSide,
-          isNot(DabblerSizing.touchTargetMin));
+      expect(
+        DabblerCardEventGeometry.smallThumbSide,
+        isNot(DabblerSizing.touchTargetMin),
+      );
       expect(DabblerCardEventGeometry.smallThumbSide % 4, 0);
 
       // Where a ruled number coincides with a system token, it is taken as
@@ -665,26 +730,40 @@ void main() {
       expect(DabblerCardEventGeometry.rowGap, DabblerSpacing.stackDefault);
 
       // The widgets re-export the block; none of them declares its own.
-      expect(DabblerCardEventLarge.coverAspectRatio,
-          DabblerCardEventGeometry.coverAspectRatio);
-      expect(DabblerCardEventMedium.thumbSide,
-          DabblerCardEventGeometry.mediumThumbSide);
-      expect(DabblerCardEventMedium.thumbRadius,
-          DabblerCardEventGeometry.mediumThumbRadius);
-      expect(DabblerCardEventSmall.thumbSide,
-          DabblerCardEventGeometry.smallThumbSide);
-      expect(DabblerCardEventSmall.thumbRadius,
-          DabblerCardEventGeometry.rowThumbRadius);
+      expect(
+        DabblerCardEventLarge.coverAspectRatio,
+        DabblerCardEventGeometry.coverAspectRatio,
+      );
+      expect(
+        DabblerCardEventMedium.thumbSide,
+        DabblerCardEventGeometry.mediumThumbSide,
+      );
+      expect(
+        DabblerCardEventMedium.thumbRadius,
+        DabblerCardEventGeometry.mediumThumbRadius,
+      );
+      expect(
+        DabblerCardEventSmall.thumbSide,
+        DabblerCardEventGeometry.smallThumbSide,
+      );
+      expect(
+        DabblerCardEventSmall.thumbRadius,
+        DabblerCardEventGeometry.rowThumbRadius,
+      );
       // D-018 confirms 12 as the corner of a tile inside a card, which is what
       // both row thumbnails are — so the two row sizes share one ruled step.
-      expect(DabblerCardEventGeometry.rowThumbRadius,
-          DabblerCardEventGeometry.mediumThumbRadius);
+      expect(
+        DabblerCardEventGeometry.rowThumbRadius,
+        DabblerCardEventGeometry.mediumThumbRadius,
+      );
 
       // The cover inherits the card's corner rather than carrying a literal.
       // D-018 resolves D-006's 16 by changing the card's corner, so this
       // constant follows it with no edit — which is the property to pin.
-      expect(DabblerCardEventGeometry.coverCornerRadius,
-          DabblerCard.defaultRadius);
+      expect(
+        DabblerCardEventGeometry.coverCornerRadius,
+        DabblerCard.defaultRadius,
+      );
 
       // The token-only values, which needed no ruling.
       expect(DabblerCardEventLarge.metaIconSize, DabblerSizing.iconSm);
@@ -692,42 +771,52 @@ void main() {
       expect(DabblerCardEventLarge.metaEntryGap, DabblerSpacing.stackDefault);
     });
 
-    testWidgets('the thumbnails are the sides they declare',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerCardEventMedium(title: 'Padel'),
-      ));
+    testWidgets('the thumbnails are the sides they declare', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const DabblerCardEventMedium(title: 'Padel')),
+      );
       expect(_thumb(DabblerCardEventMedium.thumbSide), findsOneWidget);
       expect(
         tester.getSize(_thumb(DabblerCardEventMedium.thumbSide)),
-        const Size(DabblerCardEventMedium.thumbSide,
-            DabblerCardEventMedium.thumbSide),
+        const Size(
+          DabblerCardEventMedium.thumbSide,
+          DabblerCardEventMedium.thumbSide,
+        ),
       );
 
-      await tester.pumpWidget(_host(
-        const DabblerCardEventSmall(title: 'Padel'),
-      ));
+      await tester.pumpWidget(
+        _host(const DabblerCardEventSmall(title: 'Padel')),
+      );
       expect(_thumb(DabblerCardEventSmall.thumbSide), findsOneWidget);
       expect(
         tester.getSize(_thumb(DabblerCardEventSmall.thumbSide)),
         const Size(
-            DabblerCardEventSmall.thumbSide, DabblerCardEventSmall.thumbSide),
+          DabblerCardEventSmall.thumbSide,
+          DabblerCardEventSmall.thumbSide,
+        ),
       );
     });
   });
 
   group('RTL', () {
-    testWidgets('the row sizes mirror, so the thumbnail leads in both',
-        (WidgetTester tester) async {
+    testWidgets('the row sizes mirror, so the thumbnail leads in both', (
+      WidgetTester tester,
+    ) async {
       const Widget card = DabblerCardEventMedium(title: 'Padel');
 
       await tester.pumpWidget(_host(card));
-      final Rect ltrThumb = tester.getRect(_thumb(DabblerCardEventMedium.thumbSide));
+      final Rect ltrThumb = tester.getRect(
+        _thumb(DabblerCardEventMedium.thumbSide),
+      );
       final Rect ltrTitle = tester.getRect(find.text('Padel'));
       expect(ltrThumb.left, lessThan(ltrTitle.left));
 
       await tester.pumpWidget(_host(card, direction: TextDirection.rtl));
-      final Rect rtlThumb = tester.getRect(_thumb(DabblerCardEventMedium.thumbSide));
+      final Rect rtlThumb = tester.getRect(
+        _thumb(DabblerCardEventMedium.thumbSide),
+      );
       final Rect rtlTitle = tester.getRect(find.text('Padel'));
       expect(rtlThumb.right, greaterThan(rtlTitle.right));
     });
