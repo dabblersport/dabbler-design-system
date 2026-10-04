@@ -59,6 +59,8 @@ a new prop.
 preference — a plain colour can't say which ink goes on it or what hairline it carries, so the type
 system refuses one outright.
 
+**`comfortable` is the profile-header size** (`Profiles.dc.html:89-97`): 12px bold type, 6/12 padding, 6 between glyph and label. Additive; the default stays the 11px list badge.
+
 ## Axes
 
 ### Decorative tone

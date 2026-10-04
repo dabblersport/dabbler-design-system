@@ -130,6 +130,7 @@ class DabblerBadge extends StatelessWidget {
     this.minWidth,
     this.fill,
     this.outlined = false,
+    this.comfortable = false,
   }) : isDot = false,
        semanticLabel = null;
 
@@ -158,6 +159,7 @@ class DabblerBadge extends StatelessWidget {
        minWidth = null,
        fill = null,
        outlined = false,
+       comfortable = false,
        isDot = true;
 
   /// Whether this is the count-less [DabblerBadge.dot] marker.
@@ -195,6 +197,11 @@ class DabblerBadge extends StatelessWidget {
   /// (`Listings.dc.html:795-799`). Wins over [tone] and [fill]; ignored when
   /// [status] is set.
   final bool outlined;
+
+  /// The roomier profile-header size (`Profiles.dc.html:89-97`): 12px bold
+  /// type, 6 vertical and 12 horizontal padding, 6 between glyph and label.
+  /// Additive; false keeps the 11px list badge.
+  final bool comfortable;
 
   /// Overrides the tone's fill for a decorative badge (not for [status]).
   ///
@@ -371,8 +378,10 @@ class DabblerBadge extends StatelessWidget {
         constraints: BoxConstraints(minWidth: minWidth ?? 0),
         child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: verticalPadding,
-            horizontal: paddingInline ?? horizontalPadding,
+            vertical: comfortable ? DabblerSpacing.space2 : verticalPadding,
+            horizontal:
+                paddingInline ??
+                (comfortable ? DabblerSpacing.space4 : horizontalPadding),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -390,14 +399,21 @@ class DabblerBadge extends StatelessWidget {
                   data: IconThemeData(color: foreground),
                   child: icon!,
                 ),
-                const SizedBox(width: iconGap),
+                SizedBox(width: comfortable ? DabblerSpacing.space2 : iconGap),
               ],
               Text(
                 label,
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.clip,
-                style: textStyleFor(direction).copyWith(color: foreground),
+                style: comfortable
+                    ? DabblerType.caption1
+                          .resolveForDirection(direction)
+                          .copyWith(
+                            color: foreground,
+                            fontWeight: DabblerType.bold,
+                          )
+                    : textStyleFor(direction).copyWith(color: foreground),
               ),
             ],
           ),

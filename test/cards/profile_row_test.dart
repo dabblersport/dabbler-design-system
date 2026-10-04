@@ -108,6 +108,41 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('DabblerAvatar onTap and comfortable badge (${d.name})', (
+      tester,
+    ) async {
+      int taps = 0;
+      await tester.pumpWidget(
+        threadHost(
+          Column(
+            children: <Widget>[
+              DabblerAvatar(
+                seed: 'x',
+                semanticLabel: 'Change avatar',
+                badge: const DabblerIcon('camera'),
+                onTap: () => taps++,
+              ),
+              DabblerBadge(
+                label: rtl ? 'لاعب' : 'Player',
+                comfortable: true,
+                icon: const DabblerIcon('activity', size: 14),
+              ),
+              const DabblerBadge(label: 'Player'),
+            ],
+          ),
+          direction: d,
+        ),
+      );
+      await tester.tap(find.byType(DabblerAvatar));
+      expect(taps, 1);
+      final double big = tester.getSize(find.byType(DabblerBadge).at(0)).height;
+      final double small = tester
+          .getSize(find.byType(DabblerBadge).at(1))
+          .height;
+      expect(big, greaterThan(small));
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('DabblerChip dot builds (${d.name})', (tester) async {
       await tester.pumpWidget(
         threadHost(
