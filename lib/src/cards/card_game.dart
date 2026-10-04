@@ -196,11 +196,7 @@ class DabblerCardGame extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: DabblerSpacing.space1,
       children: <Widget>[
-        DabblerIcon(
-          'location',
-          size: pinSize,
-          color: colors.textTertiary,
-        ),
+        DabblerIcon('location', size: pinSize, color: colors.textTertiary),
         Flexible(
           child: Wrap(
             spacing: DabblerSpacing.space1,
@@ -262,8 +258,7 @@ class DabblerCardGame extends StatelessWidget {
     return DabblerCard(
       onTap: onTap,
       enabled: enabled,
-      semanticLabel:
-          semanticLabel ?? <String>[title, ?timeLabel].join(', '),
+      semanticLabel: semanticLabel ?? <String>[title, ?timeLabel].join(', '),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

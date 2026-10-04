@@ -430,10 +430,16 @@ class DabblerOpenPost extends StatelessWidget {
             spacing: DabblerSpacing.space2,
             children: <Widget>[
               if (timeLabel != null)
-                Text(_ltr(DabblerType.toWesternDigits(timeLabel!)), style: muted),
+                Text(
+                  _ltr(DabblerType.toWesternDigits(timeLabel!)),
+                  style: muted,
+                ),
               if (timeLabel != null && dateLabel != null) _dot(colors),
               if (dateLabel != null)
-                Text(_ltr(DabblerType.toWesternDigits(dateLabel!)), style: muted),
+                Text(
+                  _ltr(DabblerType.toWesternDigits(dateLabel!)),
+                  style: muted,
+                ),
               if (viewsLabel != null) ...<Widget>[
                 _dot(colors),
                 DabblerIcon('eye', size: 14, color: colors.textTertiary),

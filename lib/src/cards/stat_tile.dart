@@ -429,7 +429,8 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
           widget.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: size == DabblerStatTileSize.detail ||
+          style:
+              size == DabblerStatTileSize.detail ||
                   size == DabblerStatTileSize.setting
               // The Details fact tile's caption and the Settings tile's label:
               // 11/15 regular in the tone's muted ink (`Details.dc.html:102`,

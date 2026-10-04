@@ -44,10 +44,7 @@ class DabblerLinkChip extends StatelessWidget {
         ? DabblerBadge(
             label: copiedLabel,
             status: colors.success,
-            icon: const DabblerIcon(
-              'tick-circle',
-              size: DabblerSizing.iconXs,
-            ),
+            icon: const DabblerIcon('tick-circle', size: DabblerSizing.iconXs),
           )
         : const DabblerBadge(
             label: '',

@@ -52,7 +52,10 @@ class _DabblerCounterLinkState extends State<DabblerCounterLink> {
           widget.value,
           style: DabblerType.headline
               .resolveForDirection(dir)
-              .copyWith(color: colors.textPrimary, fontWeight: DabblerType.bold),
+              .copyWith(
+                color: colors.textPrimary,
+                fontWeight: DabblerType.bold,
+              ),
         ),
         const SizedBox(width: DabblerSpacing.space2),
         Text(

@@ -163,8 +163,11 @@ class DabblerCardVenue extends StatelessWidget {
   );
 
   /// One facility: a brand-ink glyph and a caption (`Listings.dc.html:803-806`).
-  static Widget facility({Key? key, required String icon, required String label}) =>
-      _Facility(key: key, icon: icon, label: label);
+  static Widget facility({
+    Key? key,
+    required String icon,
+    required String label,
+  }) => _Facility(key: key, icon: icon, label: label);
 
   /// The default accessible name: name, place and price.
   String get defaultSemanticLabel => <String>[
@@ -397,7 +400,11 @@ class _Facility extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: DabblerSpacing.space1,
       children: <Widget>[
-        DabblerIcon(icon, size: DabblerSizing.iconInline, color: colors.brandPrimary),
+        DabblerIcon(
+          icon,
+          size: DabblerSizing.iconInline,
+          color: colors.brandPrimary,
+        ),
         Text(
           label,
           style: DabblerType.caption1

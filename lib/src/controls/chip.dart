@@ -126,6 +126,7 @@ class DabblerChip extends StatefulWidget {
     this.dot = false,
     this.compact = false,
     this.dense = false,
+    this.tag = false,
     this.count,
     this.trailingIcon,
   });
@@ -153,6 +154,11 @@ class DabblerChip extends StatefulWidget {
   /// (`Search.dc.html` recents) and the Article tag pill. Keeps the card fill
   /// and outline, unlike [compact].
   final bool dense;
+
+  /// The tag pill: 12/16 medium label in `textSecondary`, 6 / 12 padding, card
+  /// fill and outline — the Article tag (`Article.dc.html` tags). Use for a
+  /// static label; combine with nothing else.
+  final bool tag;
 
   /// Optional leading glyph, painted at [DabblerSizing.iconSm] (18).
   ///
@@ -203,6 +209,12 @@ class DabblerChip extends StatefulWidget {
   /// the secondary ink and a brand glyph at [DabblerSizing.iconInline]. Meant
   /// for a static tag; additive, default false.
   final bool compact;
+
+  /// [tag]'s vertical padding — `6` (`Article.dc.html` tag pill).
+  static const double tagVerticalPadding = 6;
+
+  /// [tag]'s horizontal padding — `12`.
+  static const double tagHorizontalPadding = 12;
 
   /// [dense]'s vertical padding — `7` (`Search.dc.html` recent chip).
   static const double denseVerticalPadding = 7;
@@ -329,7 +341,14 @@ class _DabblerChipState extends State<DabblerChip> {
     final Color iconColor =
         vibe?.ink ??
         DabblerChip.iconColorFor(colors, selected: widget.selected);
-    final TextStyle labelStyle = (widget.compact || widget.dense)
+    final TextStyle labelStyle = widget.tag
+        ? DabblerType.caption1
+              .resolveForDirection(direction)
+              .copyWith(
+                fontWeight: DabblerType.medium,
+                color: colors.textSecondary,
+              )
+        : (widget.compact || widget.dense)
         ? DabblerType.footnote
               .resolveForDirection(direction)
               .copyWith(
@@ -491,17 +510,23 @@ class _DabblerChipState extends State<DabblerChip> {
                 ? (widget.selected ? vibe.selectedBorder : vibe.border)
                 : (widget.selected ? Colors.transparent : null)),
       padding: EdgeInsetsDirectional.only(
-        top: widget.dense
+        top: widget.tag
+            ? DabblerChip.tagVerticalPadding
+            : widget.dense
             ? DabblerChip.denseVerticalPadding
             : widget.compact
             ? DabblerChip.compactVerticalPadding
             : DabblerChip.verticalPadding,
-        bottom: widget.dense
+        bottom: widget.tag
+            ? DabblerChip.tagVerticalPadding
+            : widget.dense
             ? DabblerChip.denseVerticalPadding
             : widget.compact
             ? DabblerChip.compactVerticalPadding
             : DabblerChip.verticalPadding,
-        start: widget.dense
+        start: widget.tag
+            ? DabblerChip.tagHorizontalPadding
+            : widget.dense
             ? DabblerChip.denseHorizontalPadding
             : widget.compact
             ? DabblerChip.compactHorizontalPadding
@@ -509,7 +534,9 @@ class _DabblerChipState extends State<DabblerChip> {
         // The remove box absorbs the trailing padding — see [onRemove].
         end: removable
             ? 0
-            : (widget.dense
+            : (widget.tag
+                  ? DabblerChip.tagHorizontalPadding
+                  : widget.dense
                   ? DabblerChip.denseHorizontalPadding
                   : widget.compact
                   ? DabblerChip.compactHorizontalPadding
