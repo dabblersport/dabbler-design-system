@@ -88,9 +88,8 @@ class DabblerCardEventResult extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
-    TextStyle t(DabblerTypeStyle s, Color c, [FontWeight? w]) => s
-        .resolveForDirection(dir)
-        .copyWith(color: c, fontWeight: w);
+    TextStyle t(DabblerTypeStyle s, Color c, [FontWeight? w]) =>
+        s.resolveForDirection(dir).copyWith(color: c, fontWeight: w);
 
     final Widget tile = DabblerSurface.brandTint(
       radius: DabblerRadius.md,
@@ -102,13 +101,19 @@ class DabblerCardEventResult extends StatelessWidget {
         children: <Widget>[
           Text(
             month.toUpperCase(),
-            style: t(DabblerType.caption2, colors.brandPrimary,
-                DabblerType.semibold),
+            style: t(
+              DabblerType.caption2,
+              colors.brandPrimary,
+              DabblerType.semibold,
+            ),
           ),
           Text(
             day,
-            style: t(DabblerType.headline, colors.brandPrimary,
-                DabblerType.bold),
+            style: t(
+              DabblerType.headline,
+              colors.brandPrimary,
+              DabblerType.bold,
+            ),
           ),
         ],
       ),

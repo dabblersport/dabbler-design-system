@@ -382,7 +382,8 @@ class _DabblerChipState extends State<DabblerChip> {
                     child: DabblerIcon(
                       DabblerChip.removeIconName,
                       size: DabblerSizing.iconSm,
-                      color: widget.mutedRemove && vibe == null && !widget.selected
+                      color:
+                          widget.mutedRemove && vibe == null && !widget.selected
                           ? colors.textTertiary
                           : iconColor,
                     ),
