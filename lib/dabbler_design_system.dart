@@ -99,6 +99,8 @@ export 'src/controls/chip.dart';
 export 'src/controls/chip_gallery.dart';
 export 'src/controls/filter_rail.dart';
 export 'src/controls/filter_rail_gallery.dart';
+export 'src/controls/filter_rail.dart';
+export 'src/controls/filter_rail_gallery.dart';
 export 'src/controls/fab.dart';
 export 'src/controls/fab_gallery.dart';
 export 'src/feedback/banner.dart';

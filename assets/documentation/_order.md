@@ -152,6 +152,7 @@ lot about the rest.
 - [SelectableCard](components/selectable-card.md) — a tappable card that is either chosen or not.
 - [SortControl](components/sort-control.md) — how a view-all list lets the reader change its order.
 - [FilterRail](components/filter-rail.md) — the applied filters as removable chips, and a labelled option group for a filter sheet.
+- [FilterRail](components/filter-rail.md) — the applied filters as removable chips, and a labelled option group for a filter sheet.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
