@@ -119,6 +119,7 @@ states, helper/error line — comes from `FieldShell`.
 
 ## Change log
 
+- KAN-426 (final) — adds `borderOutside` (47px box, default false) and, for the select variant, `circledSelectArrow`: the trailing glyph is `arrow-circle-down` (`arrow-circle-up` while open, no rotation) instead of the plain `arrow-down-1` chevron, as the Auth date-of-birth field draws it. The frames' other selects were not found, so both stay options.
 - KAN-426 (cxo ruling) — the muted field ink introduced earlier in KAN-426 is reverted: label and placeholder stay on the secondary text role (see *Known ruled deviation*). Helper text is unchanged.
 
 - Alpha DS gaps 5 — adds `validator`, `onSaved`, `autovalidateMode` (Form integration) and

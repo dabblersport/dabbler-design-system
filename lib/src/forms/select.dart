@@ -159,6 +159,8 @@ class DabblerSelect<T> extends StatefulWidget {
     this.searchPlaceholder = defaultSearchPlaceholder,
     this.groups,
     this.sheetTitle,
+    this.borderOutside = false,
+    this.circledArrow = false,
   }) : multiple = false,
        values = const <Never>[],
        onChangedAll = null;
@@ -178,6 +180,8 @@ class DabblerSelect<T> extends StatefulWidget {
     this.searchPlaceholder = defaultSearchPlaceholder,
     this.groups,
     this.sheetTitle,
+    this.borderOutside = false,
+    this.circledArrow = false,
   }) : multiple = true,
        value = null,
        onChanged = null;
@@ -188,6 +192,14 @@ class DabblerSelect<T> extends StatefulWidget {
   /// `placeholder="search"` on the searchable header's field
   /// (`Select.jsx:75`).
   static const String defaultSearchPlaceholder = 'search';
+
+  /// Whether the field's hairline sits outside the 45px content box (a 47px
+  /// field). See [DabblerFieldShell.borderOutside]. Default false.
+  final bool borderOutside;
+
+  /// Whether the trailing glyph is the circled chevron. See
+  /// [DabblerTextField.circledSelectArrow]. Default false.
+  final bool circledArrow;
 
   /// The ungrouped rows, in order, drawn before any [groups]. Optional since
   /// DS gaps 6 so a fully grouped select need not pass an empty list.
@@ -391,6 +403,8 @@ class _DabblerSelectState<T> extends State<DabblerSelect<T>> {
       onKeyEvent: _handleFieldKey,
       child: DabblerTextField(
         variant: DabblerTextFieldVariant.select,
+        borderOutside: widget.borderOutside,
+        circledSelectArrow: widget.circledArrow,
         label: widget.label,
         value: DabblerSelect.displayOf<T>(widget.allOptions, _selected),
         placeholder: widget.placeholder,

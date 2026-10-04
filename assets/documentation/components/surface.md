@@ -69,6 +69,7 @@ brand fill for `selected`. Hairline: `borderDefault`, present on `card` and `bra
 
 ## Change log
 
+- KAN-426 (final) — adds `borderOutside` (also on `.card`), default false. The web `Surface` adds its 1px border to the content instead of eating into it, so a content-sized card is 2px taller than this paints by default; with `borderOutside` the child is inset by the border width, a content-sized surface grows by twice the border, and an explicit `width` or `height` stays the outer size. Existing callers are unchanged.
 - Alpha DS gaps 6 — adds `brandTintBleed`.
 - Alpha final follow-up — `brandTintBleed` now matches the design's 14% brand mix.
 

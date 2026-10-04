@@ -36,8 +36,25 @@ const List<GalleryEntry> chipGalleryEntries = <GalleryEntry>[
   ),
 ];
 
-Widget _chips(BuildContext context) =>
-    const GallerySpecimen(label: 'filter row', child: _FilterRow());
+Widget _chips(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GallerySpecimen(label: 'filter row', child: _FilterRow()),
+    GallerySpecimen(
+      label: 'compactHitArea — 40px pill, no 45px box in the layout',
+      child: GalleryWrap(
+        children: <Widget>[
+          DabblerChip(label: 'Marcus', onTap: () {}, compactHitArea: true),
+          DabblerChip(
+            label: 'Marcus M',
+            selected: true,
+            onTap: () {},
+            compactHitArea: true,
+          ),
+        ],
+      ),
+    ),
+  ],
+);
 
 class _FilterRow extends StatefulWidget {
   const _FilterRow();

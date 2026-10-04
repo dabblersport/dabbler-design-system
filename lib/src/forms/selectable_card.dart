@@ -108,6 +108,7 @@ class DabblerSelectableCard extends StatefulWidget {
     this.tint,
     this.tone,
     this.semanticLabel,
+    this.borderOutside = false,
   });
 
   /// The main line — the persona hook, or the sport name on a tile.
@@ -147,6 +148,15 @@ class DabblerSelectableCard extends StatefulWidget {
 
   /// Overrides the label read by assistive technology.
   final String? semanticLabel;
+
+  /// Whether the border sits **outside** the content box, as the Auth and
+  /// Onboarding frame draws every card (`box-sizing: border-box`, no explicit
+  /// height): the padded row and the sport tile then grow by twice the border
+  /// (1px idle, 2px selected). The two `min-height` layouts
+  /// ([DabblerSelectableCardLayout.listRow] and `.stacked`) keep their 64 / 96
+  /// *outer* minimum, because `min-height` under `border-box` includes the
+  /// border. Default false: the border is painted inside.
+  final bool borderOutside;
 
   /// The check glyph shown while selected.
   static const String checkIconName = 'tick-circle';
@@ -255,6 +265,7 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
           ? Duration.zero
           : DabblerMotion.base,
       child: DabblerSurface(
+        borderOutside: widget.borderOutside,
         radius: radius,
         fill: fill,
         borderColor: widget.selected ? solid : edge,
@@ -364,6 +375,16 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
     );
   }
 
+  /// A `min-height` that [DabblerSelectableCard.borderOutside] keeps as the
+  /// outer size: the border width is taken off the inner constraint.
+  double _innerMin(double outer) => widget.borderOutside
+      ? outer -
+            2 *
+                (widget.selected
+                    ? DabblerSizing.borderDefault * 2
+                    : DabblerSizing.borderDefault)
+      : outer;
+
   TextStyle _rowHook(TextDirection direction) {
     final TextStyle s = DabblerType.body.resolveForDirection(direction);
     return direction == TextDirection.ltr
@@ -387,8 +408,8 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
     Widget? glyph,
   ) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: DabblerSelectableCard.listRowMinHeight,
+      constraints: BoxConstraints(
+        minHeight: _innerMin(DabblerSelectableCard.listRowMinHeight),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -428,8 +449,8 @@ class _DabblerSelectableCardState extends State<DabblerSelectableCard> {
     Widget? glyph,
   ) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: DabblerSelectableCard.stackedMinHeight,
+      constraints: BoxConstraints(
+        minHeight: _innerMin(DabblerSelectableCard.stackedMinHeight),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(

@@ -54,6 +54,7 @@ Deviation: the design's step title is 30px, between `title1` (28) and `largeTitl
 
 ## Change log
 
+- KAN-426 (final) — adds `bodyBottomPadding` (default 0): space under the scrolling body above the footer. The persona welcome frame uses 24 so the last card sits 42 above Continue.
 - Alpha fidelity rebuild (auth2) — adds this component.
 - KAN-426 (close) — adds `titleGap` (default `space2`; the email, log-in, code and welcome-back frames give `space3`, 9px, between title and subtitle).
 

@@ -75,6 +75,7 @@ class DabblerPickerFieldShell extends StatefulWidget {
     this.focusNode,
     this.openPickerSemanticsLabel = defaultOpenSemanticsLabel,
     this.closePickerSemanticsLabel = defaultCloseSemanticsLabel,
+    this.borderOutside = false,
   });
 
   /// The key the trailing 45×45 target carries, so a test can reach it
@@ -102,6 +103,12 @@ class DabblerPickerFieldShell extends StatefulWidget {
         DabblerSpacing.space1,
         DabblerSpacing.space3,
       );
+
+  /// Whether the box's hairline sits outside its content box, as the Auth
+  /// and Onboarding frame draws it: the box grows by 2 (63 to 65 for a
+  /// picker, whose content is the 45px button plus its padding). See
+  /// [DabblerFieldShell.borderOutside]. Default false.
+  final bool borderOutside;
 
   /// The text being edited. Owned by the composing field, which keeps it in
   /// sync with the typed value — the port of `text` + `onTextChange`.
@@ -222,6 +229,7 @@ class _DabblerPickerFieldShellState extends State<DabblerPickerFieldShell> {
       errorText: widget.errorText,
       focused: _focused || widget.open,
       disabled: disabled,
+      borderOutside: widget.borderOutside,
       radius: DabblerRadius.xxl,
       innerPadding: DabblerPickerFieldShell.innerPadding,
       children: <Widget>[

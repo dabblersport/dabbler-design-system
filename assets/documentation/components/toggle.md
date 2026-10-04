@@ -39,6 +39,8 @@ the same way `InputRow` pairs a title with a trailing control.
 **Let the track and knob motion — colour over 120ms, the knob sliding, no bounce — run as built.**
 It already switches to an instant snap under reduced motion; there's nothing to configure here.
 
+**Pass `compactHitArea: true` only where the row around the switch already carries the tap.** The layout is then 28px tall and the 45px target survives as an area that is hit-tested but not laid out, so the parent has to leave about 8px free above and below the track for it to apply in full.
+
 ## Axes
 
 ### State
@@ -58,6 +60,10 @@ a fixed side. Not yet checked against the gallery's direction switcher.*
 
 Track: `brandPrimary` when on, `borderDefault` when off. Knob: `surfaceCard`. Focus ring and the
 45px touch-target minimum are the same shared tokens every interactive control reads.
+
+## Change log
+
+- KAN-426 (final) — adds `compactHitArea` (default false): drops the 45px-tall box from layout so the switch is exactly its 28px track, as the frames lay it out.
 
 ## Source
 

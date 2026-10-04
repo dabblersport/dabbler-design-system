@@ -78,6 +78,10 @@ and disabled, the focus-ring role while focused, the error status tone's role on
 text: `textSecondary`. Error text: the error status tone. Touch-target minimum is the same shared
 token every field control reads.
 
+## Change log
+
+- KAN-426 (final) — adds `borderOutside`: the 45px minimum content box gets its hairline outside it, so the box is 47 high (49 while the 2px focus border shows). Default false.
+
 ## Source
 
 `lib/src/forms/field_shell.dart`, `lib/src/interaction/focus_ring.dart`

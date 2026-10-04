@@ -197,6 +197,7 @@ export 'src/foundations/sport_accent.dart';
 export 'src/foundations/foundations_gallery.dart';
 export 'src/foundations/vibes.dart';
 export 'src/foundations/vibes_gallery.dart';
+export 'src/interaction/expanded_hit_area.dart';
 export 'src/interaction/focus_ring.dart';
 export 'src/interaction/press_scale.dart';
 export 'src/interaction/scrim.dart';

@@ -80,6 +80,7 @@ class DabblerFlowPage extends StatelessWidget {
     this.spreadChildren = false,
     this.bodyGap = DabblerSpacing.space6,
     this.bodyTopPadding = DabblerSpacing.space6,
+    this.bodyBottomPadding = 0,
     this.footerBottomPadding = DabblerSpacing.space8,
     this.headerTopPadding,
     this.footerBanner,
@@ -126,6 +127,12 @@ class DabblerFlowPage extends StatelessWidget {
 
   /// The line under the title.
   final String? subtitle;
+
+  /// Padding under the scrolling body, above the footer. Default `0`. The
+  /// persona welcome frame pads the body bottom by `24` so its last card sits
+  /// 42 above the primary button (`DabblerSpacing.space8`). Ignored by the
+  /// [centered] layout, which is not a scrolling body.
+  final double bodyBottomPadding;
 
   /// The title's type step. Default [DabblerType.title1].
   final DabblerTypeStyle titleStyle;
@@ -263,10 +270,12 @@ class DabblerFlowPage extends StatelessWidget {
               start: DabblerSpacing.space8,
               end: DabblerSpacing.space8,
               top: bodyTopPadding,
+              bottom: bodyBottomPadding,
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - bodyTopPadding,
+                minHeight:
+                    constraints.maxHeight - bodyTopPadding - bodyBottomPadding,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -285,6 +294,7 @@ class DabblerFlowPage extends StatelessWidget {
                 start: DabblerSpacing.space8,
                 end: DabblerSpacing.space8,
                 top: bodyTopPadding,
+                bottom: bodyBottomPadding,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

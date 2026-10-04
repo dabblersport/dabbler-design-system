@@ -51,6 +51,7 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
       helperText: widget.helperText,
       errorText: errorText,
       announceError: announceError,
+      borderOutside: widget.borderOutside,
       focused: _focused,
       disabled: disabled,
       radius: radius,

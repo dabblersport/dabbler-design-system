@@ -380,6 +380,24 @@ Widget _textFieldVariants(BuildContext context) => _sections(<Widget>[
         ),
       ),
       _field(
+        'borderOutside — 47px, as the Auth frame draws it',
+        const DabblerTextField(
+          label: 'Email',
+          placeholder: 'you@email.com',
+          borderOutside: true,
+        ),
+      ),
+      _field(
+        'select with circledSelectArrow — the date-of-birth field',
+        const DabblerTextField(
+          label: 'Date of birth',
+          variant: DabblerTextFieldVariant.select,
+          placeholder: 'Select',
+          borderOutside: true,
+          circledSelectArrow: true,
+        ),
+      ),
+      _field(
         'select shell — open',
         const DabblerTextField(
           label: 'Sport',
@@ -435,6 +453,21 @@ Widget _selection(BuildContext context) => _sections(<Widget>[
           checked: true,
           disabled: true,
           semanticLabel: 'Notifications',
+        ),
+      ]),
+    ),
+    GallerySpecimen(
+      label: 'compactHitArea — 28px layout, 45px target kept',
+      child: _controlRow(const <Widget>[
+        DabblerToggle(
+          checked: false,
+          semanticLabel: 'Notifications',
+          compactHitArea: true,
+        ),
+        DabblerToggle(
+          checked: true,
+          semanticLabel: 'Notifications',
+          compactHitArea: true,
         ),
       ]),
     ),
@@ -756,6 +789,18 @@ Widget _rows(BuildContext context) => _sections(<Widget>[
             ),
             const SizedBox(height: DabblerSpacing.space3),
             DabblerInputRow(title: 'Everyone', selected: true, onTap: () {}),
+            const SizedBox(height: DabblerSpacing.space3),
+            DabblerInputRow.option(
+              title: 'English',
+              selected: true,
+              onTap: () {},
+            ),
+            DabblerInputRow.option(
+              title: 'Arabic (its own script, flush right)',
+              selected: false,
+              textDirection: TextDirection.rtl,
+              onTap: () {},
+            ),
             const SizedBox(height: DabblerSpacing.space3),
             DabblerInputRow(flat: true, title: 'Marina', onTap: () {}),
             DabblerInputRow(

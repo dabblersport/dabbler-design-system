@@ -39,6 +39,20 @@ Widget _cards(BuildContext context) => GalleryStack(
       child: SizedBox(width: _width, child: _SportDemo()),
     ),
     GallerySpecimen(
+      label: 'borderOutside — the frame grows each card by its border',
+      child: SizedBox(
+        width: _width,
+        child: DabblerSelectableCard(
+          icon: 'game',
+          caption: 'Player',
+          title: 'I want to play',
+          subtitle: 'Find games near you',
+          borderOutside: true,
+          onChanged: _noop,
+        ),
+      ),
+    ),
+    GallerySpecimen(
       label: 'disabled',
       child: SizedBox(
         width: _width,

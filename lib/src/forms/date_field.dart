@@ -157,9 +157,8 @@ abstract final class DabblerDateFormat {
   /// The spaced hyphen must stay spaced, or `05-09-2026` would split into
   /// nonsense before [parse] ever saw it.
   static DabblerDateSpan parseSpan(String input) {
-    final List<String> parts = DabblerType.toWesternDigits(
-      input,
-    ).split(_rangeSplitPattern);
+    final List<String> parts = DabblerType.toWesternDigits(input)
+        .split(_rangeSplitPattern);
     return DabblerDateSpan(
       start: parts.isEmpty ? null : parse(parts[0]),
       end: parts.length > 1 ? parse(parts[1]) : null,
@@ -246,6 +245,7 @@ class DabblerDateField extends StatefulWidget {
     this.open = false,
     this.onOpenPicker,
     this.focusNode,
+    this.borderOutside = false,
   }) : range = false,
        span = DabblerDateSpan.empty,
        onSpanChanged = null;
@@ -270,6 +270,7 @@ class DabblerDateField extends StatefulWidget {
     this.open = false,
     this.onOpenPicker,
     this.focusNode,
+    this.borderOutside = false,
   }) : range = true,
        value = null,
        onChanged = null;
@@ -298,6 +299,12 @@ class DabblerDateField extends StatefulWidget {
 
   /// The latest acceptable date, inclusive. `max` in the source.
   final DateTime? maximum;
+
+  /// Whether the box's hairline sits outside its content box, as the Auth
+  /// and Onboarding frame draws it: the box grows by 2 (63 to 65 for a
+  /// picker, whose content is the 45px button plus its padding). See
+  /// [DabblerFieldShell.borderOutside]. Default false.
+  final bool borderOutside;
 
   /// The label above the box.
   final String? label;
@@ -426,6 +433,7 @@ class _DabblerDateFieldState extends State<DabblerDateField> {
   @override
   Widget build(BuildContext context) {
     return DabblerPickerFieldShell(
+      borderOutside: widget.borderOutside,
       controller: _controller,
       iconName: DabblerDateField.iconName,
       label: widget.label,

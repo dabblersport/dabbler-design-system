@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import '../foundations/icon.dart';
 import '../foundations/sport_accent.dart';
 import '../foundations/vibes.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
 import '../surfaces/surface.dart';
@@ -150,7 +151,18 @@ class DabblerChip extends StatefulWidget {
     this.trailingIcon,
     this.accent,
     this.size = DabblerChipSize.regular,
+    this.compactHitArea = false,
   });
+
+  /// Whether a tappable chip drops the [DabblerSizing.touchTargetMin] box from
+  /// layout and is exactly as tall as its pill (40 regular), as the frames
+  /// that lay a chip out inside a row draw it. Default false keeps the 45px
+  /// minimum box. A static chip (null [onTap]) never had one.
+  ///
+  /// The target is not given up: a hit within 45 by 45 of the pill's centre
+  /// (wider pills keep their width) still taps it, hit-test only, so the
+  /// parent must leave that margin free for it to apply in full.
+  final bool compactHitArea;
 
   /// The chip text. `label: string` in `Chip.d.ts`.
   final String label;
@@ -624,51 +636,66 @@ class _DabblerChipState extends State<DabblerChip> {
       );
     }
 
-    return Semantics(
-      container: removable,
-      button: true,
-      selected: widget.selected,
-      label: widget.label,
-      onTap: widget.onTap,
-      onLongPress: widget.onLongPress,
-      child: ExcludeSemantics(
-        excluding: !removable,
-        child: FocusableActionDetector(
-          mouseCursor: SystemMouseCursors.click,
-          onShowFocusHighlight: _setFocused,
-          actions: <Type, Action<Intent>>{
-            // Enter and Space, which the source's `role="button"` gets from the
-            // user agent and Flutter does not.
-            ActivateIntent: CallbackAction<ActivateIntent>(
-              onInvoke: (ActivateIntent intent) {
-                widget.onTap?.call();
-                return null;
-              },
-            ),
-          },
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onTap,
-            onLongPress: widget.onLongPress,
-            onTapDown: (TapDownDetails _) => _setPressed(true),
-            onTapUp: (TapUpDetails _) => _setPressed(false),
-            onTapCancel: () => _setPressed(false),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                minWidth: DabblerSizing.touchTargetMin,
-                minHeight: DabblerSizing.touchTargetMin,
+    return _hit(
+      Semantics(
+        container: removable,
+        button: true,
+        selected: widget.selected,
+        label: widget.label,
+        onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
+        child: ExcludeSemantics(
+          excluding: !removable,
+          child: FocusableActionDetector(
+            mouseCursor: SystemMouseCursors.click,
+            onShowFocusHighlight: _setFocused,
+            actions: <Type, Action<Intent>>{
+              // Enter and Space, which the source's `role="button"` gets from the
+              // user agent and Flutter does not.
+              ActivateIntent: CallbackAction<ActivateIntent>(
+                onInvoke: (ActivateIntent intent) {
+                  widget.onTap?.call();
+                  return null;
+                },
               ),
-              // heightFactor/widthFactor 1 so the box hugs the pill in the axis
-              // the minimum is not binding on, instead of expanding to fill.
-              child: Center(
-                widthFactor: 1,
-                heightFactor: 1,
-                child: interactive,
-              ),
+            },
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onTap,
+              onLongPress: widget.onLongPress,
+              onTapDown: (TapDownDetails _) => _setPressed(true),
+              onTapUp: (TapUpDetails _) => _setPressed(false),
+              onTapCancel: () => _setPressed(false),
+              child: widget.compactHitArea
+                  ? interactive
+                  : ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: DabblerSizing.touchTargetMin,
+                        minHeight: DabblerSizing.touchTargetMin,
+                      ),
+                      // heightFactor/widthFactor 1 so the box hugs the pill in
+                      // the axis the minimum is not binding on, instead of
+                      // expanding to fill.
+                      child: Center(
+                        widthFactor: 1,
+                        heightFactor: 1,
+                        child: interactive,
+                      ),
+                    ),
             ),
           ),
         ),
       ),
     );
   }
+
+  Widget _hit(Widget child) => widget.compactHitArea
+      ? DabblerExpandedHitArea(
+          minimum: const Size(
+            DabblerSizing.touchTargetMin,
+            DabblerSizing.touchTargetMin,
+          ),
+          child: child,
+        )
+      : child;
 }

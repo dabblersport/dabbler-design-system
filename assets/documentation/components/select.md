@@ -68,6 +68,7 @@ or to `Menu` (the open list) — see those two pages.
 
 ## Change log
 
+- KAN-426 (final) — adds `borderOutside` and `circledArrow`, both default false and passed to the field; see `TextField`.
 - DS gaps 6 — `groups` (`DabblerSelectGroup`) and `sheetTitle` on both constructors; `options` is
   now optional. Additive.
 

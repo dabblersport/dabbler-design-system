@@ -180,22 +180,23 @@ void main() {
         );
       });
 
-      testWidgets('field label and placeholder stay on the secondary role (ruled deviation)', (
-        WidgetTester tester,
-      ) async {
-        await tester.pumpWidget(
-          host(
-            const DabblerTextField(label: 'Email', placeholder: 'you@x.com'),
-            direction: dir,
-          ),
-        );
-        final DabblerColors colors = testColors();
-        expect(_styleOf(tester, 'Email').color, colors.textSecondary);
-        final TextField field = tester.widget<TextField>(
-          find.byType(TextField),
-        );
-        expect(field.decoration!.hintStyle!.color, colors.textSecondary);
-      });
+      testWidgets(
+        'field label and placeholder stay on the secondary role (ruled deviation)',
+        (WidgetTester tester) async {
+          await tester.pumpWidget(
+            host(
+              const DabblerTextField(label: 'Email', placeholder: 'you@x.com'),
+              direction: dir,
+            ),
+          );
+          final DabblerColors colors = testColors();
+          expect(_styleOf(tester, 'Email').color, colors.textSecondary);
+          final TextField field = tester.widget<TextField>(
+            find.byType(TextField),
+          );
+          expect(field.decoration!.hintStyle!.color, colors.textSecondary);
+        },
+      );
 
       testWidgets('regular chip is 40 tall, selected or not', (
         WidgetTester tester,

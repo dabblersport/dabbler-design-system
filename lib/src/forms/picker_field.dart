@@ -91,6 +91,7 @@ class DabblerPickerField extends StatefulWidget {
     this.openLabel = DabblerPickerFieldShell.defaultOpenSemanticsLabel,
     this.closeLabel = DabblerPickerFieldShell.defaultCloseSemanticsLabel,
     this.child,
+    this.borderOutside = false,
   });
 
   /// `icon = 'calendar'` (`PickerField.jsx:23`).
@@ -102,6 +103,12 @@ class DabblerPickerField extends StatefulWidget {
 
   /// The key the trailing target carries; [DabblerPickerFieldShell]'s.
   static const Key trailingButtonKey = DabblerPickerFieldShell.pickerButtonKey;
+
+  /// Whether the box's hairline sits outside its content box, as the Auth
+  /// and Onboarding frame draws it: the box grows by 2 (63 to 65 for a
+  /// picker, whose content is the 45px button plus its padding). See
+  /// [DabblerFieldShell.borderOutside]. Default false.
+  final bool borderOutside;
 
   /// The label above the box.
   final String? label;
@@ -241,6 +248,7 @@ class _DabblerPickerFieldState extends State<DabblerPickerField> {
         MediaQuery.sizeOf(context).width < DabblerMenu.sheetBreakpoint;
 
     final Widget field = DabblerPickerFieldShell(
+      borderOutside: widget.borderOutside,
       controller: _controller,
       focusNode: _inputFocus,
       iconName: widget.icon,

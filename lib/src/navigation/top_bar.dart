@@ -877,6 +877,11 @@ class DabblerWordmark extends StatelessWidget {
   /// The drawn box. Null uses [DabblerNavigationTopBar.wordmarkSize] (100×19).
   final Size? size;
 
+  /// The wordmark as the landing frame draws it, `104 x 20`
+  /// (`Auth and Onboarding.dc.html`). Pass it as [size] where the frame sizes
+  /// the mark explicitly, instead of a literal. The default stays 100 x 19.
+  static const Size landingSize = Size(104, 20);
+
   /// The seven glyphs of "dabbler", each as `[dx, dy, x0, y0, x1, y1, …]` with
   /// a `-1` marking the start of a new sub-path within the same glyph.
   ///
