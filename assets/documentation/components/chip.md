@@ -48,6 +48,8 @@ built for.
 the design source. If the product needs one, that is a design-source change to raise first, not
 something to improvise here.
 
+**A count rides after the label.** Pass `count` for the small count pill the Notifications filter rail draws; it tints with the selection.
+
 ## Axes
 
 ### State

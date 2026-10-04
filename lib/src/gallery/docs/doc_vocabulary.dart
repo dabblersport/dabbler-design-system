@@ -110,8 +110,7 @@ abstract final class DabblerDocVocabulary {
   }
 
   /// Whether [kind] is bound by the vocabulary at all.
-  static bool isGoverned(DabblerDocPageKind kind) =>
-      forKind(kind).isNotEmpty;
+  static bool isGoverned(DabblerDocPageKind kind) => forKind(kind).isNotEmpty;
 
   /// The root every documentation asset path sits under.
   static const String assetRoot = 'assets/documentation';

@@ -42,14 +42,14 @@ import 'gallery_theme_scope.dart';
 /// The display name of a [DabblerTheme], as the design source's
 /// `[data-theme]` blocks name it.
 String galleryThemeLabel(DabblerTheme theme) => switch (theme) {
-      DabblerTheme.main => 'Main',
-      DabblerTheme.sport => 'Sport',
-      DabblerTheme.social => 'Social',
-      DabblerTheme.active => 'Active',
-      DabblerTheme.bright => 'Bright',
-      DabblerTheme.simple => 'Simple',
-      DabblerTheme.shade => 'Shade',
-    };
+  DabblerTheme.main => 'Main',
+  DabblerTheme.sport => 'Sport',
+  DabblerTheme.social => 'Social',
+  DabblerTheme.active => 'Active',
+  DabblerTheme.bright => 'Bright',
+  DabblerTheme.simple => 'Simple',
+  DabblerTheme.shade => 'Shade',
+};
 
 /// The display name of a [TextDirection], as the gallery labels the axis.
 ///
@@ -57,16 +57,16 @@ String galleryThemeLabel(DabblerTheme theme) => switch (theme) {
 /// nearly twice the width of the widest theme label and would be the only
 /// triggers in the row that set the app bar's height on a phone.
 String galleryDirectionLabel(TextDirection direction) => switch (direction) {
-      TextDirection.ltr => 'LTR',
-      TextDirection.rtl => 'RTL',
-    };
+  TextDirection.ltr => 'LTR',
+  TextDirection.rtl => 'RTL',
+};
 
 /// The display name of a [ThemeMode].
 String galleryModeLabel(ThemeMode mode) => switch (mode) {
-      ThemeMode.light => 'Light',
-      ThemeMode.dark => 'Dark',
-      ThemeMode.system => 'System',
-    };
+  ThemeMode.light => 'Light',
+  ThemeMode.dark => 'Dark',
+  ThemeMode.system => 'System',
+};
 
 /// A theme picker and a brightness picker, for an app bar's `actions`.
 class GalleryThemeSwitcher extends StatefulWidget {
@@ -113,8 +113,9 @@ class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
     // failing every one of those tests on a control they do not use. Its
     // presence in the real app is what `gallery_theme_switcher_test.dart`
     // pins.
-    final GalleryThemeController? controller =
-        GalleryThemeScope.maybeOf(context);
+    final GalleryThemeController? controller = GalleryThemeScope.maybeOf(
+      context,
+    );
     if (controller == null) {
       return const SizedBox.shrink();
     }
@@ -185,12 +186,12 @@ class _GalleryThemeSwitcherState extends State<GalleryThemeSwitcher> {
           DabblerMenu(
             label: 'Direction',
             open: _directionOpen,
-            onOpenChanged: (bool open) =>
-                setState(() => _directionOpen = open),
+            onOpenChanged: (bool open) => setState(() => _directionOpen = open),
             items: <DabblerMenuEntry>[
               for (final TextDirection direction in TextDirection.values)
                 DabblerMenuEntry(
-                  id: '${GalleryThemeSwitcher.directionEntryPrefix}'
+                  id:
+                      '${GalleryThemeSwitcher.directionEntryPrefix}'
                       '${direction.name}',
                   label: galleryDirectionLabel(direction),
                   selected: direction == appearance.direction,

@@ -57,8 +57,7 @@ class DabblerNavigationTabBar extends StatelessWidget {
 
   /// The source's four defaults — `home-2`, `search-normal`, `add-circle`,
   /// `sms` (`NavigationTabBar.d.ts`).
-  static const List<DabblerNavigationTab> defaultTabs =
-      <DabblerNavigationTab>[
+  static const List<DabblerNavigationTab> defaultTabs = <DabblerNavigationTab>[
     DabblerNavigationTab(icon: 'home-2', label: 'Home'),
     DabblerNavigationTab(icon: 'search-normal', label: 'Search'),
     DabblerNavigationTab(icon: 'add-circle', label: 'Create'),

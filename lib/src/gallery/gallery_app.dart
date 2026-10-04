@@ -55,8 +55,7 @@ class GalleryApp extends StatelessWidget {
     // the Navigator is what makes the choice survive a push and a pop. See
     // GalleryThemeScope.
     return GalleryThemeScope(
-      builder: (BuildContext context, GalleryAppearance appearance) =>
-          MaterialApp(
+      builder: (BuildContext context, GalleryAppearance appearance) => MaterialApp(
         title: 'Dabbler Design System',
         debugShowCheckedModeBanner: false,
         theme: galleryTheme(appearance.theme, Brightness.light),
@@ -81,8 +80,9 @@ class GalleryApp extends StatelessWidget {
           textDirection: appearance.direction,
           child: DefaultTextStyle(
             style: galleryTextStyle(context),
-            child:
-                DabblerToastProvider(child: child ?? const SizedBox.shrink()),
+            child: DabblerToastProvider(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         ),
         home: GalleryHomeScreen(entries: entries),
@@ -158,7 +158,9 @@ class GalleryEntryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     const String separator = ' — ';
     final int at = entry.title.indexOf(separator);
-    final String component = at < 0 ? entry.title : entry.title.substring(0, at);
+    final String component = at < 0
+        ? entry.title
+        : entry.title.substring(0, at);
     final String band = at < 0
         ? 'Specimen'
         : entry.title.substring(at + separator.length);

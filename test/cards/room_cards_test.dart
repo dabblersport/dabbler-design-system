@@ -41,11 +41,15 @@ void main() {
       expect(DabblerCardPoll.headerTintAlpha, 0.133);
       expect(DabblerCardPoll.barGap, 12);
       expect(DabblerCardPoll.optionColorFor(_c(), 0), _c().brandPrimary);
-      expect(DabblerCardPoll.optionColorFor(_c(), 1), DabblerPalette.activeP600);
+      expect(
+        DabblerCardPoll.optionColorFor(_c(), 1),
+        DabblerPalette.activeP600,
+      );
     });
 
-    testWidgets('question is subheadline 15/700; percent is caption-1 12/700',
-        (WidgetTester tester) async {
+    testWidgets('question is subheadline 15/700; percent is caption-1 12/700', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const DabblerCardPoll(
@@ -62,8 +66,10 @@ void main() {
       expect(p.style!.fontSize, 12);
       expect(p.style!.fontWeight, FontWeight.w700);
       expect(p.style!.color, _c().brandPrimary);
-      expect(tester.widget<Text>(find.text('35%')).style!.color,
-          DabblerPalette.activeP600);
+      expect(
+        tester.widget<Text>(find.text('35%')).style!.color,
+        DabblerPalette.activeP600,
+      );
     });
 
     testWidgets('bars fill to their fraction of the track', (
@@ -81,8 +87,10 @@ void main() {
       final List<FractionallySizedBox> fills = tester
           .widgetList<FractionallySizedBox>(find.byType(FractionallySizedBox))
           .toList();
-      expect(fills.map((FractionallySizedBox f) => f.widthFactor),
-          <double?>[0.65, 0.35]);
+      expect(fills.map((FractionallySizedBox f) => f.widthFactor), <double?>[
+        0.65,
+        0.35,
+      ]);
     });
 
     testWidgets('options are announced by their label; end poll is a button '
@@ -153,8 +161,9 @@ void main() {
       expect(DabblerCardRoom.padding, 16);
     });
 
-    testWidgets('chip text is caption-2 11 at 700, name 11/500, topic 15/700',
-        (WidgetTester tester) async {
+    testWidgets('chip text is caption-2 11 at 700, name 11/500, topic 15/700', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const DabblerCardRoom(
@@ -176,27 +185,31 @@ void main() {
       expect(topic.style!.fontWeight, FontWeight.w700);
     });
 
-    testWidgets('the stack steps 28 apart and the chip follows the last avatar',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(
-          const DabblerCardRoom(
-            name: 'n',
-            topic: 't',
-            avatarSeeds: <String>['a', 'b', 'c'],
-            overflowLabel: '+9',
+    testWidgets(
+      'the stack steps 28 apart and the chip follows the last avatar',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(
+            const DabblerCardRoom(
+              name: 'n',
+              topic: 't',
+              avatarSeeds: <String>['a', 'b', 'c'],
+              overflowLabel: '+9',
+            ),
           ),
-        ),
-      );
-      final List<double> xs = tester
-          .widgetList<DabblerAvatar>(find.byType(DabblerAvatar))
-          .map((DabblerAvatar a) => tester.getTopLeft(find.byWidget(a)).dx)
-          .toList();
-      expect(xs[1] - xs[0], 28);
-      expect(xs[2] - xs[1], 28);
-      expect(tester.getTopLeft(find.text('+9')).dx,
-          greaterThan(xs[2] + 28 - 36));
-    });
+        );
+        final List<double> xs = tester
+            .widgetList<DabblerAvatar>(find.byType(DabblerAvatar))
+            .map((DabblerAvatar a) => tester.getTopLeft(find.byWidget(a)).dx)
+            .toList();
+        expect(xs[1] - xs[0], 28);
+        expect(xs[2] - xs[1], 28);
+        expect(
+          tester.getTopLeft(find.text('+9')).dx,
+          greaterThan(xs[2] + 28 - 36),
+        );
+      },
+    );
 
     testWidgets('no seeds and no label draws no stack; tap makes a button', (
       WidgetTester tester,
@@ -242,14 +255,20 @@ void main() {
           ),
         ),
       );
-      expect(tester.widget<Text>(find.text('Design Sync')).style!.fontWeight,
-          FontWeight.w600);
-      expect(tester.widget<Text>(find.text('Weekly critique')).style!.fontWeight,
-          FontWeight.w700);
+      expect(
+        tester.widget<Text>(find.text('Design Sync')).style!.fontWeight,
+        FontWeight.w600,
+      );
+      expect(
+        tester.widget<Text>(find.text('Weekly critique')).style!.fontWeight,
+        FontWeight.w700,
+      );
       expect(tester.widget<Text>(find.text('Design Sync')).style!.fontSize, 13);
       expect(tester.widget<Text>(find.text('unmute')).style!.fontSize, 12);
-      expect(tester.widget<Text>(find.text('join')).style!.fontWeight,
-          FontWeight.w600);
+      expect(
+        tester.widget<Text>(find.text('join')).style!.fontWeight,
+        FontWeight.w600,
+      );
     });
 
     testWidgets('pills fire only when a handler is given', (

@@ -51,98 +51,110 @@ Widget _host(
 
 BoxDecoration _panelDecoration(WidgetTester tester) {
   return tester
-      .widget<DecoratedBox>(
-        find
-            .descendant(
-              of: find.byType(DabblerSheet),
-              matching: find.byType(DecoratedBox),
-            )
-            .first,
-      )
-      .decoration as BoxDecoration;
+          .widget<DecoratedBox>(
+            find
+                .descendant(
+                  of: find.byType(DabblerSheet),
+                  matching: find.byType(DecoratedBox),
+                )
+                .first,
+          )
+          .decoration
+      as BoxDecoration;
 }
 
 void main() {
-  group('AC1 — the sheet uses DS-200 scrim and renders modally from the bottom',
-      () {
-    testWidgets('the wash is DabblerScrim, composed exactly once',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
-      );
-      await tester.pumpAndSettle();
+  group(
+    'AC1 — the sheet uses DS-200 scrim and renders modally from the bottom',
+    () {
+      testWidgets('the wash is DabblerScrim, composed exactly once', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.byType(DabblerScrim), findsOneWidget);
-      // The panel itself never paints the scrim colour — one scrim, not two.
-      final Iterable<DecoratedBox> boxes =
-          tester.widgetList<DecoratedBox>(find.byType(DecoratedBox));
-      for (final DecoratedBox box in boxes) {
-        expect((box.decoration as BoxDecoration).color,
-            isNot(_colours().scrim));
-      }
-    });
+        expect(find.byType(DabblerScrim), findsOneWidget);
+        // The panel itself never paints the scrim colour — one scrim, not two.
+        final Iterable<DecoratedBox> boxes = tester.widgetList<DecoratedBox>(
+          find.byType(DecoratedBox),
+        );
+        for (final DecoratedBox box in boxes) {
+          expect(
+            (box.decoration as BoxDecoration).color,
+            isNot(_colours().scrim),
+          );
+        }
+      });
 
-    testWidgets('the panel sits on the bottom edge of the viewport',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
-      );
-      await tester.pumpAndSettle();
+      testWidgets('the panel sits on the bottom edge of the viewport', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
+        );
+        await tester.pumpAndSettle();
 
-      final Rect panel = tester.getRect(find.byType(ClipRRect).first);
-      expect(panel.bottom, _viewport.height);
-      // Default detent 0.5 of the viewport (`Sheet.d.ts:8` (unverified: file not mirrored)).
-      expect(panel.height, closeTo(_viewport.height * 0.5, 0.5));
-    });
+        final Rect panel = tester.getRect(find.byType(ClipRRect).first);
+        expect(panel.bottom, _viewport.height);
+        // Default detent 0.5 of the viewport (`Sheet.d.ts:8` (unverified: file not mirrored)).
+        expect(panel.height, closeTo(_viewport.height * 0.5, 0.5));
+      });
 
-    testWidgets('detents are sorted ascending and snapTo indexes into them',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(
-          DabblerSheet(
-            onClose: () {},
-            detents: const <double>[0.9, 0.25],
-            snapTo: 0,
-            child: const Text('body'),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // snapTo 0 is the SMALLEST detent once sorted, i.e. 0.25 not 0.9.
-      expect(
-        tester.getRect(find.byType(ClipRRect).first).height,
-        closeTo(_viewport.height * 0.25, 0.5),
-      );
-    });
-
-    testWidgets('the panel never exceeds 520 wide', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(1200, 800)),
-          child: Directionality(
-            textDirection: TextDirection.ltr,
-            child: Theme(
-              data: ThemeData(
-                extensions: <ThemeExtension<dynamic>>[_colours()],
-              ),
-              child: DabblerSheet(onClose: () {}, child: const Text('body')),
+      testWidgets('detents are sorted ascending and snapTo indexes into them', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _host(
+            DabblerSheet(
+              onClose: () {},
+              detents: const <double>[0.9, 0.25],
+              snapTo: 0,
+              child: const Text('body'),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      expect(
-        tester.getRect(find.byType(ClipRRect).first).width,
-        DabblerSheet.maxPanelWidth,
-      );
-    });
-  });
+        // snapTo 0 is the SMALLEST detent once sorted, i.e. 0.25 not 0.9.
+        expect(
+          tester.getRect(find.byType(ClipRRect).first).height,
+          closeTo(_viewport.height * 0.25, 0.5),
+        );
+      });
+
+      testWidgets('the panel never exceeds 520 wide', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          MediaQuery(
+            data: const MediaQueryData(size: Size(1200, 800)),
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: Theme(
+                data: ThemeData(
+                  extensions: <ThemeExtension<dynamic>>[_colours()],
+                ),
+                child: DabblerSheet(onClose: () {}, child: const Text('body')),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          tester.getRect(find.byType(ClipRRect).first).width,
+          DabblerSheet.maxPanelWidth,
+        );
+      });
+    },
+  );
 
   group('flat panel — Sheet.prompt.md "Visual"', () {
-    testWidgets('surface-card fill, 1px outline-card hairline, no shadow',
-        (WidgetTester tester) async {
+    testWidgets('surface-card fill, 1px outline-card hairline, no shadow', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
       );
@@ -158,7 +170,9 @@ void main() {
       expect(border.bottom, BorderSide.none);
     });
 
-    testWidgets('top corners are --radius-xl (18)', (WidgetTester tester) async {
+    testWidgets('top corners are --radius-xl (18)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
       );
@@ -171,8 +185,9 @@ void main() {
       expect(DabblerRadius.xl, 18);
     });
 
-    testWidgets('inline presentation has no scrim and all four corners',
-        (WidgetTester tester) async {
+    testWidgets('inline presentation has no scrim and all four corners', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const DabblerSheet(
@@ -189,8 +204,9 @@ void main() {
   });
 
   group('the grab handle', () {
-    testWidgets('is a 40x4 pill in --outline-strong on a 45 tall row',
-        (WidgetTester tester) async {
+    testWidgets('is a 40x4 pill in --outline-strong on a 45 tall row', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
       );
@@ -213,14 +229,12 @@ void main() {
         of: handle,
         matching: find.byType(GestureDetector),
       );
-      expect(
-        tester.getSize(row.first).height,
-        DabblerSizing.touchTargetMin,
-      );
+      expect(tester.getSize(row.first).height, DabblerSizing.touchTargetMin);
     });
 
-    testWidgets('is absent when dragHandle is false',
-        (WidgetTester tester) async {
+    testWidgets('is absent when dragHandle is false', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           DabblerSheet(
@@ -233,17 +247,20 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.byWidgetPredicate((Widget w) =>
-            w is Container &&
-            w.constraints?.maxWidth == DabblerSheet.handleWidth),
+        find.byWidgetPredicate(
+          (Widget w) =>
+              w is Container &&
+              w.constraints?.maxWidth == DabblerSheet.handleWidth,
+        ),
         findsNothing,
       );
     });
   });
 
   group('dismissal', () {
-    testWidgets('the close affordance is at least 44x44 and closes',
-        (WidgetTester tester) async {
+    testWidgets('the close affordance is at least 44x44 and closes', (
+      WidgetTester tester,
+    ) async {
       int closed = 0;
       await tester.pumpWidget(
         _host(
@@ -269,9 +286,7 @@ void main() {
     testWidgets('a press on the scrim closes', (WidgetTester tester) async {
       int closed = 0;
       await tester.pumpWidget(
-        _host(
-          DabblerSheet(onClose: () => closed++, child: const Text('body')),
-        ),
+        _host(DabblerSheet(onClose: () => closed++, child: const Text('body'))),
       );
       await tester.pumpAndSettle();
 
@@ -282,9 +297,7 @@ void main() {
     testWidgets('Escape closes', (WidgetTester tester) async {
       int closed = 0;
       await tester.pumpWidget(
-        _host(
-          DabblerSheet(onClose: () => closed++, child: const Text('body')),
-        ),
+        _host(DabblerSheet(onClose: () => closed++, child: const Text('body'))),
       );
       await tester.pumpAndSettle();
 
@@ -293,8 +306,9 @@ void main() {
       expect(closed, 1);
     });
 
-    testWidgets('dismissible false removes every route',
-        (WidgetTester tester) async {
+    testWidgets('dismissible false removes every route', (
+      WidgetTester tester,
+    ) async {
       int closed = 0;
       await tester.pumpWidget(
         _host(
@@ -322,13 +336,12 @@ void main() {
   });
 
   group('dragging moves the panel and nothing else', () {
-    testWidgets('a drag well past the smallest detent dismisses',
-        (WidgetTester tester) async {
+    testWidgets('a drag well past the smallest detent dismisses', (
+      WidgetTester tester,
+    ) async {
       int closed = 0;
       await tester.pumpWidget(
-        _host(
-          DabblerSheet(onClose: () => closed++, child: const Text('body')),
-        ),
+        _host(DabblerSheet(onClose: () => closed++, child: const Text('body'))),
       );
       await tester.pumpAndSettle();
 
@@ -342,35 +355,35 @@ void main() {
       expect(closed, 1);
     });
 
-    testWidgets('a small drag snaps back without changing the panel height',
-        (WidgetTester tester) async {
+    testWidgets('a small drag snaps back without changing the panel height', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(DabblerSheet(onClose: () {}, child: const Text('body'))),
       );
       await tester.pumpAndSettle();
 
-      final double before =
-          tester.getRect(find.byType(ClipRRect).first).height;
+      final double before = tester.getRect(find.byType(ClipRRect).first).height;
       await tester.drag(
-        find.byWidgetPredicate((Widget w) =>
-            w is Container &&
-            w.constraints?.maxWidth == DabblerSheet.handleWidth),
+        find.byWidgetPredicate(
+          (Widget w) =>
+              w is Container &&
+              w.constraints?.maxWidth == DabblerSheet.handleWidth,
+        ),
         const Offset(0, 20),
       );
       await tester.pumpAndSettle();
 
       // Height is untouched by the gesture: the drag is a translation only
       // (`Sheet.prompt.md:58` (unverified: file not mirrored)).
-      expect(
-        tester.getRect(find.byType(ClipRRect).first).height,
-        before,
-      );
+      expect(tester.getRect(find.byType(ClipRRect).first).height, before);
     });
   });
 
   group('title, body and footer', () {
-    testWidgets('the title renders in .t-title-3 (20px) on text-primary',
-        (WidgetTester tester) async {
+    testWidgets('the title renders in .t-title-3 (20px) on text-primary', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           DabblerSheet(
@@ -382,8 +395,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final TextStyle style =
-          tester.widget<Text>(find.text('filters')).style!;
+      final TextStyle style = tester.widget<Text>(find.text('filters')).style!;
       expect(style.fontSize, 20);
       expect(style.color, _colours().textPrimary);
     });
@@ -403,27 +415,32 @@ void main() {
       await tester.pumpAndSettle();
 
       final BoxDecoration footer = tester
-          .widgetList<DecoratedBox>(find.descendant(
-            of: find.byType(DabblerSheet),
-            matching: find.byType(DecoratedBox),
-          ))
+          .widgetList<DecoratedBox>(
+            find.descendant(
+              of: find.byType(DabblerSheet),
+              matching: find.byType(DecoratedBox),
+            ),
+          )
           .map((DecoratedBox b) => b.decoration as BoxDecoration)
           .firstWhere((BoxDecoration d) => d.color == null);
       expect((footer.border! as Border).top.color, _colours().bgTertiary);
 
       final EdgeInsets padding = tester
-          .widgetList<Padding>(find.descendant(
-            of: find.byType(DabblerSheet),
-            matching: find.byType(Padding),
-          ))
+          .widgetList<Padding>(
+            find.descendant(
+              of: find.byType(DabblerSheet),
+              matching: find.byType(Padding),
+            ),
+          )
           .map((Padding p) => p.padding.resolve(TextDirection.ltr))
           .firstWhere((EdgeInsets e) => e.bottom > DabblerSpacing.space6);
       expect(padding.bottom, DabblerSpacing.space6 + 34);
       expect(padding.top, DabblerSpacing.space4);
     });
 
-    testWidgets('padding is directional, so RTL mirrors it',
-        (WidgetTester tester) async {
+    testWidgets('padding is directional, so RTL mirrors it', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           DabblerSheet(
@@ -445,8 +462,9 @@ void main() {
   });
 
   group('the route helper', () {
-    testWidgets('showDabblerSheet opens a sheet and resolves what it pops',
-        (WidgetTester tester) async {
+    testWidgets('showDabblerSheet opens a sheet and resolves what it pops', (
+      WidgetTester tester,
+    ) async {
       late BuildContext sheetContext;
       Future<String?>? result;
 
@@ -481,8 +499,9 @@ void main() {
       expect(await result, 'padel');
     });
 
-    testWidgets('the route draws no barrier colour of its own',
-        (WidgetTester tester) async {
+    testWidgets('the route draws no barrier colour of its own', (
+      WidgetTester tester,
+    ) async {
       final DabblerSheetRoute<void> route = DabblerSheetRoute<void>(
         builder: (BuildContext context) => const Text('body'),
       );

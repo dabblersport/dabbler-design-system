@@ -165,8 +165,9 @@ class _GalleryIndexState extends State<GalleryIndex> {
         return at < 0 ? authored.length + p.index : at;
       }
 
-      ordered.sort((GalleryPurpose a, GalleryPurpose b) =>
-          rank(a).compareTo(rank(b)));
+      ordered.sort(
+        (GalleryPurpose a, GalleryPurpose b) => rank(a).compareTo(rank(b)),
+      );
     }
 
     return <(String, List<GalleryEntry>)>[

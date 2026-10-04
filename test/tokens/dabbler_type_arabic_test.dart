@@ -38,15 +38,18 @@ void main() {
       );
     });
 
-    test('latin size, arabic size and both leadings match the transcribed live table (mirror, no byte check)', () {
-      for (final DabblerTypeStyle s in DabblerType.styles) {
-        final (double ls, double ars, double ll, double al) = _live[s.name]!;
-        expect(s.fontSize, ls, reason: '${s.name} latin size');
-        expect(s.arabicFontSize, ars, reason: '${s.name} arabic size');
-        expect(s.latinLeading, ll, reason: '${s.name} latin leading');
-        expect(s.arabicLeading, al, reason: '${s.name} arabic leading');
-      }
-    });
+    test(
+      'latin size, arabic size and both leadings match the transcribed live table (mirror, no byte check)',
+      () {
+        for (final DabblerTypeStyle s in DabblerType.styles) {
+          final (double ls, double ars, double ll, double al) = _live[s.name]!;
+          expect(s.fontSize, ls, reason: '${s.name} latin size');
+          expect(s.arabicFontSize, ars, reason: '${s.name} arabic size');
+          expect(s.latinLeading, ll, reason: '${s.name} latin leading');
+          expect(s.arabicLeading, al, reason: '${s.name} arabic leading');
+        }
+      },
+    );
 
     test('Arabic size is Latin less 0.9 on every style', () {
       for (final DabblerTypeStyle s in DabblerType.styles) {

@@ -14,8 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// Wraps a widget in the minimum a toast needs: a [ThemeData] carrying the
 /// [DabblerColors] extension, a direction, and a [MediaQuery] we can steer.
@@ -36,10 +35,9 @@ Widget _host(
       ],
     ),
     builder: (BuildContext context, Widget? home) => MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        disableAnimations: reduceMotion,
-        padding: viewPadding,
-      ),
+      data: MediaQuery.of(
+        context,
+      ).copyWith(disableAnimations: reduceMotion, padding: viewPadding),
       child: home!,
     ),
     home: Directionality(
@@ -99,10 +97,10 @@ void main() {
       final DabblerToastController c = DabblerToastController();
       c.show(_spec('a'));
       c.show(_spec('b'));
-      expect(
-        c.visible.map((DabblerToastEntry e) => e.spec.message),
-        <String>['a', 'b'],
-      );
+      expect(c.visible.map((DabblerToastEntry e) => e.spec.message), <String>[
+        'a',
+        'b',
+      ]);
       c.dispose();
     });
 
@@ -116,11 +114,11 @@ void main() {
       c.show(_spec('d'));
 
       expect(c.visible.length, 3, reason: 'the cap is 3, not 4');
-      expect(
-        c.visible.map((DabblerToastEntry e) => e.spec.message),
-        <String>['b', 'c', 'd'],
-        reason: 'the oldest is dropped and the newest is last (bottom)',
-      );
+      expect(c.visible.map((DabblerToastEntry e) => e.spec.message), <String>[
+        'b',
+        'c',
+        'd',
+      ], reason: 'the oldest is dropped and the newest is last (bottom)');
       c.dispose();
     });
 
@@ -130,10 +128,11 @@ void main() {
         c.show(_spec('m$i'));
       }
       expect(c.visible.length, 3);
-      expect(
-        c.visible.map((DabblerToastEntry e) => e.spec.message),
-        <String>['m9', 'm10', 'm11'],
-      );
+      expect(c.visible.map((DabblerToastEntry e) => e.spec.message), <String>[
+        'm9',
+        'm10',
+        'm11',
+      ]);
       c.dispose();
     });
 
@@ -155,11 +154,11 @@ void main() {
       expect(c.visible.length, 2);
 
       c.show(_spec('d'));
-      expect(
-        c.visible.map((DabblerToastEntry e) => e.spec.message),
-        <String>['b', 'c', 'd'],
-        reason: 'room was freed, so nothing else had to be dropped',
-      );
+      expect(c.visible.map((DabblerToastEntry e) => e.spec.message), <String>[
+        'b',
+        'c',
+        'd',
+      ], reason: 'room was freed, so nothing else had to be dropped');
       c.dispose();
     });
 
@@ -171,10 +170,10 @@ void main() {
 
       c.dismiss(b); // the middle one, not the head of the queue.
 
-      expect(
-        c.visible.map((DabblerToastEntry e) => e.spec.message),
-        <String>['a', 'c'],
-      );
+      expect(c.visible.map((DabblerToastEntry e) => e.spec.message), <String>[
+        'a',
+        'c',
+      ]);
       c.dispose();
     });
 
@@ -229,10 +228,12 @@ void main() {
       final DabblerToastController c = DabblerToastController();
       c.show(_spec('a'));
       expect(
-        () => c.visible.add(const DabblerToastEntry(
-          id: 'x',
-          spec: DabblerToastSpec(message: 'x'),
-        )),
+        () => c.visible.add(
+          const DabblerToastEntry(
+            id: 'x',
+            spec: DabblerToastSpec(message: 'x'),
+          ),
+        ),
         throwsUnsupportedError,
       );
       c.dispose();
@@ -244,14 +245,18 @@ void main() {
   // ---------------------------------------------------------------------
   group('DabblerToast (AC1 — the single toast)', () {
     testWidgets('renders its message', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerToast(message: 'joined game')));
+      await tester.pumpWidget(
+        _host(const DabblerToast(message: 'joined game')),
+      );
       await tester.pumpAndSettle();
       expect(find.text('joined game'), findsOneWidget);
     });
 
     testWidgets('defaults to the neutral tone: card surface, primary ink, '
         'card outline', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(const DabblerToast(message: 'link copied')));
+      await tester.pumpWidget(
+        _host(const DabblerToast(message: 'link copied')),
+      );
       await tester.pumpAndSettle();
 
       final DabblerColors colors = _colors();
@@ -276,8 +281,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final DabblerStatusColor expected =
-            _colors().status(tone.status!);
+        final DabblerStatusColor expected = _colors().status(tone.status!);
         final BoxDecoration shell = _shell(tester);
 
         expect(shell.color, expected.surface);
@@ -341,12 +345,13 @@ void main() {
       expect(rendered.height, greaterThanOrEqualTo(45));
     });
 
-    testWidgets('is flat — no shadow, no gradient', (WidgetTester tester) async {
+    testWidgets('is flat — no shadow, no gradient', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const DabblerToast(
-          tone: DabblerToastTone.error,
-          message: 'flat',
-        )),
+        _host(
+          const DabblerToast(tone: DabblerToastTone.error, message: 'flat'),
+        ),
       );
       await tester.pumpAndSettle();
       final BoxDecoration shell = _shell(tester);
@@ -354,14 +359,17 @@ void main() {
       expect(shell.gradient, isNull);
     });
 
-    testWidgets('the icon slot is 18×18 and inherits the tone ink',
-        (WidgetTester tester) async {
+    testWidgets('the icon slot is 18×18 and inherits the tone ink', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const DabblerToast(
-          tone: DabblerToastTone.success,
-          message: 'with glyph',
-          icon: Icon(Icons.check),
-        )),
+        _host(
+          const DabblerToast(
+            tone: DabblerToastTone.success,
+            message: 'with glyph',
+            icon: Icon(Icons.check),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -369,8 +377,9 @@ void main() {
         tester.getSize(find.byIcon(Icons.check)),
         const Size(DabblerSizing.iconSm, DabblerSizing.iconSm),
       );
-      final DabblerStatusColor success =
-          _colors().status(DabblerStatusTone.success);
+      final DabblerStatusColor success = _colors().status(
+        DabblerStatusTone.success,
+      );
       final IconThemeData theme = IconTheme.of(
         tester.element(find.byIcon(Icons.check)),
       );
@@ -378,8 +387,9 @@ void main() {
       expect(theme.size, DabblerSizing.iconSm);
     });
 
-    testWidgets('the tone glyph is rendered by default; noIcon suppresses it',
-        (WidgetTester tester) async {
+    testWidgets('the tone glyph is rendered by default; noIcon suppresses it', (
+      WidgetTester tester,
+    ) async {
       // The name this test used to carry — *"no icon is rendered by default —
       // the package has no icon dependency yet"* — announced a deviation as if
       // it were the rule. The premise has been false since DS-300 shipped
@@ -388,14 +398,18 @@ void main() {
       // design ever draws: `status-feedback.card.html` shows every tone with
       // its Iconsax glyph, bold at 18.
       await tester.pumpWidget(
-        _host(const DabblerToast(tone: DabblerToastTone.success, message: 'ok')),
+        _host(
+          const DabblerToast(tone: DabblerToastTone.success, message: 'ok'),
+        ),
       );
       await tester.pumpAndSettle();
 
-      final DabblerIcon glyph = tester.widget<DabblerIcon>(find.descendant(
-        of: find.byType(DabblerToast),
-        matching: find.byType(DabblerIcon),
-      ));
+      final DabblerIcon glyph = tester.widget<DabblerIcon>(
+        find.descendant(
+          of: find.byType(DabblerToast),
+          matching: find.byType(DabblerIcon),
+        ),
+      );
       expect(glyph.name, DabblerToastTone.success.glyph);
       expect(glyph.weight, DabblerIconWeight.bold);
       expect(glyph.size, DabblerSizing.iconSm);
@@ -403,10 +417,11 @@ void main() {
       // The source distinguishes an omitted `icon` from an explicit
       // `icon={null}`; `dabblerToastNoIcon` is that second case.
       await tester.pumpWidget(const SizedBox());
-      await tester.pumpWidget(_host(const DabblerToast(
-        message: 'no glyph',
-        icon: dabblerToastNoIcon,
-      )));
+      await tester.pumpWidget(
+        _host(
+          const DabblerToast(message: 'no glyph', icon: dabblerToastNoIcon),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(
         find.descendant(
@@ -417,8 +432,9 @@ void main() {
       );
     });
 
-    testWidgets('announces politely as a live region',
-        (WidgetTester tester) async {
+    testWidgets('announces politely as a live region', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(_host(const DabblerToast(message: 'announced')));
       await tester.pumpAndSettle();
@@ -435,35 +451,43 @@ void main() {
   // The action button.
   // ---------------------------------------------------------------------
   group('DabblerToast action', () {
-    testWidgets('has a >=44x44 target — measured, not asserted in a comment',
-        (WidgetTester tester) async {
+    testWidgets('has a >=44x44 target — measured, not asserted in a comment', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: "couldn't join",
-          action: DabblerToastAction(label: 'retry', onPressed: () {}),
-        )),
+        _host(
+          DabblerToast(
+            message: "couldn't join",
+            action: DabblerToastAction(label: 'retry', onPressed: () {}),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
-      final Size target = tester.getSize(find.byKey(DabblerToast.actionTargetKey));
+      final Size target = tester.getSize(
+        find.byKey(DabblerToast.actionTargetKey),
+      );
       expect(target.width, greaterThanOrEqualTo(44));
       expect(target.height, greaterThanOrEqualTo(44));
       expect(target.height, DabblerSizing.touchTargetMin);
     });
 
-    testWidgets('fires onPressed and then dismisses',
-        (WidgetTester tester) async {
+    testWidgets('fires onPressed and then dismisses', (
+      WidgetTester tester,
+    ) async {
       final List<String> log = <String>[];
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: "couldn't join",
-          duration: DabblerToastSpec.sticky,
-          action: DabblerToastAction(
-            label: 'retry',
-            onPressed: () => log.add('pressed'),
+        _host(
+          DabblerToast(
+            message: "couldn't join",
+            duration: DabblerToastSpec.sticky,
+            action: DabblerToastAction(
+              label: 'retry',
+              onPressed: () => log.add('pressed'),
+            ),
+            onDismiss: () => log.add('dismissed'),
           ),
-          onDismiss: () => log.add('dismissed'),
-        )),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -475,10 +499,12 @@ void main() {
 
     testWidgets('carries the shared focus ring', (WidgetTester tester) async {
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: 'msg',
-          action: DabblerToastAction(label: 'retry', onPressed: () {}),
-        )),
+        _host(
+          DabblerToast(
+            message: 'msg',
+            action: DabblerToastAction(label: 'retry', onPressed: () {}),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
       expect(
@@ -490,14 +516,17 @@ void main() {
       );
     });
 
-    testWidgets('is a semantic button carrying its label',
-        (WidgetTester tester) async {
+    testWidgets('is a semantic button carrying its label', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: 'msg',
-          action: DabblerToastAction(label: 'retry', onPressed: () {}),
-        )),
+        _host(
+          DabblerToast(
+            message: 'msg',
+            action: DabblerToastAction(label: 'retry', onPressed: () {}),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -525,14 +554,14 @@ void main() {
   // The dismissal timer.
   // ---------------------------------------------------------------------
   group('DabblerToast timer', () {
-    testWidgets('auto-dismisses after the default 4000ms, and not before',
-        (WidgetTester tester) async {
+    testWidgets('auto-dismisses after the default 4000ms, and not before', (
+      WidgetTester tester,
+    ) async {
       int dismissals = 0;
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: 'joined game',
-          onDismiss: () => dismissals++,
-        )),
+        _host(
+          DabblerToast(message: 'joined game', onDismiss: () => dismissals++),
+        ),
       );
       await tester.pump(const Duration(milliseconds: 3900));
       expect(dismissals, 0);
@@ -543,29 +572,30 @@ void main() {
       await tester.pumpWidget(_host(const SizedBox.shrink()));
     });
 
-    testWidgets('a duration of zero is sticky — it never fires',
-        (WidgetTester tester) async {
+    testWidgets('a duration of zero is sticky — it never fires', (
+      WidgetTester tester,
+    ) async {
       int dismissals = 0;
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: 'syncing',
-          duration: DabblerToastSpec.sticky,
-          onDismiss: () => dismissals++,
-        )),
+        _host(
+          DabblerToast(
+            message: 'syncing',
+            duration: DabblerToastSpec.sticky,
+            onDismiss: () => dismissals++,
+          ),
+        ),
       );
       await tester.pump(const Duration(seconds: 30));
       expect(dismissals, 0);
       await tester.pumpWidget(_host(const SizedBox.shrink()));
     });
 
-    testWidgets('a disposed toast never fires its timer',
-        (WidgetTester tester) async {
+    testWidgets('a disposed toast never fires its timer', (
+      WidgetTester tester,
+    ) async {
       int dismissals = 0;
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: 'gone',
-          onDismiss: () => dismissals++,
-        )),
+        _host(DabblerToast(message: 'gone', onDismiss: () => dismissals++)),
       );
       await tester.pump(const Duration(milliseconds: 100));
 
@@ -580,19 +610,16 @@ void main() {
       );
     });
 
-    testWidgets('hover pauses the timer and leaving re-arms it',
-        (WidgetTester tester) async {
+    testWidgets('hover pauses the timer and leaving re-arms it', (
+      WidgetTester tester,
+    ) async {
       int dismissals = 0;
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: 'hover me',
-          onDismiss: () => dismissals++,
-        )),
+        _host(DabblerToast(message: 'hover me', onDismiss: () => dismissals++)),
       );
       await tester.pump(const Duration(milliseconds: 100));
 
-      final TestPointer mouse =
-          TestPointer(1, PointerDeviceKind.mouse);
+      final TestPointer mouse = TestPointer(1, PointerDeviceKind.mouse);
       final Offset centre = tester.getCenter(find.byType(DabblerToast));
       await tester.sendEventToBinding(mouse.hover(centre));
       await tester.pump();
@@ -610,15 +637,18 @@ void main() {
       await tester.pumpWidget(_host(const SizedBox.shrink()));
     });
 
-    testWidgets('focus pauses the timer and blur re-arms it',
-        (WidgetTester tester) async {
+    testWidgets('focus pauses the timer and blur re-arms it', (
+      WidgetTester tester,
+    ) async {
       int dismissals = 0;
       await tester.pumpWidget(
-        _host(DabblerToast(
-          message: 'focus me',
-          action: DabblerToastAction(label: 'retry', onPressed: () {}),
-          onDismiss: () => dismissals++,
-        )),
+        _host(
+          DabblerToast(
+            message: 'focus me',
+            action: DabblerToastAction(label: 'retry', onPressed: () {}),
+            onDismiss: () => dismissals++,
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -644,13 +674,16 @@ void main() {
   // Motion.
   // ---------------------------------------------------------------------
   group('DabblerToast motion', () {
-    testWidgets('entry animates opacity and a downward 9px translate',
-        (WidgetTester tester) async {
+    testWidgets('entry animates opacity and a downward 9px translate', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const DabblerToast(
-          message: 'entering',
-          duration: DabblerToastSpec.sticky,
-        )),
+        _host(
+          const DabblerToast(
+            message: 'entering',
+            duration: DabblerToastSpec.sticky,
+          ),
+        ),
       );
       await tester.pump(); // build; the entry has not started.
 
@@ -673,44 +706,47 @@ void main() {
       expect(DabblerMotion.base.inMilliseconds, 120);
     });
 
-    testWidgets('reduced motion drops the translate and animates opacity only',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(
-          const DabblerToast(
-            message: 'still',
-            duration: DabblerToastSpec.sticky,
+    testWidgets(
+      'reduced motion drops the translate and animates opacity only',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(
+            const DabblerToast(
+              message: 'still',
+              duration: DabblerToastSpec.sticky,
+            ),
+            reduceMotion: true,
           ),
-          reduceMotion: true,
-        ),
-      );
-      await tester.pump();
+        );
+        await tester.pump();
 
-      expect(
-        find.descendant(
-          of: find.byType(DabblerToast),
-          matching: find.byType(FadeTransition),
-        ),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(
-          of: find.byType(DabblerToast),
-          matching: find.byType(Transform),
-        ),
-        findsNothing,
-        reason: 'under reduced motion only opacity animates',
-      );
-      await tester.pumpAndSettle();
-    });
+        expect(
+          find.descendant(
+            of: find.byType(DabblerToast),
+            matching: find.byType(FadeTransition),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(DabblerToast),
+            matching: find.byType(Transform),
+          ),
+          findsNothing,
+          reason: 'under reduced motion only opacity animates',
+        );
+        await tester.pumpAndSettle();
+      },
+    );
   });
 
   // ---------------------------------------------------------------------
   // The provider and its viewport.
   // ---------------------------------------------------------------------
   group('DabblerToastProvider', () {
-    testWidgets('renders the child and, initially, no toast',
-        (WidgetTester tester) async {
+    testWidgets('renders the child and, initially, no toast', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(bounded: false, const DabblerToastProvider(child: Text('app'))),
       );
@@ -719,16 +755,22 @@ void main() {
       expect(find.byType(DabblerToast), findsNothing);
     });
 
-    testWidgets('of() reaches the queue and showing paints a toast',
-        (WidgetTester tester) async {
+    testWidgets('of() reaches the queue and showing paints a toast', (
+      WidgetTester tester,
+    ) async {
       late BuildContext inner;
       await tester.pumpWidget(
-        _host(bounded: false, DabblerToastProvider(
-          child: Builder(builder: (BuildContext context) {
-            inner = context;
-            return const Text('app');
-          }),
-        )),
+        _host(
+          bounded: false,
+          DabblerToastProvider(
+            child: Builder(
+              builder: (BuildContext context) {
+                inner = context;
+                return const Text('app');
+              },
+            ),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -739,14 +781,18 @@ void main() {
       expect(find.text('joined game'), findsOneWidget);
     });
 
-    testWidgets('caps the painted toasts at 3, newest at the bottom',
-        (WidgetTester tester) async {
+    testWidgets('caps the painted toasts at 3, newest at the bottom', (
+      WidgetTester tester,
+    ) async {
       final DabblerToastController controller = DabblerToastController();
       await tester.pumpWidget(
-        _host(bounded: false, DabblerToastProvider(
-          controller: controller,
-          child: const Text('app'),
-        )),
+        _host(
+          bounded: false,
+          DabblerToastProvider(
+            controller: controller,
+            child: const Text('app'),
+          ),
+        ),
       );
       for (final String m in <String>['a', 'b', 'c', 'd']) {
         controller.show(_spec(m, duration: DabblerToastSpec.sticky));
@@ -767,17 +813,22 @@ void main() {
     testWidgets('stacks with a 9px gap', (WidgetTester tester) async {
       final DabblerToastController controller = DabblerToastController();
       await tester.pumpWidget(
-        _host(bounded: false, DabblerToastProvider(
-          controller: controller,
-          child: const Text('app'),
-        )),
+        _host(
+          bounded: false,
+          DabblerToastProvider(
+            controller: controller,
+            child: const Text('app'),
+          ),
+        ),
       );
       controller.show(_spec('one', duration: DabblerToastSpec.sticky));
       controller.show(_spec('two', duration: DabblerToastSpec.sticky));
       await tester.pumpAndSettle();
 
-      final List<Element> toasts =
-          find.byType(DabblerToast).evaluate().toList(growable: false);
+      final List<Element> toasts = find
+          .byType(DabblerToast)
+          .evaluate()
+          .toList(growable: false);
       final Rect first = tester.getRect(find.byWidget(toasts[0].widget));
       final Rect second = tester.getRect(find.byWidget(toasts[1].widget));
       expect(second.top - first.bottom, DabblerSpacing.space3);
@@ -786,8 +837,9 @@ void main() {
       controller.dispose();
     });
 
-    testWidgets('the viewport clears the bottom safe-area inset',
-        (WidgetTester tester) async {
+    testWidgets('the viewport clears the bottom safe-area inset', (
+      WidgetTester tester,
+    ) async {
       final DabblerToastController controller = DabblerToastController();
       const double inset = 34; // a home-indicator-sized inset.
       await tester.pumpWidget(
@@ -803,8 +855,12 @@ void main() {
       controller.show(_spec('safe', duration: DabblerToastSpec.sticky));
       await tester.pumpAndSettle();
 
-      final double screenBottom = tester.getSize(find.byType(MaterialApp)).height;
-      final double toastBottom = tester.getRect(find.byType(DabblerToast)).bottom;
+      final double screenBottom = tester
+          .getSize(find.byType(MaterialApp))
+          .height;
+      final double toastBottom = tester
+          .getRect(find.byType(DabblerToast))
+          .bottom;
       expect(
         screenBottom - toastBottom,
         inset + DabblerSpacing.space4,
@@ -815,8 +871,9 @@ void main() {
       controller.dispose();
     });
 
-    testWidgets('the viewport gutters by 12 and caps the toast at 420 wide',
-        (WidgetTester tester) async {
+    testWidgets('the viewport gutters by 12 and caps the toast at 420 wide', (
+      WidgetTester tester,
+    ) async {
       final DabblerToastController controller = DabblerToastController();
       await tester.pumpWidget(
         _host(
@@ -839,8 +896,9 @@ void main() {
       controller.dispose();
     });
 
-    testWidgets('a narrow viewport leaves a 12px gutter on each side',
-        (WidgetTester tester) async {
+    testWidgets('a narrow viewport leaves a 12px gutter on each side', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(320, 640);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -866,14 +924,18 @@ void main() {
       controller.dispose();
     });
 
-    testWidgets('a toast whose timer elapses leaves the queue and the tree',
-        (WidgetTester tester) async {
+    testWidgets('a toast whose timer elapses leaves the queue and the tree', (
+      WidgetTester tester,
+    ) async {
       final DabblerToastController controller = DabblerToastController();
       await tester.pumpWidget(
-        _host(bounded: false, DabblerToastProvider(
-          controller: controller,
-          child: const Text('app'),
-        )),
+        _host(
+          bounded: false,
+          DabblerToastProvider(
+            controller: controller,
+            child: const Text('app'),
+          ),
+        ),
       );
       controller.show(_spec('transient'));
       await tester.pumpAndSettle();
@@ -889,21 +951,29 @@ void main() {
       controller.dispose();
     });
 
-    testWidgets('the app behind the viewport stays tappable',
-        (WidgetTester tester) async {
+    testWidgets('the app behind the viewport stays tappable', (
+      WidgetTester tester,
+    ) async {
       final DabblerToastController controller = DabblerToastController();
       int taps = 0;
       await tester.pumpWidget(
-        _host(bounded: false, DabblerToastProvider(
-          controller: controller,
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: GestureDetector(
-              onTap: () => taps++,
-              child: const SizedBox(width: 60, height: 60, child: Text('hit')),
+        _host(
+          bounded: false,
+          DabblerToastProvider(
+            controller: controller,
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: GestureDetector(
+                onTap: () => taps++,
+                child: const SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: Text('hit'),
+                ),
+              ),
             ),
           ),
-        )),
+        ),
       );
       controller.show(_spec('over it', duration: DabblerToastSpec.sticky));
       await tester.pumpAndSettle();
@@ -916,14 +986,19 @@ void main() {
       controller.dispose();
     });
 
-    testWidgets('maybeOf returns null with no provider',
-        (WidgetTester tester) async {
+    testWidgets('maybeOf returns null with no provider', (
+      WidgetTester tester,
+    ) async {
       late BuildContext inner;
       await tester.pumpWidget(
-        _host(Builder(builder: (BuildContext context) {
-          inner = context;
-          return const Text('bare');
-        })),
+        _host(
+          Builder(
+            builder: (BuildContext context) {
+              inner = context;
+              return const Text('bare');
+            },
+          ),
+        ),
       );
       expect(DabblerToastProvider.maybeOf(inner), isNull);
     });
@@ -933,14 +1008,18 @@ void main() {
   // The imperative escape hatch.
   // ---------------------------------------------------------------------
   group('DabblerToasts', () {
-    testWidgets('routes to the mounted provider and unregisters on unmount',
-        (WidgetTester tester) async {
+    testWidgets('routes to the mounted provider and unregisters on unmount', (
+      WidgetTester tester,
+    ) async {
       final DabblerToastController controller = DabblerToastController();
       await tester.pumpWidget(
-        _host(bounded: false, DabblerToastProvider(
-          controller: controller,
-          child: const Text('app'),
-        )),
+        _host(
+          bounded: false,
+          DabblerToastProvider(
+            controller: controller,
+            child: const Text('app'),
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 

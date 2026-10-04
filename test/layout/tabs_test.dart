@@ -19,8 +19,7 @@ const List<DabblerTabItem> _items = <DabblerTabItem>[
 DabblerColors _colors({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// The minimum the tabs need: a direction, a [DabblerColors] in the theme, a
 /// [MediaQuery] the test controls, and a bounded width.
@@ -114,10 +113,10 @@ TextStyle _labelStyle(WidgetTester tester, String label) =>
 
 /// The rect of the tab labelled [label], as laid out.
 Rect _tabRect(WidgetTester tester, String label) => tester.getRect(
-      find
-          .ancestor(of: find.text(label), matching: find.byType(GestureDetector))
-          .first,
-    );
+  find
+      .ancestor(of: find.text(label), matching: find.byType(GestureDetector))
+      .first,
+);
 
 Future<void> _pressKey(WidgetTester tester, LogicalKeyboardKey key) async {
   await tester.sendKeyEvent(key);
@@ -162,9 +161,7 @@ void main() {
     ) async {
       // The whole point of matching on the id: `players` is index 1 in one
       // order and index 2 in the other, and both must show the same panel.
-      await tester.pumpWidget(
-        _host(const _Harness(initial: 'players')),
-      );
+      await tester.pumpWidget(_host(const _Harness(initial: 'players')));
       expect(find.text('panel:players'), findsOneWidget);
 
       const List<DabblerTabItem> reordered = <DabblerTabItem>[
@@ -201,8 +198,11 @@ void main() {
       await tester.pumpAndSettle();
 
       final Rect after = _tabRect(tester, 'players');
-      expect(after.left, isNot(before.left),
-          reason: 'the reorder must actually have moved the tab');
+      expect(
+        after.left,
+        isNot(before.left),
+        reason: 'the reorder must actually have moved the tab',
+      );
       expect(tester.getRect(find.byType(ColoredBox).last).left, after.left);
     });
 
@@ -224,9 +224,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final List<String> reported = <String>[];
-      await tester.pumpWidget(
-        _host(_Harness(onChanged: reported.add)),
-      );
+      await tester.pumpWidget(_host(_Harness(onChanged: reported.add)));
 
       await tester.tap(find.text('chat'));
       await tester.pumpAndSettle();
@@ -266,8 +264,11 @@ void main() {
           .map((DabblerFocusRing r) => r.focusNode!)
           .toList();
 
-      expect(nodes.map((FocusNode n) => n.skipTraversal),
-          <bool>[true, false, true]);
+      expect(nodes.map((FocusNode n) => n.skipTraversal), <bool>[
+        true,
+        false,
+        true,
+      ]);
     });
 
     testWidgets('the roving order follows the selection', (
@@ -284,8 +285,11 @@ void main() {
           .map((DabblerFocusRing r) => r.focusNode!)
           .toList();
 
-      expect(nodes.map((FocusNode n) => n.skipTraversal),
-          <bool>[true, true, false]);
+      expect(nodes.map((FocusNode n) => n.skipTraversal), <bool>[
+        true,
+        true,
+        false,
+      ]);
     });
   });
 
@@ -419,7 +423,10 @@ void main() {
       await _pressKey(tester, LogicalKeyboardKey.arrowRight);
 
       final Finder ring = find
-          .ancestor(of: find.text('players'), matching: find.byType(CustomPaint))
+          .ancestor(
+            of: find.text('players'),
+            matching: find.byType(CustomPaint),
+          )
           .first;
       expect(
         tester.widget<CustomPaint>(ring).foregroundPainter,
@@ -447,8 +454,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final DabblerFocusRing ring =
-          tester.widgetList<DabblerFocusRing>(find.byType(DabblerFocusRing)).first;
+      final DabblerFocusRing ring = tester
+          .widgetList<DabblerFocusRing>(find.byType(DabblerFocusRing))
+          .first;
       expect(ring.borderRadius, DabblerRadius.pillAll);
     });
   });
@@ -486,8 +494,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(_tabRect(tester, 'a').width,
-          greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
+      expect(
+        _tabRect(tester, 'a').width,
+        greaterThanOrEqualTo(DabblerSizing.touchTargetMin),
+      );
     });
 
     testWidgets('segmented tabs — the pill paints 39, the target is 45', (
@@ -563,12 +573,15 @@ void main() {
       await tester.pumpAndSettle();
 
       final DabblerColors colors = _colors();
-      final List<ColoredBox> boxes =
-          tester.widgetList<ColoredBox>(find.byType(ColoredBox)).toList();
+      final List<ColoredBox> boxes = tester
+          .widgetList<ColoredBox>(find.byType(ColoredBox))
+          .toList();
 
       expect(boxes.map((ColoredBox b) => b.color), contains(colors.bgTertiary));
       expect(
-          boxes.map((ColoredBox b) => b.color), contains(colors.brandPrimary));
+        boxes.map((ColoredBox b) => b.color),
+        contains(colors.brandPrimary),
+      );
     });
 
     testWidgets('the indicator is 2px and spans the active tab', (
@@ -735,10 +748,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      for (final BoxDecoration d in tester
-          .widgetList<Container>(find.byType(Container))
-          .map((Container c) => c.decoration)
-          .whereType<BoxDecoration>()) {
+      for (final BoxDecoration d
+          in tester
+              .widgetList<Container>(find.byType(Container))
+              .map((Container c) => c.decoration)
+              .whereType<BoxDecoration>()) {
         expect(d.boxShadow ?? const <BoxShadow>[], isEmpty);
         expect(d.gradient, isNull);
       }
@@ -830,8 +844,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final SingleChildScrollView view = tester
-          .widget<SingleChildScrollView>(find.byType(SingleChildScrollView));
+      final SingleChildScrollView view = tester.widget<SingleChildScrollView>(
+        find.byType(SingleChildScrollView),
+      );
       expect(view.scrollDirection, Axis.horizontal);
     });
 
@@ -846,8 +861,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final ScrollableState scrollable =
-          tester.state<ScrollableState>(find.byType(Scrollable));
+      final ScrollableState scrollable = tester.state<ScrollableState>(
+        find.byType(Scrollable),
+      );
       expect(scrollable.position.pixels, 0);
 
       // Arrow-key to the far end, which is the path that must not move
@@ -902,9 +918,7 @@ void main() {
       expect(b, moreOrLessEquals(c));
     });
 
-    testWidgets('segmented is always full width', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('segmented is always full width', (WidgetTester tester) async {
       await tester.pumpWidget(
         _host(
           const _Harness(
@@ -937,10 +951,10 @@ void main() {
       await tester.pumpWidget(_host(const _Harness()));
       await tester.pumpAndSettle();
 
-      final AnimatedPositionedDirectional indicator =
-          tester.widget<AnimatedPositionedDirectional>(
-        find.byType(AnimatedPositionedDirectional),
-      );
+      final AnimatedPositionedDirectional indicator = tester
+          .widget<AnimatedPositionedDirectional>(
+            find.byType(AnimatedPositionedDirectional),
+          );
       expect(indicator.duration, const Duration(milliseconds: 120));
       expect(indicator.curve, const Cubic(0.2, 0, 0.2, 1));
     });
@@ -948,9 +962,7 @@ void main() {
     testWidgets('reduced motion drops the slide to zero', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(const _Harness(), disableAnimations: true),
-      );
+      await tester.pumpWidget(_host(const _Harness(), disableAnimations: true));
       await tester.pumpAndSettle();
 
       expect(
@@ -977,7 +989,8 @@ void main() {
 
       final SemanticsNode list = tester.getSemantics(
         find.byWidgetPredicate(
-          (Widget w) => w is Semantics && w.properties.role == SemanticsRole.tabBar,
+          (Widget w) =>
+              w is Semantics && w.properties.role == SemanticsRole.tabBar,
         ),
       );
       expect(list.role, SemanticsRole.tabBar);
@@ -990,18 +1003,27 @@ void main() {
       });
 
       expect(tabs.length, _items.length);
-      expect(tabs.map((SemanticsNode n) => n.role),
-          everyElement(SemanticsRole.tab));
-      expect(tabs.map((SemanticsNode n) => n.label),
-          <String>['overview', 'players', 'chat']);
       expect(
-        tabs.map((SemanticsNode n) =>
-            n.getSemanticsData().flagsCollection.isSelected.name),
+        tabs.map((SemanticsNode n) => n.role),
+        everyElement(SemanticsRole.tab),
+      );
+      expect(tabs.map((SemanticsNode n) => n.label), <String>[
+        'overview',
+        'players',
+        'chat',
+      ]);
+      expect(
+        tabs.map(
+          (SemanticsNode n) =>
+              n.getSemanticsData().flagsCollection.isSelected.name,
+        ),
         <String>['isTrue', 'isFalse', 'isFalse'],
       );
       expect(
-        tabs.every((SemanticsNode n) =>
-            n.getSemanticsData().hasAction(SemanticsAction.tap)),
+        tabs.every(
+          (SemanticsNode n) =>
+              n.getSemanticsData().hasAction(SemanticsAction.tap),
+        ),
         isTrue,
       );
       handle.dispose();
@@ -1019,10 +1041,9 @@ void main() {
           (Widget w) => w is Semantics && w.properties.label == 'players',
         ),
       );
-      expect(
-        tab.getSemanticsData().controlsNodes,
-        <String>{DabblerTabPanel.semanticsIdentifier('players')},
-      );
+      expect(tab.getSemanticsData().controlsNodes, <String>{
+        DabblerTabPanel.semanticsIdentifier('players'),
+      });
       handle.dispose();
     });
 
@@ -1033,11 +1054,11 @@ void main() {
       await tester.pumpWidget(_host(const _Harness()));
       await tester.pumpAndSettle();
 
-      final SemanticsNode panel =
-          tester.getSemantics(find.text('panel:overview'));
+      final SemanticsNode panel = tester.getSemantics(
+        find.text('panel:overview'),
+      );
       expect(panel.role, SemanticsRole.tabPanel);
-      expect(panel.identifier,
-          DabblerTabPanel.semanticsIdentifier('overview'));
+      expect(panel.identifier, DabblerTabPanel.semanticsIdentifier('overview'));
       handle.dispose();
     });
   });

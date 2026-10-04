@@ -133,7 +133,8 @@ void main() {
         r'galleryEntries = <GalleryEntry>\[(.*?)\];',
         dotAll: true,
       );
-      final String body = entryList.firstMatch(main.readAsStringSync())!
+      final String body = entryList
+          .firstMatch(main.readAsStringSync())!
           .group(1)!;
 
       final List<String> lines = body
@@ -185,7 +186,8 @@ void main() {
           .readAsLinesSync()
           .where(
             (String l) =>
-                !l.trimLeft().startsWith('///') && !l.trimLeft().startsWith('//'),
+                !l.trimLeft().startsWith('///') &&
+                !l.trimLeft().startsWith('//'),
           )
           .join('\n');
       // The app shell is allowed to name the design system's tokens, its

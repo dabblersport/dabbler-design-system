@@ -109,9 +109,9 @@ abstract final class DabblerDateFormat {
   /// `DateField.jsx:40-42` — `[fmt(a), fmt(b)].filter(Boolean).join(' – ')`,
   /// so a half-chosen range renders as the start alone with no dangling dash.
   static String formatSpan(DabblerDateSpan span) => <String>[
-        format(span.start),
-        format(span.end),
-      ].where((String s) => s.isNotEmpty).join(rangeJoiner);
+    format(span.start),
+    format(span.end),
+  ].where((String s) => s.isNotEmpty).join(rangeJoiner);
 
   /// `DD/MM/YYYY`, `.` or `-` separators, and a two-digit year — or null.
   ///
@@ -246,9 +246,9 @@ class DabblerDateField extends StatefulWidget {
     this.open = false,
     this.onOpenPicker,
     this.focusNode,
-  })  : range = false,
-        span = DabblerDateSpan.empty,
-        onSpanChanged = null;
+  }) : range = false,
+       span = DabblerDateSpan.empty,
+       onSpanChanged = null;
 
   /// A date range: `DD/MM/YYYY – DD/MM/YYYY`.
   ///
@@ -270,9 +270,9 @@ class DabblerDateField extends StatefulWidget {
     this.open = false,
     this.onOpenPicker,
     this.focusNode,
-  })  : range = true,
-        value = null,
-        onChanged = null;
+  }) : range = true,
+       value = null,
+       onChanged = null;
 
   /// `icon="calendar"` — `DateField.jsx:114`.
   static const String iconName = 'calendar';
@@ -335,8 +335,9 @@ class DabblerDateField extends StatefulWidget {
 }
 
 class _DabblerDateFieldState extends State<DabblerDateField> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.displayText);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.displayText,
+  );
 
   @override
   void didUpdateWidget(DabblerDateField oldWidget) {
@@ -356,11 +357,8 @@ class _DabblerDateFieldState extends State<DabblerDateField> {
     super.dispose();
   }
 
-  bool _inBounds(DateTime d) => DabblerDateFormat.inBounds(
-        d,
-        min: widget.minimum,
-        max: widget.maximum,
-      );
+  bool _inBounds(DateTime d) =>
+      DabblerDateFormat.inBounds(d, min: widget.minimum, max: widget.maximum);
 
   /// `commitText` — `DateField.jsx:55-72`.
   void _commit(String raw) {
@@ -431,7 +429,8 @@ class _DabblerDateFieldState extends State<DabblerDateField> {
       controller: _controller,
       iconName: DabblerDateField.iconName,
       label: widget.label,
-      placeholder: widget.placeholder ??
+      placeholder:
+          widget.placeholder ??
           (widget.range
               ? DabblerDateFormat.rangePlaceholder
               : DabblerDateFormat.placeholder),

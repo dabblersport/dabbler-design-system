@@ -13,7 +13,10 @@ const double _sourcePressScale = 0.98;
 
 /// Reads [DabblerMotion.reduceMotion] out of a real element, with the platform
 /// flag set the way the platform would set it.
-Widget _probe({required bool disableAnimations, required void Function(bool) sink}) {
+Widget _probe({
+  required bool disableAnimations,
+  required void Function(bool) sink,
+}) {
   return MediaQuery(
     data: MediaQueryData(disableAnimations: disableAnimations),
     child: Builder(
@@ -54,8 +57,9 @@ void main() {
   });
 
   group('reduceMotion reads MediaQuery.maybeDisableAnimationsOf', () {
-    testWidgets('false when the platform has not asked for it',
-        (WidgetTester tester) async {
+    testWidgets('false when the platform has not asked for it', (
+      WidgetTester tester,
+    ) async {
       bool? seen;
       await tester.pumpWidget(
         _probe(disableAnimations: false, sink: (bool v) => seen = v),
@@ -71,8 +75,9 @@ void main() {
       expect(seen, isTrue);
     });
 
-    testWidgets('false — never an exception — with no MediaQuery in scope',
-        (WidgetTester tester) async {
+    testWidgets('false — never an exception — with no MediaQuery in scope', (
+      WidgetTester tester,
+    ) async {
       bool? seen;
       await tester.pumpWidget(
         Builder(

@@ -9,10 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '_host.dart';
 
 Finder _circleFinder() => find
-    .descendant(
-      of: find.byType(DabblerRadio),
-      matching: find.byType(Container),
-    )
+    .descendant(of: find.byType(DabblerRadio), matching: find.byType(Container))
     .first;
 
 BoxDecoration _circle(WidgetTester tester) =>
@@ -74,11 +71,9 @@ void main() {
 
       await tester.tap(find.byType(DabblerRadio));
       await tester.pump();
-      expect(
-        reported,
-        <bool>[true],
-        reason: 'Radio.jsx:17 — onChange(true), even when already selected',
-      );
+      expect(reported, <bool>[
+        true,
+      ], reason: 'Radio.jsx:17 — onChange(true), even when already selected');
     });
 
     testWidgets('a group is several radios reading one value', (
@@ -142,8 +137,9 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
-      final DabblerFocusRing ring =
-          tester.widget<DabblerFocusRing>(find.byType(DabblerFocusRing));
+      final DabblerFocusRing ring = tester.widget<DabblerFocusRing>(
+        find.byType(DabblerFocusRing),
+      );
       expect(ring.visible, isTrue);
       expect(ring.borderRadius, DabblerRadius.pillAll);
 

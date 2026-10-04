@@ -12,20 +12,17 @@ Widget host(
   Brightness brightness = Brightness.light,
   TextDirection textDirection = TextDirection.ltr,
 }) {
-  final DabblerColors colors =
-      DabblerColors.resolve(theme: theme, brightness: brightness);
+  final DabblerColors colors = DabblerColors.resolve(
+    theme: theme,
+    brightness: brightness,
+  );
   return MediaQuery(
     data: MediaQueryData(disableAnimations: disableAnimations),
     child: Directionality(
       textDirection: textDirection,
       child: Theme(
-        data: ThemeData(
-          extensions: <ThemeExtension<dynamic>>[colors],
-        ),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: child,
-        ),
+        data: ThemeData(extensions: <ThemeExtension<dynamic>>[colors]),
+        child: Align(alignment: Alignment.topLeft, child: child),
       ),
     ),
   );

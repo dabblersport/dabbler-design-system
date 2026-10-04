@@ -231,7 +231,7 @@ class DabblerCommentRow extends StatelessWidget {
       ),
     );
 
-    final Widget header = Row(
+    final Widget lead = Row(
       children: <Widget>[
         Flexible(
           child: DabblerFeedTappable(
@@ -271,17 +271,21 @@ class DabblerCommentRow extends StatelessWidget {
               maxLines: 1,
               style: caption,
             ),
-        if (onMore != null) ...<Widget>[
-          const Spacer(),
-          DabblerFeedAction(
-            icon: 'more-circle',
-            iconSize: actionGlyphSize,
-            onTap: onMore,
-            semanticLabel: moreLabel,
-          ),
-        ],
       ],
     );
+    final Widget header = onMore == null
+        ? lead
+        : Row(
+            children: <Widget>[
+              Expanded(child: lead),
+              DabblerFeedAction(
+                icon: 'more-circle',
+                iconSize: actionGlyphSize,
+                onTap: onMore,
+                semanticLabel: moreLabel,
+              ),
+            ],
+          );
 
     final TextStyle bodyStyle = t(
       textRole,
@@ -334,6 +338,7 @@ class DabblerCommentRow extends StatelessWidget {
         padding: EdgeInsetsDirectional.only(
           start: indentStep * depth,
           top: nested ? DabblerSpacing.space4 : DabblerSpacing.space5,
+          bottom: nested ? DabblerSpacing.space3 : 0,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

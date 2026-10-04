@@ -58,8 +58,8 @@ class DabblerSkeleton extends StatefulWidget {
     this.height,
     this.radius,
     this.animate = true,
-  })  : variant = DabblerSkeletonVariant.text,
-        assert(lines >= 1, 'a text skeleton needs at least one line');
+  }) : variant = DabblerSkeletonVariant.text,
+       assert(lines >= 1, 'a text skeleton needs at least one line');
 
   /// One block, [width] × [height].
   const DabblerSkeleton.rect({
@@ -68,19 +68,16 @@ class DabblerSkeleton extends StatefulWidget {
     this.height,
     this.radius,
     this.animate = true,
-  })  : variant = DabblerSkeletonVariant.rect,
-        lines = 1;
+  }) : variant = DabblerSkeletonVariant.rect,
+       lines = 1;
 
   /// An avatar well. [width] is the diameter; it defaults to
   /// [DabblerSizing.touchTargetMin] (45).
-  const DabblerSkeleton.circle({
-    super.key,
-    this.width,
-    this.animate = true,
-  })  : variant = DabblerSkeletonVariant.circle,
-        lines = 1,
-        height = null,
-        radius = null;
+  const DabblerSkeleton.circle({super.key, this.width, this.animate = true})
+    : variant = DabblerSkeletonVariant.circle,
+      lines = 1,
+      height = null,
+      radius = null;
 
   /// The generic card shell: 16:9 media, then a title and a meta bar.
   const DabblerSkeleton.card({
@@ -88,9 +85,9 @@ class DabblerSkeleton extends StatefulWidget {
     this.width,
     this.radius,
     this.animate = true,
-  })  : variant = DabblerSkeletonVariant.card,
-        lines = 1,
-        height = null;
+  }) : variant = DabblerSkeletonVariant.card,
+       lines = 1,
+       height = null;
 
   /// The shape this skeleton takes.
   final DabblerSkeletonVariant variant;
@@ -166,7 +163,8 @@ class _DabblerSkeletonState extends State<DabblerSkeleton>
 
   @override
   Widget build(BuildContext context) {
-    final bool reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final bool reduceMotion =
+        MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final bool pulsing = widget.animate && !reduceMotion;
     _syncController(pulsing);
 
@@ -206,14 +204,13 @@ class _DabblerSkeletonState extends State<DabblerSkeleton>
 
     if (!pulsing) {
       return Opacity(
-        opacity: widget.animate
-            ? DabblerSkeleton.reducedMotionOpacity
-            : 1,
+        opacity: widget.animate ? DabblerSkeleton.reducedMotionOpacity : 1,
         child: box,
       );
     }
 
-    final double offset = phase *
+    final double offset =
+        phase *
         DabblerSkeleton.pulseStagger.inMilliseconds /
         DabblerSkeleton.pulsePeriod.inMilliseconds;
 
@@ -267,11 +264,11 @@ class _DabblerSkeletonState extends State<DabblerSkeleton>
   }
 
   Widget _buildRect(bool pulsing) => _block(
-        pulsing: pulsing,
-        radius: widget.radius ?? DabblerRadius.sm,
-        width: widget.width,
-        height: widget.height ?? DabblerSizing.touchTargetMin,
-      );
+    pulsing: pulsing,
+    radius: widget.radius ?? DabblerRadius.sm,
+    width: widget.width,
+    height: widget.height ?? DabblerSizing.touchTargetMin,
+  );
 
   Widget _buildCircle(bool pulsing) {
     final double diameter = widget.width ?? DabblerSizing.touchTargetMin;
@@ -289,8 +286,9 @@ class _DabblerSkeletonState extends State<DabblerSkeleton>
       padding: const EdgeInsets.all(DabblerSpacing.space4),
       decoration: BoxDecoration(
         color: DabblerPalette.surfaceCard,
-        borderRadius:
-            BorderRadius.all(Radius.circular(widget.radius ?? DabblerRadius.lg)),
+        borderRadius: BorderRadius.all(
+          Radius.circular(widget.radius ?? DabblerRadius.lg),
+        ),
         border: Border.all(
           color: DabblerPalette.outlineCard,
           width: DabblerSizing.borderDefault,

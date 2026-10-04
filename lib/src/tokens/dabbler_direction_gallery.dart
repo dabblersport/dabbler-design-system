@@ -65,7 +65,8 @@ const List<GalleryEntry> directionGalleryEntries = <GalleryEntry>[
     page: 'foundations/bidirectionality',
     group: null,
     title: 'Direction — where mirroring stops',
-    description: 'Six RTL contracts, each rendered LTR and RTL side by side. '
+    description:
+        'Six RTL contracts, each rendered LTR and RTL side by side. '
         'The subject is not that the system mirrors; it is what deliberately '
         'does not.',
     builder: _direction,
@@ -92,7 +93,8 @@ Widget _direction(BuildContext context) {
       ),
       _band(
         name: '1 · A code does not mirror',
-        usage: '**`code_input.dart:51`.** The box row is wrapped in an '
+        usage:
+            '**`code_input.dart:51`.** The box row is wrapped in an '
             'explicit `Directionality(textDirection: TextDirection.ltr)`. A '
             'verification code is a number, numbers read left to right in both '
             'scripts, and mirroring the boxes would change the value the user '
@@ -103,7 +105,8 @@ Widget _direction(BuildContext context) {
       ),
       _band(
         name: '2 · A picker field pins its editable, not its chrome',
-        usage: '**`picker_field_shell.dart:255` — the shared shell, not '
+        usage:
+            '**`picker_field_shell.dart:255` — the shared shell, not '
             '`DabblerDateField`.** The value run carries '
             '`textDirection: TextDirection.ltr` so `12/09/2026` cannot be '
             'reordered to `2026/09/12` by the bidi algorithm: `/` is '
@@ -120,7 +123,8 @@ Widget _direction(BuildContext context) {
       ),
       _band(
         name: '3 · The week start is the caller’s fact',
-        usage: '**`calendar.dart:126`.** Nothing in the calendar decides a '
+        usage:
+            '**`calendar.dart:126`.** Nothing in the calendar decides a '
             'week start. `defaultFirstWeekdayFor` is a **fallback** for a '
             'caller that named none — Monday under LTR, Saturday under RTL, '
             'which is the first day across the Arabic-speaking markets Dabbler '
@@ -133,7 +137,8 @@ Widget _direction(BuildContext context) {
       ),
       _band(
         name: '4 · The slider inverts its pointer mapping',
-        usage: '**`slider.dart:373`.** `_valueAt` takes the ratio of the drag '
+        usage:
+            '**`slider.dart:373`.** `_valueAt` takes the ratio of the drag '
             'x to the track width and, under RTL, uses `1 - ratio`. Without it '
             'the track would mirror while the gesture did not, and dragging '
             'toward the high end would lower the value. The filled portion '
@@ -149,7 +154,8 @@ Widget _direction(BuildContext context) {
       _TypeBand(),
       _band(
         name: '6 · A directional glyph is selected, never transformed',
-        usage: '**`input_row.dart:299`.** Flutter has no ambient glyph '
+        usage:
+            '**`input_row.dart:299`.** Flutter has no ambient glyph '
             'mirroring and `DabblerIcon` never mirrors itself — the caller '
             'picks the name. `DabblerChevron` asks for `arrow-right` under LTR '
             'and `arrow-left` under RTL. A `Transform` would have been the '
@@ -288,10 +294,7 @@ class _TypeReadout extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Text(
-          _TypeBand._latin,
-          style: body.copyWith(color: colors.textPrimary),
-        ),
+        Text(_TypeBand._latin, style: body.copyWith(color: colors.textPrimary)),
         const SizedBox(height: DabblerSpacing.space2),
         Text(
           _TypeBand._arabic,

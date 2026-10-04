@@ -289,7 +289,10 @@ Widget _activityThumb(BuildContext context) => GalleryStack(
       label: 'LTR',
       child: _frame(
         DabblerActivityRow(
-          leading: const DabblerAvatar(seed: 'Khalid', size: DabblerAvatarSize.sm),
+          leading: const DabblerAvatar(
+            seed: 'Khalid',
+            size: DabblerAvatarSize.sm,
+          ),
           actor: 'khalid',
           verb: 'commented on',
           subject: 'Dubai Padel Open returns',
@@ -304,7 +307,10 @@ Widget _activityThumb(BuildContext context) => GalleryStack(
         Directionality(
           textDirection: TextDirection.rtl,
           child: DabblerActivityRow(
-            leading: const DabblerAvatar(seed: 'Khalid', size: DabblerAvatarSize.sm),
+            leading: const DabblerAvatar(
+              seed: 'Khalid',
+              size: DabblerAvatarSize.sm,
+            ),
             actor: 'خالد',
             verb: 'علّق على',
             subject: 'بطولة دبي للبادل',

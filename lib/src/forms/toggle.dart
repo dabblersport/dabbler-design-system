@@ -126,8 +126,7 @@ class _DabblerToggleState extends State<DabblerToggle> {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final bool reduceMotion = DabblerMotion.reduceMotion(context);
-    final Duration duration =
-        reduceMotion ? Duration.zero : DabblerMotion.base;
+    final Duration duration = reduceMotion ? Duration.zero : DabblerMotion.base;
 
     final Widget track = AnimatedContainer(
       duration: duration,

@@ -40,12 +40,15 @@ const String notAPage = '_order.md';
 const String corpusRoot = DabblerDocVocabulary.assetRoot;
 
 /// Every `.md` in the corpus except [notAPage], sorted for stable reporting.
-List<File> corpusFiles() => Directory(corpusRoot)
-    .listSync(recursive: true)
-    .whereType<File>()
-    .where((File f) => f.path.endsWith('.md') && !f.path.endsWith('/$notAPage'))
-    .toList()
-  ..sort((File a, File b) => a.path.compareTo(b.path));
+List<File> corpusFiles() =>
+    Directory(corpusRoot)
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where(
+          (File f) => f.path.endsWith('.md') && !f.path.endsWith('/$notAPage'),
+        )
+        .toList()
+      ..sort((File a, File b) => a.path.compareTo(b.path));
 
 /// A sentence terminator followed by the start of another sentence.
 ///
@@ -65,8 +68,9 @@ List<String> corpusViolations(
   DabblerDocSpecimenResolver? resolver,
 }) {
   final List<String> found = <String>[];
-  final DabblerDocPageKind kind =
-      DabblerDocVocabulary.kindForAssetPath(assetPath);
+  final DabblerDocPageKind kind = DabblerDocVocabulary.kindForAssetPath(
+    assetPath,
+  );
   if (kind == DabblerDocPageKind.notAPage) {
     return found;
   }
@@ -77,33 +81,43 @@ List<String> corpusViolations(
   // title and the first `##`: a one-sentence Definition, then the Intro. A
   // `### ` in the lead is a heading, not a paragraph, so it is not counted —
   // most component pages open `# Toast` / `### `DabblerToast``.
-  final List<DabblerDocProse> leadProse =
-      page.lead.whereType<DabblerDocProse>().toList();
+  final List<DabblerDocProse> leadProse = page.lead
+      .whereType<DabblerDocProse>()
+      .toList();
   if (leadProse.length != 2) {
-    found.add('lead prose: expected exactly 2 paragraphs (Definition, then '
-        'Intro), found ${leadProse.length}');
+    found.add(
+      'lead prose: expected exactly 2 paragraphs (Definition, then '
+      'Intro), found ${leadProse.length}',
+    );
   } else {
     final String definition = leadProse.first.markup.trim();
     if (_sentenceBoundary.hasMatch(definition)) {
-      found.add('lead prose: the Definition paragraph must be a single '
-          'sentence — "${definition.replaceAll('\n', ' ')}"');
+      found.add(
+        'lead prose: the Definition paragraph must be a single '
+        'sentence — "${definition.replaceAll('\n', ' ')}"',
+      );
     }
   }
 
   // An empty vocabulary means UNCONSTRAINED (start-here.md), never "no
   // headings allowed" — doc_vocabulary.dart says so in as many words.
   if (DabblerDocVocabulary.isGoverned(kind)) {
-    final List<DabblerDocHeading> vocabulary =
-        DabblerDocVocabulary.forKind(kind);
-    final List<String> legal =
-        vocabulary.map((DabblerDocHeading h) => h.text).toList();
-    final List<String> present =
-        page.sections.map((DabblerDocSection s) => s.heading).toList();
+    final List<DabblerDocHeading> vocabulary = DabblerDocVocabulary.forKind(
+      kind,
+    );
+    final List<String> legal = vocabulary
+        .map((DabblerDocHeading h) => h.text)
+        .toList();
+    final List<String> present = page.sections
+        .map((DabblerDocSection s) => s.heading)
+        .toList();
 
     for (final String heading in present) {
       if (!legal.contains(heading)) {
-        found.add('heading "$heading" is not in the ${kind.name} vocabulary '
-            '(${legal.join(" · ")})');
+        found.add(
+          'heading "$heading" is not in the ${kind.name} vocabulary '
+          '(${legal.join(" · ")})',
+        );
       }
     }
     for (final DabblerDocHeading h in vocabulary) {
@@ -116,15 +130,19 @@ List<String> corpusViolations(
     final List<String> recognised = present.where(legal.contains).toList();
     final List<String> expected = legal.where(recognised.contains).toList();
     if (recognised.join('|') != expected.join('|')) {
-      found.add('headings out of order: found ${recognised.join(" · ")}, '
-          'expected ${expected.join(" · ")}');
+      found.add(
+        'headings out of order: found ${recognised.join(" · ")}, '
+        'expected ${expected.join(" · ")}',
+      );
     }
     // Optional means omitted, never emptied — a present heading with no body
     // fails, and there is no way to spell an accepted stub.
     for (final DabblerDocSection s in page.sections) {
       if (s.blocks.isEmpty) {
-        found.add('section "${s.heading}" is present but empty — optional '
-            'means omitted, never emptied');
+        found.add(
+          'section "${s.heading}" is present but empty — optional '
+          'means omitted, never emptied',
+        );
       }
     }
   }
@@ -143,38 +161,55 @@ List<String> corpusViolations(
 
 /// The real registry — what the gallery app resolves `@specimen` lines
 /// through, so the gate and the screen agree on what exists.
-final DabblerDocSpecimenResolver _registry =
-    DabblerDocSpecimenResolver(galleryEntries);
+final DabblerDocSpecimenResolver _registry = DabblerDocSpecimenResolver(
+  galleryEntries,
+);
 
 void main() {
   group('KAN-324 — the corpus conforms (AC5)', () {
-    test('every in-scope page passes rule (a), vocabulary, order and specimens',
-        () {
-      final List<File> files = corpusFiles();
-      expect(files.length, greaterThan(50),
-          reason: 'found ${files.length} pages — the walk is not reaching the '
-              'corpus, and a gate that reads nothing passes vacuously');
+    test(
+      'every in-scope page passes rule (a), vocabulary, order and specimens',
+      () {
+        final List<File> files = corpusFiles();
+        expect(
+          files.length,
+          greaterThan(50),
+          reason:
+              'found ${files.length} pages — the walk is not reaching the '
+              'corpus, and a gate that reads nothing passes vacuously',
+        );
 
-      final Map<String, List<String>> failures = <String, List<String>>{};
-      for (final File f in files) {
-        final List<String> v = corpusViolations(f.path, f.readAsStringSync(),
-            resolver: _registry);
-        if (v.isNotEmpty) failures[f.path] = v;
-      }
-      expect(failures, isEmpty,
-          reason: 'The corpus was re-baselined clean; a red result here is a '
-              'real regression:\n${failures.entries.map((MapEntry<String, List<String>> e) => '  ${e.key}\n${e.value.map((String s) => '    - $s').join('\n')}').join('\n')}');
-    });
+        final Map<String, List<String>> failures = <String, List<String>>{};
+        for (final File f in files) {
+          final List<String> v = corpusViolations(
+            f.path,
+            f.readAsStringSync(),
+            resolver: _registry,
+          );
+          if (v.isNotEmpty) failures[f.path] = v;
+        }
+        expect(
+          failures,
+          isEmpty,
+          reason:
+              'The corpus was re-baselined clean; a red result here is a '
+              'real regression:\n${failures.entries.map((MapEntry<String, List<String>> e) => '  ${e.key}\n${e.value.map((String s) => '    - $s').join('\n')}').join('\n')}',
+        );
+      },
+    );
 
     test('every component and foundations page maps its live specimen, and '
         'every gallery entry is mapped from some page', () {
       final Set<String> referenced = <String>{};
       final List<String> unmapped = <String>[];
       for (final File f in corpusFiles()) {
-        final DabblerDocPageKind kind =
-            DabblerDocVocabulary.kindForAssetPath(f.path);
-        final List<String> ids =
-            DabblerDocSplitter.split(f.path, f.readAsStringSync()).specimenIds;
+        final DabblerDocPageKind kind = DabblerDocVocabulary.kindForAssetPath(
+          f.path,
+        );
+        final List<String> ids = DabblerDocSplitter.split(
+          f.path,
+          f.readAsStringSync(),
+        ).specimenIds;
         referenced.addAll(ids);
         if ((kind == DabblerDocPageKind.component ||
                 kind == DabblerDocPageKind.foundations) &&
@@ -182,16 +217,21 @@ void main() {
           unmapped.add(f.path);
         }
       }
-      expect(unmapped, isEmpty,
-          reason: 'these pages carry no `@specimen` line under `## Specimen`, '
-              'so the component is not shown inside its documentation');
+      expect(
+        unmapped,
+        isEmpty,
+        reason:
+            'these pages carry no `@specimen` line under `## Specimen`, '
+            'so the component is not shown inside its documentation',
+      );
       expect(
         <String>[
           for (final GalleryEntry e in galleryEntries)
             if (!referenced.contains(e.id)) e.id,
         ],
         isEmpty,
-        reason: 'these gallery entries are referenced by no documentation '
+        reason:
+            'these gallery entries are referenced by no documentation '
             'page — name each one in its page\'s `## Specimen` section',
       );
     });
@@ -201,8 +241,9 @@ void main() {
       expect(DabblerDocVocabulary.foundations.length, 6);
       expect(DabblerDocVocabulary.patterns.length, 4);
       expect(
-        DabblerDocVocabulary.foundations
-            .any((DabblerDocHeading h) => h.text == 'Tokens used'),
+        DabblerDocVocabulary.foundations.any(
+          (DabblerDocHeading h) => h.text == 'Tokens used',
+        ),
         isFalse,
         reason: 'D-034(a): on a Foundations page its presence is the error',
       );
@@ -211,32 +252,46 @@ void main() {
 
   group('KAN-324 — exclusions and exemptions (AC3)', () {
     test('_order.md is excluded by path, explicitly', () {
-      expect(DabblerDocVocabulary.kindForAssetPath('$corpusRoot/$notAPage'),
-          DabblerDocPageKind.notAPage);
-      expect(corpusFiles().where((File f) => f.path.endsWith(notAPage)),
-          isEmpty,
-          reason: 'the walk must exclude it by name, not by luck');
-      expect(corpusViolations('$corpusRoot/$notAPage', '# not a page'), isEmpty);
+      expect(
+        DabblerDocVocabulary.kindForAssetPath('$corpusRoot/$notAPage'),
+        DabblerDocPageKind.notAPage,
+      );
+      expect(
+        corpusFiles().where((File f) => f.path.endsWith(notAPage)),
+        isEmpty,
+        reason: 'the walk must exclude it by name, not by luck',
+      );
+      expect(
+        corpusViolations('$corpusRoot/$notAPage', '# not a page'),
+        isEmpty,
+      );
     });
 
     test('start-here.md is vocabulary-exempt but bound by rule (a)', () {
-      expect(DabblerDocVocabulary.kindForAssetPath('$corpusRoot/start-here.md'),
-          DabblerDocPageKind.exempt);
       expect(
-        corpusViolations('$corpusRoot/start-here.md',
-            '# Start here\n\nOne sentence.\n\nIntro.\n\n## Anything at all\n\nBody.\n'),
+        DabblerDocVocabulary.kindForAssetPath('$corpusRoot/start-here.md'),
+        DabblerDocPageKind.exempt,
+      );
+      expect(
+        corpusViolations(
+          '$corpusRoot/start-here.md',
+          '# Start here\n\nOne sentence.\n\nIntro.\n\n## Anything at all\n\nBody.\n',
+        ),
         isEmpty,
       );
       expect(
-        corpusViolations('$corpusRoot/start-here.md',
-            '# Start here\n\nOnly one paragraph.\n\n## Anything\n\nBody.\n'),
+        corpusViolations(
+          '$corpusRoot/start-here.md',
+          '# Start here\n\nOnly one paragraph.\n\n## Anything\n\nBody.\n',
+        ),
         contains(startsWith('lead prose:')),
       );
     });
   });
 
   group('KAN-324 — the gate can fail (AC4)', () {
-    const String good = '# Button\n\n'
+    const String good =
+        '# Button\n\n'
         'A button is the one control that commits an action.\n\n'
         'Intro paragraph that may run to several sentences. It does here.\n\n'
         '## Specimen\n\nBody.\n\n'
@@ -250,25 +305,33 @@ void main() {
     });
 
     test('an unrecognised heading fails', () {
-      expect(corpusViolations(path, good.replaceFirst('## Using it', '## Usage')),
-          contains(contains('not in the component vocabulary')));
+      expect(
+        corpusViolations(path, good.replaceFirst('## Using it', '## Usage')),
+        contains(contains('not in the component vocabulary')),
+      );
     });
 
     test('a misordered heading fails', () {
-      const String swapped = '# Button\n\n'
+      const String swapped =
+          '# Button\n\n'
           'A button is the one control that commits an action.\n\n'
           'Intro.\n\n'
           '## Using it\n\nBody.\n\n'
           '## Specimen\n\nBody.\n\n'
           '## Tokens used\n\nBody.\n\n'
           '## Source\n\nBody.\n';
-      expect(corpusViolations(path, swapped), contains(contains('out of order')));
+      expect(
+        corpusViolations(path, swapped),
+        contains(contains('out of order')),
+      );
     });
 
     test('an optional heading present but empty fails', () {
       expect(
         corpusViolations(
-            path, good.replaceFirst('## Source', '## Change log\n\n## Source')),
+          path,
+          good.replaceFirst('## Source', '## Change log\n\n## Source'),
+        ),
         contains(contains('present but empty')),
       );
     });
@@ -276,23 +339,29 @@ void main() {
     test('a required heading missing fails', () {
       expect(
         corpusViolations(
-            path, good.replaceFirst('## Tokens used\n\nBody.\n\n', '')),
+          path,
+          good.replaceFirst('## Tokens used\n\nBody.\n\n', ''),
+        ),
         contains(contains('required heading "Tokens used" is missing')),
       );
     });
 
     test('Tokens used on a Foundations page fails (D-034(a))', () {
-      expect(corpusViolations('$corpusRoot/foundations/colour.md', good),
-          contains(contains('not in the foundations vocabulary')));
+      expect(
+        corpusViolations('$corpusRoot/foundations/colour.md', good),
+        contains(contains('not in the foundations vocabulary')),
+      );
     });
 
     test('a two-sentence Definition fails rule (a)', () {
       expect(
         corpusViolations(
-            path,
-            good.replaceFirst(
-                'A button is the one control that commits an action.',
-                'A button commits an action. It is the only control that does.')),
+          path,
+          good.replaceFirst(
+            'A button is the one control that commits an action.',
+            'A button commits an action. It is the only control that does.',
+          ),
+        ),
         contains(contains('must be a single sentence')),
       );
     });
@@ -300,18 +369,25 @@ void main() {
     test('a lead of one paragraph fails rule (a)', () {
       expect(
         corpusViolations(
-            path,
-            good.replaceFirst(
-                'Intro paragraph that may run to several sentences. It does here.\n\n',
-                '')),
+          path,
+          good.replaceFirst(
+            'Intro paragraph that may run to several sentences. It does here.\n\n',
+            '',
+          ),
+        ),
         contains(contains('expected exactly 2 paragraphs')),
       );
     });
 
     test('an unresolved @specimen id fails', () {
       expect(
-        corpusViolations(path,
-            good.replaceFirst('## Specimen\n\nBody.', '## Specimen\n\n@specimen no-such-entry')),
+        corpusViolations(
+          path,
+          good.replaceFirst(
+            '## Specimen\n\nBody.',
+            '## Specimen\n\n@specimen no-such-entry',
+          ),
+        ),
         contains(contains('resolves to no gallery entry')),
       );
     });
@@ -319,18 +395,21 @@ void main() {
     test('a resolvable @specimen id passes', () {
       final DabblerDocSpecimenResolver resolver =
           DabblerDocSpecimenResolver(<GalleryEntry>[
-        GalleryEntry(
-          id: 'real-entry',
-          title: 'Real',
-          page: 'x',
-          group: GalleryPurpose.navigation,
-          builder: (BuildContext _) => const SizedBox.shrink(),
-        ),
-      ]);
+            GalleryEntry(
+              id: 'real-entry',
+              title: 'Real',
+              page: 'x',
+              group: GalleryPurpose.navigation,
+              builder: (BuildContext _) => const SizedBox.shrink(),
+            ),
+          ]);
       expect(
         corpusViolations(
           path,
-          good.replaceFirst('## Specimen\n\nBody.', '## Specimen\n\n@specimen real-entry'),
+          good.replaceFirst(
+            '## Specimen\n\nBody.',
+            '## Specimen\n\n@specimen real-entry',
+          ),
           resolver: resolver,
         ),
         isEmpty,

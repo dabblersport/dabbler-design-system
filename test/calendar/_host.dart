@@ -15,8 +15,7 @@ const double phoneWidth = 375;
 DabblerColors colorsFor({
   DabblerTheme theme = DabblerTheme.main,
   Brightness brightness = Brightness.light,
-}) =>
-    DabblerColors.resolve(theme: theme, brightness: brightness);
+}) => DabblerColors.resolve(theme: theme, brightness: brightness);
 
 /// A [ThemeData] carrying [DabblerColors], a direction and a bounded width —
 /// the same minimum `test/layout/section_test.dart` uses, so geometry

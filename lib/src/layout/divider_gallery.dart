@@ -28,7 +28,10 @@ Widget _dividers(BuildContext context) => const GalleryStack(
       label: 'inset',
       child: DabblerDivider(inset: DabblerSpacing.space8),
     ),
-    GallerySpecimen(label: 'labelled', child: DabblerDivider(label: 'or')),
+    GallerySpecimen(
+      label: 'labelled',
+      child: DabblerDivider(label: 'or'),
+    ),
     GallerySpecimen(
       label: 'vertical',
       child: SizedBox(height: 48, child: DabblerDivider.vertical()),

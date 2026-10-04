@@ -112,9 +112,11 @@ class DabblerSurface extends StatelessWidget {
     this.height,
     this.center = false,
     this.clipBehavior = Clip.antiAlias,
-  })  : _bleed = false,
-        assert(borderWidth == null || borderWidth >= 0,
-            'a border cannot be narrower than zero');
+  }) : _bleed = false,
+       assert(
+         borderWidth == null || borderWidth >= 0,
+         'a border cannot be narrower than zero',
+       );
 
   /// The opaque card surface with its hairline —
   /// [DabblerSurfaceVariant.card].
@@ -131,19 +133,19 @@ class DabblerSurface extends StatelessWidget {
     bool center = false,
     Clip clipBehavior = Clip.antiAlias,
   }) : this(
-          key: key,
-          child: child,
-          variant: DabblerSurfaceVariant.card,
-          radius: radius,
-          fill: fill,
-          borderColor: borderColor,
-          borderWidth: borderWidth,
-          padding: padding,
-          width: width,
-          height: height,
-          center: center,
-          clipBehavior: clipBehavior,
-        );
+         key: key,
+         child: child,
+         variant: DabblerSurfaceVariant.card,
+         radius: radius,
+         fill: fill,
+         borderColor: borderColor,
+         borderWidth: borderWidth,
+         padding: padding,
+         width: width,
+         height: height,
+         center: center,
+         clipBehavior: clipBehavior,
+       );
 
   /// The sunken fill step — [DabblerSurfaceVariant.sunken].
   const DabblerSurface.sunken({
@@ -159,19 +161,19 @@ class DabblerSurface extends StatelessWidget {
     bool center = false,
     Clip clipBehavior = Clip.antiAlias,
   }) : this(
-          key: key,
-          child: child,
-          variant: DabblerSurfaceVariant.sunken,
-          radius: radius,
-          fill: fill,
-          borderColor: borderColor,
-          borderWidth: borderWidth,
-          padding: padding,
-          width: width,
-          height: height,
-          center: center,
-          clipBehavior: clipBehavior,
-        );
+         key: key,
+         child: child,
+         variant: DabblerSurfaceVariant.sunken,
+         radius: radius,
+         fill: fill,
+         borderColor: borderColor,
+         borderWidth: borderWidth,
+         padding: padding,
+         width: width,
+         height: height,
+         center: center,
+         clipBehavior: clipBehavior,
+       );
 
   /// The neutral inset panel — [DabblerSurfaceVariant.grey].
   const DabblerSurface.grey({
@@ -187,19 +189,19 @@ class DabblerSurface extends StatelessWidget {
     bool center = false,
     Clip clipBehavior = Clip.antiAlias,
   }) : this(
-          key: key,
-          child: child,
-          variant: DabblerSurfaceVariant.grey,
-          radius: radius,
-          fill: fill,
-          borderColor: borderColor,
-          borderWidth: borderWidth,
-          padding: padding,
-          width: width,
-          height: height,
-          center: center,
-          clipBehavior: clipBehavior,
-        );
+         key: key,
+         child: child,
+         variant: DabblerSurfaceVariant.grey,
+         radius: radius,
+         fill: fill,
+         borderColor: borderColor,
+         borderWidth: borderWidth,
+         padding: padding,
+         width: width,
+         height: height,
+         center: center,
+         clipBehavior: clipBehavior,
+       );
 
   /// The opaque brand tint with the card hairline —
   /// [DabblerSurfaceVariant.brandTint].
@@ -216,19 +218,19 @@ class DabblerSurface extends StatelessWidget {
     bool center = false,
     Clip clipBehavior = Clip.antiAlias,
   }) : this(
-          key: key,
-          child: child,
-          variant: DabblerSurfaceVariant.brandTint,
-          radius: radius,
-          fill: fill,
-          borderColor: borderColor,
-          borderWidth: borderWidth,
-          padding: padding,
-          width: width,
-          height: height,
-          center: center,
-          clipBehavior: clipBehavior,
-        );
+         key: key,
+         child: child,
+         variant: DabblerSurfaceVariant.brandTint,
+         radius: radius,
+         fill: fill,
+         borderColor: borderColor,
+         borderWidth: borderWidth,
+         padding: padding,
+         width: width,
+         height: height,
+         center: center,
+         clipBehavior: clipBehavior,
+       );
 
   /// The brand tint as a **full-bleed page section** — the profile hero band
   /// behind the avatar, name and stats (`Profiles.dc.html:70`, `:933-934`):
@@ -248,14 +250,14 @@ class DabblerSurface extends StatelessWidget {
     this.padding,
     this.width,
     this.height,
-  })  : variant = DabblerSurfaceVariant.brandTint,
-        radius = 0,
-        fill = null,
-        borderColor = null,
-        borderWidth = 0,
-        center = false,
-        clipBehavior = Clip.none,
-        _bleed = true;
+  }) : variant = DabblerSurfaceVariant.brandTint,
+       radius = 0,
+       fill = null,
+       borderColor = null,
+       borderWidth = 0,
+       center = false,
+       clipBehavior = Clip.none,
+       _bleed = true;
 
   /// The solid brand fill of a selected control —
   /// [DabblerSurfaceVariant.selected].
@@ -272,19 +274,19 @@ class DabblerSurface extends StatelessWidget {
     bool center = false,
     Clip clipBehavior = Clip.antiAlias,
   }) : this(
-          key: key,
-          child: child,
-          variant: DabblerSurfaceVariant.selected,
-          radius: radius,
-          fill: fill,
-          borderColor: borderColor,
-          borderWidth: borderWidth,
-          padding: padding,
-          width: width,
-          height: height,
-          center: center,
-          clipBehavior: clipBehavior,
-        );
+         key: key,
+         child: child,
+         variant: DabblerSurfaceVariant.selected,
+         radius: radius,
+         fill: fill,
+         borderColor: borderColor,
+         borderWidth: borderWidth,
+         padding: padding,
+         width: width,
+         height: height,
+         center: center,
+         clipBehavior: clipBehavior,
+       );
 
   /// The content of the surface. May be null — an empty surface is a legitimate
   /// spacer or media well.
@@ -366,11 +368,15 @@ class DabblerSurface extends StatelessWidget {
   /// `white`, which is the card surface in light and keeps the tile on the
   /// card in dark).
   static Color tintedFillOf(DabblerColors colors, Color tint) =>
-      Color.alphaBlend(tint.withValues(alpha: tintFillAlpha), colors.surfaceCard);
+      Color.alphaBlend(
+        tint.withValues(alpha: tintFillAlpha),
+        colors.surfaceCard,
+      );
 
   /// The 1px stroke of a surface tinted with [tint]: [tint] at
   /// [tintBorderAlpha] over [DabblerColors.surfaceCard].
-  static Color tintedBorderOf(DabblerColors colors, Color tint) => Color.alphaBlend(
+  static Color tintedBorderOf(DabblerColors colors, Color tint) =>
+      Color.alphaBlend(
         tint.withValues(alpha: tintBorderAlpha),
         colors.surfaceCard,
       );
@@ -405,8 +411,7 @@ class DabblerSurface extends StatelessWidget {
       DabblerSurfaceVariant.brandTint => colors.borderDefault,
       DabblerSurfaceVariant.sunken ||
       DabblerSurfaceVariant.grey ||
-      DabblerSurfaceVariant.selected =>
-        null,
+      DabblerSurfaceVariant.selected => null,
     };
   }
 
@@ -434,12 +439,13 @@ class DabblerSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final Color resolvedFill = fill ??
-        (_bleed ? brandTintBleedFill(colors) : fillOf(colors, variant));
+    final Color resolvedFill =
+        fill ?? (_bleed ? brandTintBleedFill(colors) : fillOf(colors, variant));
     final Color? resolvedBorder = borderColor ?? borderOf(colors, variant);
     final double resolvedWidth = borderWidth ?? DabblerSizing.borderDefault;
-    final BorderRadius borderRadius =
-        BorderRadius.all(Radius.circular(radius ?? defaultRadius));
+    final BorderRadius borderRadius = BorderRadius.all(
+      Radius.circular(radius ?? defaultRadius),
+    );
 
     Widget? content = child;
     if (content != null && padding != null) {

@@ -12,7 +12,9 @@ import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import 'attachment_add_tile.dart';
 import 'attachment_chip.dart';
+import 'open_post.dart';
 import 'comment_row.dart';
 import 'post_detail.dart';
 import 'post_row.dart';
@@ -60,6 +62,26 @@ const List<GalleryEntry> threadGalleryEntries = <GalleryEntry>[
         'The full timestamp, the edited marker and the visibility line, in '
         'LTR and RTL.',
     builder: _detail,
+  ),
+  GalleryEntry(
+    id: 'post-row/open',
+    page: 'components/post-row',
+    group: GalleryPurpose.contentContainers,
+    title: 'OpenPost — the post a detail screen is about',
+    description:
+        'The author header with Follow, the body, the sport and place '
+        'pills, the time and views line and the action row, in LTR and RTL.',
+    builder: _open,
+  ),
+  GalleryEntry(
+    id: 'reply-composer/composing',
+    page: 'components/reply-composer',
+    group: GalleryPurpose.selectionAndInput,
+    title: 'ReplyComposer — the composing frame',
+    description:
+        'The boxed editor with an add tile, a preview, a place pill, the '
+        'counter and the Reply button.',
+    builder: _composing,
   ),
   GalleryEntry(
     id: 'post-row/repost',
@@ -393,6 +415,113 @@ Widget _reposts(BuildContext context) => GalleryStack(
               divider: false,
             ),
           ),
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _open(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'author, pills, views and actions',
+      child: _frame(
+        const DabblerOpenPost(
+          name: 'Moataz Mustapha',
+          roleLabel: 'Player',
+          badgeLabel: 'Dab',
+          handle: '@moatazmustapha',
+          followLabel: 'Follow',
+          onFollow: _noop,
+          segments: <DabblerPostSegment>[
+            DabblerPostSegment(
+              'Organising a Dubai football night this Sunday. All levels '
+              'welcome. Drop your name below.',
+            ),
+          ],
+          sportLabel: 'Football',
+          placeLabel: 'Al Quoz Pond Park',
+          timeLabel: '8:00 PM',
+          dateLabel: 'Aug 16, 2026',
+          viewsLabel: '1,204 views',
+          audienceLabel: 'EN',
+          likes: 128,
+          vibes: 24,
+          replies: 6,
+          onShare: _noop,
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'RTL',
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: _frame(
+          const DabblerOpenPost(
+            name: 'معتز مصطفى',
+            handle: '@moataz',
+            followLabel: 'متابعة',
+            following: true,
+            segments: <DabblerPostSegment>[
+              DabblerPostSegment('مباراة كرة قدم'),
+            ],
+            timeLabel: '8:00',
+            dateLabel: '16 أغسطس',
+            likes: 3,
+            onShare: _noop,
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _composing(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'composing, with preview, place and counter',
+      child: _frame(
+        DabblerReplyComposer(
+          onSend: _send,
+          padSafeArea: false,
+          composing: true,
+          multiline: true,
+          replyingTo: '@moatazmustapha',
+          onCancelReply: _noop,
+          canSendEmpty: true,
+          counter: '82/280',
+          attachments: Wrap(
+            spacing: DabblerSpacing.space3,
+            runSpacing: DabblerSpacing.space3,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              const DabblerAttachmentAddTile(label: 'Add', onTap: _noop),
+              DabblerAttachmentChip(
+                thumbnail: _media(context),
+                semanticLabel: 'Pitch photo',
+                onRemove: _noop,
+              ),
+              const DabblerAttachmentChip(
+                icon: 'location',
+                label: 'Al Quoz Pond Park',
+                onRemove: _noop,
+              ),
+            ],
+          ),
+          attachActions: const <DabblerReplyComposerAction>[
+            DabblerReplyComposerAction(
+              icon: 'gallery',
+              label: 'Add photo',
+              onTap: _noop,
+              active: true,
+            ),
+            DabblerReplyComposerAction(
+              icon: 'location',
+              label: 'Add place',
+              onTap: _noop,
+              active: true,
+            ),
+          ],
         ),
       ),
     ),

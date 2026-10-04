@@ -436,21 +436,28 @@ void main() {
       ]) {
         await tester.pumpWidget(_host(_yearly, theme: theme));
         await tester.pumpAndSettle(); // MaterialApp animates theme changes.
-        final Color fill = (tester
-                .widget<DecoratedBox>(find
-                    .descendant(
-                      of: find.byType(DabblerBadge),
-                      matching: find.byType(DecoratedBox),
-                    )
-                    .first)
-                .decoration as BoxDecoration)
-            .color!;
+        final Color fill =
+            (tester
+                        .widget<DecoratedBox>(
+                          find
+                              .descendant(
+                                of: find.byType(DabblerBadge),
+                                matching: find.byType(DecoratedBox),
+                              )
+                              .first,
+                        )
+                        .decoration
+                    as BoxDecoration)
+                .color!;
         expect(fill, _colors(theme: theme).brandPrimaryHover, reason: '$theme');
         fills.add(fill);
       }
       expect(fills.first, const Color(0xFF5A1FA1));
-      expect(fills.first, isNot(const Color(0xFF5A1EA8)),
-          reason: 'approximation, not the live value');
+      expect(
+        fills.first,
+        isNot(const Color(0xFF5A1EA8)),
+        reason: 'approximation, not the live value',
+      );
       expect(fills.last, isNot(fills.first));
     });
 
@@ -495,8 +502,11 @@ void main() {
       final Rect plan = tester.getRect(find.text(_yearly.plan));
       expect(indicator.center.dx, lessThan(plan.center.dx));
       final Rect card = tester.getRect(find.byType(DabblerCard));
-      expect(card.right - plan.right, closeTo(16, 0.6),
-          reason: 'Card.jsx padding 16 from the leading (right) edge');
+      expect(
+        card.right - plan.right,
+        closeTo(16, 0.6),
+        reason: 'Card.jsx padding 16 from the leading (right) edge',
+      );
     });
 
     testWidgets('is inset from the left under LTR', (

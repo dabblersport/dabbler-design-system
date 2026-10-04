@@ -47,7 +47,8 @@ const List<GalleryEntry> buttonGalleryEntries = <GalleryEntry>[
     page: 'components/button',
     group: GalleryPurpose.actions,
     title: 'Button — tones × states',
-    description: 'Every tone against rest, small, pressed, focus, loading and '
+    description:
+        'Every tone against rest, small, pressed, focus, loading and '
         'disabled — the matrix the design page draws.',
     builder: _matrix,
   ),
@@ -104,18 +105,19 @@ const double _columnGap = 16;
 /// Transcribed literally. 10px is below [DabblerType.caption2] (11) and the
 /// tracking is not a token — the page states both as raw CSS, so they are
 /// stated as raw numbers here rather than snapped to the nearest ramp step.
-Widget _label(BuildContext context, String text, {required Color color}) => Text(
-  text.toUpperCase(),
-  style: DabblerType.caption2
-      .resolveForDirection(Directionality.of(context))
-      .copyWith(
-        fontSize: 10,
-        height: 1.4,
-        letterSpacing: 0.8,
-        fontWeight: DabblerType.bold,
-        color: color,
-      ),
-);
+Widget _label(BuildContext context, String text, {required Color color}) =>
+    Text(
+      text.toUpperCase(),
+      style: DabblerType.caption2
+          .resolveForDirection(Directionality.of(context))
+          .copyWith(
+            fontSize: 10,
+            height: 1.4,
+            letterSpacing: 0.8,
+            fontWeight: DabblerType.bold,
+            color: color,
+          ),
+    );
 
 Widget _matrix(BuildContext context) {
   final DabblerColors colors = DabblerColors.of(context);
@@ -129,9 +131,7 @@ Widget _matrix(BuildContext context) {
           children: <Widget>[
             const _Cell(child: SizedBox.shrink()),
             for (final String column in _matrixColumns)
-              _Cell(
-                child: _label(context, column, color: colors.textTertiary),
-              ),
+              _Cell(child: _label(context, column, color: colors.textTertiary)),
           ],
         ),
         for (final DabblerButtonTone tone in _matrixTones)
@@ -140,7 +140,13 @@ Widget _matrix(BuildContext context) {
               _Cell(
                 child: _label(context, tone.name, color: colors.textSecondary),
               ),
-              _Cell(child: DabblerButton(label: 'join', tone: tone, onPressed: _noop)),
+              _Cell(
+                child: DabblerButton(
+                  label: 'join',
+                  tone: tone,
+                  onPressed: _noop,
+                ),
+              ),
               _Cell(
                 child: DabblerButton(
                   label: 'join',
@@ -151,18 +157,30 @@ Widget _matrix(BuildContext context) {
               ),
               _Cell(
                 child: _Pressed(
-                  child: DabblerButton(label: 'join', tone: tone, onPressed: _noop),
+                  child: DabblerButton(
+                    label: 'join',
+                    tone: tone,
+                    onPressed: _noop,
+                  ),
                 ),
               ),
               _Cell(
                 child: DabblerFocusRing.visible(
                   visible: true,
                   borderRadius: DabblerRadius.pillAll,
-                  child: DabblerButton(label: 'join', tone: tone, onPressed: _noop),
+                  child: DabblerButton(
+                    label: 'join',
+                    tone: tone,
+                    onPressed: _noop,
+                  ),
                 ),
               ),
               _Cell(
-                child: DabblerButton(label: 'joining', tone: tone, loading: true),
+                child: DabblerButton(
+                  label: 'joining',
+                  tone: tone,
+                  loading: true,
+                ),
               ),
               _Cell(
                 child: DabblerButton(label: 'join', tone: tone, disabled: true),
@@ -192,11 +210,7 @@ Widget _sizesAndIcons(BuildContext context) => const GalleryStack(
             tone: DabblerButtonTone.icon,
             disabled: true,
           ),
-          DabblerButton(
-            label: 'create a game',
-            icon: 'add',
-            onPressed: _noop,
-          ),
+          DabblerButton(label: 'create a game', icon: 'add', onPressed: _noop),
           DabblerButton(
             label: 'share',
             icon: 'share',
@@ -259,10 +273,7 @@ class _Cell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsetsDirectional.only(
-      end: _columnGap,
-      bottom: _rowGap,
-    ),
+    padding: const EdgeInsetsDirectional.only(end: _columnGap, bottom: _rowGap),
     child: Align(alignment: AlignmentDirectional.centerStart, child: child),
   );
 }
@@ -312,7 +323,9 @@ class _PressedState extends State<_Pressed> {
     if (object is! RenderBox || !object.hasSize) {
       return;
     }
-    final Offset position = object.localToGlobal(object.size.center(Offset.zero));
+    final Offset position = object.localToGlobal(
+      object.size.center(Offset.zero),
+    );
     _position = position;
     GestureBinding.instance.handlePointerEvent(
       PointerDownEvent(pointer: _pointer, position: position),
@@ -340,7 +353,8 @@ class _PressedState extends State<_Pressed> {
   }
 
   @override
-  Widget build(BuildContext context) => KeyedSubtree(key: _key, child: widget.child);
+  Widget build(BuildContext context) =>
+      KeyedSubtree(key: _key, child: widget.child);
 }
 
 void _noop() {}

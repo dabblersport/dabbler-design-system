@@ -155,8 +155,9 @@ void main() {
       tester.getSize(find.byKey(DabblerBanner.actionTargetKey)).height,
       greaterThanOrEqualTo(45),
     );
-    final Size dismiss =
-        tester.getSize(find.byKey(DabblerBanner.dismissTargetKey));
+    final Size dismiss = tester.getSize(
+      find.byKey(DabblerBanner.dismissTargetKey),
+    );
     expect(dismiss.width, greaterThanOrEqualTo(45));
     expect(dismiss.height, greaterThanOrEqualTo(45));
   });
