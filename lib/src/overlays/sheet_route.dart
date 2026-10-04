@@ -40,6 +40,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     this.scrimLabel = DabblerSheet.defaultScrimLabel,
     this.detent = DabblerSheetDetent.fractions,
     this.contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
+    this.pageBackground = false,
     super.settings,
   });
 
@@ -48,6 +49,9 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
 
   /// See [DabblerSheet.contentMaxFraction].
   final double contentMaxFraction;
+
+  /// See [DabblerSheet.pageBackground].
+  final bool pageBackground;
 
   /// Builds the scrolling body.
   final WidgetBuilder builder;
@@ -116,6 +120,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
       scrimLabel: scrimLabel,
       detent: detent,
       contentMaxFraction: contentMaxFraction,
+      pageBackground: pageBackground,
       child: builder(context),
     );
   }
@@ -171,6 +176,7 @@ Future<T?> showDabblerSheet<T>({
   String scrimLabel = DabblerSheet.defaultScrimLabel,
   DabblerSheetDetent detent = DabblerSheetDetent.fractions,
   double contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
+  bool pageBackground = false,
 }) {
   return Navigator.of(context, rootNavigator: true).push<T>(
     DabblerSheetRoute<T>(
@@ -187,6 +193,7 @@ Future<T?> showDabblerSheet<T>({
       scrimLabel: scrimLabel,
       detent: detent,
       contentMaxFraction: contentMaxFraction,
+      pageBackground: pageBackground,
     ),
   );
 }

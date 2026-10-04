@@ -86,6 +86,10 @@ fill, transparent border rather than none, so the two states stay the same heigh
 ink: `onBrand` when selected, `textPrimary` / `brandPrimary` when not — never a hardcoded white.
 Focus ring and touch-target minimum are the same shared tokens every interactive control reads.
 
+## Change log
+
+- Alpha fidelity (Search) — adds `mutedRemove`: the remove glyph in the muted ink (`Search.dc.html` recent chips).
+
 ## Source
 
 `lib/src/controls/chip.dart`

@@ -113,6 +113,7 @@ class DabblerSheet extends StatefulWidget {
     this.scrimLabel = defaultScrimLabel,
     this.detent = DabblerSheetDetent.fractions,
     this.contentMaxFraction = defaultContentMaxFraction,
+    this.pageBackground = false,
   });
 
   /// The default cap of a [DabblerSheetDetent.content] sheet: 0.8 of the
@@ -223,6 +224,11 @@ class DabblerSheet extends StatefulWidget {
   /// viewport (never above [maxHeightFraction]). Unused for
   /// [DabblerSheetDetent.fractions].
   final double contentMaxFraction;
+
+  /// Paints the panel in the page colour instead of the card colour — the Home
+  /// Feed design's sheets all override `background` to `--surface-page`
+  /// (`Home Feed.dc.html:3051`, `sheetPAuto`).
+  final bool pageBackground;
 
   @override
   State<DabblerSheet> createState() => _DabblerSheetState();

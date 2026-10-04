@@ -68,6 +68,7 @@ const Map<String, double> sizingAppRoles = <String, double>{
   'iconRow': DabblerSizing.iconRow,
   'iconXl': DabblerSizing.iconXl,
   'tileMd': DabblerSizing.tileMd,
+  'tileSm': DabblerSizing.tileSm,
   'tileLg': DabblerSizing.tileLg,
   'illustrationSm': DabblerSizing.illustrationSm,
   'illustrationMd': DabblerSizing.illustrationMd,

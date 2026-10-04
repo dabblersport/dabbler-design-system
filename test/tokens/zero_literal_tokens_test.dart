@@ -83,6 +83,7 @@ void main() {
       'iconRow': 21,
       'iconXl': 36,
       'tileMd': 45,
+      'tileSm': 39,
       'tileLg': 48,
       'illustrationSm': 54,
       'illustrationMd': 72,
