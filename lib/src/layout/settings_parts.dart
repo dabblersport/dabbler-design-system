@@ -146,7 +146,19 @@ class DabblerRowGroup extends StatelessWidget {
     required this.children,
     this.header,
     this.note,
-  });
+  }) : _stacked = false;
+
+  /// A heading over loose [children] — no card, no hairlines, a 9px gap
+  /// between them. The preset cards and the option segments sit in one
+  /// (`Settings.dc.html:317-366`: the group's own column, `gap: 9px`).
+  const DabblerRowGroup.stack({
+    super.key,
+    required this.children,
+    this.header,
+    this.note,
+  }) : _stacked = true;
+
+  final bool _stacked;
 
   /// The rows.
   final List<Widget> children;
@@ -197,22 +209,28 @@ class DabblerRowGroup extends StatelessWidget {
               ],
             ),
           ),
-        DabblerSurface.card(
-          radius: DabblerRadius.xl,
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: DabblerSpacing.space5,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              for (int i = 0; i < children.length; i++) ...<Widget>[
-                if (i > 0) const DabblerDivider(),
-                children[i],
+        if (_stacked)
+          for (int i = 0; i < children.length; i++) ...<Widget>[
+            if (i > 0) const SizedBox(height: DabblerSpacing.space3),
+            children[i],
+          ]
+        else
+          DabblerSurface.card(
+            radius: DabblerRadius.xl,
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: DabblerSpacing.space5,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                for (int i = 0; i < children.length; i++) ...<Widget>[
+                  if (i > 0) const DabblerDivider(),
+                  children[i],
+                ],
               ],
-            ],
+            ),
           ),
-        ),
       ],
     );
   }

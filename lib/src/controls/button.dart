@@ -108,6 +108,11 @@ enum DabblerButtonSize {
 
   /// 8/16 padding, 12px/600 label, `--radius-pill`.
   small,
+
+  /// The sheet and form action: [DabblerSizing.touchTargetMin] (45) tall, the
+  /// width it is given, 15px/600 label, `--radius-md` corner —
+  /// `Settings.dc.html:381, 388, 404`. Always as wide as its parent.
+  block,
 }
 
 /// Button — the one button.
@@ -119,7 +124,7 @@ enum DabblerButtonSize {
 /// consolidated into the former — the two render the same grid).
 ///
 /// It merges the Figma kit's 13 standalone Button symbols into one widget with
-/// modifiers: ten [DabblerButtonTone]s × three [DabblerButtonSize]s, plus
+/// modifiers: ten [DabblerButtonTone]s × four [DabblerButtonSize]s, plus
 /// [icon], [fullWidth], [disabled] and [loading]. There are no separate
 /// `PrimaryButton` / `SmallButton` / `IconButton` widgets, and adding one would
 /// re-fragment exactly what the source merged.
@@ -376,8 +381,11 @@ class DabblerButton extends StatefulWidget {
 
   /// The corner for [size]: [fullRadius] on `full`, [DabblerRadius.pill]
   /// otherwise.
-  static double radiusFor(DabblerButtonSize size) =>
-      size == DabblerButtonSize.full ? fullRadius : DabblerRadius.pill;
+  static double radiusFor(DabblerButtonSize size) => switch (size) {
+    DabblerButtonSize.full => fullRadius,
+    DabblerButtonSize.block => DabblerRadius.md,
+    _ => DabblerRadius.pill,
+  };
 
   /// The padding for [size].
   ///
@@ -392,7 +400,8 @@ class DabblerButton extends StatefulWidget {
   /// Raised in the KAN-243 report.
   static EdgeInsetsDirectional paddingFor(DabblerButtonSize size) =>
       switch (size) {
-        DabblerButtonSize.full => EdgeInsetsDirectional.zero,
+        DabblerButtonSize.full ||
+        DabblerButtonSize.block => EdgeInsetsDirectional.zero,
         DabblerButtonSize.medium => const EdgeInsetsDirectional.symmetric(
           vertical: 10,
           horizontal: 20,
@@ -408,6 +417,7 @@ class DabblerButton extends StatefulWidget {
     DabblerButtonSize.full => 16,
     DabblerButtonSize.medium => 14,
     DabblerButtonSize.small => 12,
+    DabblerButtonSize.block => 15,
   };
 
   /// `line-height: 1.4` (`Button.jsx:86`) — a multiplier, which is already what
@@ -500,6 +510,7 @@ class _DabblerButtonState extends State<DabblerButton> {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     final bool isFull = widget.size == DabblerButtonSize.full;
+    final bool isBlock = widget.size == DabblerButtonSize.block;
 
     final Color foreground = DabblerButton.foregroundFor(colors, widget.tone);
     final Color background = DabblerButton.backgroundFor(colors, widget.tone);
@@ -566,8 +577,10 @@ class _DabblerButtonState extends State<DabblerButton> {
       padding: DabblerButton.paddingFor(widget.size),
       width: isFull
           ? (widget.fullWidth ? double.infinity : DabblerButton.fullWidthPx)
-          : (widget.fullWidth ? double.infinity : null),
-      height: isFull ? DabblerButton.fullHeight : null,
+          : (widget.fullWidth || isBlock ? double.infinity : null),
+      height: isFull
+          ? DabblerButton.fullHeight
+          : (isBlock ? DabblerSizing.touchTargetMin : null),
       // Not `center: true`: that wraps the content in a bare `Center`, which
       // expands to the maximum width it is offered, so a button inside a
       // `Wrap` or loose `Row` stretched to the full line. Live `Button.jsx`
@@ -577,8 +590,8 @@ class _DabblerButtonState extends State<DabblerButton> {
       // `tone="inherit"` on the spinner reads this, and so does any glyph that
       // was not handed an explicit colour.
       child: Center(
-        widthFactor: (widget.fullWidth || isFull) ? null : 1,
-        heightFactor: isFull ? null : 1,
+        widthFactor: (widget.fullWidth || isFull || isBlock) ? null : 1,
+        heightFactor: (isFull || isBlock) ? null : 1,
         child: IconTheme.merge(
           data: IconThemeData(color: foreground),
           child: content,

@@ -181,6 +181,7 @@ export 'src/layout/divider_gallery.dart';
 export 'src/layout/fade.dart';
 export 'src/layout/fade_gallery.dart';
 export 'src/layout/section.dart';
+export 'src/layout/settings_choices.dart';
 export 'src/layout/settings_parts.dart';
 export 'src/layout/settings_parts_gallery.dart';
 export 'src/layout/shell_gallery.dart';

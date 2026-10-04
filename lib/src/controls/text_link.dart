@@ -115,6 +115,7 @@ class DabblerTextLink extends StatelessWidget {
     this.autofocus = false,
     this.underline = true,
     this.trailingIcon,
+    this.destructive = false,
   });
 
   /// `text-underline-offset: 2px` (`Auth and Onboarding.dc.html:129`) has no
@@ -169,6 +170,11 @@ class DabblerTextLink extends StatelessWidget {
   /// `false` for a section-header link such as "Manage".
   final bool underline;
 
+  /// Draws the link in the error colour — the quiet destructive action of a
+  /// row ("Unblock" beside a blocked account, `Settings.dc.html:243`).
+  /// Default false.
+  final bool destructive;
+
   /// An optional glyph after the label (standalone only; ignored inline),
   /// mirrored in RTL. Decorative — it adds nothing to the accessible name.
   final String? trailingIcon;
@@ -187,7 +193,7 @@ class DabblerTextLink extends StatelessWidget {
                   .copyWith(fontWeight: DabblerType.medium));
     final Color color = onPressed == null
         ? colors.textTertiary
-        : colors.brandPrimary;
+        : (destructive ? colors.error.strong : colors.brandPrimary);
     return base.copyWith(
       color: color,
       decoration: underline ? decoration : TextDecoration.none,

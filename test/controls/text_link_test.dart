@@ -43,6 +43,26 @@ void main() {
       expect(s.fontWeight, DabblerType.medium);
     });
 
+    testWidgets('destructive takes the error colour', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          Center(
+            child: DabblerTextLink(
+              label: 'Unblock',
+              destructive: true,
+              underline: false,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+      final TextStyle s = _linkText(tester, 'Unblock').style!;
+      expect(s.color, testColors().error.strong);
+      expect(s.decoration, TextDecoration.none);
+    });
+
     testWidgets('hit target is at least 45×45, text painted smaller', (
       WidgetTester tester,
     ) async {
