@@ -35,7 +35,6 @@ One game, three games stacked, the opened list, the strip and an Arabic block in
 
 - The strip's text is one ellipsised line, where the design scrolls it.
 - A swipe on the card does not dismiss it; the close button does.
-- The toggle under the stack is 45px high, the touch minimum, where the design draws 32.
 - The 5px and 9px gaps take the nearest steps of the 3px ramp.
 
 ## Axes
