@@ -45,6 +45,14 @@ own. With neither set the bar is unchanged.
 
 @specimen bottom-bar/badges
 
+`mirrorInRtl` (default `true`) controls whether the layout follows an ambient RTL. Pass `false` to
+keep the pill on the physical left and the action on the physical right while the labels and the
+create-menu captions still read right to left: the Home Feed frame draws its Arabic bar exactly
+that way (its component's own auto-direction probe cannot flip). Callers that do not pass it are
+unchanged.
+
+@specimen bottom-bar/pinned-rtl
+
 ## Using it
 
 **Drive `active` and `menuOpen` together or not at all — don't control one and leave the other
@@ -86,6 +94,15 @@ direction switcher.*
 
 ## Tokens used
 
+The Home Feed frame, measured at 393 wide: the bar is 56 high, the pill's destinations are 44 circles
+with 24 icons (`DabblerSizing.navItem`), the action is a 56 circle with a 26 glyph
+(`DabblerSizing.navBarHeight`, `navGlyphLarge`), the margins are 18 and the bottom inset 24. Inside
+`DabblerPage(bottomOverlay:)` the fade behind it is 80 high (`navFadeHeight`). The open create menu is
+289 wide (393 - 2 x 18 - 12 - 56) with three 83 x 62 tiles (`navCreateTile`) and 12.5 / 15.625
+captions. Every one of these off-grid values is a named token in `sizingOffGridRulings`, with its
+source line.
+
+
 Nav pill: brand fill, pill radius. Inactive destination: the default border-tone icon colour.
 Active destination: card surface chip, brand-tinted icon and label, `bold` icon weight. Create
 action: the same size and shadow as `Fab` — see *Change log*.
@@ -99,6 +116,10 @@ action: the same size and shadow as `Fab` — see *Change log*.
 - KAN-412 W1 — per-destination unread dot and count badge (`unread`, `count`, `badgeLabel`).
   Placement and the ring are this system's: the readable designs draw no bar indicator (the Home
   Feed file is truncated), so the offsets are not transcribed.
+
+- KAN-433 — the frame's geometry pinned (`DabblerSizing.nav*` off-grid tokens, tested in
+  `test/navigation/bottom_bar_frame_test.dart` in LTR, RTL mirrored and RTL pinned with the Arabic
+  frame's strings) and the `mirrorInRtl` option, default unchanged.
 
 ## Source
 

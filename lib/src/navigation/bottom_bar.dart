@@ -204,6 +204,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
     this.onCreate,
     this.safeArea = true,
     this.rotateActionOnOpen = true,
+    this.mirrorInRtl = true,
   });
 
   /// Home / Explore / Games / You — the source's own `ITEMS`
@@ -289,7 +290,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   /// and the previous cut snapped to it; the rendered specimen draws 44, and a
   /// 1px taller pill reads as a visibly fatter bar next to the 56 action.
   /// Recorded as a token conflict rather than resolved in favour of the ramp.
-  static const double itemSize = 44;
+  static const double itemSize = DabblerSizing.navItem;
 
   /// `gap: on ? 8 : 0` on the active chip (`NavigationBottomBar.jsx:149`).
   /// Off the base-3 grid; transcribed rather than rounded to `--space-3` (9).
@@ -306,7 +307,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   /// `size={26}` on the action glyph and on each create-tile glyph
   /// (`NavigationBottomBar.jsx:116,193`). Off the 18/24/30 icon ramp;
   /// transcribed, because 24 visibly under-fills the 56 action.
-  static const double glyph26 = 26;
+  static const double glyph26 = DabblerSizing.navGlyphLarge;
 
   /// `fontSize: 12.5, fontWeight: 500` on the create-tile label
   /// (`NavigationBottomBar.jsx:119-124`).
@@ -317,13 +318,26 @@ class DabblerNavigationBottomBar extends StatefulWidget {
   ///
   /// Off the base-3 grid and stated here rather than borrowed from a spacing
   /// step that happens to be near it.
-  static const double createTileHeight = 62;
+  static const double createTileHeight = DabblerSizing.navCreateTile;
 
   /// Whether the action glyph turns [actionOpenTurns] while the menu is open.
   /// The Home Feed design pins it upright
   /// (`[aria-label="Close menu"] > span { transform: rotate(0deg) }`); pass
   /// false for that. Defaults to true, the component source's 45°.
   final bool rotateActionOnOpen;
+
+  /// Whether the bar's layout mirrors under an RTL [Directionality]. Default
+  /// true: the pill sits at the inline start and the action at the inline end,
+  /// so in Arabic the pill is on the right.
+  ///
+  /// Pass false to keep the layout **physically** as in LTR (pill on the left,
+  /// action on the right, items in the same left-to-right order) while the
+  /// labels, the create-menu captions and the type keep following the ambient
+  /// direction. The Home Feed frame draws the Arabic bar exactly this way
+  /// (`Home_feed_—_Arabic.png`: its component's `autoRtl` probe reads the
+  /// direction it has just set, so it never flips). Roving-focus arrow keys
+  /// follow the layout, so they stay physical too. Ignored under LTR.
+  final bool mirrorInRtl;
 
   /// Turns of rotation the action makes when the menu opens: 45°
   /// (`NavigationBottomBar.jsx:190`), i.e. an eighth turn, which is what
@@ -366,6 +380,11 @@ class _DabblerNavigationBottomBarState
   }
 
   bool get _open => widget.menuOpen ?? _openUncontrolled;
+
+  /// Whether the layout follows an ambient RTL (see
+  /// [DabblerNavigationBottomBar.mirrorInRtl]).
+  bool get _mirrors =>
+      widget.mirrorInRtl || Directionality.of(context) != TextDirection.rtl;
 
   /// `props.active ?? uncontrolled`, with the source's
   /// `defaultActive ?? items[0]?.id` fallback (`NavigationBottomBar.jsx:39-41`).
@@ -434,7 +453,8 @@ class _DabblerNavigationBottomBarState
         widget.items.isEmpty) {
       return KeyEventResult.ignored;
     }
-    final bool rtl = Directionality.of(context) == TextDirection.rtl;
+    final bool rtl =
+        Directionality.of(context) == TextDirection.rtl && _mirrors;
     final LogicalKeyboardKey forward = rtl
         ? LogicalKeyboardKey.arrowLeft
         : LogicalKeyboardKey.arrowRight;
@@ -494,14 +514,20 @@ class _DabblerNavigationBottomBarState
       ],
     );
 
-    if (!widget.safeArea) {
-      return row;
-    }
-    // Zero under an ancestor SafeArea, which has already consumed it.
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
-      child: row,
-    );
+    final Widget bar = widget.safeArea
+        // Zero under an ancestor SafeArea, which has already consumed it.
+        ? Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.paddingOf(context).bottom,
+            ),
+            child: row,
+          )
+        : row;
+    // Only the layout is pinned: the type and text direction below are read
+    // from the ambient context (this State's), not from this wrapper.
+    return _mirrors
+        ? bar
+        : Directionality(textDirection: TextDirection.ltr, child: bar);
   }
 
   /// The nav pill: `padding: '6px 9px'` (`--space-2` / `--space-3`),
@@ -611,6 +637,7 @@ class _DabblerNavigationBottomBarState
                     ),
                 // `whiteSpace: 'nowrap'`.
                 softWrap: false,
+                textDirection: Directionality.of(context),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -812,6 +839,7 @@ class _DabblerNavigationBottomBarState
         Text(
           tile.label,
           textAlign: TextAlign.center,
+          textDirection: Directionality.of(context),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           // `fontSize: 12.5, fontWeight: 500, color: var(--text-body)`

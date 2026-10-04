@@ -72,6 +72,11 @@ const Map<String, double> sizingOffGridRulings = <String, double>{
   'mediaRailHeight': DabblerSizing.mediaRailHeight,
   'mediaRailAddWidth': DabblerSizing.mediaRailAddWidth,
   'mediaRailTileWidth': DabblerSizing.mediaRailTileWidth,
+  'navItem': DabblerSizing.navItem,
+  'navBarHeight': DabblerSizing.navBarHeight,
+  'navGlyphLarge': DabblerSizing.navGlyphLarge,
+  'navCreateTile': DabblerSizing.navCreateTile,
+  'navFadeHeight': DabblerSizing.navFadeHeight,
 };
 
 /// The sizing and layout-extent app roles, in declaration order.
