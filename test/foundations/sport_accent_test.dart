@@ -42,6 +42,11 @@ void main() {
       expect(DabblerSportAccent.of('tennis').deep, DabblerColors.tileInfo.ink);
     });
 
+    test('the persona ramps are the main and social entries', () {
+      expect(DabblerSportAccent.mainRamp, DabblerSportAccent.padel);
+      expect(DabblerSportAccent.socialRamp, DabblerSportAccent.tennis);
+    });
+
     test('anything else is the All entry, as ACCENT[sel] ?? ACCENT.All', () {
       for (final String? k in <String?>[
         null,

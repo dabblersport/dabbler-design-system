@@ -93,6 +93,16 @@ class DabblerSportAccent {
     deep: DabblerPalette.socialP700,
   );
 
+  /// The `main` ramp as an accent — the Organiser profile's hero tile, which
+  /// is the brand purple (`Profiles.dc.html:631`, `bg: BRAND`). The same
+  /// colours as [padel].
+  static const DabblerSportAccent mainRamp = padel;
+
+  /// The `social` ramp as an accent — the Socialiser profile's hero tile
+  /// (`Profiles.dc.html:628`, `bg: var(--social-p-600)`). The same colours as
+  /// [tennis].
+  static const DabblerSportAccent socialRamp = tennis;
+
   /// The accent for a kebab-case sport [key] (`padel`, `table-tennis`), or
   /// [all] for null, an unknown key, or a sport the frames do not colour.
   static DabblerSportAccent of(String? key) => switch (key) {

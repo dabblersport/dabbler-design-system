@@ -106,6 +106,7 @@ through the same registry.
 - D-010 (cxo) — rules the fallback-paint and never-sole-carrier requirements above; its
   never-bundled clause is superseded for the eleven main files (see above).
 - KAN-426 (Seat B) — adds `DabblerSportAccent`, the per-sport accent of `Profiles.dc.html:474-480`.
+- KAN-426 (close) — adds `DabblerSportAccent.mainRamp` and `socialRamp`, the persona hero ramps of `Profiles.dc.html:628-631`.
 - KAN-411 — handball, squash, baseball, rugby and hockey added; no background artwork exists for them (see
   *Using it*).
 - D-034 (cxo) — rules the Foundations page template this page
