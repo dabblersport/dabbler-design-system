@@ -41,6 +41,10 @@ void main() {
       'actionRowPaddingBlock': DabblerHomeFrame.actionRowPaddingBlock,
       'actionRowTextGap': DabblerHomeFrame.actionRowTextGap,
       'subChipGlyph': DabblerHomeFrame.subChipGlyph,
+      'searchFieldHeight': DabblerHomeFrame.searchFieldHeight,
+      'searchFieldGlyph': DabblerHomeFrame.searchFieldGlyph,
+      'listRowSubtitleGap': DabblerHomeFrame.listRowSubtitleGap,
+      'listRowGlyph': DabblerHomeFrame.listRowGlyph,
     };
 
     const Map<String, double> expected = <String, double>{
@@ -76,6 +80,10 @@ void main() {
       'actionRowPaddingBlock': 14,
       'actionRowTextGap': 1,
       'subChipGlyph': 14,
+      'searchFieldHeight': 42,
+      'searchFieldGlyph': 16,
+      'listRowSubtitleGap': 1,
+      'listRowGlyph': 20,
     };
 
     test('every token has its measured value', () {

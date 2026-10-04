@@ -147,6 +147,25 @@ abstract final class DabblerHomeFrame {
   /// An action row's label-to-note gap: **1** (`gap:1px`).
   static const double actionRowTextGap = 1;
 
+  // --- Search field (section 9b) ---
+
+  /// The city sheet's search field: **42** high (`height:42px`, hairline
+  /// inside), against the field's 45 minimum.
+  static const double searchFieldHeight = 42;
+
+  /// The search field's leading glyph: **16** (`search-normal` at 16).
+  static const double searchFieldGlyph = 16;
+
+  // --- List rows (section 9b) ---
+
+  /// A row's label-to-subtitle gap in the city sheet: **1** (`gap:1px`), which
+  /// makes a row with a subtitle 62 (12 + 20 + 1 + 16 + 12 + the hairline)
+  /// where the flat DS row was 61.
+  static const double listRowSubtitleGap = 1;
+
+  /// The row's leading and trailing glyphs: **20** (the DS row role is 21).
+  static const double listRowGlyph = 20;
+
   // --- Sub-chips (section 6) ---
 
   /// The leading glyph of a sub-chip: **14**, bold (`size="14"`).
@@ -208,4 +227,8 @@ const Map<String, double> homeFrameTokens = <String, double>{
   'actionRowPaddingBlock': DabblerHomeFrame.actionRowPaddingBlock,
   'actionRowTextGap': DabblerHomeFrame.actionRowTextGap,
   'subChipGlyph': DabblerHomeFrame.subChipGlyph,
+  'searchFieldHeight': DabblerHomeFrame.searchFieldHeight,
+  'searchFieldGlyph': DabblerHomeFrame.searchFieldGlyph,
+  'listRowSubtitleGap': DabblerHomeFrame.listRowSubtitleGap,
+  'listRowGlyph': DabblerHomeFrame.listRowGlyph,
 };

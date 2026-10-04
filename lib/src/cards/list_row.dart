@@ -6,6 +6,7 @@ import '../layout/divider.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 
 /// The fill of a [DabblerListGroup] — the surfaces the Details frames set
@@ -93,7 +94,13 @@ class DabblerListRow extends StatelessWidget {
     this.semanticLabel,
     this.flat = false,
     this.brand = false,
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] draws the row as the Home city sheet's area
+  /// row: the title at the regular weight, 1 between title and subtitle (a
+  /// row with a subtitle is 62 with its hairline). Default unchanged.
+  final DabblerFeedMetrics metrics;
 
   /// The row's main line.
   final String title;
@@ -164,9 +171,13 @@ class DabblerListRow extends StatelessWidget {
               .resolveForDirection(direction)
               .copyWith(
                 color: brand ? colors.brandPrimary : colors.textPrimary,
-                fontWeight: DabblerType.semibold,
+                fontWeight: metrics == DabblerFeedMetrics.drawn
+                    ? DabblerType.regular
+                    : DabblerType.semibold,
               ),
         ),
+        if (subtitle != null && metrics == DabblerFeedMetrics.drawn)
+          const SizedBox(height: DabblerHomeFrame.listRowSubtitleGap),
         if (subtitle != null)
           Text(
             subtitle!,

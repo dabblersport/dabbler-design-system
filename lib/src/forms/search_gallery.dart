@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
+import '../tokens/dabbler_home_frame.dart';
 import 'highlighted_text.dart';
 import 'search_field.dart';
 
@@ -46,6 +47,16 @@ Widget _searchFields(BuildContext context) => const GalleryStack(
       child: SizedBox(
         width: _width,
         child: DabblerSearchField(placeholder: 'Search people, games, posts'),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — the Home city sheet field, 42 high',
+      child: SizedBox(
+        width: _width,
+        child: DabblerSearchField(
+          metrics: DabblerFeedMetrics.drawn,
+          placeholder: 'Search area, street or city',
+        ),
       ),
     ),
     GallerySpecimen(

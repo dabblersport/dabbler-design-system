@@ -71,6 +71,7 @@ and placeholder — is `TextField`'s.
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics`. Drawn is the Home city sheet's field: 42 high (hairline inside), a 16 glyph, 15 inside the hairline and 9 between glyph and text, through `DabblerFieldShell.minHeight` and `gap`. Default stays 45.
 - KAN-426 (fidelity) — adds `borderOutside` (default false), forwarded to the text field: the Auth frame's search field is 47 high because the hairline adds to the box. Existing callers are unchanged.
 - KAN-412 — adds the inline clear button, `onCleared` and `clearLabel`, and this component.
   `TextField` gains `clearable` (off by default, so existing search fields are unchanged); the

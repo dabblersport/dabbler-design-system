@@ -38,10 +38,15 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
         .resolveForDirection(direction)
         .copyWith(color: disabled ? colors.textTertiary : colors.textPrimary);
 
+    final bool framed =
+        widget.metrics == DabblerFeedMetrics.drawn &&
+        widget.variant == DabblerTextFieldVariant.search;
     final Widget? lead = widget.variant == DabblerTextFieldVariant.search
         ? DabblerIcon(
             DabblerTextField.searchIconName,
-            size: DabblerSizing.iconMd,
+            size: framed
+                ? DabblerHomeFrame.searchFieldGlyph
+                : DabblerSizing.iconMd,
             color: colors.brandPrimary,
           )
         : widget.prefixIcon;
@@ -52,6 +57,10 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
       errorText: errorText,
       announceError: announceError,
       borderOutside: widget.borderOutside,
+      minHeight: framed
+          ? DabblerHomeFrame.searchFieldHeight
+          : DabblerSizing.touchTargetMin,
+      gap: framed ? DabblerSpacing.space3 : DabblerSpacing.iconGap,
       focused: _focused,
       disabled: disabled,
       radius: radius,
@@ -67,7 +76,11 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
       // (`Auth and Onboarding.dc.html:28-30`): the toggle keeps its 45px tap
       // target but stops stretching the field past the 45px box every other
       // field draws.
-      innerPadding: showClear || showLoading || password
+      innerPadding: framed && !showClear && !showLoading
+          ? const EdgeInsetsDirectional.symmetric(
+              horizontal: DabblerSpacing.space5 + DabblerSizing.borderDefault,
+            )
+          : showClear || showLoading || password
           ? const EdgeInsetsDirectional.fromSTEB(
               DabblerSpacing.space4,
               0,
@@ -77,7 +90,11 @@ extension _DabblerTextFieldEditable on _DabblerTextFieldState {
           : DabblerFieldShell.defaultInnerPadding,
       children: <Widget>[
         if (lead != null)
-          _DabblerTextFieldState._iconSlot(lead, colors.brandPrimary),
+          _DabblerTextFieldState._iconSlot(
+            lead,
+            colors.brandPrimary,
+            framed ? DabblerHomeFrame.searchFieldGlyph : DabblerSizing.iconMd,
+          ),
         Expanded(
           // Material's text-editing behaviour needs a [Material] ancestor for
           // its selection toolbar. `MaterialType.transparency` supplies one
