@@ -130,7 +130,7 @@ void main() {
         expect(find.text('2.0'), findsOneWidget);
       });
 
-      testWidgets('destructive colours title, subtitle, icon and chevron', (
+      testWidgets('destructive colours title, icon and chevron; subtitle stays secondary', (
         WidgetTester tester,
       ) async {
         await tester.pumpWidget(
@@ -152,7 +152,7 @@ void main() {
         expect(title.style!.fontWeight, DabblerType.semibold);
         expect(
           tester.widget<Text>(find.text('Leave this device')).style!.color,
-          danger,
+          colors.textSecondary,
         );
         expect(
           tester.widget<DabblerChevron>(find.byType(DabblerChevron)).color,

@@ -102,8 +102,8 @@ capped in width and ellipsised, drawn before the chevron. A tappable row with a 
 @figure 150 lib/src/forms/input_row.dart#valueMaxWidth
 
 ### Tone
-`DabblerInputRowTone.destructive` puts the title (semibold), the subtitle, the leading glyph and the
-chevron in the error role's strong step — Sign out and Delete account.
+`DabblerInputRowTone.destructive` puts the title (semibold), the leading glyph and the chevron in the
+error role's strong step — Sign out and Delete account. The subtitle stays in the secondary text role.
 
 ### Selection
 `selected` null is an ordinary row. `true` draws the bold `tick-circle` in the brand colour and

@@ -528,7 +528,7 @@ class DabblerInputRow extends StatelessWidget {
                                               DabblerType.caption1.fontSize,
                                         )
                                   : subtitleStyleFor(direction))
-                              .copyWith(color: danger ?? colors.textSecondary),
+                              .copyWith(color: colors.textSecondary),
                     ),
                 ],
               ),
