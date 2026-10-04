@@ -320,7 +320,13 @@ void main() {
         final List<DabblerCard> cards = tester
             .widgetList<DabblerCard>(find.byType(DabblerCard))
             .toList();
-        expect(cards[0].fill, tinted);
+        // CardGame is the white card (KAN-429); the venue card is tonal.
+        expect(
+          cards[0].fill,
+          DabblerSportAccent.padel.surfaceOver(
+            DabblerCard.fillOf(c, DabblerCardVariant.white),
+          ),
+        );
         expect(cards[1].fill, tinted);
         expect(cards[2].fill, isNull);
       });
