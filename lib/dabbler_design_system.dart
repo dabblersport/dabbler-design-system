@@ -132,6 +132,8 @@ export 'src/feed/attachment_add_tile.dart';
 export 'src/feed/attachment_chip.dart';
 export 'src/feed/comment_row.dart';
 export 'src/feed/open_post.dart';
+export 'src/forms/composer_box.dart';
+export 'src/forms/select_pill.dart';
 export 'src/feed/post_detail.dart';
 export 'src/feed/repost_row.dart';
 export 'src/feed/upcoming_reminder.dart';

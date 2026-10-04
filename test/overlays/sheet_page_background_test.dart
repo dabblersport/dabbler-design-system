@@ -32,4 +32,25 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets('showCloseButton false draws no close button', (
+    WidgetTester tester,
+  ) async {
+    Widget sheet(bool show) => threadHost(
+      SizedBox(
+        height: 400,
+        child: DabblerSheet(
+          presentation: DabblerSheetPresentation.inline,
+          onClose: () {},
+          title: 'T',
+          showCloseButton: show,
+          child: const Text('body'),
+        ),
+      ),
+    );
+    await tester.pumpWidget(sheet(true));
+    expect(find.bySemanticsLabel('Close'), findsOneWidget);
+    await tester.pumpWidget(sheet(false));
+    expect(find.bySemanticsLabel('Close'), findsNothing);
+  });
 }

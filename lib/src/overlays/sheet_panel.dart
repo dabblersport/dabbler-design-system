@@ -297,7 +297,9 @@ class _DabblerSheetState extends State<DabblerSheet> {
       );
     }
 
-    final Widget? close = _canDismiss ? _closeButton(context, colors) : null;
+    final Widget? close = _canDismiss && widget.showCloseButton
+        ? _closeButton(context, colors)
+        : null;
 
     if (_hasTitle || widget.headerAction != null || close != null) {
       rows.add(

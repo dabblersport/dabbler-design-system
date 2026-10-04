@@ -53,6 +53,10 @@ Inside a `Form` with a validator, and with a unit as suffix text — see `form_e
 
 @specimen text-field/form
 
+The post editor: `DabblerComposerBox`, a card with a multi-line field, a counter and a toolbar of glyphs, and `DabblerSelectPill`, the status-tinted pill that opens a choice.
+
+@specimen text-field/composer-box
+
 ## Using it
 
 **Reach for the variant, not a manually composed field.** `search` supplies its own leading glyph,
