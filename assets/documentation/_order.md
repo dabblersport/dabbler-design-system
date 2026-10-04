@@ -110,6 +110,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [LinkChip](components/link-chip.md) — the small copy-link pill beside a handle.
 - [PanelCard](components/panel-card.md) — the framed panel with a header, an inset body and a footer.
 - [ChecklistPanel](components/checklist-panel.md) — the task rows inside a panel.
+- [IconList](components/icon-list.md) — a short list of lines each led by one glyph, with an optional title.
 - [MemberListPanel](components/member-list-panel.md) — people rows with an add or remove button.
 - [Message](components/message.md) — one message bubble for every ownership, context, content and delivery case.
 - [MessageThread](components/message-thread.md) — the conversation timeline: grouping, rhythm and scroll anchoring.
@@ -174,6 +175,7 @@ lot about the rest.
 ### 5 · Date and time — the one input concern too large to fold into the last group
 
 - [DateField](components/date-field.md) — a date, or a date range, typed or picked.
+- [DateColumns](components/date-columns.md) — a date picked from day, month and year lists.
 - [TimeField](components/time-field.md) — a time of day, typed or picked.
 - [Calendar](components/calendar.md) — the month grid, standalone, used as-is by every date picker.
 - [TimePicker](components/time-picker.md) — the hour/minute/meridiem picker that pairs with it.
@@ -201,13 +203,13 @@ lot about the rest.
 
 - [Banner](components/banner.md) — a persistent, in-flow message about the screen it's on.
 - [ConversationNotice](components/conversation-notice.md) — a banner inside a message thread.
-- [InlineMessage](components/inline-message.md) — one line of status text with a glyph, under the control it explains.
 - [ReactionGroup](components/reaction-group.md) — the reaction tallies under a message.
 - [Toast](components/toast.md) — a transient, queued notification that survives navigation.
 - [Spinner](components/spinner.md) — the system's only indeterminate loading indicator.
 - [Refresh](components/refresh.md) — pull-to-refresh, drawn with the system Spinner.
 - [ProgressBar](components/progress-bar.md) — progress with a known end, or a busy bar when there
   isn't one.
+- [ProgressStages](components/progress-stages.md) — the named stages of a setup, each pending, running, done or failed.
 - [Skeleton](components/skeleton.md) — placeholder geometry for content that hasn't arrived yet.
 - [EmptyState](components/empty-state.md) — the "nothing here yet" state, and the only one this
   system has.
@@ -219,6 +221,8 @@ lot about the rest.
 ### 9 · Structure — the one thing that separates, and nothing else
 
 - [Page](components/page.md) — the screen scaffold: page background, safe area, top bar, body and bottom bar.
+- [FlowPage](components/flow-page.md) — the onboarding screen template: back, progress, title, body and one primary action.
+- [TileGrid](components/tile-grid.md) — equal tiles in fixed columns, each row as tall as its tallest tile.
 - [Fade](components/fade.md) — the page-colour wash that lets a list run out beneath a bottom bar.
 - [DetailHeader](components/detail-header.md) — the coloured band that opens a detail screen.
 - [GalleryHero](components/gallery-hero.md) — the paged photo hero with captions and dots.
