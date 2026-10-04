@@ -129,6 +129,7 @@ class DabblerBadge extends StatelessWidget {
     this.paddingInline,
     this.minWidth,
     this.fill,
+    this.outlined = false,
   }) : isDot = false,
        semanticLabel = null;
 
@@ -156,6 +157,7 @@ class DabblerBadge extends StatelessWidget {
        paddingInline = null,
        minWidth = null,
        fill = null,
+       outlined = false,
        isDot = true;
 
   /// Whether this is the count-less [DabblerBadge.dot] marker.
@@ -187,6 +189,12 @@ class DabblerBadge extends StatelessWidget {
   /// A minimum width. Live `ConversationRow` sets `minWidth: 24` on its unread
   /// pill; the badge is `fit-content` otherwise.
   final double? minWidth;
+
+  /// Draws the badge as a quiet outlined tag: the card surface, the default
+  /// hairline and the secondary ink — the Venues listing's sport tags
+  /// (`Listings.dc.html:795-799`). Wins over [tone] and [fill]; ignored when
+  /// [status] is set.
+  final bool outlined;
 
   /// Overrides the tone's fill for a decorative badge (not for [status]).
   ///
@@ -337,11 +345,17 @@ class DabblerBadge extends StatelessWidget {
           : Semantics(label: name, container: true, child: dot);
     }
 
-    final Color background =
-        semantic?.surface ?? fill ?? backgroundOf(tone, colors);
-    final Color foreground = semantic?.strong ?? foregroundOf(tone, colors);
+    final bool quiet = outlined && semantic == null;
+    final Color background = quiet
+        ? colors.surfaceCard
+        : semantic?.surface ?? fill ?? backgroundOf(tone, colors);
+    final Color foreground = quiet
+        ? colors.textSecondary
+        : semantic?.strong ?? foregroundOf(tone, colors);
     // `Badge.jsx:41` — decorative tones draw no border at all.
-    final Color? hairline = semantic == null
+    final Color? hairline = quiet
+        ? colors.borderDefault
+        : semantic == null
         ? null
         : hairlineFor(semantic, colors);
 

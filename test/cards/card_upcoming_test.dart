@@ -37,7 +37,11 @@ void main() {
   testWidgets('fills with the tile tone', (tester) async {
     await tester.pumpWidget(_tile());
     final DabblerCard card = tester.widget(find.byType(DabblerCard));
-    expect(card.fill, DabblerCardUpcoming.fillOf(DabblerCardUpcomingTone.amber));
+    final DabblerColors colors = testColors();
+    expect(
+      card.fill,
+      DabblerCardUpcoming.fillOf(colors, DabblerCardUpcomingTone.amber),
+    );
   });
 
   testWidgets('tap fires', (tester) async {

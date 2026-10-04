@@ -469,4 +469,26 @@ void main() {
       expect(t2.left - b2.left, 6);
     });
   });
+
+  group('outlined', () {
+    testWidgets('draws the card surface, hairline and secondary ink', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const DabblerBadge(label: 'Padel', outlined: true)),
+      );
+      final DabblerColors colors = _colors();
+      final DecoratedBox box = tester.widget(
+        find.descendant(
+          of: find.byType(DabblerBadge),
+          matching: find.byType(DecoratedBox),
+        ),
+      );
+      final BoxDecoration d = box.decoration as BoxDecoration;
+      expect(d.color, colors.surfaceCard);
+      expect((d.border! as Border).top.color, colors.borderDefault);
+      final Text text = tester.widget(find.text('Padel'));
+      expect(text.style!.color, colors.textSecondary);
+    });
+  });
 }

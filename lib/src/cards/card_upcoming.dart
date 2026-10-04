@@ -111,12 +111,22 @@ class DabblerCardUpcoming extends StatelessWidget {
   /// The ring's tick count.
   static const int ringTicks = 24;
 
-  /// The tile's fill for [tone].
-  static Color fillOf(DabblerCardUpcomingTone tone) => switch (tone) {
-    DabblerCardUpcomingTone.amber => DabblerColors.tileAmber.surface,
-    DabblerCardUpcomingTone.info => DabblerColors.tileInfo.surface,
-    DabblerCardUpcomingTone.accent => DabblerColors.tileAccent.surface,
-  };
+  /// The share of the amber tile kept over the card surface —
+  /// `color-mix(in srgb, var(--tile-amber-surface) 22%, #FFFFFF)`
+  /// (`Listings.dc.html`, `PASTEL_TINTS`).
+  static const double amberMix = 0.22;
+
+  /// The tile's fill for [tone], resolved against [colors].
+  static Color fillOf(DabblerColors colors, DabblerCardUpcomingTone tone) =>
+      switch (tone) {
+        DabblerCardUpcomingTone.amber => Color.lerp(
+          colors.surfaceCard,
+          DabblerColors.tileAmber.surface,
+          amberMix,
+        )!,
+        DabblerCardUpcomingTone.info => DabblerColors.tileInfo.surface,
+        DabblerCardUpcomingTone.accent => DabblerColors.tileAccent.surface,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +153,7 @@ class DabblerCardUpcoming extends StatelessWidget {
     final bool hasPlace = place != null || distance != null;
     return DabblerCard(
       width: width,
-      fill: fillOf(tone),
+      fill: fillOf(colors, tone),
       onTap: onTap,
       semanticLabel: onTap == null ? null : (semanticLabel ?? title),
       child: Row(

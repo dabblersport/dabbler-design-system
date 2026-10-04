@@ -81,6 +81,7 @@ opacity — the one badge configuration that carries a border at all.
 
 ## Change log
 
+- Alpha fidelity rebuild (KAN-426) — adds `outlined`, the quiet card-surface tag of the Venues listing's sports row.
 - D-020 (cxo) — a one-step colour drift in a pricing screen's
   trial pill is not grounds for a fill override on this component; the source is corrected instead.
 - D-028 (cxo) — Badge is the one site that must not simply be
