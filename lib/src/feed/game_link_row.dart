@@ -163,10 +163,14 @@ class DabblerGameLinkRow extends StatelessWidget {
               const SizedBox(width: DabblerSpacing.space2),
             ],
             if (time != null)
-              Text(
-                DabblerType.toWesternDigits(time!),
-                maxLines: 1,
-                style: caption,
+              Flexible(
+                child: Text(
+                  DabblerType.toWesternDigits(time!),
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  style: caption,
+                ),
               ),
           ],
         ),
