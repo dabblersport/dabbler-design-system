@@ -99,4 +99,24 @@ void main() {
       expect(find.text('4/8'), findsOneWidget);
     });
   }
+
+  for (final TextDirection dir in TextDirection.values) {
+    testWidgets('hint and action — $dir', (tester) async {
+      int taps = 0;
+      await tester.pumpWidget(
+        _host(
+          Column(
+            children: <Widget>[
+              const DabblerRowHint(text: 'Nothing here'),
+              DabblerRowAction(label: 'Unblock', onPressed: () => taps++),
+            ],
+          ),
+          dir,
+        ),
+      );
+      expect(find.text('Nothing here'), findsOneWidget);
+      await tester.tap(find.text('Unblock'));
+      expect(taps, 1);
+    });
+  }
 }
