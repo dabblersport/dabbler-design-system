@@ -718,11 +718,12 @@ void main() {
       }
     });
 
-    testWidgets('the weekday label is --muted taken as textSecondary (D-003a)', (
+    testWidgets('the weekday label is --muted as the frame draws it (textTertiary)', (
       WidgetTester tester,
     ) async {
-      // Live `Calendar.jsx:46` — `color: var(--muted)`; D-003(a) maps `--muted`
-      // text to textSecondary, which clears 4.5:1 where raw `--muted` does not.
+      // Live `Calendar.jsx:46` — `color: var(--muted)`; the Home Feed frame
+      // draws the weekday header in that grey (CXO close-out ruling), which is
+      // textTertiary in light.
       await tester.pumpWidget(host(DabblerCalendar(month: specimenMonth)));
       final Text label = tester.widget<Text>(
         find.descendant(
@@ -731,14 +732,9 @@ void main() {
         ),
       );
       final DabblerColors c = colorsFor();
-      expect(label.style!.color, c.textSecondary);
+      expect(label.style!.color, c.textTertiary);
       expect(label.style!.fontSize, 11);
       expect(label.style!.fontWeight, FontWeight.w600);
-      expect(contrastRatio(DabblerPalette.muted, c.surfaceCard), lessThan(4.5));
-      expect(
-        contrastRatio(c.textSecondary, c.surfaceCard),
-        greaterThanOrEqualTo(4.5),
-      );
     });
 
     testWidgets('an outside day is the only sub-4.5 foreground, and is inert', (
@@ -764,7 +760,7 @@ void main() {
           matching: find.byType(Text),
         ),
       );
-      expect(text.style!.color, colorsFor().textSecondary);
+      expect(text.style!.color, colorsFor().textTertiary);
       await tester.tap(
         find.byKey(DabblerCalendar.dayKey(outside.date)),
         warnIfMissed: false,
