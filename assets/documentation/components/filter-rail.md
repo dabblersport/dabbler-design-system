@@ -11,9 +11,9 @@ Sources  : lib/src/controls/filter_rail.dart (class dartdoc)
 # FilterRail
 ### `DabblerFilterRail`, `DabblerFilterGroup`
 
-FilterRail is the applied-filters rail under a listing's tabs: one selected, removable chip per
-filter and a "Clear all" action. FilterGroup is the labelled group of option chips inside a filter
-sheet.
+FilterRail is the applied-filters rail under a listing's tabs, one selected removable chip per
+filter followed by a "Clear all" action, and its companion FilterGroup is the labelled group of
+option chips inside a filter sheet.
 
 Both compose `Chip` and `Button`; they paint nothing of their own.
 

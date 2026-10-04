@@ -11,9 +11,9 @@ Sources  : lib/src/cards/card_game.dart (class dartdoc)
 # CardGame
 ### `DabblerCardGame`
 
-CardGame is a game in a listing: a title with a verified mark and tags on the start side, the day
-and time on the end side, a place line, the player progress beside the price, and the join action.
-It carries no cover.
+CardGame is a game in a listing, drawn without a cover as a title with tags on the start side, the
+day and time on the end side, a place line, the player progress beside the price, and the join
+action.
 
 It composes `Card`, `Text`, `Icon` and the listing slots of the event cards.
 

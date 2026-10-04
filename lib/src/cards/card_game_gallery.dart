@@ -5,10 +5,10 @@ library;
 
 import 'package:flutter/widgets.dart';
 
-import '../controls/chip.dart';
 import '../feedback/progress_bar.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
+import '../surfaces/badge.dart';
 import 'card_event_listing.dart';
 import 'card_game.dart';
 
@@ -37,8 +37,8 @@ Widget _games(BuildContext context) => GalleryStack(
           title: 'Tuesday 5-a-side',
           verified: true,
           tags: const <Widget>[
-            DabblerChip(label: 'Football'),
-            DabblerChip(label: 'Intermediate'),
+            DabblerBadge(label: 'Football'),
+            DabblerBadge(label: 'Intermediate'),
           ],
           dayLabel: 'Today',
           timeLabel: '7:30 PM',
