@@ -224,7 +224,8 @@ class DabblerNavigationTopBar extends StatelessWidget {
        titleOpacity = 1,
        scrollController = null,
        titleRevealOffset = defaultTitleRevealOffset,
-       heroTint = false;
+       heroTint = false,
+       centerTitle = false;
 
   /// The titled variant: a back button, a title and trailing actions — the
   /// inner-screen header of the design files `Settings.dc.html` (`isInner`
@@ -260,6 +261,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.scrollController,
     this.titleRevealOffset = defaultTitleRevealOffset,
     this.heroTint = false,
+    this.centerTitle = false,
   }) : _titled = true,
        avatarSeed = defaultAvatarSeed,
        avatarBadge = null,
@@ -318,6 +320,12 @@ class DabblerNavigationTopBar extends StatelessWidget {
 
   /// The scroll offset past which [scrollController] reveals the title.
   final double titleRevealOffset;
+
+  /// Centres the title in the space between the back button and the actions
+  /// while keeping the back button's disc — the Sport Profile header
+  /// (`Sport Profile v2.dc.html:35-37`, `text-align:center`). [plain] centres
+  /// too, but also drops the disc. Titled variant only.
+  final bool centerTitle;
 
   /// Paints the bar (and the status-bar inset above it) on the Settings hero's
   /// brand tint until [scrollController] passes [titleRevealOffset], then on
@@ -779,7 +787,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
               Semantics(
                 header: true,
                 child: _TopBarTitle(
-                  centered: plain,
+                  centered: plain || centerTitle,
                   text: title ?? '',
                   opacity: titleOpacity,
                   controller: scrollController,

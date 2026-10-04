@@ -175,6 +175,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 - Alpha fidelity (Search) — adds `titleWidget` to the titled variant: a widget that takes the title slot
   beside the back button, for the search header of `Search.dc.html`.
 - Alpha fidelity (Results) — adds `plain` to the titled variant: the back glyph without its bordered disc and a centred title (`Results.dc.html`).
+- KAN-426 (close) — adds `centerTitle` to the titled variant: the title centred between the back disc and the actions (`Sport Profile v2.dc.html:35-37`).
 
 ## Source
 
