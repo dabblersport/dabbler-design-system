@@ -32,6 +32,10 @@ section.
 
 @specimen section
 
+**Use `style: DabblerSectionStyle.label` for a small label.** The subtitle sits beside the title and the content is 9 below.
+
+@specimen section/label
+
 ## Using it
 
 **Pass the trailing action as a `Button` at the `text` tone once that tone exists — not as a
@@ -64,6 +68,8 @@ fill, border or radius of its own — Section draws no surface at all.
 - D-013 (cxo) — the title's type style and weight, correcting
   a one-off inline style in the design source that no other title-bearing component in the system
   followed.
+
+- KAN-426 — adds `DabblerSectionStyle.label`.
 
 ## Source
 

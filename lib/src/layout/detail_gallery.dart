@@ -6,6 +6,10 @@ library;
 import 'package:flutter/widgets.dart';
 
 import '../cards/headcount.dart';
+import '../cards/stat_tile.dart';
+import '../controls/chip.dart';
+import '../foundations/icon.dart';
+import 'section.dart';
 import '../cards/list_row.dart';
 import '../controls/button.dart';
 import '../controls/on_color_icon_button.dart';
@@ -53,6 +57,31 @@ const List<GalleryEntry> detailGalleryEntries = <GalleryEntry>[
     title: 'ListRow and ListGroup — rows on a rounded panel',
     description: 'Squad rows with tags, and a contact group with chevrons.',
     builder: _rows,
+  ),
+  GalleryEntry(
+    id: 'stat-tile/detail',
+    page: 'components/stat-tile',
+    group: GalleryPurpose.contentContainers,
+    title: 'StatTile — the Details fact tile and the success tone',
+    description:
+        'Detail size: sans 20/25 value over an 11/15 caption, radius 12.',
+    builder: _tiles,
+  ),
+  GalleryEntry(
+    id: 'section/label',
+    page: 'components/section',
+    group: GalleryPurpose.structure,
+    title: 'Section — the small label style',
+    description: 'Title with the subtitle beside it, 9 to the content.',
+    builder: _label,
+  ),
+  GalleryEntry(
+    id: 'chip/compact',
+    page: 'components/chip',
+    group: GalleryPurpose.actions,
+    title: 'Chip — compact static tag',
+    description: 'Sunken fill, 13/18 label, brand glyph: facilities.',
+    builder: _compact,
   ),
   GalleryEntry(
     id: 'headcount',
@@ -221,6 +250,63 @@ Widget _count(BuildContext context) => _both(
         caption: 'Full',
         progress: 1,
         critical: true,
+      ),
+    ],
+  ),
+);
+
+Widget _tiles(BuildContext context) => _both(
+  () => const SizedBox(
+    width: 340,
+    child: DabblerStatGrid(
+      rowExtent: DabblerStatGrid.detailsRowHeight,
+      children: <DabblerStatTile>[
+        DabblerStatTile(
+          size: DabblerStatTileSize.detail,
+          tone: DabblerStatTileTone.amber,
+          icon: DabblerIcon('clock', size: DabblerSizing.iconSm),
+          value: '7:30 PM',
+          label: 'Tuesday',
+        ),
+        DabblerStatTile(
+          size: DabblerStatTileSize.detail,
+          tone: DabblerStatTileTone.success,
+          icon: DabblerIcon('clock', size: DabblerSizing.iconSm),
+          value: 'Open until 11 PM',
+          label: 'Daily 08:00 - 23:00',
+          fitValue: true,
+        ),
+      ],
+    ),
+  ),
+);
+
+Widget _label(BuildContext context) => _both(
+  () => const SizedBox(
+    width: 340,
+    child: DabblerSection(
+      style: DabblerSectionStyle.label,
+      title: 'Spaces',
+      subtitle: '8 bookable areas',
+      children: <Widget>[DabblerChip(label: 'Football', compact: true)],
+    ),
+  ),
+);
+
+Widget _compact(BuildContext context) => _both(
+  () => const Wrap(
+    spacing: DabblerSpacing.space3,
+    runSpacing: DabblerSpacing.space3,
+    children: <Widget>[
+      DabblerChip(
+        label: 'Parking',
+        compact: true,
+        leadingIcon: DabblerIcon('car'),
+      ),
+      DabblerChip(
+        label: 'Cafe',
+        compact: true,
+        leadingIcon: DabblerIcon('coffee'),
       ),
     ],
   ),
