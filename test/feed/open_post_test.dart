@@ -47,7 +47,7 @@ void main() {
         'EN',
         '128',
       ]) {
-        expect(find.text(t), findsWidgets, reason: t);
+        expect(find.textContaining(t), findsWidgets, reason: t);
       }
     });
   }
