@@ -40,6 +40,7 @@ The price sits at the inline start and mirrors.
 
 ## Change log
 
+- KAN-429 (Meetups) — the price takes its natural width, at most 40% of the row, and the action takes the rest (it was split evenly, which cut long action labels).
 - KAN-426 fidelity rebuild — adds this component.
 
 ## Source

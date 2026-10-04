@@ -98,6 +98,10 @@ class DabblerActionBar extends StatelessWidget {
   /// [DabblerSpacing.space5] (15).
   static const double gap = DabblerSpacing.space5;
 
+  /// The widest share of the row the price may take, so the action keeps the
+  /// rest — the frame's price is natural width and the action `flex: 1`.
+  static const double priceMaxShare = 0.4;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -136,8 +140,12 @@ class DabblerActionBar extends StatelessWidget {
             ],
           );
 
-    final List<Widget> row = <Widget>[
-      if (priceBlock != null) Flexible(child: priceBlock),
+    List<Widget> rowFor(double maxPriceWidth) => <Widget>[
+      if (priceBlock != null)
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxPriceWidth),
+          child: priceBlock,
+        ),
       if (priceBlock != null && (secondary != null || primary != null))
         const SizedBox(width: gap),
       if (secondary != null) ...<Widget>[
@@ -164,7 +172,10 @@ class DabblerActionBar extends StatelessWidget {
           paddingInline,
           math.max(bottomInset, safeBottom),
         ),
-        child: Row(children: row),
+        child: LayoutBuilder(
+          builder: (BuildContext _, BoxConstraints c) =>
+              Row(children: rowFor(c.maxWidth * priceMaxShare)),
+        ),
       ),
     );
   }

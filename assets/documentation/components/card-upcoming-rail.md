@@ -43,6 +43,7 @@ Deviation: the day is `headline` bold (17) where the design draws 18/22.
 
 ## Change log
 
+- KAN-429 (Meetups) — the ring's number is 12/13 and its unit 6/7, as the frame draws them in the 40 ring (the unit overlapped the ticks).
 - KAN-429 (Meetups) — adds this component.
 
 ## Source

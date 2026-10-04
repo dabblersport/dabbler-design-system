@@ -112,6 +112,14 @@ class DabblerCardUpcomingRail extends StatelessWidget {
   /// The ring's diameter — `40`, [DabblerSizing.resultTile].
   static const double ringDiameter = DabblerSizing.resultTile;
 
+  /// The ring's number size and leading — `12/13`.
+  static const double ringValueSize = 12;
+  static const double ringValueLeading = 13;
+
+  /// The ring's unit size and leading — `6/7`.
+  static const double ringUnitSize = 6;
+  static const double ringUnitLeading = 7;
+
   /// The ring's tick count — `24`.
   static const int ringTicks = DabblerCardUpcoming.ringTicks;
 
@@ -160,12 +168,28 @@ class DabblerCardUpcomingRail extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DabblerText(countdownValue, style: DabblerType.footnote, maxLines: 1),
-          DabblerText(
-            countdownUnit,
-            style: DabblerType.caption2,
-            tone: DabblerTextTone.secondary,
+          Text(
+            countdownValue,
             maxLines: 1,
+            // `12/13`, display face (`Listings.dc.html:476`).
+            style: DabblerType.footnote
+                .resolveForDirection(direction)
+                .copyWith(
+                  fontSize: ringValueSize,
+                  height: ringValueLeading / ringValueSize,
+                ),
+          ),
+          Text(
+            countdownUnit,
+            maxLines: 1,
+            // `6/7`, muted (`Listings.dc.html:477`): the ring is 40 wide.
+            style: DabblerType.caption2
+                .resolveForDirection(direction)
+                .copyWith(
+                  color: colors.textSecondary,
+                  fontSize: ringUnitSize,
+                  height: ringUnitLeading / ringUnitSize,
+                ),
           ),
         ],
       ),

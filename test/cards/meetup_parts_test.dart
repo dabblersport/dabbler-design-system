@@ -120,6 +120,54 @@ void main() {
     });
   });
 
+  group('layout fixes (KAN-429 cycle 2)', () {
+    testWidgets('rail ring unit is 6 and number 12', (tester) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerCardUpcomingRail(
+            month: 'SEP',
+            day: '2',
+            title: 'Run',
+            fraction: 0.5,
+            countdownValue: '19',
+            countdownUnit: 'hours',
+          ),
+          width: 300,
+        ),
+      );
+      expect(
+        tester.widget<Text>(find.text('hours')).style!.fontSize,
+        DabblerCardUpcomingRail.ringUnitSize,
+      );
+      expect(
+        tester.widget<Text>(find.text('19')).style!.fontSize,
+        DabblerCardUpcomingRail.ringValueSize,
+      );
+    });
+
+    testWidgets('action bar: the action gets the width the price leaves', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerActionBar(
+            price: 'Free',
+            caption: 'no charge',
+            primary: DabblerRsvpCta(
+              state: DabblerRsvpCtaState.full,
+              label: "Full - you're interested",
+            ),
+          ),
+          width: 393,
+        ),
+      );
+      expect(
+        tester.getSize(find.byType(DabblerRsvpCta)).width,
+        greaterThan(200),
+      );
+    });
+  });
+
   group('RsvpCta', () {
     Widget cta(
       DabblerRsvpCtaState s, {
