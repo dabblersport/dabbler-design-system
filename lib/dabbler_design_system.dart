@@ -108,6 +108,8 @@ export 'src/controls/fab.dart';
 export 'src/controls/fab_gallery.dart';
 export 'src/feedback/banner.dart';
 export 'src/feedback/banner_gallery.dart';
+export 'src/feedback/inline_message.dart';
+export 'src/feedback/inline_message_gallery.dart';
 export 'src/feedback/progress_bar.dart' hide progressSweepOffsetAt;
 export 'src/feedback/progress_bar_gallery.dart';
 export 'src/feedback/progress_stages.dart';

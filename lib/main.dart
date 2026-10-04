@@ -39,6 +39,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...badgeGalleryEntries,
   ...ratingGalleryEntries,
   ...bannerGalleryEntries,
+  ...inlineMessageGalleryEntries,
   ...buttonGalleryEntries,
   ...onColorIconButtonGalleryEntries,
   ...calendarGalleryEntries,
