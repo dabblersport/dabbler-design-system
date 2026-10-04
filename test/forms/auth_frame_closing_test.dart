@@ -180,7 +180,7 @@ void main() {
         );
       });
 
-      testWidgets('field label and placeholder are muted (tertiary)', (
+      testWidgets('field label and placeholder stay on the secondary role (ruled deviation)', (
         WidgetTester tester,
       ) async {
         await tester.pumpWidget(
@@ -190,11 +190,11 @@ void main() {
           ),
         );
         final DabblerColors colors = testColors();
-        expect(_styleOf(tester, 'Email').color, colors.textTertiary);
+        expect(_styleOf(tester, 'Email').color, colors.textSecondary);
         final TextField field = tester.widget<TextField>(
           find.byType(TextField),
         );
-        expect(field.decoration!.hintStyle!.color, colors.textTertiary);
+        expect(field.decoration!.hintStyle!.color, colors.textSecondary);
       });
 
       testWidgets('regular chip is 40 tall, selected or not', (

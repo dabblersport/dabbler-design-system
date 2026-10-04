@@ -280,7 +280,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(_host(const DabblerTextField(label: 'Email')));
-      expect(styleOf(tester, 'Email').color, colors.textTertiary);
+      expect(styleOf(tester, 'Email').color, colors.textSecondary);
       await tester.tap(find.byType(EditableText));
       await tester.pumpAndSettle();
       expect(styleOf(tester, 'Email').color, colors.brandPrimary);
@@ -553,7 +553,7 @@ void main() {
     });
 
     testWidgets(
-      'a select with no value shows the placeholder in textTertiary (design --muted)',
+      'a select with no value shows the placeholder in textSecondary',
       (WidgetTester tester) async {
         await tester.pumpWidget(
           _host(
@@ -563,11 +563,11 @@ void main() {
             ),
           ),
         );
-        // KAN-426: the design draws the placeholder in `--muted`, the
-        // tertiary role, overriding D-003(a)'s secondary role.
+        // D-003(a): a placeholder is text under WCAG, so it takes the
+        // ink-soft-backed secondary role — never a surface neutral.
         expect(
           tester.widget<Text>(find.text('pick a sport')).style!.color,
-          _colors().textTertiary,
+          _colors().textSecondary,
         );
       },
     );
@@ -598,7 +598,7 @@ void main() {
       );
     });
 
-    testWidgets('an editable placeholder is textTertiary when enabled (design --muted)', (
+    testWidgets('an editable placeholder is textSecondary when enabled', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -609,7 +609,7 @@ void main() {
         isEmpty,
       );
       final TextField field = tester.widget<TextField>(find.byType(TextField));
-      expect(field.decoration!.hintStyle!.color, _colors().textTertiary);
+      expect(field.decoration!.hintStyle!.color, _colors().textSecondary);
     });
 
     testWidgets('a DISABLED editable placeholder falls to textTertiary', (
