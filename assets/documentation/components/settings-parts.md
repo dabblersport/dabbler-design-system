@@ -32,6 +32,8 @@ The hero with its version pill, title and identity row, and a group with a toggl
 
 **RowGroup separates, it does not style.** Give it flat input rows with `showDivider: false`; it draws the card and the hairlines between them. `header` and `note` sit above the card.
 
+**RowHint and RowAction.** A hint is a muted one-line note with an information glyph, used where a group has nothing to list; a row action is a destructive text action at a row's end, such as Unblock.
+
 ## Axes
 
 ### Hero
@@ -51,6 +53,7 @@ The brand colour at 14% over the card surface for the tint, the card surface and
 ## Change log
 
 - Added for the Settings fidelity rebuild.
+- Added RowHint and RowAction for the blocked-accounts list.
 
 ## Source
 
