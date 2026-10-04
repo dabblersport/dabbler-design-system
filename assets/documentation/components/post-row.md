@@ -94,6 +94,7 @@ Ink: primary for the name, secondary for role, time, place, body and counts, ter
 - Added from the Home Feed design file.
 - Gained the opt-in open-post detail line from the Post design file (KAN-412 gaps 5).
 - Alpha final follow-up — adds `DabblerRepostRow`.
+- Alpha fidelity (Results) — adds `showActions` (off for the result lists, which end on the sport pill).
 
 ## Source
 

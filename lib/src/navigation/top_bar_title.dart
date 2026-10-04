@@ -28,6 +28,7 @@ class _TopBarTitle extends StatelessWidget {
     required this.opacity,
     required this.controller,
     required this.revealOffset,
+    this.centered = false,
   });
 
   final String text;
@@ -35,6 +36,7 @@ class _TopBarTitle extends StatelessWidget {
   final double opacity;
   final ScrollController? controller;
   final double revealOffset;
+  final bool centered;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,7 @@ class _TopBarTitle extends StatelessWidget {
       maxLines: 1,
       softWrap: false,
       overflow: TextOverflow.ellipsis,
+      textAlign: centered ? TextAlign.center : null,
       style: style,
     );
     final Duration duration = DabblerMotion.reduceMotion(context)

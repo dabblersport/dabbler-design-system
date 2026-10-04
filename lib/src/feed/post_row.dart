@@ -103,6 +103,7 @@ class DabblerPostRow extends StatelessWidget {
     this.segments,
     this.sportLabel,
     this.sportLeading,
+    this.showActions = true,
     this.likes = 0,
     this.replies = 0,
     this.liked = false,
@@ -205,6 +206,10 @@ class DabblerPostRow extends StatelessWidget {
 
   /// The sport pill's text; the pill is omitted when null.
   final String? sportLabel;
+
+  /// Whether the action row (like, vibe, reply, share, more) is drawn. Off for
+  /// the result lists of `Results.dc.html`, which end on the sport pill.
+  final bool showActions;
 
   /// An optional leading glyph for the sport pill (a widget slot, never emoji).
   final Widget? sportLeading;
@@ -525,7 +530,7 @@ class DabblerPostRow extends StatelessWidget {
                     sport,
                   ],
                   if (detail != null) DabblerPostDetailLine(detail: detail!),
-                  actions,
+                  if (showActions) actions,
                   if (reactions != null) ...<Widget>[
                     const SizedBox(height: DabblerSpacing.space2),
                     reactions!,
