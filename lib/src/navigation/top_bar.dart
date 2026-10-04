@@ -32,8 +32,8 @@ class DabblerNavigationAction {
     this.unread = false,
     this.unreadLabel,
     this.loading = false,
-  })  : text = false,
-        semanticLabel = null;
+  }) : text = false,
+       semanticLabel = null;
 
   /// A labelled text action — e.g. `Save` — drawn as a text-tone button in
   /// the bar instead of a glyph.
@@ -48,11 +48,11 @@ class DabblerNavigationAction {
     this.onPressed,
     this.semanticLabel,
     this.loading = false,
-  })  : text = true,
-        icon = '',
-        weight = DabblerIconWeight.linear,
-        unread = false,
-        unreadLabel = null;
+  }) : text = true,
+       icon = '',
+       weight = DabblerIconWeight.linear,
+       unread = false,
+       unreadLabel = null;
 
   /// Whether this is the [DabblerNavigationAction.text] variant.
   final bool text;
@@ -117,8 +117,17 @@ class DabblerNavigationAction {
           other.loading == loading;
 
   @override
-  int get hashCode => Object.hash(icon, label, onPressed, weight, unread,
-      unreadLabel, text, semanticLabel, loading);
+  int get hashCode => Object.hash(
+    icon,
+    label,
+    onPressed,
+    weight,
+    unread,
+    unreadLabel,
+    text,
+    semanticLabel,
+    loading,
+  );
 
   @override
   String toString() => text
@@ -182,15 +191,15 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.safeArea = true,
     this.transparent = false,
     this.avatarImageUrl,
-  })  : title = null,
-        titleWidget = null,
-        plain = false,
-        onBack = null,
-        backLabel = defaultBackLabel,
-        _titled = false,
-        titleOpacity = 1,
-        scrollController = null,
-        titleRevealOffset = defaultTitleRevealOffset;
+  }) : title = null,
+       titleWidget = null,
+       plain = false,
+       onBack = null,
+       backLabel = defaultBackLabel,
+       _titled = false,
+       titleOpacity = 1,
+       scrollController = null,
+       titleRevealOffset = defaultTitleRevealOffset;
 
   /// The titled variant: a back button, a title and trailing actions — the
   /// inner-screen header of the design files `Settings.dc.html` (`isInner`
@@ -225,13 +234,13 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.titleOpacity = 1,
     this.scrollController,
     this.titleRevealOffset = defaultTitleRevealOffset,
-  })  : _titled = true,
-        avatarSeed = defaultAvatarSeed,
-        avatarBadge = null,
-        onAvatarPressed = null,
-        avatarLabel = 'Account',
-        leading = null,
-        avatarImageUrl = null;
+  }) : _titled = true,
+       avatarSeed = defaultAvatarSeed,
+       avatarBadge = null,
+       onAvatarPressed = null,
+       avatarLabel = 'Account',
+       leading = null,
+       avatarImageUrl = null;
 
   /// The back button's default accessible name.
   static const String defaultBackLabel = 'Back';
@@ -394,34 +403,36 @@ class DabblerNavigationTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
 
-    final Widget row = isTitled ? _titledRow(context, colors) : Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Flexible(
-          child:
-              leading ??
-              DabblerWordmark(
-                // `color: 'var(--purple-600)'` on the export's root, which the
-                // paths inherit through `fill="currentColor"`.
-                color: colors.brandPrimary,
+    final Widget row = isTitled
+        ? _titledRow(context, colors)
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Flexible(
+                child:
+                    leading ??
+                    DabblerWordmark(
+                      // `color: 'var(--purple-600)'` on the export's root, which the
+                      // paths inherit through `fill="currentColor"`.
+                      color: colors.brandPrimary,
+                    ),
               ),
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          // `gap: 12` between **bare** 22px glyph nodes — i.e. 34 between
-          // glyph centres. [actionTarget] is 34 wide, so butting the boxes
-          // reproduces that pitch exactly while each box still clears the
-          // touch-target floor on its constrained axis (D-032).
-          spacing: 0,
-          children: <Widget>[
-            for (final DabblerNavigationAction action in actions)
-              _action(colors, action),
-            _avatar(),
-          ],
-        ),
-      ],
-    );
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                // `gap: 12` between **bare** 22px glyph nodes — i.e. 34 between
+                // glyph centres. [actionTarget] is 34 wide, so butting the boxes
+                // reproduces that pitch exactly while each box still clears the
+                // touch-target floor on its constrained axis (D-032).
+                spacing: 0,
+                children: <Widget>[
+                  for (final DabblerNavigationAction action in actions)
+                    _action(colors, action),
+                  _avatar(),
+                ],
+              ),
+            ],
+          );
 
     Widget bar = Container(
       height: barHeight,
@@ -504,16 +515,16 @@ class DabblerNavigationTopBar extends StatelessWidget {
                 ),
               )
             : DabblerNavigationUnreadDot.wrap(
-          visible: action.unread,
-          child: DabblerIcon(
-            action.icon,
-            weight: action.weight,
-            // `size={22}` — transcribed, see [actionGlyphSize].
-            size: actionGlyphSize,
-            // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary.
-            color: colors.textPrimary,
-          ),
-        ),
+                visible: action.unread,
+                child: DabblerIcon(
+                  action.icon,
+                  weight: action.weight,
+                  // `size={22}` — transcribed, see [actionGlyphSize].
+                  size: actionGlyphSize,
+                  // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary.
+                  color: colors.textPrimary,
+                ),
+              ),
       ),
     );
 
@@ -650,15 +661,15 @@ class DabblerNavigationTopBar extends StatelessWidget {
                           decoration: plain
                               ? null
                               : BoxDecoration(
-                            // `background:var(--surface-card);
-                            // border:1px solid var(--outline-card)`.
-                            color: colors.surfaceCard,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colors.borderDefault,
-                              width: DabblerSizing.borderDefault,
-                            ),
-                          ),
+                                  // `background:var(--surface-card);
+                                  // border:1px solid var(--outline-card)`.
+                                  color: colors.surfaceCard,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: colors.borderDefault,
+                                    width: DabblerSizing.borderDefault,
+                                  ),
+                                ),
                           child: Center(
                             // Measured 2026-10-03: `arrow-circle-left` and
                             // `-right` are true pixel mirrors in
@@ -683,24 +694,26 @@ class DabblerNavigationTopBar extends StatelessWidget {
           const SizedBox(width: DabblerSpacing.space3),
         ],
         Expanded(
-          child: titleWidget ?? Semantics(
-            header: true,
-            child: _TopBarTitle(
-              centered: plain,
-              text: title ?? '',
-              opacity: titleOpacity,
-              controller: scrollController,
-              revealOffset: titleRevealOffset,
-              // `font-size:16px;line-height:21px;font-weight:600;color:var(--ink)`
-              // — the body step at semibold (weight override only).
-              style: DabblerType.body
-                  .resolveForDirection(dir)
-                  .copyWith(
-                    color: colors.textPrimary,
-                    fontWeight: DabblerType.semibold,
-                  ),
-            ),
-          ),
+          child:
+              titleWidget ??
+              Semantics(
+                header: true,
+                child: _TopBarTitle(
+                  centered: plain,
+                  text: title ?? '',
+                  opacity: titleOpacity,
+                  controller: scrollController,
+                  revealOffset: titleRevealOffset,
+                  // `font-size:16px;line-height:21px;font-weight:600;color:var(--ink)`
+                  // — the body step at semibold (weight override only).
+                  style: DabblerType.body
+                      .resolveForDirection(dir)
+                      .copyWith(
+                        color: colors.textPrimary,
+                        fontWeight: DabblerType.semibold,
+                      ),
+                ),
+              ),
         ),
         if (plain && actions.isEmpty && back != null)
           const SizedBox(

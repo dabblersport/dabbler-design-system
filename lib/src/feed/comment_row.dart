@@ -196,9 +196,7 @@ class DabblerCommentRow extends StatelessWidget {
           minHeight: DabblerSizing.touchTargetMin,
         ),
         child: Padding(
-          padding: const EdgeInsetsDirectional.only(
-            end: DabblerSpacing.space5,
-          ),
+          padding: const EdgeInsetsDirectional.only(end: DabblerSpacing.space5),
           child: Center(
             widthFactor: 1,
             heightFactor: 1,
