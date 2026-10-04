@@ -75,6 +75,8 @@ ruled defect, not current behaviour.** The design draws the chevron lighter than
 beside it; the shipped component currently paints both the same weight, which is a real fidelity
 loss pending a fix. See *Change log*.
 
+**Dense is the Settings rhythm.** Pass `dense: true` for the Settings rows: a 15/20 title over a 12/17 subtitle with a 2-point gap, in a row at least 56 tall. It changes the rhythm only; slots, tone and semantics are unchanged.
+
 ## Axes
 
 ### Content
@@ -100,8 +102,8 @@ capped in width and ellipsised, drawn before the chevron. A tappable row with a 
 @figure 150 lib/src/forms/input_row.dart#valueMaxWidth
 
 ### Tone
-`DabblerInputRowTone.destructive` puts the title (semibold), the subtitle, the leading glyph and the
-chevron in the error role's strong step — Sign out and Delete account.
+`DabblerInputRowTone.destructive` puts the title (semibold), the leading glyph and the chevron in the
+error role's strong step — Sign out and Delete account. The subtitle stays in the secondary text role.
 
 ### Selection
 `selected` null is an ordinary row. `true` draws the bold `tick-circle` in the brand colour and
@@ -156,6 +158,7 @@ shared tokens and primitives every other tappable surface reads.
 - DS gaps 6 — `flat` and `showDivider` added. The chevron's glyphs corrected to the bare
   chevron and its measured mirror; the previous pair drew a boxed chevron in one direction and a
   shafted arrow in the other.
+- Added `dense`, the Settings row rhythm.
 
 ## Source
 
