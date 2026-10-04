@@ -277,8 +277,8 @@ void main() {
     });
 
     test('a DabblerToneColor is never == a plain Color', () {
-      // ignore: unrelated_type_equality_checks
       expect(
+        // ignore: unrelated_type_equality_checks
         DabblerColors.tagPending == DabblerPalette.tagPendingSurface,
         isFalse,
       );
