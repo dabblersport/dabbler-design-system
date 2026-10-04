@@ -53,7 +53,7 @@ Inside a `Form` with a validator, and with a unit as suffix text — see `form_e
 
 @specimen text-field/form
 
-The post editor: `DabblerComposerBox`, a card with a multi-line field, a counter and a toolbar of glyphs, and `DabblerSelectPill`, the status-tinted pill that opens a choice.
+The post editor: `DabblerComposerBox`, a card with a multi-line field, a counter and a toolbar of glyphs, and `DabblerSelectPill`, the status-tinted pill that opens a choice — without a tint it is the neutral card pill that shows a value and a trailing arrow. `DabblerStepperPill` is the compact minus, value and plus pill for a small bounded count.
 
 @specimen text-field/composer-box
 
