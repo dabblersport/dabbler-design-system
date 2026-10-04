@@ -134,6 +134,29 @@ void main() {
       );
     });
 
+    test('the back arrow is 24, as Auth and Onboarding.dc.html:150 draws it', () {
+      expect(DabblerFlowPage.backGlyphSize, 24);
+    });
+
+    for (final TextDirection dir in TextDirection.values) {
+      testWidgets('the back glyph renders at 24 and the target stays 45 ($dir)', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          host(_page(onBack: () {}), direction: dir, width: 393),
+        );
+        final Finder back = find.descendant(
+          of: find.byType(DabblerButton).first,
+          matching: find.byType(DabblerIcon),
+        );
+        expect(tester.widget<DabblerIcon>(back).size, 24);
+        expect(
+          tester.getSize(find.byType(DabblerButton).first).height,
+          greaterThanOrEqualTo(DabblerSizing.touchTargetMin),
+        );
+      });
+    }
+
     for (final TextDirection dir in TextDirection.values) {
       testWidgets('title at the inline start, back arrow mirrored ($dir)', (
         WidgetTester tester,

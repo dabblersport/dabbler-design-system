@@ -43,10 +43,22 @@ drawn outside the ramp entirely.
 @specimen type/faces
 @specimen type/ramp
 @specimen type/weights
+@specimen type/frame-roles
 
 ## Using it
 
-**No new ramp constant may be added to this class right now — there is a standing freeze.** The
+**D-024 (type ramp frozen) is amended: the design is the source of truth.** Roles the design
+frames use were added on 2026-10-04 (KAN-426); the ramp may grow only from design frames. The
+twelve `.t-*` steps are unchanged; the added roles live in `DabblerType.frameRoles`
+(`displayHero`, `displayWelcome`, `displayScreen`, `displayStep`, `displaySection`, `displayStat`,
+`displayStatHero`, `displayStatMid`, `displayStatSmall`, `leadLarge`, `lead`, `rowTitle`, `copy`,
+`small`, `smallTight`, `smallRelaxed`, `footnoteTight`, `tag`, `tagTight`, `figure`, `figureLarge`,
+`figureXl`), each documented with the design file and line it is read from. Arabic is the Latin
+size less 0.9px; Arabic leading is the design's own Arabic frame where one exists. A role has a
+default weight and `DabblerText.weight` overrides it. The freeze text that follows is kept as
+history and still holds for anything that is not a design frame.
+
+**(Historical, pre-amendment) No new ramp constant may be added to this class right now — there was a standing freeze.** The
 design source specifies type three different ways across its components, and which one is actually
 the product's type is escalated to the CEO, unresolved. Until it's answered: new work uses the
 existing twelve `.t-*` steps; where it genuinely can't, it transcribes the source's literal value
@@ -81,6 +93,11 @@ Glory/Meral Sans, the full weight range).
 `footnote`, `caption1`, `caption2`, `label` — each a fixed size, leading (with a separate Arabic
 leading override where the two scripts diverge) and weight.
 
+### Frame roles
+The twenty-two roles in `DabblerType.frameRoles` (see *Using it*). Only `displayStep`, `lead`,
+`rowTitle`, `copy`, `small`, `smallTight` and `smallRelaxed` take extra Arabic leading
+(`DabblerType.frameRolesArabicExtraLeading`).
+
 ### Outside the ramp
 Button's own 16/14/12-at-600 label scale — real, shipped, and explicitly not a set of ramp steps.
 
@@ -101,6 +118,9 @@ Button's own 16/14/12-at-600 label scale — real, shipped, and explicitly not a
 - D-024 (cxo) — measures the three-way type-specification
   split across the design source, rules `typography.css` the sole ramp, and imposes the freeze this
   page describes above.
+- D-024 amended (KAN-426, 2026-10-04) — the design is the source of truth; the frame roles above
+  were added and the ramp may grow only from design frames. The back control in `DabblerFlowPage`
+  now draws its glyph at 24 (`DabblerButton.icon(iconGlyphSize:)`), as the design's flow frames do.
 - D-040 (cxo) — confirms this page's specimen has shipped and
   ships this page.
 

@@ -99,6 +99,12 @@ class DabblerFlowPage extends StatelessWidget {
   /// The content never grows wider than this, `480`.
   static const double maxContentWidth = 480;
 
+  /// The back arrow's glyph size — 24, drawn inside the standard 45px target
+  /// (`Auth and Onboarding.dc.html:150`, `<Icon name="arrow-left" size="24">`;
+  /// the same at `:183`, `:213`, `:332`). Was 20 (the icon-only default)
+  /// until 2026-10-04 (KAN-426), when the design's flow frames were measured.
+  static const double backGlyphSize = 24;
+
   /// Called by the back button. Null draws no back row.
   final VoidCallback? onBack;
 
@@ -300,6 +306,7 @@ class DabblerFlowPage extends StatelessWidget {
               child: DabblerButton.icon(
                 icon: 'arrow-circle-left',
                 mirrorInRtl: true,
+                iconGlyphSize: backGlyphSize,
                 tone: DabblerButtonTone.text,
                 semanticLabel: backLabel!,
                 onPressed: onBack,

@@ -199,7 +199,7 @@ class DabblerButton extends StatefulWidget {
     this.fullWidth = false,
     this.semanticLabel,
     this.mirrorIconInRtl = false,
-  });
+  }) : iconGlyphSize = null;
 
   /// Creates an icon-only button — the source's `tone="icon"` form.
   ///
@@ -215,6 +215,7 @@ class DabblerButton extends StatefulWidget {
     this.disabled = false,
     this.loading = false,
     bool mirrorInRtl = false,
+    this.iconGlyphSize,
   }) : label = null,
        leadingWidget = null,
        fullWidth = false,
@@ -254,6 +255,18 @@ class DabblerButton extends StatefulWidget {
   /// `mirrorIconInRtl` on [DabblerButton.new] and `mirrorInRtl` on
   /// [DabblerButton.icon]. Default false: existing buttons are unchanged.
   final bool mirrorIconInRtl;
+
+  /// The glyph size of an icon-only button, in logical pixels. Null keeps
+  /// [iconOnlyGlyphSize] (20).
+  ///
+  /// Added 2026-10-04 (KAN-426) because the design draws the flow back arrow
+  /// at **24** inside the standard 45px target
+  /// (`Auth and Onboarding.dc.html:150`, `<Icon name="arrow-left" size="24">`
+  /// in a 45x45 pill) while every other icon-only glyph stays at 20 (the
+  /// Details, Profiles, Favourites and Sport Profile back circles are
+  /// `size="20"` in a 40px circle). Only meaningful on [DabblerButton.icon];
+  /// ignored when a [label] is present.
+  final double? iconGlyphSize;
 
   /// Called on tap. Named for the gesture rather than the source's `onClick`.
   ///
@@ -528,7 +541,8 @@ class _DabblerButtonState extends State<DabblerButton> {
               ? DabblerIcon(
                   widget.icon!,
                   size: iconOnly
-                      ? DabblerButton.iconOnlyGlyphSize
+                      ? (widget.iconGlyphSize ??
+                            DabblerButton.iconOnlyGlyphSize)
                       : DabblerButton.leadingIconSize,
                   color: foreground,
                   mirrorInRtl: widget.mirrorIconInRtl,
