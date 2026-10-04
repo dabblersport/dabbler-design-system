@@ -93,6 +93,8 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [Surface](components/surface.md) — the flat container primitive everything with a fill and a
   hairline composes, including `Card` itself.
 - [Section](components/section.md) — a titled group of content, with an optional trailing action.
+- [KeyValueRow](components/key-value-row.md) — a read-only label and its value, with long values wrapping.
+- [TransactionRow](components/transaction-row.md) — one money line in a history list: tile, title, status, amount.
 - [Accordion](components/accordion.md) — collapsible sections for content that's secondary but not
   hidden.
 - [IconTile](components/icon-tile.md) — the tinted square that holds one glyph.
@@ -153,7 +155,6 @@ lot about the rest.
 - [SelectableCard](components/selectable-card.md) — a tappable card that is either chosen or not.
 - [SortControl](components/sort-control.md) — how a view-all list lets the reader change its order.
 - [FilterRail](components/filter-rail.md) — the applied filters as removable chips, and a labelled option group for a filter sheet.
-- [FilterRail](components/filter-rail.md) — the applied filters as removable chips, and a labelled option group for a filter sheet.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
@@ -202,6 +203,7 @@ lot about the rest.
 ### 8 · Status and feedback — telling the user what happened
 
 - [Banner](components/banner.md) — a persistent, in-flow message about the screen it's on.
+- [ProgressCard](components/progress-card.md) — one stage of a multi-stage goal: badge, tick, count and a bar.
 - [ConversationNotice](components/conversation-notice.md) — a banner inside a message thread.
 - [InlineMessage](components/inline-message.md) — one line of status text with a glyph, under the control it explains.
 - [ReactionGroup](components/reaction-group.md) — the reaction tallies under a message.
