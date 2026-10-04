@@ -9,10 +9,27 @@ import '../surfaces/avatar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_motion.dart';
+import '../layout/settings_parts.dart' show DabblerSettingsHeader;
 import '../tokens/dabbler_type.dart';
 
 part 'top_bar_title.dart';
 part 'top_bar_unread_dot.dart';
+
+/// The ink a trailing icon action is drawn in.
+///
+/// `Notifications.dc.html:48, 561` — the *Mark all read* tick is
+/// `--color-brand-primary` while something is unread and `--subtle` once
+/// nothing is, where every other action is `--ink`.
+enum DabblerNavigationActionTone {
+  /// The default ink — `textPrimary`.
+  neutral,
+
+  /// The brand ink — an action that is live and worth doing now.
+  brand,
+
+  /// The subtle ink — an action with nothing left to do.
+  subtle,
+}
 
 /// One trailing action in a [DabblerNavigationTopBar].
 ///
@@ -32,6 +49,7 @@ class DabblerNavigationAction {
     this.unread = false,
     this.unreadLabel,
     this.loading = false,
+    this.tone = DabblerNavigationActionTone.neutral,
   }) : text = false,
        semanticLabel = null;
 
@@ -52,6 +70,7 @@ class DabblerNavigationAction {
        icon = '',
        weight = DabblerIconWeight.linear,
        unread = false,
+       tone = DabblerNavigationActionTone.neutral,
        unreadLabel = null;
 
   /// Whether this is the [DabblerNavigationAction.text] variant.
@@ -88,6 +107,9 @@ class DabblerNavigationAction {
   /// `'new notifications'`. Without it the dot is announced by nothing.
   final String? unreadLabel;
 
+  /// The glyph's ink — see [DabblerNavigationActionTone]. Icon variant only.
+  final DabblerNavigationActionTone tone;
+
   /// Kebab-case Iconsax name, e.g. `sms`.
   final String icon;
 
@@ -114,6 +136,7 @@ class DabblerNavigationAction {
           other.unreadLabel == unreadLabel &&
           other.text == text &&
           other.semanticLabel == semanticLabel &&
+          other.tone == tone &&
           other.loading == loading;
 
   @override
@@ -127,6 +150,7 @@ class DabblerNavigationAction {
     text,
     semanticLabel,
     loading,
+    tone,
   );
 
   @override
@@ -199,7 +223,8 @@ class DabblerNavigationTopBar extends StatelessWidget {
        _titled = false,
        titleOpacity = 1,
        scrollController = null,
-       titleRevealOffset = defaultTitleRevealOffset;
+       titleRevealOffset = defaultTitleRevealOffset,
+       heroTint = false;
 
   /// The titled variant: a back button, a title and trailing actions — the
   /// inner-screen header of the design files `Settings.dc.html` (`isInner`
@@ -234,6 +259,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.titleOpacity = 1,
     this.scrollController,
     this.titleRevealOffset = defaultTitleRevealOffset,
+    this.heroTint = false,
   }) : _titled = true,
        avatarSeed = defaultAvatarSeed,
        avatarBadge = null,
@@ -292,6 +318,13 @@ class DabblerNavigationTopBar extends StatelessWidget {
 
   /// The scroll offset past which [scrollController] reveals the title.
   final double titleRevealOffset;
+
+  /// Paints the bar (and the status-bar inset above it) on the Settings hero's
+  /// brand tint until [scrollController] passes [titleRevealOffset], then on
+  /// the page ground with a hairline rule — `Settings.dc.html:66`. Needs a
+  /// [scrollController]; titled variant only. Overrides [transparent] and
+  /// [border].
+  final bool heroTint;
 
   /// [titleRevealOffset]'s default — the `18` floor of
   /// `Math.max(el.offsetHeight - 52, 18)` (`Profiles.dc.html:818`),
@@ -402,6 +435,9 @@ class DabblerNavigationTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
+    final bool hero = isTitled && heroTint && scrollController != null;
+    final bool transparent = this.transparent || hero;
+    final bool border = this.border && !hero;
 
     final Widget row = isTitled
         ? _titledRow(context, colors)
@@ -490,7 +526,46 @@ class DabblerNavigationTopBar extends StatelessWidget {
         child: bar,
       );
     }
+    if (hero) {
+      bar = _heroTinted(context, colors, bar);
+    }
     return bar;
+  }
+
+  /// `Settings.dc.html:66, 1190-1191` — the root bar sits on the hero's brand
+  /// tint until the page scrolls past [titleRevealOffset], then drops it for
+  /// the page ground and a hairline rule (`navBg` / `navBorder`).
+  Widget _heroTinted(BuildContext context, DabblerColors colors, Widget bar) {
+    final ScrollController c = scrollController!;
+    final Duration duration = DabblerMotion.reduceMotion(context)
+        ? Duration.zero
+        : DabblerMotion.base;
+    return ListenableBuilder(
+      listenable: c,
+      builder: (BuildContext context, Widget? child) {
+        final bool scrolled =
+            c.hasClients && c.positions.first.pixels > titleRevealOffset;
+        return AnimatedContainer(
+          duration: duration,
+          curve: DabblerMotion.easeOut,
+          decoration: BoxDecoration(
+            color: scrolled
+                ? colors.bgPrimary
+                : DabblerSettingsHeader.tintFor(colors),
+            border: Border(
+              bottom: BorderSide(
+                color: scrolled
+                    ? colors.bgTertiary
+                    : colors.bgTertiary.withValues(alpha: 0),
+                width: DabblerSizing.borderDefault,
+              ),
+            ),
+          ),
+          child: child,
+        );
+      },
+      child: bar,
+    );
   }
 
   /// One trailing action in a [DabblerSizing.touchTargetMin] square.
@@ -521,8 +596,13 @@ class DabblerNavigationTopBar extends StatelessWidget {
                   weight: action.weight,
                   // `size={22}` — transcribed, see [actionGlyphSize].
                   size: actionGlyphSize,
-                  // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary.
-                  color: colors.textPrimary,
+                  // `color: 'var(--neutral-900)'` — `--ink`, i.e. textPrimary —
+                  // unless the action asks for the brand or the subtle ink.
+                  color: switch (action.tone) {
+                    DabblerNavigationActionTone.neutral => colors.textPrimary,
+                    DabblerNavigationActionTone.brand => colors.brandPrimary,
+                    DabblerNavigationActionTone.subtle => colors.textTertiary,
+                  },
                 ),
               ),
       ),

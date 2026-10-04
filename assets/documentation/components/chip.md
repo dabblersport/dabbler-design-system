@@ -92,6 +92,7 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 
 ## Change log
 
+- Alpha fidelity (Notifications) — adds `trailingIcon`: a 14px glyph after the label, the quiet-hours pill's `arrow-circle-right` (`Notifications.dc.html:226`).
 - Alpha fidelity (Search) — adds `mutedRemove`: the remove glyph in the muted ink (`Search.dc.html` recent chips).
 
 ## Source

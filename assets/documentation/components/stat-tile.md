@@ -76,6 +76,7 @@ Corner: the 18px extra-large radius. Fill and ink: the surface, brand, ink, stat
 
 ## Change log
 
+- Alpha fidelity (Settings) — the `setting` size's label is 11/15 (`caption2`), as `Settings.dc.html:151` draws it, so `Language & region` fits a two-column tile on one line.
 - Added from the live design project, design system 1.2.0 (`StatTile.jsx` with `href` and `trailing`, 1.1.0 DSG-002).
 
 - Alpha DS gaps 6 — adds `icon`, `fitValue` and `minValueScale` to `DabblerStatTile`,

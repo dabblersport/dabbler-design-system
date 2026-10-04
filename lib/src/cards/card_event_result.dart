@@ -141,6 +141,7 @@ class DabblerCardEventResult extends StatelessWidget {
                     children: <Widget>[
                       DabblerBadge(
                         label: kind,
+                        tone: DabblerBadgeTone.warning,
                         icon: kindIcon == null
                             ? null
                             : DabblerIcon(

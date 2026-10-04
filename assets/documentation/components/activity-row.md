@@ -67,6 +67,7 @@ Surface: the grey inset surface with the default border and the 24px corner. Ink
 
 ## Change log
 
+- Alpha fidelity (Notifications) — `DabblerActivityGroupHeader.count` (the `3 items` caption between label and rule) and `dense` (`padding:9px 0 3px`); `Notifications.dc.html:109-112`.
 - Added from the Home Feed design file.
 
 ## Source

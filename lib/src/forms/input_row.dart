@@ -661,7 +661,19 @@ enum DabblerInputRowTone {
 /// level with it. See [DabblerInputRow]'s D-003/D-027 note.
 class DabblerChevron extends StatelessWidget {
   /// Creates a disclosure chevron.
-  const DabblerChevron({super.key, this.color});
+  const DabblerChevron({super.key, this.color, this.circled = false});
+
+  /// Draws the glyph inside its ring — the disclosure mark the Settings frames
+  /// render (`Settings.dc.html:97`, `:134`, `:269`): `arrow-circle-right` in
+  /// LTR, `arrow-circle-left` in RTL, both at [size]. Default false, which is
+  /// the bare open chevron every other row uses.
+  final bool circled;
+
+  /// [circled]'s glyph in a left-to-right layout.
+  static const String circledForwardIconName = 'arrow-circle-right';
+
+  /// [circled]'s glyph in a right-to-left layout.
+  static const String circledBackwardIconName = 'arrow-circle-left';
 
   /// `size={18}` (`InputRow.jsx:62`) — [DabblerSizing.iconSm].
   static const double size = DabblerSizing.iconSm;
@@ -682,8 +694,13 @@ class DabblerChevron extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextDirection direction = Directionality.of(context);
     return DabblerIcon(
-      iconNameFor(Directionality.of(context)),
+      circled
+          ? (direction == TextDirection.rtl
+                ? circledBackwardIconName
+                : circledForwardIconName)
+          : iconNameFor(direction),
       size: size,
       color: color ?? DabblerColors.of(context).textTertiary,
     );
