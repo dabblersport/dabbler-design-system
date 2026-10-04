@@ -171,22 +171,21 @@ class DabblerFab extends StatelessWidget {
   ///
   /// Never substitute [DabblerElevation.dialogFor] here, and never use this in
   /// a Dialog.
-  static final List<BoxShadow> shadow = List<BoxShadow>.unmodifiable(
-    <BoxShadow>[
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.1),
-        offset: const Offset(0, 10),
-        blurRadius: 15,
-        spreadRadius: -3,
-      ),
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.1),
-        offset: const Offset(0, 4),
-        blurRadius: 6,
-        spreadRadius: -4,
-      ),
-    ],
-  );
+  static final List<BoxShadow> shadow =
+      List<BoxShadow>.unmodifiable(<BoxShadow>[
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.1),
+          offset: const Offset(0, 10),
+          blurRadius: 15,
+          spreadRadius: -3,
+        ),
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.1),
+          offset: const Offset(0, 4),
+          blurRadius: 6,
+          spreadRadius: -4,
+        ),
+      ]);
 
   /// The fill for [tone], resolved against the enclosing theme.
   static Color backgroundOf(DabblerFabTone tone, DabblerColors colors) =>
@@ -199,18 +198,19 @@ class DabblerFab extends StatelessWidget {
       };
 
   /// The glyph colour for [tone], resolved against the enclosing theme.
-  static Color foregroundOf(DabblerFabTone tone, DabblerColors colors) =>
-      switch (tone) {
-        // Three of the four tones name `--surface-card` as the foreground in
-        // `FAB.jsx`; transcribed literally rather than through `--color-on-brand`
-        // so the source stays readable against this file.
-        DabblerFabTone.indigo ||
-        DabblerFabTone.primary ||
-        DabblerFabTone.accent =>
-          colors.surfaceCard,
-        // `--ink`, whose semantic role in the token layer is `--color-text-primary`.
-        DabblerFabTone.dark => colors.textPrimary,
-      };
+  static Color foregroundOf(
+    DabblerFabTone tone,
+    DabblerColors colors,
+  ) => switch (tone) {
+    // Three of the four tones name `--surface-card` as the foreground in
+    // `FAB.jsx`; transcribed literally rather than through `--color-on-brand`
+    // so the source stays readable against this file.
+    DabblerFabTone.indigo ||
+    DabblerFabTone.primary ||
+    DabblerFabTone.accent => colors.surfaceCard,
+    // `--ink`, whose semantic role in the token layer is `--color-text-primary`.
+    DabblerFabTone.dark => colors.textPrimary,
+  };
 
   /// `--accent-indigo`, the fill `FAB.jsx` gives the `default` tone.
   static const Color _indigo = DabblerPalette.accentIndigo;
@@ -298,10 +298,7 @@ class DabblerFab extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onPressed,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: ringed,
-      ),
+      child: MouseRegion(cursor: SystemMouseCursors.click, child: ringed),
     );
   }
 }

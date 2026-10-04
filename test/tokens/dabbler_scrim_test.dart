@@ -7,12 +7,16 @@ void main() {
     for (final DabblerTheme t in DabblerTheme.values) {
       for (final Brightness b in Brightness.values) {
         test('colorFor equals the resolved scrim (${t.name}, ${b.name})', () {
-          final Color resolved =
-              DabblerColors.resolve(theme: t, brightness: b).scrim;
+          final Color resolved = DabblerColors.resolve(
+            theme: t,
+            brightness: b,
+          ).scrim;
           expect(DabblerScrimColors.colorFor(b), resolved);
           expect(DabblerScrim.colorFor(b), resolved);
           expect(
-            b == Brightness.dark ? DabblerScrimColors.dark : DabblerScrimColors.light,
+            b == Brightness.dark
+                ? DabblerScrimColors.dark
+                : DabblerScrimColors.light,
             resolved,
           );
         });
@@ -20,8 +24,14 @@ void main() {
     }
 
     test('light and dark are the palette values', () {
-      expect(DabblerScrimColors.light, DabblerPalette.ink.withValues(alpha: 0.45));
-      expect(DabblerScrimColors.dark, DabblerPalette.ink950.withValues(alpha: 0.65));
+      expect(
+        DabblerScrimColors.light,
+        DabblerPalette.ink.withValues(alpha: 0.45),
+      );
+      expect(
+        DabblerScrimColors.dark,
+        DabblerPalette.ink950.withValues(alpha: 0.65),
+      );
     });
 
     test('none and transparent are fully transparent', () {

@@ -82,10 +82,7 @@ class _FilterFieldState extends State<_FilterField> {
         child: Stack(
           children: <Widget>[
             if (widget.controller.text.isEmpty)
-              Text(
-                'Filter',
-                style: style.copyWith(color: colors.textTertiary),
-              ),
+              Text('Filter', style: style.copyWith(color: colors.textTertiary)),
             EditableText(
               controller: widget.controller,
               focusNode: _focus,

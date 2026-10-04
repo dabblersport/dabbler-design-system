@@ -138,35 +138,35 @@ class _DabblerTooltipState extends State<DabblerTooltip> {
   ) {
     return switch (widget.placement) {
       DabblerTooltipPlacement.top => (
-          target: Alignment.topCenter,
-          follower: Alignment.bottomCenter,
-          offset: const Offset(0, -DabblerTooltip.gap),
-        ),
+        target: Alignment.topCenter,
+        follower: Alignment.bottomCenter,
+        offset: const Offset(0, -DabblerTooltip.gap),
+      ),
       DabblerTooltipPlacement.bottom => (
-          target: Alignment.bottomCenter,
-          follower: Alignment.topCenter,
-          offset: const Offset(0, DabblerTooltip.gap),
-        ),
+        target: Alignment.bottomCenter,
+        follower: Alignment.topCenter,
+        offset: const Offset(0, DabblerTooltip.gap),
+      ),
       DabblerTooltipPlacement.start => (
-          target: AlignmentDirectional.centerStart.resolve(direction),
-          follower: AlignmentDirectional.centerEnd.resolve(direction),
-          offset: Offset(
-            direction == TextDirection.rtl
-                ? DabblerTooltip.gap
-                : -DabblerTooltip.gap,
-            0,
-          ),
+        target: AlignmentDirectional.centerStart.resolve(direction),
+        follower: AlignmentDirectional.centerEnd.resolve(direction),
+        offset: Offset(
+          direction == TextDirection.rtl
+              ? DabblerTooltip.gap
+              : -DabblerTooltip.gap,
+          0,
         ),
+      ),
       DabblerTooltipPlacement.end => (
-          target: AlignmentDirectional.centerEnd.resolve(direction),
-          follower: AlignmentDirectional.centerStart.resolve(direction),
-          offset: Offset(
-            direction == TextDirection.rtl
-                ? -DabblerTooltip.gap
-                : DabblerTooltip.gap,
-            0,
-          ),
+        target: AlignmentDirectional.centerEnd.resolve(direction),
+        follower: AlignmentDirectional.centerStart.resolve(direction),
+        offset: Offset(
+          direction == TextDirection.rtl
+              ? -DabblerTooltip.gap
+              : DabblerTooltip.gap,
+          0,
         ),
+      ),
     };
   }
 
@@ -220,10 +220,7 @@ class _DabblerTooltipState extends State<DabblerTooltip> {
                 alignment: AlignmentDirectional.topStart,
                 widthFactor: 1,
                 heightFactor: 1,
-                child: Directionality(
-                  textDirection: direction,
-                  child: panel,
-                ),
+                child: Directionality(textDirection: direction, child: panel),
               ),
             ),
           ),

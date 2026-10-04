@@ -156,8 +156,9 @@ class DabblerDocSection {
     if (!DabblerDocVocabulary.isGoverned(kind)) {
       return true;
     }
-    return DabblerDocVocabulary.forKind(kind)
-        .any((DabblerDocHeading h) => h.text == heading);
+    return DabblerDocVocabulary.forKind(
+      kind,
+    ).any((DabblerDocHeading h) => h.text == heading);
   }
 
   /// Every specimen id referenced in this section, in document order.
@@ -234,9 +235,8 @@ class DabblerDocPage {
 
   /// Every specimen id on the page, in document order, duplicates kept.
   List<String> get specimenIds => <String>[
-        for (final DabblerDocSection section in sections)
-          ...section.specimenIds,
-      ];
+    for (final DabblerDocSection section in sections) ...section.specimenIds,
+  ];
 }
 
 /// Turns one page's markdown into its ordered sections.
@@ -246,8 +246,9 @@ class DabblerDocPage {
 abstract final class DabblerDocSplitter {
   static final RegExp _provenance = RegExp(r'^\s*<!--.*?-->', dotAll: true);
   static final RegExp _specimen = RegExp(r'^@specimen[ \t]+(\S+)[ \t]*$');
-  static final RegExp _figure =
-      RegExp(r'^@figure[ \t]+(\S+)[ \t]+(\S+)[ \t]*$');
+  static final RegExp _figure = RegExp(
+    r'^@figure[ \t]+(\S+)[ \t]+(\S+)[ \t]*$',
+  );
 
   /// Removes the leading HTML provenance comment, which is never rendered.
   ///
@@ -278,10 +279,7 @@ abstract final class DabblerDocSplitter {
     void closeSection() {
       if (heading != null) {
         sections.add(
-          DabblerDocSection(
-            heading: heading,
-            blocks: _blocks(sectionLines),
-          ),
+          DabblerDocSection(heading: heading, blocks: _blocks(sectionLines)),
         );
       }
       sectionLines = <String>[];
@@ -309,9 +307,9 @@ abstract final class DabblerDocSplitter {
       assetPath: assetPath,
       kind: DabblerDocVocabulary.kindForAssetPath(assetPath),
       title: title,
-      lead: _blocks(leadLines)
-          .where((DabblerDocBlock b) => b is! DabblerDocSpecimen)
-          .toList(),
+      lead: _blocks(
+        leadLines,
+      ).where((DabblerDocBlock b) => b is! DabblerDocSpecimen).toList(),
       sections: sections,
     );
   }

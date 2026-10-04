@@ -108,7 +108,8 @@ class DabblerIconResolution {
   bool get hasGlyph => glyph != null;
 
   @override
-  String toString() => 'DabblerIconResolution($requestedName -> $resolvedKey, '
+  String toString() =>
+      'DabblerIconResolution($requestedName -> $resolvedKey, '
       '${resolvedWeight.name}, ${outcome.name})';
 }
 
@@ -187,12 +188,45 @@ abstract final class DabblerIconRegistry {
   /// Documentation and a test fixture, not a gate: [resolve] never consults it,
   /// and a name outside this list resolves like any other.
   static const List<String> vocabulary = <String>[
-    'home-2', 'search-normal', 'add', 'add-circle', 'user', 'profile-circle',
-    'people', 'notification', 'notification-bing', 'setting-2', 'calendar',
-    'location', 'game', 'ticket-2', 'cup', 'activity', 'clock', 'star',
-    'heart', 'sms', 'call', 'filter', 'tick-circle', 'danger', 'warning-2',
-    'info-circle', 'eye', 'eye-slash', 'lock', 'edit', 'trash', 'gallery',
-    'camera', 'video', 'play', 'share', 'microphone-2', 'more', 'menu',
+    'home-2',
+    'search-normal',
+    'add',
+    'add-circle',
+    'user',
+    'profile-circle',
+    'people',
+    'notification',
+    'notification-bing',
+    'setting-2',
+    'calendar',
+    'location',
+    'game',
+    'ticket-2',
+    'cup',
+    'activity',
+    'clock',
+    'star',
+    'heart',
+    'sms',
+    'call',
+    'filter',
+    'tick-circle',
+    'danger',
+    'warning-2',
+    'info-circle',
+    'eye',
+    'eye-slash',
+    'lock',
+    'edit',
+    'trash',
+    'gallery',
+    'camera',
+    'video',
+    'play',
+    'share',
+    'microphone-2',
+    'more',
+    'menu',
     'close-circle',
   ];
 
@@ -202,11 +236,25 @@ abstract final class DabblerIconRegistry {
   ///
   /// Nothing in [resolve] reads this list.
   static const List<String> webProGatedNames = <String>[
-    'arrow-right', 'arrow-right-1', 'arrow-right-2', 'arrow-right-3',
-    'arrow-left', 'arrow-left-1', 'arrow-left-2', 'arrow-left-3',
-    'arrow-down', 'arrow-down-1', 'arrow-down-2',
-    'arrow-up', 'arrow-up-1', 'arrow-up-2',
-    'more-2', 'refresh', 'refresh-2', 'logout', 'login',
+    'arrow-right',
+    'arrow-right-1',
+    'arrow-right-2',
+    'arrow-right-3',
+    'arrow-left',
+    'arrow-left-1',
+    'arrow-left-2',
+    'arrow-left-3',
+    'arrow-down',
+    'arrow-down-1',
+    'arrow-down-2',
+    'arrow-up',
+    'arrow-up-1',
+    'arrow-up-2',
+    'more-2',
+    'refresh',
+    'refresh-2',
+    'logout',
+    'login',
   ];
 
   /// The suffix `iconsax_flutter` gives the **outline** variant of a glyph.
@@ -303,9 +351,9 @@ abstract final class DabblerIconRegistry {
         _warnOnce(
           'weight:$name',
           '[Dabbler DS] Icon "$name" has no linear weight in iconsax_flutter '
-          '("$boldKey$linearSuffix" is not declared) — drawing the bold '
-          'glyph instead. The right glyph in the wrong weight is closer to the '
-          'design than a placeholder.',
+              '("$boldKey$linearSuffix" is not declared) — drawing the bold '
+              'glyph instead. The right glyph in the wrong weight is closer to the '
+              'design than a placeholder.',
         );
         return DabblerIconResolution(
           requestedName: name,
@@ -323,11 +371,11 @@ abstract final class DabblerIconRegistry {
     _warnOnce(
       'missing:$name',
       '[Dabbler DS] Icon "$name" is not an Iconsax glyph — no '
-      // The base key is the canonical name; `_copy` is the outline variant of
-      // it, so naming the base is what tells the reader what to look up.
-      '"${keyFor(name, DabblerIconWeight.bold)}" in iconsax_flutter. '
-      'Rendering the missing-glyph placeholder. Check the kebab-case name '
-      'against app.iconsax.io.',
+          // The base key is the canonical name; `_copy` is the outline variant of
+          // it, so naming the base is what tells the reader what to look up.
+          '"${keyFor(name, DabblerIconWeight.bold)}" in iconsax_flutter. '
+          'Rendering the missing-glyph placeholder. Check the kebab-case name '
+          'against app.iconsax.io.',
     );
     return DabblerIconResolution(
       requestedName: name,
@@ -464,18 +512,20 @@ class DabblerIcon extends StatelessWidget {
   /// See [DabblerIconRegistry] → *Why a debug report and not an `assert`*.
   static void _reportMissingInDebug(DabblerIconResolution resolution) {
     assert(() {
-      FlutterError.reportError(FlutterErrorDetails(
-        exception: FlutterError(
-          'DabblerIcon: "${resolution.requestedName}" is not an Iconsax glyph.',
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: FlutterError(
+            'DabblerIcon: "${resolution.requestedName}" is not an Iconsax glyph.',
+          ),
+          library: 'dabbler design system',
+          context: ErrorDescription(
+            'building a DabblerIcon. Names are kebab-case exactly as at '
+            'app.iconsax.io (e.g. "search-normal", "home-2"). A visible '
+            'placeholder is rendered at the requested size rather than failing '
+            'the frame.',
+          ),
         ),
-        library: 'dabbler design system',
-        context: ErrorDescription(
-          'building a DabblerIcon. Names are kebab-case exactly as at '
-          'app.iconsax.io (e.g. "search-normal", "home-2"). A visible '
-          'placeholder is rendered at the requested size rather than failing '
-          'the frame.',
-        ),
-      ));
+      );
       return true;
     }());
   }
@@ -483,13 +533,17 @@ class DabblerIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double side = size ?? DabblerSizing.iconMd;
-    final bool mirror = mirrorInRtl &&
-        Directionality.maybeOf(context) == TextDirection.rtl;
-    final String? mirroredName =
-        mirror ? DabblerIconMirror.pairFor(name, weight) : null;
-    final DabblerIconResolution resolution =
-        DabblerIconRegistry.resolve(mirroredName ?? name, weight: weight);
-    final Color tint = color ??
+    final bool mirror =
+        mirrorInRtl && Directionality.maybeOf(context) == TextDirection.rtl;
+    final String? mirroredName = mirror
+        ? DabblerIconMirror.pairFor(name, weight)
+        : null;
+    final DabblerIconResolution resolution = DabblerIconRegistry.resolve(
+      mirroredName ?? name,
+      weight: weight,
+    );
+    final Color tint =
+        color ??
         IconTheme.of(context).color ??
         DabblerColors.of(context).textPrimary;
 

@@ -99,15 +99,20 @@ void main() {
       },
     );
 
-    test('tracking stays the step\'s 0 (the source\'s -0.01em is not applied)',
-        () {
-      for (final DabblerStatTileSize size in DabblerStatTileSize.values) {
-        expect(
-          DabblerStatTile.valueStyleFor(size, TextDirection.ltr).letterSpacing,
-          0,
-        );
-      }
-    });
+    test(
+      'tracking stays the step\'s 0 (the source\'s -0.01em is not applied)',
+      () {
+        for (final DabblerStatTileSize size in DabblerStatTileSize.values) {
+          expect(
+            DabblerStatTile.valueStyleFor(
+              size,
+              TextDirection.ltr,
+            ).letterSpacing,
+            0,
+          );
+        }
+      },
+    );
 
     testWidgets('the label is footnote 13/18 at weight 600', (
       WidgetTester tester,

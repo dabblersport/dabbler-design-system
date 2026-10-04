@@ -46,18 +46,30 @@ void main() {
 
     test('frame and on-frame colours per tone', () {
       final DabblerColors c = _colors();
-      expect(DabblerPanelCard.frameFor(c, DabblerPanelCardTone.brand),
-          c.brandPrimary);
-      expect(DabblerPanelCard.frameFor(c, DabblerPanelCardTone.sport),
-          DabblerPalette.sportP600);
-      expect(DabblerPanelCard.frameFor(c, DabblerPanelCardTone.active),
-          DabblerPalette.activeP600);
-      expect(DabblerPanelCard.frameFor(c, DabblerPanelCardTone.info),
-          c.info.solid);
-      expect(DabblerPanelCard.onFrameFor(c, DabblerPanelCardTone.info),
-          DabblerPalette.paper);
-      expect(DabblerPanelCard.onFrameFor(c, DabblerPanelCardTone.amber),
-          DabblerColors.tileAmber.ink);
+      expect(
+        DabblerPanelCard.frameFor(c, DabblerPanelCardTone.brand),
+        c.brandPrimary,
+      );
+      expect(
+        DabblerPanelCard.frameFor(c, DabblerPanelCardTone.sport),
+        DabblerPalette.sportP600,
+      );
+      expect(
+        DabblerPanelCard.frameFor(c, DabblerPanelCardTone.active),
+        DabblerPalette.activeP600,
+      );
+      expect(
+        DabblerPanelCard.frameFor(c, DabblerPanelCardTone.info),
+        c.info.solid,
+      );
+      expect(
+        DabblerPanelCard.onFrameFor(c, DabblerPanelCardTone.info),
+        DabblerPalette.paper,
+      );
+      expect(
+        DabblerPanelCard.onFrameFor(c, DabblerPanelCardTone.amber),
+        DabblerColors.tileAmber.ink,
+      );
     });
 
     testWidgets('is 340 wide by default and 6px inset', (
@@ -132,8 +144,11 @@ void main() {
       );
       await tester.tap(find.bySemanticsLabel('Next'));
       expect(next, 1);
-      expect(find.bySemanticsLabel('Previous'), findsNothing,
-          reason: 'no onPrev: no button semantics');
+      expect(
+        find.bySemanticsLabel('Previous'),
+        findsNothing,
+        reason: 'no onPrev: no button semantics',
+      );
       expect(
         tester
             .widgetList<Opacity>(find.byType(Opacity))
@@ -193,20 +208,24 @@ void main() {
 
     test('done rows are muted; dark open rows are page paper', () {
       final DabblerColors c = _colors();
-      expect(DabblerChecklistPanel.labelColorFor(c, done: true, dark: false),
-          c.textSecondary);
-      expect(DabblerChecklistPanel.labelColorFor(c, done: false, dark: false),
-          c.textPrimary);
-      expect(DabblerChecklistPanel.labelColorFor(c, done: false, dark: true),
-          DabblerPalette.surfacePage);
+      expect(
+        DabblerChecklistPanel.labelColorFor(c, done: true, dark: false),
+        c.textSecondary,
+      );
+      expect(
+        DabblerChecklistPanel.labelColorFor(c, done: false, dark: false),
+        c.textPrimary,
+      );
+      expect(
+        DabblerChecklistPanel.labelColorFor(c, done: false, dark: true),
+        DabblerPalette.surfacePage,
+      );
     });
 
     testWidgets('label is subheadline 15 at weight 500; rows are 6 apart', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(const DabblerChecklistPanel(items: items)),
-      );
+      await tester.pumpWidget(_host(const DabblerChecklistPanel(items: items)));
       final Text t = tester.widget<Text>(find.text('Two'));
       expect(t.style!.fontSize, 15);
       expect(t.style!.fontWeight, FontWeight.w500);
@@ -257,22 +276,30 @@ void main() {
 
     test('button colours per added and dark', () {
       final DabblerColors c = _colors();
-      expect(DabblerMemberListPanel.buttonFillFor(c, added: true, dark: false),
-          DabblerPalette.ink);
-      expect(DabblerMemberListPanel.buttonFillFor(c, added: true, dark: true),
-          c.surfaceCard);
       expect(
-          DabblerMemberListPanel.buttonFillFor(c, added: false, dark: false)
-              .a,
-          0);
-      expect(DabblerMemberListPanel.buttonBorderFor(c, added: true, dark: false),
-          isNull);
-      expect(DabblerMemberListPanel.buttonBorderFor(c, added: false, dark: false),
-          c.borderDefault);
+        DabblerMemberListPanel.buttonFillFor(c, added: true, dark: false),
+        DabblerPalette.ink,
+      );
       expect(
-          DabblerMemberListPanel.buttonBorderFor(c, added: false, dark: true)!
-              .a,
-          closeTo(0.28, 0.01));
+        DabblerMemberListPanel.buttonFillFor(c, added: true, dark: true),
+        c.surfaceCard,
+      );
+      expect(
+        DabblerMemberListPanel.buttonFillFor(c, added: false, dark: false).a,
+        0,
+      );
+      expect(
+        DabblerMemberListPanel.buttonBorderFor(c, added: true, dark: false),
+        isNull,
+      );
+      expect(
+        DabblerMemberListPanel.buttonBorderFor(c, added: false, dark: false),
+        c.borderDefault,
+      );
+      expect(
+        DabblerMemberListPanel.buttonBorderFor(c, added: false, dark: true)!.a,
+        closeTo(0.28, 0.01),
+      );
       expect(DabblerMemberListPanel.buttonSide, 32);
     });
 
@@ -287,9 +314,9 @@ void main() {
       expect(name.style!.fontWeight, FontWeight.w700);
       expect(tester.widget<Text>(find.text('Organiser')).style!.fontSize, 13);
       expect(
-        tester.widgetList<DabblerAvatar>(find.byType(DabblerAvatar)).every(
-              (DabblerAvatar a) => a.size == DabblerAvatarSize.sm,
-            ),
+        tester
+            .widgetList<DabblerAvatar>(find.byType(DabblerAvatar))
+            .every((DabblerAvatar a) => a.size == DabblerAvatarSize.sm),
         isTrue,
       );
     });
@@ -323,8 +350,9 @@ void main() {
   });
 
   group('DabblerMutualsCard — MutualsCard.jsx', () {
-    testWidgets('card shell: fill, 1px outline, 12 radius; text footnote',
-        (WidgetTester tester) async {
+    testWidgets('card shell: fill, 1px outline, 12 radius; text footnote', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const SizedBox(
@@ -337,10 +365,12 @@ void main() {
         ),
       );
       final DecoratedBox box = tester.widget<DecoratedBox>(
-        find.descendant(
-          of: find.byType(DabblerMutualsCard),
-          matching: find.byType(DecoratedBox),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(DabblerMutualsCard),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
       );
       final BoxDecoration d = box.decoration as BoxDecoration;
       final DabblerColors c = _colors();

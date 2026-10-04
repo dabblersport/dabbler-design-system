@@ -51,6 +51,9 @@ With or without the remove button and a tap.
 height instead. `borderRadius` takes another radius token for a smaller tile; the large corner stays
 the default.
 
+### Add tile
+`DabblerAttachmentAddTile` is the dashed Add tile that precedes the previews in the composing frame.
+
 ## Direction
 
 The remove button sits at the end corner and mirrors under right-to-left; the pill's icon leads.

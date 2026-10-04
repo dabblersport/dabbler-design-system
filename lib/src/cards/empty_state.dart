@@ -20,6 +20,11 @@ enum DabblerEmptyStateSize {
   /// no frame, `min-height: 60dvh`, title at `.t-title-3` and copy capped at
   /// 320px. For a whole empty screen.
   page,
+
+  /// No frame and no icon well: a bare 42px glyph in the subtle ink over the
+  /// title and copy, centred, with 48/36 padding. The empty replies area of
+  /// `Post.dc.html` (lines 82-87), where the state sits straight on the page.
+  plain,
 }
 
 /// The tone of an empty state's icon well.
@@ -251,7 +256,7 @@ class DabblerEmptyState extends StatelessWidget {
     DabblerEmptyStateSize.page => DabblerType.title3.resolveForDirection(
       direction,
     ),
-    DabblerEmptyStateSize.inline =>
+    DabblerEmptyStateSize.inline || DabblerEmptyStateSize.plain =>
       DabblerType.body
           .resolveForDirection(direction)
           .copyWith(fontWeight: DabblerType.semibold),
@@ -271,6 +276,13 @@ class DabblerEmptyState extends StatelessWidget {
     final Widget content = _content(colors, direction);
 
     return switch (size) {
+      DabblerEmptyStateSize.plain => Padding(
+        padding: const EdgeInsetsDirectional.symmetric(
+          vertical: DabblerSpacing.space11,
+          horizontal: DabblerSpacing.space10,
+        ),
+        child: Center(child: content),
+      ),
       DabblerEmptyStateSize.inline => DabblerCard(
         variant: DabblerCardVariant.white,
         padding: inlinePadding,
@@ -299,7 +311,11 @@ class DabblerEmptyState extends StatelessWidget {
       children.add(child);
     }
 
-    if (icon != null || iconWidget != null) add(_well(colors));
+    if (size == DabblerEmptyStateSize.plain && icon != null) {
+      add(DabblerIcon(icon!, size: 42, color: colors.textTertiary));
+    } else if (icon != null || iconWidget != null) {
+      add(_well(colors));
+    }
 
     if (title != null) {
       add(

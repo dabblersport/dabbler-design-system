@@ -112,7 +112,10 @@ class DabblerCardPoll extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: DabblerType.subheadline
                 .resolveForDirection(direction)
-                .copyWith(fontWeight: FontWeight.w700, color: colors.textPrimary),
+                .copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colors.textPrimary,
+                ),
           ),
         ),
       ),
@@ -142,8 +145,7 @@ class DabblerCardPoll extends StatelessWidget {
                       Expanded(
                         child: _Bar(
                           fraction: options[i].fraction,
-                          fill:
-                              options[i].color ?? optionColorFor(colors, i),
+                          fill: options[i].color ?? optionColorFor(colors, i),
                           track: colors.surfaceSunken,
                         ),
                       ),
@@ -156,8 +158,7 @@ class DabblerCardPoll extends StatelessWidget {
                             .copyWith(
                               fontWeight: FontWeight.w700,
                               color:
-                                  options[i].color ??
-                                  optionColorFor(colors, i),
+                                  options[i].color ?? optionColorFor(colors, i),
                             ),
                       ),
                     ],

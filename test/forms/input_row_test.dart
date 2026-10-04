@@ -39,13 +39,13 @@ Widget _host(
 }
 
 DabblerSurface _surface(WidgetTester tester) => tester.widget<DabblerSurface>(
-      find
-          .descendant(
-            of: find.byType(DabblerInputRow),
-            matching: find.byType(DabblerSurface),
-          )
-          .first,
-    );
+  find
+      .descendant(
+        of: find.byType(DabblerInputRow),
+        matching: find.byType(DabblerSurface),
+      )
+      .first,
+);
 
 void main() {
   group('KAN-248 AC1 — a horizontal composition helper for form fields', () {
@@ -55,7 +55,11 @@ void main() {
       await tester.pumpWidget(
         _host(
           const DabblerInputRow(
-            leading: SizedBox(key: ValueKey<String>('lead'), width: 24, height: 24),
+            leading: SizedBox(
+              key: ValueKey<String>('lead'),
+              width: 24,
+              height: 24,
+            ),
             title: 'my friends',
             subtitle: 'only friends can join',
             trailing: SizedBox(
@@ -67,10 +71,13 @@ void main() {
         ),
       );
 
-      final Rect lead = tester.getRect(find.byKey(const ValueKey<String>('lead')));
+      final Rect lead = tester.getRect(
+        find.byKey(const ValueKey<String>('lead')),
+      );
       final Rect title = tester.getRect(find.text('my friends'));
-      final Rect trail =
-          tester.getRect(find.byKey(const ValueKey<String>('trail')));
+      final Rect trail = tester.getRect(
+        find.byKey(const ValueKey<String>('trail')),
+      );
 
       expect(lead.right, lessThanOrEqualTo(title.left));
       expect(title.right, lessThanOrEqualTo(trail.left));
@@ -98,7 +105,11 @@ void main() {
       await tester.pumpWidget(
         _host(
           const DabblerInputRow(
-            leading: SizedBox(key: ValueKey<String>('lead'), width: 24, height: 24),
+            leading: SizedBox(
+              key: ValueKey<String>('lead'),
+              width: 24,
+              height: 24,
+            ),
             title: 'x',
             trailing: SizedBox(
               key: ValueKey<String>('trail'),
@@ -108,48 +119,58 @@ void main() {
           ),
         ),
       );
-      final Rect lead = tester.getRect(find.byKey(const ValueKey<String>('lead')));
+      final Rect lead = tester.getRect(
+        find.byKey(const ValueKey<String>('lead')),
+      );
       final Rect title = tester.getRect(find.text('x'));
-      final Rect trail =
-          tester.getRect(find.byKey(const ValueKey<String>('trail')));
+      final Rect trail = tester.getRect(
+        find.byKey(const ValueKey<String>('trail')),
+      );
 
       expect(title.left - lead.right, DabblerSpacing.stackDefault);
       expect(DabblerInputRow.slotGap, 12);
       // The text column is Expanded, so the trailing gap is measured off the
       // column's edge rather than the glyph's.
-      expect(trail.left - title.right, greaterThanOrEqualTo(DabblerInputRow.slotGap));
+      expect(
+        trail.left - title.right,
+        greaterThanOrEqualTo(DabblerInputRow.slotGap),
+      );
     });
 
-    testWidgets('the text column takes the remaining width and wraps inside it', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        _host(
-          const DabblerInputRow(
-            title: 'a very long settings row title that will not fit on a line',
-            trailing: SizedBox(
-              key: ValueKey<String>('trail'),
-              width: 24,
-              height: 24,
+    testWidgets(
+      'the text column takes the remaining width and wraps inside it',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(
+            const DabblerInputRow(
+              title:
+                  'a very long settings row title that will not fit on a line',
+              trailing: SizedBox(
+                key: ValueKey<String>('trail'),
+                width: 24,
+                height: 24,
+              ),
             ),
           ),
-        ),
-      );
-      expect(tester.takeException(), isNull);
-      final Rect row = tester.getRect(find.byType(DabblerInputRow));
-      final Rect trail =
-          tester.getRect(find.byKey(const ValueKey<String>('trail')));
-      expect(row.width, hostWidth);
-      expect(
-        trail.right,
-        lessThanOrEqualTo(row.right),
-        reason: 'the trailing slot stays inside the row however long the title',
-      );
-      expect(
-        tester.getRect(find.byType(Text)).right,
-        lessThanOrEqualTo(row.right),
-      );
-    });
+        );
+        expect(tester.takeException(), isNull);
+        final Rect row = tester.getRect(find.byType(DabblerInputRow));
+        final Rect trail = tester.getRect(
+          find.byKey(const ValueKey<String>('trail')),
+        );
+        expect(row.width, hostWidth);
+        expect(
+          trail.right,
+          lessThanOrEqualTo(row.right),
+          reason:
+              'the trailing slot stays inside the row however long the title',
+        );
+        expect(
+          tester.getRect(find.byType(Text)).right,
+          lessThanOrEqualTo(row.right),
+        );
+      },
+    );
   });
 
   group('geometry — the drawn literals, with the token conflicts named', () {
@@ -163,34 +184,35 @@ void main() {
       expect(DabblerRadius.xl, 18);
     });
 
-    testWidgets('padding is the drawn 14 block / 16 inline, and mirrors in RTL', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(_host(const DabblerInputRow(title: 'x')));
-      expect(_surface(tester).padding, DabblerInputRow.defaultPadding);
-      expect(
-        DabblerInputRow.defaultPadding,
-        const EdgeInsetsDirectional.symmetric(
-          vertical: 14,
-          horizontal: 16,
-        ),
-      );
+    testWidgets(
+      'padding is the drawn 14 block / 16 inline, and mirrors in RTL',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(_host(const DabblerInputRow(title: 'x')));
+        expect(_surface(tester).padding, DabblerInputRow.defaultPadding);
+        expect(
+          DabblerInputRow.defaultPadding,
+          const EdgeInsetsDirectional.symmetric(vertical: 14, horizontal: 16),
+        );
 
-      final Rect ltrRow = tester.getRect(find.byType(DabblerInputRow));
-      final Rect ltr = tester.getRect(find.text('x'));
-      expect(ltr.left - ltrRow.left, closeTo(16, 0.01));
+        final Rect ltrRow = tester.getRect(find.byType(DabblerInputRow));
+        final Rect ltr = tester.getRect(find.text('x'));
+        expect(ltr.left - ltrRow.left, closeTo(16, 0.01));
 
-      await tester.pumpWidget(
-        _host(const DabblerInputRow(title: 'x'), direction: TextDirection.rtl),
-      );
-      final Rect rtlRow = tester.getRect(find.byType(DabblerInputRow));
-      final Rect rtl = tester.getRect(find.text('x'));
-      expect(
-        rtlRow.right - rtl.right,
-        closeTo(16, 0.01),
-        reason: 'the inline start inset moves to the right in RTL',
-      );
-    });
+        await tester.pumpWidget(
+          _host(
+            const DabblerInputRow(title: 'x'),
+            direction: TextDirection.rtl,
+          ),
+        );
+        final Rect rtlRow = tester.getRect(find.byType(DabblerInputRow));
+        final Rect rtl = tester.getRect(find.text('x'));
+        expect(
+          rtlRow.right - rtl.right,
+          closeTo(16, 0.01),
+          reason: 'the inline start inset moves to the right in RTL',
+        );
+      },
+    );
 
     testWidgets('the row is never shorter than the 45px touch floor', (
       WidgetTester tester,
@@ -251,8 +273,12 @@ void main() {
     testWidgets('title is .t-subheadline in --color-text-primary', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_host(const DabblerInputRow(title: 'my friends')));
-      final TextStyle style = tester.widget<Text>(find.text('my friends')).style!;
+      await tester.pumpWidget(
+        _host(const DabblerInputRow(title: 'my friends')),
+      );
+      final TextStyle style = tester
+          .widget<Text>(find.text('my friends'))
+          .style!;
       expect(style.fontSize, DabblerType.subheadline.fontSize);
       expect(style.fontSize, 15);
       expect(style.fontWeight, DabblerType.regular);
@@ -267,14 +293,16 @@ void main() {
           const DabblerInputRow(title: 'a', subtitle: 'only friends can join'),
         ),
       );
-      final TextStyle style =
-          tester.widget<Text>(find.text('only friends can join')).style!;
+      final TextStyle style = tester
+          .widget<Text>(find.text('only friends can join'))
+          .style!;
       expect(style.fontSize, DabblerType.footnote.fontSize);
       expect(style.fontSize, 13);
       expect(
         style.color,
         _colors().textSecondary,
-        reason: 'D-003 forbids --subtle as a text colour; textSecondary is the '
+        reason:
+            'D-003 forbids --subtle as a text colour; textSecondary is the '
             'role the system carries for a second line',
       );
     });
@@ -311,8 +339,9 @@ void main() {
       );
       expect(find.byType(DabblerPressScale), findsOneWidget);
 
-      final DabblerFocusRing ring =
-          tester.widget<DabblerFocusRing>(find.byType(DabblerFocusRing));
+      final DabblerFocusRing ring = tester.widget<DabblerFocusRing>(
+        find.byType(DabblerFocusRing),
+      );
       expect(
         ring.borderRadius,
         const BorderRadius.all(Radius.circular(DabblerInputRow.defaultRadius)),
@@ -327,18 +356,18 @@ void main() {
     testWidgets('the press tint is not ported — the row scales', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(DabblerInputRow(title: 'x', onTap: () {})),
+      await tester.pumpWidget(_host(DabblerInputRow(title: 'x', onTap: () {})));
+      final DabblerPressScale press = tester.widget<DabblerPressScale>(
+        find.byType(DabblerPressScale),
       );
-      final DabblerPressScale press =
-          tester.widget<DabblerPressScale>(find.byType(DabblerPressScale));
       expect(press.scale, DabblerMotion.pressScale);
 
       // The fill is the variant's at rest and while pressed: nothing here
       // darkens it.
       final Color? restingFill = _surface(tester).fill;
-      final TestGesture gesture =
-          await tester.startGesture(tester.getCenter(find.text('x')));
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.text('x')),
+      );
       await tester.pumpAndSettle();
       expect(_surface(tester).fill, restingFill);
       await gesture.up();
@@ -350,15 +379,15 @@ void main() {
     ) async {
       int taps = 0;
       await tester.pumpWidget(
-        _host(
-          DabblerInputRow(title: 'x', enabled: false, onTap: () => taps++),
-        ),
+        _host(DabblerInputRow(title: 'x', enabled: false, onTap: () => taps++)),
       );
       await tester.tap(find.byType(DabblerInputRow), warnIfMissed: false);
       await tester.pumpAndSettle();
       expect(taps, 0);
       expect(
-        tester.widget<DabblerPressScale>(find.byType(DabblerPressScale)).enabled,
+        tester
+            .widget<DabblerPressScale>(find.byType(DabblerPressScale))
+            .enabled,
         isFalse,
       );
       expect(
@@ -385,10 +414,7 @@ void main() {
         find.byType(DabblerInputRow),
       );
       expect(node.getSemanticsData().flagsCollection.isButton, isTrue);
-      expect(
-        node.getSemanticsData().hasAction(SemanticsAction.tap),
-        isTrue,
-      );
+      expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
       expect(node.label, contains('my friends'));
       expect(node.label, contains('only friends can join'));
       expect(
@@ -447,9 +473,7 @@ void main() {
     testWidgets('a tappable row clears the 45px target floor', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        _host(DabblerInputRow(title: 'x', onTap: () {})),
-      );
+      await tester.pumpWidget(_host(DabblerInputRow(title: 'x', onTap: () {})));
       final Size size = tester.getSize(find.byType(DabblerInputRow));
       expect(size.height, greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
     });
@@ -498,8 +522,11 @@ void main() {
       );
       for (final Icon icon in icons) {
         expect(icon.color, _colors().textTertiary);
-        expect(icon.color, isNot(_colors().textSecondary),
-            reason: 'the chevron must not read as heavy as the subtitle');
+        expect(
+          icon.color,
+          isNot(_colors().textSecondary),
+          reason: 'the chevron must not read as heavy as the subtitle',
+        );
         expect(icon.size, DabblerSizing.iconSm);
       }
     });
@@ -550,14 +577,16 @@ void main() {
         reason: '$path must take every colour from the tokens',
       );
       expect(
-        RegExp(r'ringWidth\s*=|ringOffset\s*=|pressScale\s*=|outlineOffset')
-            .hasMatch(code),
+        RegExp(
+          r'ringWidth\s*=|ringOffset\s*=|pressScale\s*=|outlineOffset',
+        ).hasMatch(code),
         isFalse,
         reason: '$path must not restate an interaction constant',
       );
       expect(
-        RegExp(r'BoxShadow|LinearGradient|ImageFilter|BackdropFilter')
-            .hasMatch(code),
+        RegExp(
+          r'BoxShadow|LinearGradient|ImageFilter|BackdropFilter',
+        ).hasMatch(code),
         isFalse,
         reason: 'the system is flat',
       );
@@ -569,13 +598,15 @@ void main() {
       expect(
         RegExp(r'=\s*45\s*;|=\s*12\s*;|=\s*18\s*;').hasMatch(code),
         isFalse,
-        reason: 'a value the ramp DOES express is read from the ramp; only '
+        reason:
+            'a value the ramp DOES express is read from the ramp; only '
             'the four drawn values no token carries (16, 14, 22.5, 19.5) are '
             'written literally, each named in the class doc',
       );
       expect(
-        RegExp(r'EdgeInsets\.only|EdgeInsets\.fromLTRB|left:|right:')
-            .hasMatch(code),
+        RegExp(
+          r'EdgeInsets\.only|EdgeInsets\.fromLTRB|left:|right:',
+        ).hasMatch(code),
         isFalse,
         reason: 'the row is RTL-safe: directional insets only',
       );

@@ -51,27 +51,31 @@ void main() {
           expect(avatar.right, row.right);
         }
         final Rect card = tester.getRect(find.byType(DabblerCard));
-        expect(card.top, greaterThan(tester.getRect(find.text('Who is in?')).bottom));
+        expect(
+          card.top,
+          greaterThan(tester.getRect(find.text('Who is in?')).bottom),
+        );
       });
     }
 
-    testWidgets('blank quote draws nothing; unavailable note without original', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        threadHost(
-          const DabblerRepostRow(
-            name: 'Karim',
-            repostedLabel: 'Reposted',
-            quote: '   ',
-            unavailableLabel: 'Unavailable',
+    testWidgets(
+      'blank quote draws nothing; unavailable note without original',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          threadHost(
+            const DabblerRepostRow(
+              name: 'Karim',
+              repostedLabel: 'Reposted',
+              quote: '   ',
+              unavailableLabel: 'Unavailable',
+            ),
           ),
-        ),
-      );
-      expect(find.text('Unavailable'), findsOneWidget);
-      expect(find.byType(DabblerPostRow), findsNothing);
-      expect(find.text('   '), findsNothing);
-    });
+        );
+        expect(find.text('Unavailable'), findsOneWidget);
+        expect(find.byType(DabblerPostRow), findsNothing);
+        expect(find.text('   '), findsNothing);
+      },
+    );
 
     testWidgets('author target is one named button', (
       WidgetTester tester,
@@ -89,10 +93,7 @@ void main() {
           ),
         ),
       );
-      expect(
-        find.bySemanticsLabel('Open Karim'),
-        findsNWidgets(2),
-      );
+      expect(find.bySemanticsLabel('Open Karim'), findsNWidgets(2));
       await tester.tap(find.text('Karim'));
       await tester.tap(find.byType(DabblerAvatar));
       expect(taps, 2);

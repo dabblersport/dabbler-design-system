@@ -53,7 +53,8 @@ const List<GalleryEntry> motionGalleryEntries = <GalleryEntry>[
     page: 'foundations/motion',
     group: null,
     title: 'Motion — durations and the easing curve',
-    description: 'The three durations running the same travel under the '
+    description:
+        'The three durations running the same travel under the '
         'system\'s one curve, on a loop, so 80/120/200 can be compared '
         'rather than read.',
     builder: _durations,
@@ -63,7 +64,8 @@ const List<GalleryEntry> motionGalleryEntries = <GalleryEntry>[
     page: 'foundations/motion',
     group: null,
     title: 'Motion — press scale, and the FAB deviation',
-    description: 'Press either target. 0.98 is the system\'s only press '
+    description:
+        'Press either target. 0.98 is the system\'s only press '
         'transform; the FAB\'s 0.96 is a documented exception, labelled as '
         'one.',
     builder: _press,
@@ -73,7 +75,8 @@ const List<GalleryEntry> motionGalleryEntries = <GalleryEntry>[
     page: 'foundations/motion',
     group: null,
     title: 'Motion — reduced motion',
-    description: 'What the platform is currently asking for, and the same '
+    description:
+        'What the platform is currently asking for, and the same '
         'travel with the reduced-motion rule applied.',
     builder: _reducedMotion,
   ),
@@ -82,84 +85,80 @@ const List<GalleryEntry> motionGalleryEntries = <GalleryEntry>[
 /// `measurements.html`'s own wording for what each duration is for.
 const List<(String, Duration, String)> _durationRoles =
     <(String, Duration, String)>[
-  ('--motion-fast', DabblerMotion.fast, 'press, tint change'),
-  (
-    '--motion-base',
-    DabblerMotion.base,
-    'indicator slides, expand/collapse, toast enter',
-  ),
-  ('--motion-slow', DabblerMotion.slow, 'sheet + dialog enter'),
-];
+      ('--motion-fast', DabblerMotion.fast, 'press, tint change'),
+      (
+        '--motion-base',
+        DabblerMotion.base,
+        'indicator slides, expand/collapse, toast enter',
+      ),
+      ('--motion-slow', DabblerMotion.slow, 'sheet + dialog enter'),
+    ];
 
 Widget _durations(BuildContext context) => GalleryStack(
-      children: <Widget>[
-        const GalleryUsage(
-          '**Three durations, one curve.** `--ease-out` is '
-          '`cubic-bezier(.2, 0, .2, 1)` and the system declares no other — '
-          '*"transitions are short and ease-out, never bouncy"* '
-          '(`measurements.html`). Each row below travels the same distance; '
-          'only the duration differs.',
-        ),
-        for (final (String token, Duration duration, String role)
-            in _durationRoles)
-          GallerySpecimen(
-            label: '$token · ${duration.inMilliseconds}ms · $role',
-            child: _Runner(duration: duration),
-          ),
-        const GallerySpecimen(
-          label: 'All three together, released on the same frame',
-          child: _RunnerStack(),
-        ),
-        const GalleryUsage(
-          'The curve itself: `DabblerMotion.easeOut` — `Cubic(0.2, 0, 0.2, 1)`, '
-          'transcribed from `--ease-out`. It is the same curve on all three '
-          'rows, so what separates them is duration alone.',
-        ),
-        const GallerySpecimen(
-          label: 'easeOut — the curve, plotted',
-          child: _CurvePlot(),
-        ),
-      ],
-    );
+  children: <Widget>[
+    const GalleryUsage(
+      '**Three durations, one curve.** `--ease-out` is '
+      '`cubic-bezier(.2, 0, .2, 1)` and the system declares no other — '
+      '*"transitions are short and ease-out, never bouncy"* '
+      '(`measurements.html`). Each row below travels the same distance; '
+      'only the duration differs.',
+    ),
+    for (final (String token, Duration duration, String role) in _durationRoles)
+      GallerySpecimen(
+        label: '$token · ${duration.inMilliseconds}ms · $role',
+        child: _Runner(duration: duration),
+      ),
+    const GallerySpecimen(
+      label: 'All three together, released on the same frame',
+      child: _RunnerStack(),
+    ),
+    const GalleryUsage(
+      'The curve itself: `DabblerMotion.easeOut` — `Cubic(0.2, 0, 0.2, 1)`, '
+      'transcribed from `--ease-out`. It is the same curve on all three '
+      'rows, so what separates them is duration alone.',
+    ),
+    const GallerySpecimen(
+      label: 'easeOut — the curve, plotted',
+      child: _CurvePlot(),
+    ),
+  ],
+);
 
 Widget _press(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    const GalleryUsage(
+      '**`--press-scale: .98` is the system\'s only press transform** '
+      '(`measurements.html`, §Touch targets & focus geometry). Every '
+      'component reaches it through `DabblerMotion.pressScale`; the press '
+      'runs at `--motion-fast`.',
+    ),
+    const GalleryWrap(
       children: <Widget>[
-        const GalleryUsage(
-          '**`--press-scale: .98` is the system\'s only press transform** '
-          '(`measurements.html`, §Touch targets & focus geometry). Every '
-          'component reaches it through `DabblerMotion.pressScale`; the press '
-          'runs at `--motion-fast`.',
+        GallerySpecimen(
+          label: 'DabblerMotion.pressScale — 0.98 · the system value',
+          child: _PressTarget(scale: DabblerMotion.pressScale, caption: '0.98'),
         ),
-        const GalleryWrap(
-          children: <Widget>[
-            GallerySpecimen(
-              label: 'DabblerMotion.pressScale — 0.98 · the system value',
-              child: _PressTarget(
-                scale: DabblerMotion.pressScale,
-                caption: '0.98',
-              ),
-            ),
-            GallerySpecimen(
-              label: 'DabblerFab.pressedScale — 0.96 · DEVIATION, not a token',
-              child: _PressTarget(
-                scale: DabblerFab.pressedScale,
-                caption: '0.96',
-                deviation: true,
-              ),
-            ),
-          ],
-        ),
-        const GalleryUsage(
-          '**The 0.96 is a deviation, and it is drawn as one.** `FAB.jsx` '
-          'specifies `transform: scale(0.96)` while `measurements.html` calls '
-          '`.98` the system\'s *only* press transform. `DabblerFab` owns that '
-          'value itself (`DabblerFab.pressedScale`) and `DabblerMotion` does '
-          'not carry it — a second constant in the token layer would make an '
-          'exception look like a step of a scale. Nothing but the FAB may '
-          'press to 0.96.',
+        GallerySpecimen(
+          label: 'DabblerFab.pressedScale — 0.96 · DEVIATION, not a token',
+          child: _PressTarget(
+            scale: DabblerFab.pressedScale,
+            caption: '0.96',
+            deviation: true,
+          ),
         ),
       ],
-    );
+    ),
+    const GalleryUsage(
+      '**The 0.96 is a deviation, and it is drawn as one.** `FAB.jsx` '
+      'specifies `transform: scale(0.96)` while `measurements.html` calls '
+      '`.98` the system\'s *only* press transform. `DabblerFab` owns that '
+      'value itself (`DabblerFab.pressedScale`) and `DabblerMotion` does '
+      'not carry it — a second constant in the token layer would make an '
+      'exception look like a step of a scale. Nothing but the FAB may '
+      'press to 0.96.',
+    ),
+  ],
+);
 
 Widget _reducedMotion(BuildContext context) {
   final bool reduced = DabblerMotion.reduceMotion(context);
@@ -236,8 +235,7 @@ class _Runner extends StatefulWidget {
   State<_Runner> createState() => _RunnerState();
 }
 
-class _RunnerState extends State<_Runner>
-    with SingleTickerProviderStateMixin {
+class _RunnerState extends State<_Runner> with SingleTickerProviderStateMixin {
   /// The rest before each run, long enough that even `slow` reads as a
   /// separate event rather than a continuous shuttle.
   static const Duration _dwell = Duration(milliseconds: 700);
@@ -249,8 +247,7 @@ class _RunnerState extends State<_Runner>
   )..repeat(reverse: true);
 
   /// The fraction of the leg spent at rest, which is where the travel starts.
-  late final double _start =
-      _dwell.inMilliseconds / _leg.inMilliseconds;
+  late final double _start = _dwell.inMilliseconds / _leg.inMilliseconds;
 
   @override
   void dispose() {
@@ -261,7 +258,8 @@ class _RunnerState extends State<_Runner>
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final bool reduced = widget.forceReduced ||
+    final bool reduced =
+        widget.forceReduced ||
         (widget.respectReduceMotion && DabblerMotion.reduceMotion(context));
 
     return SizedBox(
@@ -314,25 +312,25 @@ class _RunnerStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          for (final (String token, Duration duration, _) in _durationRoles)
-            Padding(
-              padding: const EdgeInsets.only(bottom: DabblerSpacing.space2),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  SizedBox(
-                    width: 96,
-                    child: GalleryMono('$token  ${duration.inMilliseconds}ms'),
-                  ),
-                  _Runner(duration: duration),
-                ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      for (final (String token, Duration duration, _) in _durationRoles)
+        Padding(
+          padding: const EdgeInsets.only(bottom: DabblerSpacing.space2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox(
+                width: 96,
+                child: GalleryMono('$token  ${duration.inMilliseconds}ms'),
               ),
-            ),
-        ],
-      );
+              _Runner(duration: duration),
+            ],
+          ),
+        ),
+    ],
+  );
 }
 
 /// The travelling mark — `--radius-sm`, brand fill, the same square the
@@ -344,13 +342,13 @@ class _Mark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: _markSize,
-        height: _markSize,
-        decoration: BoxDecoration(
-          color: colors.brandPrimary,
-          borderRadius: DabblerRadius.smAll,
-        ),
-      );
+    width: _markSize,
+    height: _markSize,
+    decoration: BoxDecoration(
+      color: colors.brandPrimary,
+      borderRadius: DabblerRadius.smAll,
+    ),
+  );
 }
 
 /// A press target that scales to [scale] over [DabblerMotion.fast].
@@ -398,7 +396,9 @@ class _PressTargetState extends State<_PressTarget> {
             height: 72,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: widget.deviation ? colors.surfaceSunken : colors.surfaceCard,
+              color: widget.deviation
+                  ? colors.surfaceSunken
+                  : colors.surfaceCard,
               border: Border.all(
                 color: widget.deviation
                     ? colors.warning.strong

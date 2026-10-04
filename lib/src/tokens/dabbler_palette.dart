@@ -59,7 +59,6 @@ abstract final class DabblerPalette {
   /// `--ink-950` — `#171123`.
   static const Color ink950 = Color(0xFF171123);
 
-
   // --- Brand ramp — main ---
 
   /// `--main-p-300` — `#B289E4`.
@@ -82,7 +81,6 @@ abstract final class DabblerPalette {
 
   /// `--main-s-700` — `#800070`.
   static const Color mainS700 = Color(0xFF800070);
-
 
   // --- Brand ramp — social ---
 
@@ -107,7 +105,6 @@ abstract final class DabblerPalette {
   /// `--social-s-700` — `#4F83C7`.
   static const Color socialS700 = Color(0xFF4F83C7);
 
-
   // --- Brand ramp — sport ---
 
   /// `--sport-p-300` — `#8FBC92`.
@@ -130,7 +127,6 @@ abstract final class DabblerPalette {
 
   /// `--sport-s-700` — `#549353`.
   static const Color sportS700 = Color(0xFF549353);
-
 
   // --- Brand ramp — active ---
 
@@ -155,7 +151,6 @@ abstract final class DabblerPalette {
   /// `--active-s-700` — `#B70046`.
   static const Color activeS700 = Color(0xFFB70046);
 
-
   // --- Brand ramp — bright ---
 
   /// `--bright-p-300` — `#FAD09E`.
@@ -179,7 +174,6 @@ abstract final class DabblerPalette {
   /// `--bright-s-700` — `#572C00`.
   static const Color brightS700 = Color(0xFF572C00);
 
-
   // --- Standalone accent ---
 
   /// The only indigo in the system. Read it directly — never approximate it
@@ -193,7 +187,6 @@ abstract final class DabblerPalette {
   ///
   /// `--accent-indigo` — `#5C50E6`.
   static const Color accentIndigo = Color(0xFF5C50E6);
-
 
   // --- Surface and neutral foundation ---
 
@@ -229,7 +222,6 @@ abstract final class DabblerPalette {
 
   /// `--ink-soft` — `#404040`.
   static const Color inkSoft = Color(0xFF404040);
-
 
   // --- Status ramp ---
 
@@ -272,7 +264,6 @@ abstract final class DabblerPalette {
   /// `--spotlight-500` — `#FF5A1F`.
   static const Color spotlight500 = Color(0xFFFF5A1F);
 
-
   // --- Per-theme status overrides ---
 
   /// `--sport-success` — `#138A66`.
@@ -286,7 +277,6 @@ abstract final class DabblerPalette {
 
   /// `--bright-warning` — `#A8420A`.
   static const Color brightWarning = Color(0xFFA8420A);
-
 
   // --- Pastel status tags ---
 
@@ -336,7 +326,6 @@ abstract final class DabblerPalette {
 
   /// `--tag-expired-ink` — `#5A5A62`.
   static const Color tagExpiredInk = Color(0xFF5A5A62);
-
 
   // --- Decorative tile tones ---
 

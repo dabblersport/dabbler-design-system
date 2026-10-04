@@ -46,6 +46,8 @@ a different component, not a second action slot on this one.
 asset slot to work around that — an icon inside the card shell is the entire visual language this
 component is allowed, and that's an intentional constraint, not an unfinished feature.
 
+**`plain` is the bare form.** It draws a 42px glyph, the title and the copy straight on the page with no frame and no icon well — the empty replies area of a post.
+
 **Use `page` for a whole empty screen, `inline` for an empty section or list.** `page` drops the
 card frame entirely and centres in the viewport; `inline` keeps the bordered card shell so it reads
 as one empty section among others rather than taking over the screen.

@@ -10,19 +10,18 @@ import 'package:flutter_test/flutter_test.dart';
 /// The shared curve ([DabblerMotion.pulseOpacityAt]) bound to the spinner's own
 /// floor, so the assertions below read exactly as they did when the function
 /// lived in `spinner.dart`. Only its home changed, not its output.
-double pulseOpacityAt(double t) => DabblerMotion.pulseOpacityAt(
-      t,
-      minOpacity: DabblerSpinner.pulseMinOpacity,
-    );
+double pulseOpacityAt(double t) =>
+    DabblerMotion.pulseOpacityAt(t, minOpacity: DabblerSpinner.pulseMinOpacity);
 
 /// The design source's own numbers, restated here so the test asserts against
 /// `components/feedback/Spinner.jsx` rather than against the widget's
 /// constants. A typo in one is only caught if the other is independent.
-const Map<DabblerSpinnerSize, double> _sourceSizes = <DabblerSpinnerSize, double>{
-  DabblerSpinnerSize.sm: 18, // SIZES.sm
-  DabblerSpinnerSize.md: 24, // SIZES.md
-  DabblerSpinnerSize.lg: 30, // SIZES.lg
-};
+const Map<DabblerSpinnerSize, double> _sourceSizes =
+    <DabblerSpinnerSize, double>{
+      DabblerSpinnerSize.sm: 18, // SIZES.sm
+      DabblerSpinnerSize.md: 24, // SIZES.md
+      DabblerSpinnerSize.lg: 30, // SIZES.lg
+    };
 
 /// Minimum host: a [DabblerColors] in the theme, a [Directionality], and an
 /// [Align] so the spinner sizes itself rather than being stretched.
@@ -98,8 +97,9 @@ _SpyCanvas _paint(WidgetTester tester) {
 
 void main() {
   group('AC1 — the sizes its consumers need', () {
-    testWidgets('every size lays out at the design source\'s diameter',
-        (WidgetTester tester) async {
+    testWidgets('every size lays out at the design source\'s diameter', (
+      WidgetTester tester,
+    ) async {
       for (final MapEntry<DabblerSpinnerSize, double> entry
           in _sourceSizes.entries) {
         await tester.pumpWidget(
@@ -113,13 +113,16 @@ void main() {
       }
     });
 
-    testWidgets('sm exists and is 18px — DS-400 Button composes it',
-        (WidgetTester tester) async {
+    testWidgets('sm exists and is 18px — DS-400 Button composes it', (
+      WidgetTester tester,
+    ) async {
       // Named separately from the sweep above because Button's loading state
       // depends on this one value; if it ever disappears, the failure should
       // say which ticket breaks.
       await tester.pumpWidget(
-        _host(const DabblerSpinner(size: DabblerSpinnerSize.sm, animate: false)),
+        _host(
+          const DabblerSpinner(size: DabblerSpinnerSize.sm, animate: false),
+        ),
       );
       expect(tester.getSize(find.byType(DabblerSpinner)), const Size(18, 18));
       expect(DabblerSpinnerSize.sm.diameter, DabblerSizing.iconSm);
@@ -127,7 +130,8 @@ void main() {
 
     test('the size ramp is exactly sm/md/lg', () {
       expect(DabblerSpinnerSize.values, _sourceSizes.keys.toList());
-      for (final MapEntry<DabblerSpinnerSize, double> e in _sourceSizes.entries) {
+      for (final MapEntry<DabblerSpinnerSize, double> e
+          in _sourceSizes.entries) {
         expect(e.key.diameter, e.value);
       }
     });
@@ -139,8 +143,9 @@ void main() {
   });
 
   group('the ring — Spinner.jsx geometry', () {
-    testWidgets('2px stroke on both track and arc, arc round-capped',
-        (WidgetTester tester) async {
+    testWidgets('2px stroke on both track and arc, arc round-capped', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerSpinner(animate: false)));
       final _SpyCanvas spy = _paint(tester);
       expect(spy.circles, hasLength(1), reason: 'one track circle');
@@ -150,28 +155,33 @@ void main() {
       expect(spy.arcs.single.cap, StrokeCap.round);
     });
 
-    testWidgets('the arc sweeps 28% of the circumference',
-        (WidgetTester tester) async {
+    testWidgets('the arc sweeps 28% of the circumference', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerSpinner(animate: false)));
       final _SpyCanvas spy = _paint(tester);
       expect(spy.sweeps.single, closeTo(0.28 * 2 * math.pi, 1e-9));
     });
 
-    testWidgets('the ring is inset by half the stroke — r = (px - stroke) / 2',
-        (WidgetTester tester) async {
-      for (final MapEntry<DabblerSpinnerSize, double> e in _sourceSizes.entries) {
-        await tester.pumpWidget(
-          _host(DabblerSpinner(size: e.key, animate: false)),
-        );
-        final _SpyCanvas spy = _paint(tester);
-        for (final double r in spy.radii) {
-          expect(r, (e.value - 2) / 2);
+    testWidgets(
+      'the ring is inset by half the stroke — r = (px - stroke) / 2',
+      (WidgetTester tester) async {
+        for (final MapEntry<DabblerSpinnerSize, double> e
+            in _sourceSizes.entries) {
+          await tester.pumpWidget(
+            _host(DabblerSpinner(size: e.key, animate: false)),
+          );
+          final _SpyCanvas spy = _paint(tester);
+          for (final double r in spy.radii) {
+            expect(r, (e.value - 2) / 2);
+          }
         }
-      }
-    });
+      },
+    );
 
-    testWidgets('the track is the indicator colour at 25%',
-        (WidgetTester tester) async {
+    testWidgets('the track is the indicator colour at 25%', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerSpinner(animate: false)));
       final _SpyCanvas spy = _paint(tester);
       final Color arc = spy.arcs.single.color;
@@ -183,8 +193,9 @@ void main() {
       expect(arc.a, 1.0);
     });
 
-    testWidgets('nothing is drawn at a degenerate size',
-        (WidgetTester tester) async {
+    testWidgets('nothing is drawn at a degenerate size', (
+      WidgetTester tester,
+    ) async {
       // Guards the radius <= 0 early return: a 1px box cannot hold a 2px ring.
       await tester.pumpWidget(
         _host(const SizedBox.square(dimension: 1, child: DabblerSpinner())),
@@ -203,14 +214,17 @@ void main() {
   });
 
   group('tone — Spinner.jsx TONE_COLORS', () {
-    testWidgets('brand resolves through DabblerColors and re-tints per theme',
-        (WidgetTester tester) async {
+    testWidgets('brand resolves through DabblerColors and re-tints per theme', (
+      WidgetTester tester,
+    ) async {
       for (final DabblerTheme theme in DabblerTheme.values) {
         await tester.pumpWidget(
           _host(const DabblerSpinner(animate: false), theme: theme),
         );
-        final DabblerColors expected =
-            DabblerColors.resolve(theme: theme, brightness: Brightness.light);
+        final DabblerColors expected = DabblerColors.resolve(
+          theme: theme,
+          brightness: Brightness.light,
+        );
         expect(
           _paint(tester).arcs.single.color.toARGB32(),
           expected.brandPrimary.toARGB32(),
@@ -219,10 +233,12 @@ void main() {
     });
 
     testWidgets('brand follows dark mode too', (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerSpinner(animate: false),
-        brightness: Brightness.dark,
-      ));
+      await tester.pumpWidget(
+        _host(
+          const DabblerSpinner(animate: false),
+          brightness: Brightness.dark,
+        ),
+      );
       expect(
         _paint(tester).arcs.single.color.toARGB32(),
         DabblerColors.resolve(
@@ -232,11 +248,17 @@ void main() {
       );
     });
 
-    testWidgets('on-brand resolves to DabblerColors.onBrand',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerSpinner(tone: DabblerSpinnerTone.onBrand, animate: false),
-      ));
+    testWidgets('on-brand resolves to DabblerColors.onBrand', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerSpinner(
+            tone: DabblerSpinnerTone.onBrand,
+            animate: false,
+          ),
+        ),
+      );
       expect(
         _paint(tester).arcs.single.color.toARGB32(),
         DabblerColors.resolve(
@@ -246,21 +268,33 @@ void main() {
       );
     });
 
-    testWidgets('inherit takes the ambient currentColor',
-        (WidgetTester tester) async {
+    testWidgets('inherit takes the ambient currentColor', (
+      WidgetTester tester,
+    ) async {
       const Color ambient = Color(0xFF123456);
-      await tester.pumpWidget(_host(
-        const DabblerSpinner(tone: DabblerSpinnerTone.inherit, animate: false),
-        ambientColor: ambient,
-      ));
+      await tester.pumpWidget(
+        _host(
+          const DabblerSpinner(
+            tone: DabblerSpinnerTone.inherit,
+            animate: false,
+          ),
+          ambientColor: ambient,
+        ),
+      );
       expect(_paint(tester).arcs.single.color.toARGB32(), ambient.toARGB32());
     });
 
-    testWidgets('inherit falls back to text ink with no ambient colour',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(_host(
-        const DabblerSpinner(tone: DabblerSpinnerTone.inherit, animate: false),
-      ));
+    testWidgets('inherit falls back to text ink with no ambient colour', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerSpinner(
+            tone: DabblerSpinnerTone.inherit,
+            animate: false,
+          ),
+        ),
+      );
       final Color resolved = _paint(tester).arcs.single.color;
       final DabblerColors colors = DabblerColors.resolve(
         theme: DabblerTheme.main,
@@ -273,14 +307,17 @@ void main() {
   });
 
   group('motion', () {
-    testWidgets('it rotates — the ring is at a different angle 400ms in',
-        (WidgetTester tester) async {
+    testWidgets('it rotates — the ring is at a different angle 400ms in', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerSpinner()));
       double angleNow() => tester
-          .widget<Transform>(find.descendant(
-            of: find.byType(DabblerSpinner),
-            matching: find.byType(Transform),
-          ))
+          .widget<Transform>(
+            find.descendant(
+              of: find.byType(DabblerSpinner),
+              matching: find.byType(Transform),
+            ),
+          )
           .transform
           .entry(0, 0);
 
@@ -293,8 +330,9 @@ void main() {
       await tester.pumpWidget(_host(const DabblerSpinner(animate: false)));
     });
 
-    testWidgets('animate: false paints no rotation at all',
-        (WidgetTester tester) async {
+    testWidgets('animate: false paints no rotation at all', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_host(const DabblerSpinner(animate: false)));
       expect(
         find.descendant(
@@ -312,35 +350,39 @@ void main() {
       );
     });
 
-    testWidgets('reduced motion pulses instead of rotating — never a static frame',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        _host(const DabblerSpinner(), disableAnimations: true),
-      );
-      expect(
-        find.descendant(
-          of: find.byType(DabblerSpinner),
-          matching: find.byType(Transform),
-        ),
-        findsNothing,
-        reason: 'the rotation is replaced, not kept',
-      );
-      double opacityNow() => tester
-          .widget<Opacity>(find.descendant(
+    testWidgets(
+      'reduced motion pulses instead of rotating — never a static frame',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          _host(const DabblerSpinner(), disableAnimations: true),
+        );
+        expect(
+          find.descendant(
             of: find.byType(DabblerSpinner),
-            matching: find.byType(Opacity),
-          ))
-          .opacity;
-      final double start = opacityNow();
-      expect(start, 1.0);
-      await tester.pump(const Duration(milliseconds: 600));
-      expect(opacityNow(), closeTo(0.55, 1e-6));
-      await tester.pump(const Duration(milliseconds: 600));
-      expect(opacityNow(), closeTo(1.0, 1e-6));
-      await tester.pumpWidget(
-        _host(const DabblerSpinner(animate: false), disableAnimations: true),
-      );
-    });
+            matching: find.byType(Transform),
+          ),
+          findsNothing,
+          reason: 'the rotation is replaced, not kept',
+        );
+        double opacityNow() => tester
+            .widget<Opacity>(
+              find.descendant(
+                of: find.byType(DabblerSpinner),
+                matching: find.byType(Opacity),
+              ),
+            )
+            .opacity;
+        final double start = opacityNow();
+        expect(start, 1.0);
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(opacityNow(), closeTo(0.55, 1e-6));
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(opacityNow(), closeTo(1.0, 1e-6));
+        await tester.pumpWidget(
+          _host(const DabblerSpinner(animate: false), disableAnimations: true),
+        );
+      },
+    );
 
     test('the pulse curve matches @keyframes dbl-pulse', () {
       expect(pulseOpacityAt(0), 1.0);
@@ -367,8 +409,9 @@ void main() {
   });
 
   group('accessibility', () {
-    testWidgets('it is a live region labelled "Loading" by default',
-        (WidgetTester tester) async {
+    testWidgets('it is a live region labelled "Loading" by default', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle handle = tester.ensureSemantics();
       await tester.pumpWidget(_host(const DabblerSpinner(animate: false)));
       expect(
@@ -392,20 +435,23 @@ void main() {
   });
 
   group('RTL — direction-neutral', () {
-    testWidgets('the arc sweeps the same way under rtl',
-        (WidgetTester tester) async {
+    testWidgets('the arc sweeps the same way under rtl', (
+      WidgetTester tester,
+    ) async {
       final List<double> sweeps = <double>[];
       for (final TextDirection direction in TextDirection.values) {
         await tester.pumpWidget(
           MediaQuery(
             data: const MediaQueryData(),
             child: Theme(
-              data: ThemeData(extensions: <ThemeExtension<dynamic>>[
-                DabblerColors.resolve(
-                  theme: DabblerTheme.main,
-                  brightness: Brightness.light,
-                ),
-              ]),
+              data: ThemeData(
+                extensions: <ThemeExtension<dynamic>>[
+                  DabblerColors.resolve(
+                    theme: DabblerTheme.main,
+                    brightness: Brightness.light,
+                  ),
+                ],
+              ),
               child: Directionality(
                 textDirection: direction,
                 child: const Align(

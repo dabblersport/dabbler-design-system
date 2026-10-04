@@ -58,11 +58,11 @@ enum DabblerToastTone {
   /// The tone's default Iconsax glyph, from `statusTones`
   /// (`components/foundations/overlay.jsx:161-166`).
   String get glyph => switch (this) {
-        DabblerToastTone.success => 'tick-circle',
-        DabblerToastTone.warning => 'warning-2',
-        DabblerToastTone.error => 'danger',
-        DabblerToastTone.info || DabblerToastTone.neutral => 'info-circle',
-      };
+    DabblerToastTone.success => 'tick-circle',
+    DabblerToastTone.warning => 'warning-2',
+    DabblerToastTone.error => 'danger',
+    DabblerToastTone.info || DabblerToastTone.neutral => 'info-circle',
+  };
 }
 
 /// Passed as a toast's `icon` to draw no leading glyph at all — the source's
@@ -176,7 +176,7 @@ class DabblerToastEntry {
 class DabblerToastController extends ChangeNotifier {
   /// Creates a queue capped at [max].
   DabblerToastController({this.max = defaultMax})
-      : assert(max >= 1, 'a toast queue with no room shows nothing');
+    : assert(max >= 1, 'a toast queue with no room shows nothing');
 
   /// `ToastProvider`: `max` (default 3) — `Toast.prompt.md`, `Toast.d.ts`.
   static const int defaultMax = 3;
@@ -189,7 +189,8 @@ class DabblerToastController extends ChangeNotifier {
   bool _disposed = false;
 
   /// The queue, oldest first. Never longer than [max].
-  List<DabblerToastEntry> get visible => List<DabblerToastEntry>.unmodifiable(_items);
+  List<DabblerToastEntry> get visible =>
+      List<DabblerToastEntry>.unmodifiable(_items);
 
   /// Raises a toast and returns its id.
   ///
@@ -351,8 +352,10 @@ class _DabblerToastProviderState extends State<DabblerToastProvider> {
   @override
   void initState() {
     super.initState();
-    _adopt(widget.controller ?? DabblerToastController(max: widget.max),
-        owned: widget.controller == null);
+    _adopt(
+      widget.controller ?? DabblerToastController(max: widget.max),
+      owned: widget.controller == null,
+    );
   }
 
   void _adopt(DabblerToastController next, {required bool owned}) {
@@ -377,12 +380,15 @@ class _DabblerToastProviderState extends State<DabblerToastProvider> {
   @override
   void didUpdateWidget(DabblerToastProvider oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final bool changed = widget.controller != oldWidget.controller ||
+    final bool changed =
+        widget.controller != oldWidget.controller ||
         (widget.controller == null && widget.max != oldWidget.max);
     if (changed) {
       _release();
-      _adopt(widget.controller ?? DabblerToastController(max: widget.max),
-          owned: widget.controller == null);
+      _adopt(
+        widget.controller ?? DabblerToastController(max: widget.max),
+        owned: widget.controller == null,
+      );
     }
   }
 
@@ -412,7 +418,8 @@ class _DabblerToastProviderState extends State<DabblerToastProvider> {
                 // indicator by the full gutter. SafeArea would take the
                 // maximum of the two instead, which is a different rule.
                 padding: EdgeInsets.only(
-                  bottom: DabblerSpacing.space4 +
+                  bottom:
+                      DabblerSpacing.space4 +
                       MediaQuery.paddingOf(context).bottom,
                 ),
                 child: Align(
@@ -443,7 +450,8 @@ class _DabblerToastProviderState extends State<DabblerToastProvider> {
                                 action: items[i].spec.action,
                                 duration: items[i].spec.duration,
                                 icon: items[i].spec.icon,
-                                onDismiss: () => _controller.dismiss(items[i].id),
+                                onDismiss: () =>
+                                    _controller.dismiss(items[i].id),
                               ),
                             ),
                           ],
@@ -568,11 +576,11 @@ class DabblerToast extends StatefulWidget {
 
   /// Creates one presentational toast from a [DabblerToastSpec].
   DabblerToast.fromSpec(DabblerToastSpec spec, {super.key, this.onDismiss})
-      : message = spec.message,
-        tone = spec.tone,
-        action = spec.action,
-        duration = spec.duration,
-        icon = spec.icon;
+    : message = spec.message,
+      tone = spec.tone,
+      action = spec.action,
+      duration = spec.duration,
+      icon = spec.icon;
 
   /// The message.
   final String message;
@@ -676,7 +684,8 @@ class _DabblerToastState extends State<DabblerToast>
     if (event is! KeyDownEvent) {
       return KeyEventResult.ignored;
     }
-    final bool isActivator = event.logicalKey == LogicalKeyboardKey.enter ||
+    final bool isActivator =
+        event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter ||
         event.logicalKey == LogicalKeyboardKey.space;
     if (!isActivator) {
@@ -706,8 +715,9 @@ class _DabblerToastState extends State<DabblerToast>
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final DabblerStatusTone? status = widget.tone.status;
-    final DabblerStatusColor? resolved =
-        status == null ? null : colors.status(status);
+    final DabblerStatusColor? resolved = status == null
+        ? null
+        : colors.status(status);
 
     // `statusTones` / `statusHairline` in overlay.jsx:160-173. The neutral
     // triple is not re-derived here: it is the one shared definition
@@ -728,12 +738,12 @@ class _DabblerToastState extends State<DabblerToast>
     final Widget? glyph = identical(widget.icon, dabblerToastNoIcon)
         ? null
         : widget.icon ??
-            DabblerIcon(
-              widget.tone.glyph,
-              weight: DabblerIconWeight.bold,
-              size: DabblerSizing.iconSm,
-              color: ink,
-            );
+              DabblerIcon(
+                widget.tone.glyph,
+                weight: DabblerIconWeight.bold,
+                size: DabblerSizing.iconSm,
+                color: ink,
+              );
 
     final Widget body = Container(
       // `width: '100%', maxWidth: 420` (`Toast.jsx:118`). The previous cut left
@@ -753,10 +763,7 @@ class _DabblerToastState extends State<DabblerToast>
       decoration: BoxDecoration(
         color: surface,
         borderRadius: DabblerRadius.lgAll,
-        border: Border.all(
-          color: hairline,
-          width: DabblerSizing.borderDefault,
-        ),
+        border: Border.all(color: hairline, width: DabblerSizing.borderDefault),
         // No boxShadow and no gradient: the system is flat.
       ),
       child: Row(

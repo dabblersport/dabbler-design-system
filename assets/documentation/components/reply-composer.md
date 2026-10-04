@@ -25,6 +25,10 @@ Resting with attach buttons, replying to someone with an attachment and a multi-
 
 ## Using it
 
+**Composing is a mode.** Set `composing` and the bar draws the composing frame: previews and a multi-line field inside a brand-bordered editor, with the attach glyphs, the `counter` and a pill Reply button under it.
+
+@specimen reply-composer/composing
+
 **Send hands you the text; you clear it.** The send button is live only when the field has text, unless you allow an attachment-only reply. In single-line mode Enter sends; in multi-line mode Enter adds a line and the field grows up to its maximum.
 
 **Show who is being replied to.** Pass the target and a cancel callback; the line reads "Replying to" and the target in the brand colour, with a cancel button at the end.
@@ -39,7 +43,7 @@ Resting with attach buttons, replying to someone with an attachment and a multi-
 
 - The 42px send button and field take the 45px touch minimum.
 - The 14px field text takes the 15px subheadline.
-- The composing frame's boxed editor and pill Reply button are not reproduced; the bar keeps the resting layout and puts previews above the input row.
+- The 95px add tile and 96px preview keep their sizes; 42px controls take 45px targets.
 
 ## Axes
 
@@ -63,6 +67,7 @@ Surfaces: page for the bar, sunken for the field and the idle send button. Ink: 
 
 - Added from the Post design file (KAN-412 gaps 5).
 - DS gaps 6 — text attach actions.
+- Composing mode, counter and Reply pill from the Post design.
 
 ## Source
 

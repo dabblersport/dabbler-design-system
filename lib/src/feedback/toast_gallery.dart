@@ -20,7 +20,8 @@ const List<GalleryEntry> toastGalleryEntries = <GalleryEntry>[
     page: 'components/toast',
     group: GalleryPurpose.statusAndFeedback,
     title: 'Toast — tones (trigger)',
-    description: 'Each button shows a real toast through DabblerToasts, '
+    description:
+        'Each button shows a real toast through DabblerToasts, '
         'queued and capped by the controller the app installs.',
     builder: _toasts,
   ),

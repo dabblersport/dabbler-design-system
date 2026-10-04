@@ -253,8 +253,9 @@ void main() {
       );
     });
 
-    testWidgets('unread pill geometry: minWidth 24, paddingInline 6, centred',
-        (WidgetTester tester) async {
+    testWidgets('unread pill geometry: minWidth 24, paddingInline 6, centred', (
+      WidgetTester tester,
+    ) async {
       // Live `components/messaging/ConversationRow.jsx:65-66`: Badge style
       // `minWidth: 24, justifyContent: 'center', paddingInline: var(--space-2)`.
       await tester.pumpWidget(
