@@ -239,8 +239,9 @@ abstract final class DabblerSizing {
   /// tile. The app's 44 folds here.
   static const double tileMd = touchTargetMin;
 
-  /// The 40px tile of the result rows (`Search.dc.html:262`).
-  static const double tileSm = 40;
+  /// The result-row tile (`Search.dc.html:262` draws 40; 39 is the nearest
+  /// base-3 step).
+  static const double tileSm = 39;
 
   /// App role, mapped onto `space11` (48): a large icon tile.
   static const double tileLg = DabblerSpacing.space11;

@@ -14,6 +14,8 @@ CardEventResult is one game or meet-up as a search result: a brand-tinted date t
 with the time, the title with the typed query picked out, the place and a trailing meta line, and
 an optional pill action.
 
+It draws the card, the tile and the text column itself, so the result list needs only the data.
+
 ## Specimen
 
 A game with a Join action, and a meet-up with none.
