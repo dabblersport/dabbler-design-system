@@ -73,6 +73,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...motionGalleryEntries,
   ...appRolesGalleryEntries,
   ...navigationGalleryEntries,
+  ...pageHeaderGalleryEntries,
   ...navigationTabBarGalleryEntries,
   ...panelCardsGalleryEntries,
   ...roomCardsGalleryEntries,

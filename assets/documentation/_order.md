@@ -73,6 +73,7 @@ The first thing on most screens, and the reason it comes first here.
   position.
 - [StepProgress](components/step-progress.md) — the segmented bar that says which step of a flow you are on.
 - [PageDots](components/page-dots.md) — the position dots under a carousel.
+- [PageHeader](components/page-header.md) — a listing screen's title, location row and icon actions.
 - [ConversationHeader](components/conversation-header.md) — the top bar of a conversation: back, a
   tappable identity, overflow.
 

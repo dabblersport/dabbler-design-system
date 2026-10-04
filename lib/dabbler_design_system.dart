@@ -191,6 +191,8 @@ export 'src/navigation/tab_bar.dart';
 export 'src/navigation/tab_bar_gallery.dart';
 export 'src/navigation/top_bar.dart';
 export 'src/navigation/page_dots.dart';
+export 'src/navigation/page_header.dart';
+export 'src/navigation/page_header_gallery.dart';
 export 'src/navigation/step_progress.dart';
 export 'src/navigation/step_progress_gallery.dart';
 export 'src/messaging/chat_composer.dart';
