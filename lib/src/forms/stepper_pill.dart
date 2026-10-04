@@ -17,8 +17,8 @@ import '../tokens/dabbler_type.dart';
 ///
 /// ## Deviations
 ///
-/// * **Targets.** Each glyph gets a 45px box, so the pill is taller than the
-///   design's 30px; its paint stays the pill.
+/// * **Targets.** Each glyph gets a 30 x 45px box, so the pill is taller
+///   than the design's 30px; its paint stays the pill.
 /// * **Type.** 13/18 is `footnote`.
 ///
 /// RTL: minus leads and plus trails, mirrored by the row.
@@ -73,7 +73,7 @@ class DabblerStepperPill extends StatelessWidget {
           excludeChildSemantics: true,
           borderRadius: DabblerRadius.pillAll,
           child: SizedBox(
-            width: DabblerSizing.touchTargetMin,
+            width: DabblerSpacing.space9,
             height: DabblerSizing.touchTargetMin,
             child: Center(
               child: DabblerIcon(
@@ -104,7 +104,7 @@ class DabblerStepperPill extends StatelessWidget {
             value - 1,
           ),
           ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: DabblerSpacing.space8),
+            constraints: const BoxConstraints(minWidth: DabblerSpacing.space6),
             child: Text(
               DabblerType.toWesternDigits(
                 suffix == null ? '$value' : '$value $suffix',
