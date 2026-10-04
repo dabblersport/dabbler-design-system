@@ -166,7 +166,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
     final Widget body = DecoratedBox(
       decoration: BoxDecoration(
         // `background: var(--surface-card)` (`Sheet.jsx:86`).
-        color: colors.surfaceCard,
+        color: widget.pageBackground ? colors.bgPrimary : colors.surfaceCard,
         // `1px solid var(--outline-card)`; the modal presentation drops the
         // bottom edge, which sits off-screen (`Sheet.jsx:87-88`).
         border: Border(

@@ -81,7 +81,6 @@ class DabblerUpcomingItem {
 ///   is one ellipsised line — the system has no continuous-motion primitive.
 /// * **No swipe-to-dismiss.** The close button dismisses; the card's own
 ///   swipe (`:2911`) is a gesture the system does not model for a card.
-/// * **Toggle height.** 45 (the touch minimum), not the design's 32.
 /// * **Gaps.** 5px and 9px gaps take the nearest base-3 step.
 ///
 /// RTL: every inset is directional; the date tile leads and the ring trails.
@@ -146,6 +145,9 @@ class DabblerUpcomingReminder extends StatelessWidget {
 
   /// The ring's side — `56` (`:143`).
   static const double ringSize = 56;
+
+  /// The more / less toggle's height — `height:32px` (`:165`).
+  static const double toggleHeight = 32;
 
   /// The date tile's width — `48` (`:134`).
   static const double dateTileWidth = 48;
@@ -392,7 +394,7 @@ class DabblerUpcomingReminder extends StatelessWidget {
     return DabblerFeedTappable(
       onTap: onToggleExpanded,
       child: SizedBox(
-        height: DabblerSizing.touchTargetMin,
+        height: toggleHeight,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
