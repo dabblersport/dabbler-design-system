@@ -11,6 +11,7 @@ import '../tokens/dabbler_colors.dart';
 import 'code_input.dart';
 import 'composer_box.dart';
 import 'select_pill.dart';
+import 'stepper_pill.dart';
 import 'text_field.dart';
 
 /// Form-integration and full-width specimens.
@@ -136,6 +137,16 @@ Widget _composer(BuildContext context) {
               tone: colors.success,
               onTap: () {},
             ),
+          ],
+        ),
+      ),
+      GallerySpecimen(
+        label: 'stepper pills',
+        child: Wrap(
+          spacing: 6,
+          children: <Widget>[
+            DabblerStepperPill(value: 4, suffix: 'min', onChanged: (_) {}),
+            DabblerStepperPill(value: 10, suffix: 'max', onChanged: (_) {}),
           ],
         ),
       ),

@@ -26,20 +26,27 @@ class DabblerSelectPill extends StatelessWidget {
   const DabblerSelectPill({
     super.key,
     required this.label,
-    required this.icon,
-    required this.tone,
     required this.onTap,
+    this.icon,
+    this.tone,
+    this.trailingIcon = 'arrow-circle-down',
     this.semanticLabel,
   });
 
   /// The current value.
   final String label;
 
-  /// The leading glyph.
-  final String icon;
+  /// The leading glyph; null draws none.
+  final String? icon;
 
-  /// The status tint: `colors.info`, `colors.success`, …
-  final DabblerStatusColor tone;
+  /// The status tint: `colors.info`, `colors.success`, … Null draws the
+  /// neutral pill of `Home Feed.dc.html:566` — card fill, 1px hairline,
+  /// `textSecondary` ink.
+  final DabblerStatusColor? tone;
+
+  /// The trailing glyph (`arrow-circle-down`; `arrow-circle-right` for a
+  /// value that opens a detail).
+  final String trailingIcon;
 
   /// Opens the choice.
   final VoidCallback? onTap;
@@ -55,7 +62,9 @@ class DabblerSelectPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
+    final Color ink = tone?.strong ?? colors.textSecondary;
     return DabblerFeedTappable(
       onTap: onTap,
       semanticLabel: semanticLabel ?? label,
@@ -63,8 +72,14 @@ class DabblerSelectPill extends StatelessWidget {
       borderRadius: DabblerRadius.pillAll,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: tone.surface,
+          color: tone?.surface ?? colors.surfaceCard,
           borderRadius: DabblerRadius.pillAll,
+          border: tone == null
+              ? Border.all(
+                  color: colors.borderDefault,
+                  width: DabblerSizing.borderDefault,
+                )
+              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -74,13 +89,15 @@ class DabblerSelectPill extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              DabblerIcon(
-                icon,
-                size: glyphSize,
-                weight: DabblerIconWeight.bold,
-                color: tone.strong,
-              ),
-              const SizedBox(width: DabblerSpacing.space2),
+              if (icon != null) ...<Widget>[
+                DabblerIcon(
+                  icon!,
+                  size: glyphSize,
+                  weight: DabblerIconWeight.bold,
+                  color: ink,
+                ),
+                const SizedBox(width: DabblerSpacing.space2),
+              ],
               Flexible(
                 child: Text(
                   label,
@@ -89,15 +106,11 @@ class DabblerSelectPill extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: DabblerType.footnote
                       .resolveForDirection(dir)
-                      .copyWith(color: tone.strong),
+                      .copyWith(color: ink),
                 ),
               ),
               const SizedBox(width: DabblerSpacing.space2),
-              DabblerIcon(
-                'arrow-circle-down',
-                size: arrowSize,
-                color: tone.strong,
-              ),
+              DabblerIcon(trailingIcon, size: arrowSize, color: ink),
             ],
           ),
         ),
