@@ -172,6 +172,7 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
   title nor a back action.
 - Alpha fidelity (Search) — adds `titleWidget` to the titled variant: a widget that takes the title slot
   beside the back button, for the search header of `Search.dc.html`.
+- Alpha fidelity (Results) — adds `plain` to the titled variant: the back glyph without its bordered disc and a centred title (`Results.dc.html`).
 
 ## Source
 

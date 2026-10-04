@@ -80,6 +80,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...progressBarGalleryEntries,
   ...ringGalleryEntries,
   ...searchGalleryEntries,
+  ...cardEventResultGalleryEntries,
   ...formExtrasGalleryEntries,
   ...textLinkGalleryEntries,
   ...textGalleryEntries,

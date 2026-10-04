@@ -120,6 +120,7 @@ class DabblerChip extends StatefulWidget {
     this.leadingIcon,
     this.onLongPress,
     this.onRemove,
+    this.mutedRemove = false,
     this.removeSemanticLabel,
     this.vibe,
   });
@@ -159,6 +160,11 @@ class DabblerChip extends StatefulWidget {
   /// absorbs the trailing padding, so the visible gap after the glyph is
   /// `45 - iconGap - iconSm` (21) rather than [horizontalPadding] (15).
   final VoidCallback? onRemove;
+
+  /// Paints the remove glyph in the muted ink instead of the leading-icon
+  /// colour — the recent-search chips of `Search.dc.html:60`. Ignored while
+  /// [selected] or under a vibe.
+  final bool mutedRemove;
 
   /// The remove glyph's accessible name. Null reads `Remove <label>`.
   final String? removeSemanticLabel;
@@ -342,7 +348,9 @@ class _DabblerChipState extends State<DabblerChip> {
                     child: DabblerIcon(
                       DabblerChip.removeIconName,
                       size: DabblerSizing.iconSm,
-                      color: iconColor,
+                      color: widget.mutedRemove && vibe == null && !widget.selected
+                          ? colors.textTertiary
+                          : iconColor,
                     ),
                   ),
                 ),

@@ -59,6 +59,8 @@ export 'src/cards/card.dart';
 export 'src/cards/card_event_large.dart';
 export 'src/cards/card_event_medium.dart';
 export 'src/cards/card_event_small.dart';
+export 'src/cards/card_event_result.dart';
+export 'src/cards/card_event_result_gallery.dart';
 export 'src/cards/card_event_listing.dart';
 export 'src/cards/card_venue.dart';
 export 'src/cards/listing_cards_gallery.dart';

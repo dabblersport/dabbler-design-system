@@ -183,6 +183,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.avatarImageUrl,
   })  : title = null,
         titleWidget = null,
+        plain = false,
         onBack = null,
         backLabel = defaultBackLabel,
         _titled = false,
@@ -213,6 +214,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     super.key,
     this.title,
     this.titleWidget,
+    this.plain = false,
     this.onBack,
     this.backLabel = defaultBackLabel,
     this.actions = const <DabblerNavigationAction>[],
@@ -244,6 +246,10 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// header of `Search.dc.html:158-174`, where the slot holds the search field
   /// beside the back button. Titled variant only.
   final Widget? titleWidget;
+
+  /// The plain titled bar of `Results.dc.html`: the back glyph without its
+  /// bordered disc, and the title centred between equal-width ends.
+  final bool plain;
 
   /// The titled variant's back action. Null hides the back button.
   final VoidCallback? onBack;
@@ -635,7 +641,9 @@ class DabblerNavigationTopBar extends StatelessWidget {
                         child: Container(
                           width: backButtonSide,
                           height: backButtonSide,
-                          decoration: BoxDecoration(
+                          decoration: plain
+                              ? null
+                              : BoxDecoration(
                             // `background:var(--surface-card);
                             // border:1px solid var(--outline-card)`.
                             color: colors.surfaceCard,
@@ -672,6 +680,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
           child: titleWidget ?? Semantics(
             header: true,
             child: _TopBarTitle(
+              centered: plain,
               text: title ?? '',
               opacity: titleOpacity,
               controller: scrollController,
@@ -687,6 +696,10 @@ class DabblerNavigationTopBar extends StatelessWidget {
             ),
           ),
         ),
+        if (plain && actions.isEmpty && back != null)
+          const SizedBox(
+            width: DabblerSizing.touchTargetMin + DabblerSpacing.space3,
+          ),
         for (final DabblerNavigationAction action in actions)
           _action(colors, action),
       ],
