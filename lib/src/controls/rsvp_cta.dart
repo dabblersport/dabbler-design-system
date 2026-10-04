@@ -198,6 +198,7 @@ class DabblerRsvpCta extends StatelessWidget {
       borderColor: borderOf(colors, state),
       borderWidth: borderWidth,
       radius: DabblerRadius.pill,
+      width: double.infinity,
       height: size == DabblerRsvpCtaSize.bar ? barHeight : cardHeight,
       center: true,
       padding: const EdgeInsetsDirectional.symmetric(
