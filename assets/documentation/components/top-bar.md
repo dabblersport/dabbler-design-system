@@ -170,6 +170,8 @@ Trailing action glyphs: `linear` weight, sized within their hit box. Account ava
 - Alpha DS gaps 6 — adds the scrolled title (`titleOpacity`, `scrollController`,
   `titleRevealOffset`) and fixes the titled bar falling back to the wordmark when it had neither a
   title nor a back action.
+- Alpha fidelity (Search) — adds `titleWidget` to the titled variant: a widget that takes the title slot
+  beside the back button, for the search header of `Search.dc.html`.
 
 ## Source
 

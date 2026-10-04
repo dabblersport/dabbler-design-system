@@ -182,6 +182,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.safeArea = true,
     this.avatarImageUrl,
   })  : title = null,
+        titleWidget = null,
         onBack = null,
         backLabel = defaultBackLabel,
         _titled = false,
@@ -211,6 +212,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
   const DabblerNavigationTopBar.titled({
     super.key,
     this.title,
+    this.titleWidget,
     this.onBack,
     this.backLabel = defaultBackLabel,
     this.actions = const <DabblerNavigationAction>[],
@@ -237,6 +239,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
 
   /// The titled variant's title; null draws an empty title slot.
   final String? title;
+
+  /// A widget that takes the title slot in place of [title] — the search
+  /// header of `Search.dc.html:158-174`, where the slot holds the search field
+  /// beside the back button. Titled variant only.
+  final Widget? titleWidget;
 
   /// The titled variant's back action. Null hides the back button.
   final VoidCallback? onBack;
@@ -662,7 +669,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
           const SizedBox(width: DabblerSpacing.space3),
         ],
         Expanded(
-          child: Semantics(
+          child: titleWidget ?? Semantics(
             header: true,
             child: _TopBarTitle(
               text: title ?? '',
