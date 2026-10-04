@@ -265,8 +265,11 @@ class DabblerCardGame extends StatelessWidget {
       action: actionRow,
     );
     return DabblerCard(
+      // `background: var(--surface-card)` with the card hairline
+      // (`Listings.dc.html:524`) — the white variant, not the tonal one.
+      variant: DabblerCardVariant.white,
       fill: accent?.surfaceOver(
-        DabblerCard.fillOf(colors, DabblerCardVariant.standard),
+        DabblerCard.fillOf(colors, DabblerCardVariant.white),
       ),
       onTap: onTap,
       enabled: enabled,

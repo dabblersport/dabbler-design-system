@@ -56,6 +56,7 @@ Deviation: the time is `headline` bold (17) where the design draws 20/26 sans bo
 
 ## Change log
 
+- KAN-429 (Meetups) — the card is the white variant (`--surface-card` with the hairline), as the Listings frame draws it; it was the tonal fill.
 - Alpha fidelity rebuild (KAN-426) — adds this component.
 - KAN-429 (Meetups) — no change to the card: a meetup is this card with badges as `tags`, `MeetupAttendees` as `progress`, an `RsvpCta` as `action` and `FeedAction`s as `trailing`.
 - KAN-426 (Seat B) — adds `accent`: tints the card fill with a sport's accent at 12% over the card fill. A derivation of the persona-card recipe, not a Listings frame.
