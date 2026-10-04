@@ -106,6 +106,8 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardPricing](components/card-pricing.md) — one subscription plan as a selectable tile.
 - [CardTicket](components/card-ticket.md) — a booking as a ticket, with its own type scale.
 - [StatTile](components/stat-tile.md) — the bento stat tile used across the profile screens.
+- [ProfileRow](components/profile-row.md) — the profile list row: lead block, title, sub-line and tag on a card or status tint.
+- [LinkChip](components/link-chip.md) — the small copy-link pill beside a handle.
 - [PanelCard](components/panel-card.md) — the framed panel with a header, an inset body and a footer.
 - [ChecklistPanel](components/checklist-panel.md) — the task rows inside a panel.
 - [MemberListPanel](components/member-list-panel.md) — people rows with an add or remove button.
@@ -149,6 +151,7 @@ lot about the rest.
 - [HighlightedText](components/highlighted-text.md) — a search result's text with the matched part picked out.
 - [SelectableCard](components/selectable-card.md) — a tappable card that is either chosen or not.
 - [SortControl](components/sort-control.md) — how a view-all list lets the reader change its order.
+- [FilterRail](components/filter-rail.md) — the applied filters as removable chips, and a labelled option group for a filter sheet.
 - [Select](components/select.md) — choosing one or more values from a known list.
 - [Checkbox](components/checkbox.md) — a flat, independent on/off control.
 - [Radio](components/radio.md) — one choice in a mutually exclusive set.
