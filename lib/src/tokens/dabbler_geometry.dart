@@ -290,6 +290,10 @@ abstract final class DabblerSizing {
   /// The app's 200 folds here.
   static const double mediaPreviewHeight = DabblerSpacing.space9 * 6;
 
+  /// The article hero (`Article.dc.html:81` draws 230; 231 is the nearest
+  /// base-3 step).
+  static const double articleHeroHeight = 231;
+
   /// App role, `4 × space9` (120): a compact preview / placeholder panel.
   static const double mediaPreviewCompactHeight = DabblerSpacing.space9 * 4;
 

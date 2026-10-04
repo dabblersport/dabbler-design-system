@@ -95,6 +95,7 @@ void main() {
       'optionTileHeight': 66,
       'labelColumnWidth': 90,
       'heroCoverHeight': 240,
+      'articleHeroHeight': 231,
       'mediaPreviewHeight': 180,
       'mediaPreviewCompactHeight': 120,
       'mediaRowHeight': 150,

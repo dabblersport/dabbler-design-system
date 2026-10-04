@@ -80,6 +80,7 @@ const Map<String, double> sizingAppRoles = <String, double>{
   'optionTileHeight': DabblerSizing.optionTileHeight,
   'labelColumnWidth': DabblerSizing.labelColumnWidth,
   'heroCoverHeight': DabblerSizing.heroCoverHeight,
+  'articleHeroHeight': DabblerSizing.articleHeroHeight,
   'mediaPreviewHeight': DabblerSizing.mediaPreviewHeight,
   'mediaPreviewCompactHeight': DabblerSizing.mediaPreviewCompactHeight,
   'mediaRowHeight': DabblerSizing.mediaRowHeight,
