@@ -290,6 +290,16 @@ abstract final class DabblerSizing {
   /// The app's 200 folds here.
   static const double mediaPreviewHeight = DabblerSpacing.space9 * 6;
 
+  /// The Create post media rail's height (`Home Feed.dc.html:523` draws
+  /// 128; 129 is the nearest base-3 step).
+  static const double mediaRailHeight = 129;
+
+  /// The rail's add tile width (draws 64; 63 is the nearest base-3 step).
+  static const double mediaRailAddWidth = 63;
+
+  /// The rail's thumbnail width (draws 104; 105 is the nearest base-3 step).
+  static const double mediaRailTileWidth = 105;
+
   /// The article hero (`Article.dc.html:81` draws 230; 231 is the nearest
   /// base-3 step).
   static const double articleHeroHeight = 231;
