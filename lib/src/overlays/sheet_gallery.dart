@@ -13,6 +13,7 @@ import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_home_frame.dart';
 import 'action_row.dart';
 import 'sheet.dart';
+import 'sheet_body.dart';
 
 /// Sheet's specimens.
 const List<GalleryEntry> sheetGalleryEntries = <GalleryEntry>[
@@ -33,6 +34,16 @@ const List<GalleryEntry> sheetGalleryEntries = <GalleryEntry>[
         'A short sheet that is only as tall as its content, and a long one '
         'that stops at the 80% cap and scrolls.',
     builder: _contentSheets,
+  ),
+  GalleryEntry(
+    id: 'sheet/convention',
+    page: 'components/sheet',
+    group: GalleryPurpose.presentation,
+    title: 'Sheet — the convention (trigger)',
+    description:
+        'A content-sized sheet whose builder passes widgets only: the body '
+        'and the action stack, no panel, background or padding of its own.',
+    builder: _conventionSheet,
   ),
   GalleryEntry(
     id: 'action-row',
@@ -111,6 +122,45 @@ Widget _actionRows(BuildContext context) => const GalleryStack(
             label: 'إخفاء المنشور',
             note: 'سترى منشورات أقل من هذا النوع',
             onTap: _noopAction,
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _conventionSheet(BuildContext context) => GalleryWrap(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'content-sized, body + actions',
+      child: Builder(
+        builder: (BuildContext context) => DabblerButton(
+          label: 'Open sheet',
+          onPressed: () => showDabblerSheet<void>(
+            context: context,
+            detent: DabblerSheetDetent.content,
+            builder: (BuildContext context) => DabblerSheetBody(
+              spacing: DabblerSpacing.space2,
+              actions: DabblerSheetActions(
+                children: <Widget>[
+                  DabblerButton(
+                    label: 'Enable',
+                    fullWidth: true,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  DabblerButton(
+                    label: 'Not now',
+                    tone: DabblerButtonTone.neutral,
+                    fullWidth: true,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              children: const <Widget>[
+                Text('Stay updated'),
+                Text('Get notified about game invites and squad updates.'),
+              ],
+            ),
           ),
         ),
       ),
@@ -217,7 +267,6 @@ Widget _sheets(BuildContext context) => GalleryWrap(
   ],
 );
 
-Widget _body(BuildContext context) => const Padding(
-  padding: EdgeInsets.all(DabblerSpacing.space6),
-  child: Text('Sheet content.'),
-);
+/// Content only: the sheet's body already insets it by `space6`, so a builder
+/// that pads it again draws the double inset KAN-434 removed.
+Widget _body(BuildContext context) => const Text('Sheet content.');

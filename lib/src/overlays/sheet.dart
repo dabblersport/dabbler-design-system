@@ -204,7 +204,11 @@ class DabblerSheet extends StatefulWidget {
   /// at the end of the scroll area so they stay reachable at every detent.
   final Widget? footer;
 
-  /// The scrolling body.
+  /// The scrolling body. The sheet pads it by [DabblerSpacing.space6] on every
+  /// side, so pass widgets only: no `Padding`, `Card`, filled `DecoratedBox` or
+  /// padded scroll view around the content, which would draw a second inset and
+  /// a second panel inside this one (KAN-434). [DabblerSheetBody] and
+  /// [DabblerSheetActions] are the scaffold for the usual shapes.
   final Widget? child;
 
   /// Whether Escape, the scrim, the close button and drag-past dismiss.

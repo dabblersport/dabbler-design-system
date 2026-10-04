@@ -276,6 +276,7 @@ export 'src/overlays/dialog_gallery.dart';
 export 'src/overlays/menu.dart';
 export 'src/overlays/menu_gallery.dart';
 export 'src/overlays/sheet.dart';
+export 'src/overlays/sheet_body.dart';
 export 'src/overlays/sheet_gallery.dart';
 export 'src/overlays/sheet_list.dart';
 export 'src/overlays/sort_control.dart';
