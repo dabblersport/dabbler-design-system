@@ -31,6 +31,9 @@ Squad rows with a tag, and a contact group with chevrons, in both directions —
 ### Tone
 Sunken, info, accent or amber fill on the group.
 
+### Flat
+`flat: true` is the sheet-list form: no inline padding and a hairline under the row (Listings "Change location"); `brand: true` sets the title in the brand colour ("Use current location").
+
 ### Interaction
 With `onTap` the whole row is a button; `showChevron` adds the mirrored forward arrow.
 
@@ -41,6 +44,7 @@ With `onTap` the whole row is a button; `showChevron` adds the mirrored forward 
 ## Change log
 
 - KAN-426 fidelity rebuild — adds these components.
+- KAN-426 closing pass — `flat` and `brand` options for the Change-location sheet rows.
 
 ## Source
 
