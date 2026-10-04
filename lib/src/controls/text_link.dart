@@ -115,6 +115,7 @@ class DabblerTextLink extends StatelessWidget {
     this.autofocus = false,
     this.underline = true,
     this.trailingIcon,
+    this.muted = false,
   });
 
   /// `text-underline-offset: 2px` (`Auth and Onboarding.dc.html:129`) has no
@@ -169,6 +170,11 @@ class DabblerTextLink extends StatelessWidget {
   /// `false` for a section-header link such as "Manage".
   final bool underline;
 
+  /// Draws the label in the secondary ink instead of the brand colour — the
+  /// muted "Clear all" of `Listings.dc.html:106` (`color: var(--muted)`).
+  /// A disabled link is still the tertiary ink. Default false.
+  final bool muted;
+
   /// An optional glyph after the label (standalone only; ignored inline),
   /// mirrored in RTL. Decorative — it adds nothing to the accessible name.
   final String? trailingIcon;
@@ -187,6 +193,8 @@ class DabblerTextLink extends StatelessWidget {
                   .copyWith(fontWeight: DabblerType.medium));
     final Color color = onPressed == null
         ? colors.textTertiary
+        : muted
+        ? colors.textSecondary
         : colors.brandPrimary;
     return base.copyWith(
       color: color,

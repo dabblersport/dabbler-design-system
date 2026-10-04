@@ -51,8 +51,8 @@ drawn outside the ramp entirely.
 frames use were added on 2026-10-04 (KAN-426); the ramp may grow only from design frames. The
 twelve `.t-*` steps are unchanged; the added roles live in `DabblerType.frameRoles`
 (`displayHero`, `displayWelcome`, `displayScreen`, `displayStep`, `displaySection`, `displayStat`,
-`displayStatHero`, `displayStatMid`, `displayStatSmall`, `leadLarge`, `lead`, `rowTitle`, `copy`,
-`small`, `smallTight`, `smallRelaxed`, `footnoteTight`, `tag`, `tagTight`, `figure`, `figureLarge`,
+`displayStatHero`, `displayStatMid`, `displayStatSmall`, `displayLabel`, `leadLarge`, `lead`, `rowTitle`, `copy`,
+`small`, `smallTight`, `smallRelaxed`, `footnoteTight`, `footnoteRelaxed`, `tag`, `tagTight`, `figure`, `figureLarge`,
 `figureXl`), each documented with the design file and line it is read from. Arabic is the Latin
 size less 0.9px; Arabic leading is the design's own Arabic frame where one exists. A role has a
 default weight and `DabblerText.weight` overrides it. The freeze text that follows is kept as
@@ -94,7 +94,7 @@ Glory/Meral Sans, the full weight range).
 leading override where the two scripts diverge) and weight.
 
 ### Frame roles
-The twenty-two roles in `DabblerType.frameRoles` (see *Using it*). Only `displayStep`, `lead`,
+The twenty-four roles in `DabblerType.frameRoles` (see *Using it*). Only `displayStep`, `lead`,
 `rowTitle`, `copy`, `small`, `smallTight` and `smallRelaxed` take extra Arabic leading
 (`DabblerType.frameRolesArabicExtraLeading`).
 

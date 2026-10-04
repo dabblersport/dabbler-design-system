@@ -374,6 +374,17 @@ abstract final class DabblerType {
     fontWeight: regular,
   );
 
+  /// Rail label — 18/23, weight 400, display role. `Listings.dc.html:116,424` ("Upcoming" over a listing's countdown rail).
+  static const DabblerTypeStyle displayLabel = DabblerTypeStyle(
+    name: 'displayLabel',
+    role: DabblerTypeRole.display,
+    fontSize: 18,
+    arabicFontSize: 17.1,
+    latinLeading: 23,
+    arabicLeading: 23,
+    fontWeight: regular,
+  );
+
   /// Large lead — 19/27, weight 400, sans role. `Auth and Onboarding.dc.html:77` (landing "want" line), `:510` and `:827` at weight 600 via `DabblerText.weight`.
   static const DabblerTypeStyle leadLarge = DabblerTypeStyle(
     name: 'leadLarge',
@@ -462,6 +473,17 @@ abstract final class DabblerType {
     fontWeight: semibold,
   );
 
+  /// Footnote, relaxed — 13/20, weight 400, sans role. `Details.dc.html:486` (venue "About" copy).
+  static const DabblerTypeStyle footnoteRelaxed = DabblerTypeStyle(
+    name: 'footnoteRelaxed',
+    role: DabblerTypeRole.sans,
+    fontSize: 13,
+    arabicFontSize: 12.1,
+    latinLeading: 20,
+    arabicLeading: 20,
+    fontWeight: regular,
+  );
+
   /// Tag — 11/15, weight 600, sans role. Chip and badge text in `Auth and Onboarding.dc.html`, `Listings.dc.html`, `Details.dc.html`.
   static const DabblerTypeStyle tag = DabblerTypeStyle(
     name: 'tag',
@@ -538,6 +560,7 @@ abstract final class DabblerType {
     displayStatHero,
     displayStatMid,
     displayStatSmall,
+    displayLabel,
     leadLarge,
     lead,
     rowTitle,
@@ -546,6 +569,7 @@ abstract final class DabblerType {
     smallTight,
     smallRelaxed,
     footnoteTight,
+    footnoteRelaxed,
     tag,
     tagTight,
     figure,

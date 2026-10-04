@@ -3,8 +3,8 @@ import 'package:flutter/widgets.dart';
 import '../foundations/text.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
-import 'button.dart';
 import 'chip.dart';
+import 'text_link.dart';
 
 /// One applied filter in a [DabblerFilterRail].
 @immutable
@@ -86,15 +86,19 @@ class DabblerFilterRail extends StatelessWidget {
             DabblerChip(
               label: item.label,
               selected: true,
+              size: DabblerChipSize.small,
               onRemove: item.onRemove,
               removeSemanticLabel: item.removeSemanticLabel,
             ),
           if (onClearAll != null)
-            DabblerButton(
+            DabblerTextLink(
               key: clearAllKey,
               label: clearAllLabel,
-              tone: DabblerButtonTone.neutral,
-              size: DabblerButtonSize.small,
+              underline: false,
+              muted: true,
+              style: DabblerType.footnote
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(fontWeight: DabblerType.semibold),
               onPressed: onClearAll,
             ),
         ],
