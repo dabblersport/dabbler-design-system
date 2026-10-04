@@ -85,6 +85,7 @@ referenced here.
 ## Change log
 
 - Home Feed fidelity — `pageBackground` paints the panel in the page colour, as the Home Feed design's sheets do. Additive; off by default.
+- Home Feed fidelity — `showCloseButton: false` leaves the header close button out. Additive; on by default.
 - KAN-412 W1 — `DabblerSheetDetent.content` and `contentMaxFraction`. Additive; the default sizing
   is unchanged.
 - DS gaps 6 — `titleSpan`, `titleWidget` and `headerAction` on `DabblerSheet`, and the same three
