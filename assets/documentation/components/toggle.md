@@ -39,6 +39,8 @@ the same way `InputRow` pairs a title with a trailing control.
 **Let the track and knob motion — colour over 120ms, the knob sliding, no bounce — run as built.**
 It already switches to an instant snap under reduced motion; there's nothing to configure here.
 
+**Inside a tappable row the row is the target.** A toggle in an `InputRow` that has `onTap` lays out at its painted 28, so the row keeps the Settings rhythm; a bare toggle, or one in a row with no `onTap`, keeps the 45-point target.
+
 ## Axes
 
 ### State
@@ -58,6 +60,10 @@ a fixed side. Not yet checked against the gallery's direction switcher.*
 
 Track: `brandPrimary` when on, `borderDefault` when off. Knob: `surfaceCard`. Focus ring and the
 45px touch-target minimum are the same shared tokens every interactive control reads.
+
+## Change log
+
+- A toggle in a tappable input row lays out at 28 instead of 45.
 
 ## Source
 
