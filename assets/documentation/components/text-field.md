@@ -53,6 +53,10 @@ Inside a `Form` with a validator, and with a unit as suffix text — see `form_e
 
 @specimen text-field/form
 
+The post editor: `DabblerComposerBox`, a card with a multi-line field, a counter and a toolbar of glyphs, and `DabblerSelectPill`, the status-tinted pill that opens a choice.
+
+@specimen text-field/composer-box
+
 ## Using it
 
 **Reach for the variant, not a manually composed field.** `search` supplies its own leading glyph,
@@ -124,6 +128,9 @@ states, helper/error line — comes from `FieldShell`.
 - D-025 (cxo) — disabled text stays on `textTertiary`, bounded so
   contrast is never the only signal. Applied to this component's placeholder by KAN-336, which
   settled the variant question this page previously reported as open.
+
+- Alpha fidelity (KAN-426) — the password field is no taller than a standard one: its 45px toggle
+  fills the box instead of adding block padding (`Auth and Onboarding.dc.html:28-30`).
 
 ## Source
 

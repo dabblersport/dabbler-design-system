@@ -105,4 +105,33 @@ void main() {
     final DabblerCard card = t.widget(find.byType(DabblerCard));
     expect(card.media, isNull);
   });
+
+  for (final TextDirection dir in <TextDirection>[
+    TextDirection.ltr,
+    TextDirection.rtl,
+  ]) {
+    testWidgets('sports and facilities rows render ($dir)', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _host(
+          DabblerCardVenue(
+            name: dir == TextDirection.rtl ? 'ملاعب النخيل' : 'Elite',
+            sports: const <Widget>[DabblerChip(label: 'Padel')],
+            facilities: <Widget>[
+              DabblerCardVenue.facility(icon: 'car', label: 'Parking'),
+              DabblerCardVenue.facility(icon: 'cup', label: 'Cafe'),
+            ],
+          ),
+          direction: dir,
+        ),
+      );
+      expect(t.takeException(), isNull);
+      expect(find.text('Padel'), findsOneWidget);
+      expect(find.text('Parking'), findsOneWidget);
+      final double a = t.getCenter(find.text('Parking')).dx;
+      final double b = t.getCenter(find.text('Cafe')).dx;
+      expect(dir == TextDirection.ltr ? a < b : a > b, isTrue);
+    });
+  }
 }
