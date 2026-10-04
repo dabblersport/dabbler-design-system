@@ -112,19 +112,27 @@ class DabblerKeyValueRow extends StatelessWidget {
               valueWidget,
             ],
           )
-        : Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Flexible(flex: 1, child: labelText),
-              const SizedBox(width: gap),
-              Flexible(
-                flex: 2,
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: valueWidget,
+        : LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) => Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                // The label keeps its natural width, up to half the row.
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: constraints.maxWidth / 2,
+                  ),
+                  child: labelText,
                 ),
-              ),
-            ],
+                const SizedBox(width: gap),
+                // The value takes whatever is left and wraps inside it.
+                Expanded(
+                  child: Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: valueWidget,
+                  ),
+                ),
+              ],
+            ),
           );
 
     return Padding(

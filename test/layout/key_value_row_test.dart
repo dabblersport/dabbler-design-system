@@ -6,6 +6,23 @@ import '../forms/_host.dart';
 
 void main() {
   group('DabblerKeyValueRow', () {
+    testWidgets('the label takes at most half the row, the value the rest', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          const DabblerKeyValueRow(label: 'Active Enforcements', value: '4'),
+          width: 290,
+        ),
+      );
+      expect(
+        tester.getSize(find.text('Active Enforcements')).width,
+        lessThanOrEqualTo(145),
+      );
+      // A one-character value is not squeezed.
+      expect(tester.getSize(find.text('4')).height, lessThan(24));
+    });
+
     testWidgets('label at the inline start, value at the inline end (LTR)', (
       WidgetTester tester,
     ) async {
