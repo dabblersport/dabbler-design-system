@@ -201,6 +201,7 @@ lot about the rest.
 
 - [Banner](components/banner.md) — a persistent, in-flow message about the screen it's on.
 - [ConversationNotice](components/conversation-notice.md) — a banner inside a message thread.
+- [InlineMessage](components/inline-message.md) — one line of status text with a glyph, under the control it explains.
 - [ReactionGroup](components/reaction-group.md) — the reaction tallies under a message.
 - [Toast](components/toast.md) — a transient, queued notification that survives navigation.
 - [Spinner](components/spinner.md) — the system's only indeterminate loading indicator.
