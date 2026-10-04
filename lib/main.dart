@@ -97,6 +97,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...skeletonGalleryEntries,
   ...spinnerGalleryEntries,
   ...statTileGalleryEntries,
+  ...detailGalleryEntries,
   ...profileRowGalleryEntries,
   ...surfaceGalleryEntries,
   ...swipeActionGalleryEntries,

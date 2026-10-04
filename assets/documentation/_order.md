@@ -219,6 +219,11 @@ lot about the rest.
 
 - [Page](components/page.md) — the screen scaffold: page background, safe area, top bar, body and bottom bar.
 - [Fade](components/fade.md) — the page-colour wash that lets a list run out beneath a bottom bar.
+- [DetailHeader](components/detail-header.md) — the coloured band that opens a detail screen.
+- [GalleryHero](components/gallery-hero.md) — the paged photo hero with captions and dots.
+- [ActionBar](components/action-bar.md) — the price and call to action pinned to a detail screen's bottom.
+- [ListRow](components/list-row.md) — a row (and its rounded group) for squads, contacts and facts.
+- [Headcount](components/headcount.md) — avatars, a headline figure and a fill bar.
 - [Divider](components/divider.md) — the only line this system draws between things.
 - [Gap](components/gap.md) — one spacing step of empty space, the only spacer.
 - [DateSeparator](components/date-separator.md) — the day boundary pill in a conversation timeline.

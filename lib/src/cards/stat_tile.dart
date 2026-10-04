@@ -20,7 +20,14 @@ enum DabblerStatTileSize {
   hero(span: 4, rows: 2, padding: 15, valueSize: 46, valueLeading: 48),
 
   /// 6 columns by 2 rows, value 22/26, padding 15.
-  wide(span: 6, rows: 2, padding: 15, valueSize: 22, valueLeading: 26);
+  wide(span: 6, rows: 2, padding: 15, valueSize: 22, valueLeading: 26),
+
+  /// The Details screens' fact tile (`Details.dc.html:93-107`): 3 columns by
+  /// 1 row by default, padding 15, a **sans** value at 20/25 bold over an
+  /// 11/15 caption in the tone's muted ink. Unlike the profile sizes the
+  /// value is not a display numeral, so it reads as a fact ("7:30 PM",
+  /// "Open until 11 PM") rather than a score.
+  detail(span: 3, rows: 1, padding: 15, valueSize: 20, valueLeading: 25);
 
   const DabblerStatTileSize({
     required this.span,
@@ -38,6 +45,12 @@ enum DabblerStatTileSize {
 
   /// Inner padding on every edge.
   final double padding;
+
+  /// The tile's corner: 18 on the profile sizes, 12 on [detail] — the
+  /// Details screens draw their tiles at `--radius-lg`
+  /// (`Details.dc.html:97`).
+  BorderRadius get radius =>
+      this == detail ? DabblerRadius.lgAll : DabblerRadius.xlAll;
 
   /// The value's font size as the source draws it.
   final double valueSize;
@@ -71,6 +84,10 @@ enum DabblerStatTileTone {
 
   /// The error status surface with its strong ink.
   danger,
+
+  /// The success status surface with its strong ink — the Details venue
+  /// "Open until 11 PM" tile (`Details.dc.html:874-876`).
+  success,
 }
 
 /// StatTile — the bento stat tile used across the profile screens: a large
@@ -241,6 +258,12 @@ class DabblerStatTile extends StatefulWidget {
       right: 0.02,
       top: 0.0,
     ),
+    DabblerStatTileSize.detail => (
+      width: 0.30,
+      height: 0.82,
+      right: 0.02,
+      top: 0.06,
+    ),
   };
 
   /// The tile's effective column span.
@@ -260,6 +283,7 @@ class DabblerStatTile extends StatefulWidget {
         DabblerStatTileTone.info => DabblerColors.tileInfo.surface,
         DabblerStatTileTone.accent => DabblerColors.tileAccent.surface,
         DabblerStatTileTone.danger => colors.error.surface,
+        DabblerStatTileTone.success => colors.success.surface,
       };
 
   /// 1px border colour of [tone].
@@ -280,6 +304,7 @@ class DabblerStatTile extends StatefulWidget {
         DabblerStatTileTone.info => DabblerColors.tileInfo.ink,
         DabblerStatTileTone.accent => DabblerColors.tileAccent.ink,
         DabblerStatTileTone.danger => colors.error.strong,
+        DabblerStatTileTone.success => colors.success.strong,
       };
 
   /// Sub-line colour of [tone] — the source's `sub`.
@@ -290,6 +315,7 @@ class DabblerStatTile extends StatefulWidget {
         ),
         DabblerStatTileTone.ink => colors.bgPrimary.withValues(alpha: 0.7),
         DabblerStatTileTone.amber => DabblerPalette.ink.withValues(alpha: 0.62),
+        DabblerStatTileTone.success => colors.success.strong,
         _ => colors.textSecondary,
       };
 
@@ -306,9 +332,17 @@ class DabblerStatTile extends StatefulWidget {
       DabblerStatTileSize.small => DabblerType.title1,
       DabblerStatTileSize.hero => DabblerType.largeTitle,
       DabblerStatTileSize.wide => DabblerType.title2,
+      DabblerStatTileSize.detail => DabblerType.headline,
     };
     final TextStyle resolved = base.resolveForDirection(direction);
     if (size == DabblerStatTileSize.wide) return resolved;
+    if (size == DabblerStatTileSize.detail) {
+      return resolved.copyWith(
+        fontSize: size.valueSize,
+        height: size.valueLeading / size.valueSize,
+        fontWeight: DabblerType.bold,
+      );
+    }
     return resolved.copyWith(
       fontSize: size.valueSize,
       height: size.valueLeading / size.valueSize,
@@ -381,9 +415,18 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
           widget.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: DabblerType.footnote
-              .resolveForDirection(direction)
-              .copyWith(color: fg, fontWeight: DabblerStatTile.labelWeight),
+          style: size == DabblerStatTileSize.detail
+              // The Details fact tile's caption: 11/15 regular in the tone's
+              // muted ink (`Details.dc.html:102`).
+              ? DabblerType.caption2
+                    .resolveForDirection(direction)
+                    .copyWith(color: DabblerStatTile.subFor(colors, widget.tone))
+              : DabblerType.footnote
+                    .resolveForDirection(direction)
+                    .copyWith(
+                      color: fg,
+                      fontWeight: DabblerStatTile.labelWeight,
+                    ),
         ),
         if (widget.sub != null)
           Text(
@@ -406,14 +449,14 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
         return DecoratedBox(
           decoration: BoxDecoration(
             color: DabblerStatTile.fillFor(colors, widget.tone),
-            borderRadius: DabblerRadius.xlAll,
+            borderRadius: size.radius,
             border: Border.all(
               color: DabblerStatTile.borderFor(colors, widget.tone),
               width: DabblerSizing.borderDefault,
             ),
           ),
           child: ClipRRect(
-            borderRadius: DabblerRadius.xlAll,
+            borderRadius: size.radius,
             child: Stack(
               fit: StackFit.passthrough,
               children: <Widget>[
@@ -521,7 +564,7 @@ class _DabblerStatTileState extends State<DabblerStatTile> {
               onTapCancel: () => _setPressed(false),
               child: DabblerFocusRing.visible(
                 visible: _focused,
-                borderRadius: DabblerRadius.xlAll,
+                borderRadius: size.radius,
                 child: DabblerPressScale(pressed: _pressed, child: tile),
               ),
             ),
