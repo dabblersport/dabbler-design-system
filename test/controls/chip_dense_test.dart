@@ -1,5 +1,4 @@
 import 'package:dabbler_design_system/dabbler_design_system.dart';
-    show DabblerColors, DabblerTheme;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
