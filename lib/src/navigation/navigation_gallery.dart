@@ -13,6 +13,7 @@ import 'package:flutter/widgets.dart';
 
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
+import '../tokens/dabbler_home_frame.dart';
 import 'bottom_bar.dart';
 import 'top_bar.dart';
 
@@ -52,6 +53,17 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
         'action held upright (rotateActionOnOpen: false), as the Home Feed '
         'design draws it (DSG-NEW-001).',
     builder: _bottomBarTones,
+  ),
+  GalleryEntry(
+    id: 'bottom-bar/pinned-rtl',
+    page: 'components/bottom-bar',
+    group: GalleryPurpose.navigation,
+    title: 'Navigation — bottom bar, RTL pinned',
+    description:
+        'mirrorInRtl: false under Arabic: the pill stays on the physical '
+        'left and the action on the right, as Home_feed_—_Arabic.png draws '
+        'it; the labels still read right to left.',
+    builder: _bottomBarPinnedRtl,
   ),
   GalleryEntry(
     id: 'bottom-bar/badges',
@@ -146,6 +158,31 @@ Widget _bottomBarTones(BuildContext context) => const GallerySpecimen(
   ),
 );
 
+Widget _bottomBarPinnedRtl(BuildContext context) => const GallerySpecimen(
+  label: 'Arabic, layout unmirrored (Home Feed Arabic frame)',
+  child: SizedBox(
+    width: _phoneWidth,
+    child: Directionality(
+      textDirection: TextDirection.rtl,
+      child: DabblerNavigationBottomBar(
+        safeArea: false,
+        mirrorInRtl: false,
+        // The Arabic frame's own strings (`Home Feed.dc.html:3501`).
+        items: <DabblerNavigationItem>[
+          DabblerNavigationItem(id: 'feeds', icon: 'home-2', label: 'الرئيسية'),
+          DabblerNavigationItem(id: 'venues', icon: 'location', label: 'ملاعب'),
+          DabblerNavigationItem(id: 'games', icon: 'game', label: 'مباريات'),
+          DabblerNavigationItem(
+            id: 'meetups',
+            icon: 'calendar',
+            label: 'لقاءات',
+          ),
+        ],
+      ),
+    ),
+  ),
+);
+
 Widget _topBar(BuildContext context) => const GalleryStack(
   children: <Widget>[
     GallerySpecimen(
@@ -160,6 +197,24 @@ Widget _topBar(BuildContext context) => const GalleryStack(
           actions: <DabblerNavigationAction>[
             DabblerNavigationAction(icon: 'sms', label: 'Messages'),
             DabblerNavigationAction(icon: 'notification-bing', label: 'Alerts'),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'drawn metrics — the Home header: 18 gutter, 63 high, 24 glyphs',
+      child: SizedBox(
+        width: _phoneWidth,
+        child: DabblerNavigationTopBar(
+          metrics: DabblerFeedMetrics.drawn,
+          safeArea: false,
+          actions: <DabblerNavigationAction>[
+            DabblerNavigationAction(icon: 'search-normal', label: 'Search'),
+            DabblerNavigationAction(
+              icon: 'notification-bing',
+              label: 'Notifications',
+              unread: true,
+            ),
           ],
         ),
       ),

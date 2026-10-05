@@ -10,6 +10,7 @@ import '../interaction/press_scale.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 
 /// The three heights a [DabblerChip] is drawn at.
@@ -154,7 +155,15 @@ class DabblerChip extends StatefulWidget {
     this.accent,
     this.size = DabblerChipSize.regular,
     this.compactHitArea = false,
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] draws the chip as the Home Feed frame's
+  /// sub-chip (`home-design-measure.md` section 6): 34 high (7 above and below
+  /// an 18 line, inside the hairline), 14 inline, the 13/18 footnote at the
+  /// regular weight, a 14 glyph 6 from the label, the 45 target kept as a
+  /// hit-test-only area. Default [DabblerFeedMetrics.touch] is unchanged.
+  final DabblerFeedMetrics metrics;
 
   /// Whether a tappable chip drops the [DabblerSizing.touchTargetMin] box from
   /// layout and is exactly as tall as its pill (40 regular), as the frames
@@ -453,7 +462,14 @@ class _DabblerChipState extends State<DabblerChip> {
         (accent != null
             ? accentInk
             : DabblerChip.iconColorFor(colors, selected: widget.selected));
-    final TextStyle labelStyle = widget.tag
+    final bool drawn = widget.metrics == DabblerFeedMetrics.drawn;
+    final TextStyle labelStyle = drawn
+        ? DabblerType.footnote
+              .resolveForDirection(direction)
+              .copyWith(
+                color: widget.selected ? colors.onBrand : colors.textSecondary,
+              )
+        : widget.tag
         ? DabblerType.caption1
               .resolveForDirection(direction)
               .copyWith(
@@ -480,7 +496,9 @@ class _DabblerChipState extends State<DabblerChip> {
             DabblerChipSize.small => DabblerChip.smallHeight,
             DabblerChipSize.large => DabblerChip.largeHeight,
           };
-    final double glyph = (widget.compact || widget.dense)
+    final double glyph = drawn
+        ? DabblerHomeFrame.subChipGlyph
+        : (widget.compact || widget.dense)
         ? DabblerSizing.iconInline
         : DabblerSizing.iconSm;
     final bool removable = widget.onRemove != null;
@@ -629,39 +647,48 @@ class _DabblerChipState extends State<DabblerChip> {
           : (vibe != null
                 ? (widget.selected ? vibe.selectedBorder : vibe.border)
                 : (widget.selected ? Colors.transparent : null)),
-      padding: EdgeInsetsDirectional.only(
-        top: widget.tag
-            ? DabblerChip.tagVerticalPadding
-            : widget.dense
-            ? DabblerChip.denseVerticalPadding
-            : widget.compact
-            ? DabblerChip.compactVerticalPadding
-            : (pillHeight != null ? 0 : _regularVertical),
-        bottom: widget.tag
-            ? DabblerChip.tagVerticalPadding
-            : widget.dense
-            ? DabblerChip.denseVerticalPadding
-            : widget.compact
-            ? DabblerChip.compactVerticalPadding
-            : (pillHeight != null ? 0 : _regularVertical),
-        start: widget.tag
-            ? DabblerChip.tagHorizontalPadding
-            : widget.dense
-            ? DabblerChip.denseHorizontalPadding
-            : widget.compact
-            ? DabblerChip.compactHorizontalPadding
-            : _inlinePadding,
-        // The remove box absorbs the trailing padding — see [onRemove].
-        end: removable
-            ? 0
-            : (widget.tag
+      padding: drawn
+          ? const EdgeInsetsDirectional.symmetric(
+              vertical:
+                  DabblerChip.denseVerticalPadding +
+                  DabblerSizing.borderDefault,
+              horizontal:
+                  DabblerChip.compactHorizontalPadding +
+                  DabblerSizing.borderDefault,
+            )
+          : EdgeInsetsDirectional.only(
+              top: widget.tag
+                  ? DabblerChip.tagVerticalPadding
+                  : widget.dense
+                  ? DabblerChip.denseVerticalPadding
+                  : widget.compact
+                  ? DabblerChip.compactVerticalPadding
+                  : (pillHeight != null ? 0 : _regularVertical),
+              bottom: widget.tag
+                  ? DabblerChip.tagVerticalPadding
+                  : widget.dense
+                  ? DabblerChip.denseVerticalPadding
+                  : widget.compact
+                  ? DabblerChip.compactVerticalPadding
+                  : (pillHeight != null ? 0 : _regularVertical),
+              start: widget.tag
                   ? DabblerChip.tagHorizontalPadding
                   : widget.dense
                   ? DabblerChip.denseHorizontalPadding
                   : widget.compact
                   ? DabblerChip.compactHorizontalPadding
-                  : _inlinePadding),
-      ),
+                  : _inlinePadding,
+              // The remove box absorbs the trailing padding — see [onRemove].
+              end: removable
+                  ? 0
+                  : (widget.tag
+                        ? DabblerChip.tagHorizontalPadding
+                        : widget.dense
+                        ? DabblerChip.denseHorizontalPadding
+                        : widget.compact
+                        ? DabblerChip.compactHorizontalPadding
+                        : _inlinePadding),
+            ),
       child: pillHeight == null
           ? content
           : ConstrainedBox(
@@ -723,7 +750,7 @@ class _DabblerChipState extends State<DabblerChip> {
               onTapDown: (TapDownDetails _) => _setPressed(true),
               onTapUp: (TapUpDetails _) => _setPressed(false),
               onTapCancel: () => _setPressed(false),
-              child: widget.compactHitArea
+              child: (widget.compactHitArea || drawn)
                   ? interactive
                   : ConstrainedBox(
                       constraints: const BoxConstraints(
@@ -746,7 +773,8 @@ class _DabblerChipState extends State<DabblerChip> {
     );
   }
 
-  Widget _hit(Widget child) => widget.compactHitArea
+  Widget _hit(Widget child) =>
+      (widget.compactHitArea || widget.metrics == DabblerFeedMetrics.drawn)
       ? DabblerExpandedHitArea(
           minimum: const Size(
             DabblerSizing.touchTargetMin,

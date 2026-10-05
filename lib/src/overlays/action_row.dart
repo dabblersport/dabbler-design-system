@@ -5,6 +5,7 @@ import '../foundations/icon.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 
 /// ActionRow — one action in a sheet: a leading glyph, the action's name and a
@@ -36,7 +37,14 @@ class DabblerActionRow extends StatelessWidget {
     this.destructive = false,
     this.selected = false,
     this.onTap,
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] draws the row as the Home Feed's post-options
+  /// sheet does (`home-design-measure.md` section 9a): 14 above and below, a 1
+  /// gap between label and note and no hairline — a flat sunken fill — so a row
+  /// with a note is 65 high. Default [DabblerFeedMetrics.touch] is unchanged.
+  final DabblerFeedMetrics metrics;
 
   /// The kebab-case Iconsax name.
   final String icon;
@@ -71,6 +79,7 @@ class DabblerActionRow extends StatelessWidget {
         : destructive
         ? colors.error.strong
         : colors.textPrimary;
+    final bool drawn = metrics == DabblerFeedMetrics.drawn;
     final Widget row = DabblerFeedTappable(
       onTap: onTap,
       semanticLabel: note == null ? label : '$label. $note',
@@ -79,9 +88,12 @@ class DabblerActionRow extends StatelessWidget {
       child: DabblerSurface(
         fill: selected ? colors.brandPrimary : colors.surfaceSunken,
         radius: DabblerRadius.lg,
-        padding: const EdgeInsetsDirectional.symmetric(
+        borderWidth: drawn ? 0 : null,
+        padding: EdgeInsetsDirectional.symmetric(
           horizontal: DabblerSpacing.space5,
-          vertical: DabblerSpacing.space4,
+          vertical: drawn
+              ? DabblerHomeFrame.actionRowPaddingBlock
+              : DabblerSpacing.space4,
         ),
         child: Row(
           children: <Widget>[
@@ -103,6 +115,8 @@ class DabblerActionRow extends StatelessWidget {
                     label,
                     style: t(DabblerType.subheadline).copyWith(color: ink),
                   ),
+                  if (note != null && drawn)
+                    const SizedBox(height: DabblerHomeFrame.actionRowTextGap),
                   if (note != null)
                     Text(
                       note!,

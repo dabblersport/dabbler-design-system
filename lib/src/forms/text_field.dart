@@ -8,6 +8,7 @@ import '../foundations/icon.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 import 'field_shell.dart';
 
@@ -132,6 +133,7 @@ class DabblerTextField extends StatefulWidget {
     this.borderOutside = false,
     this.circledSelectArrow = false,
     this.mutedPasswordToggle = false,
+    this.metrics = DabblerFeedMetrics.touch,
   }) : assert(
          controller == null || initialValue == null,
          'give a controller or an initialValue, not both',
@@ -178,6 +180,11 @@ class DabblerTextField extends StatefulWidget {
   /// field), as the Auth and Onboarding frame draws it. See
   /// [DabblerFieldShell.borderOutside]. Default false.
   final bool borderOutside;
+
+  /// [DabblerFeedMetrics.drawn] on the search variant draws the Home city
+  /// sheet's field: 42 high, a 16 glyph, 15 inside the hairline, 9 between
+  /// glyph and text. Other variants ignore it.
+  final DabblerFeedMetrics metrics;
 
   /// Whether the password variant's visibility toggle is drawn light and
   /// small, as the Auth frames draw it: the glyph in
@@ -464,11 +471,15 @@ class _DabblerTextFieldState extends State<DabblerTextField> {
   /// A 24×24 slot, which is the source's `width: 24, height: 24, flexShrink: 0`
   /// around every icon in the row, tinted through [IconTheme] so a caller's
   /// plain [Icon] picks the role colour up.
-  static Widget _iconSlot(Widget icon, Color color) => SizedBox(
-    width: DabblerSizing.iconMd,
-    height: DabblerSizing.iconMd,
+  static Widget _iconSlot(
+    Widget icon,
+    Color color, [
+    double size = DabblerSizing.iconMd,
+  ]) => SizedBox(
+    width: size,
+    height: size,
     child: IconTheme.merge(
-      data: IconThemeData(color: color, size: DabblerSizing.iconMd),
+      data: IconThemeData(color: color, size: size),
       child: Center(child: icon),
     ),
   );

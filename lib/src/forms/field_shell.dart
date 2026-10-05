@@ -114,7 +114,16 @@ class DabblerFieldShell extends StatelessWidget {
     this.expanded,
     this.announceError = false,
     this.borderOutside = false,
+    this.minHeight = DabblerSizing.touchTargetMin,
+    this.gap = DabblerSpacing.iconGap,
   });
+
+  /// The box's minimum height. Default is the 45 touch floor; the Home city
+  /// sheet's search field draws 42.
+  final double minHeight;
+
+  /// The gap between the row's children. Default [DabblerSpacing.iconGap].
+  final double gap;
 
   /// Whether the box's hairline sits outside its 45px minimum content box,
   /// as the Auth and Onboarding frame draws it: the box is then 47 high (49
@@ -283,16 +292,14 @@ class DabblerFieldShell extends StatelessWidget {
         // the padding because a [BoxDecoration] border is painted, not laid
         // out: the box's height is its child's height, so 45 here is 45 on
         // screen.
-        constraints: const BoxConstraints(
-          minHeight: DabblerSizing.touchTargetMin,
-        ),
+        constraints: BoxConstraints(minHeight: minHeight),
         child: Padding(
           padding: innerPadding,
           child: Row(
             crossAxisAlignment: align == DabblerFieldAlign.start
                 ? CrossAxisAlignment.start
                 : CrossAxisAlignment.center,
-            children: _gapped(children),
+            children: _gapped(children, gap),
           ),
         ),
       ),
@@ -364,14 +371,14 @@ class DabblerFieldShell extends StatelessWidget {
 
   /// The row with `--icon-gap` inserted between every pair, which is what CSS
   /// `gap` does and what a [Row] does not do on its own.
-  static List<Widget> _gapped(List<Widget> items) {
+  static List<Widget> _gapped(List<Widget> items, double gap) {
     if (items.length < 2) {
       return items;
     }
     final List<Widget> out = <Widget>[];
     for (int i = 0; i < items.length; i++) {
       if (i > 0) {
-        out.add(const SizedBox(width: DabblerSpacing.iconGap));
+        out.add(SizedBox(width: gap));
       }
       out.add(items[i]);
     }

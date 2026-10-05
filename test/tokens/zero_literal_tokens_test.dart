@@ -132,6 +132,11 @@ void main() {
         'mediaRailHeight': 128,
         'mediaRailAddWidth': 64,
         'mediaRailTileWidth': 104,
+        'navItem': 44,
+        'navBarHeight': 56,
+        'navGlyphLarge': 26,
+        'navCreateTile': 62,
+        'navFadeHeight': 80,
       };
       expect(sizingOffGridRulings.keys.toSet(), pinned.keys.toSet());
       for (final MapEntry<String, double> e in pinned.entries) {
@@ -155,6 +160,11 @@ void main() {
       expect(DabblerInsets.card, const EdgeInsets.all(18));
       expect(DabblerInsets.listBottom, const EdgeInsets.only(bottom: 24));
       expect(DabblerInsets.underFloatingBar, const EdgeInsets.only(bottom: 96));
+      expect(
+        DabblerInsets.feedScreen,
+        const EdgeInsets.symmetric(horizontal: 18),
+      );
+      expect(DabblerInsets.feedBottom, const EdgeInsets.only(bottom: 120));
       expect(
         DabblerInsets.rowVertical,
         const EdgeInsets.symmetric(vertical: 12),

@@ -49,6 +49,7 @@ Surface: sunken, with the 12px large radius. Ink: primary, secondary for the not
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics`. Drawn is the post-options sheet's row: 14 above and below, a 1 gap between label and note, and a flat sunken fill with no hairline — 65 high with a note (68 under the Arabic leading). Default unchanged.
 - Added from the Home Feed design file.
 - KAN-429 (Meetups) — adds `selected`: the brand fill, on-brand ink and a bold glyph, the meetup RSVP sheet's chosen answer.
 

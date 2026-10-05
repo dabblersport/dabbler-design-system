@@ -40,6 +40,7 @@ class DabblerTabPager extends StatefulWidget {
     this.scrollable = false,
     this.fullWidth = false,
     this.label,
+    this.tabsPadding = EdgeInsets.zero,
   }) : assert(items.length == pages.length, 'every tab needs exactly one page');
 
   /// The tabs, in order. Each [DabblerTabItem.id] also keys its page's
@@ -72,6 +73,9 @@ class DabblerTabPager extends StatefulWidget {
 
   /// Passed to the header. See [DabblerTabs.label].
   final String? label;
+
+  /// Passed to the header. See [DabblerTabs.padding].
+  final EdgeInsetsGeometry tabsPadding;
 
   @override
   State<DabblerTabPager> createState() => _DabblerTabPagerState();
@@ -142,6 +146,7 @@ class _DabblerTabPagerState extends State<DabblerTabPager> {
           scrollable: widget.scrollable,
           fullWidth: widget.fullWidth,
           label: widget.label,
+          padding: widget.tabsPadding,
         ),
         Expanded(
           child: PageView(

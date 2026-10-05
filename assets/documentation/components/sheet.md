@@ -60,6 +60,46 @@ Arabic. The Listings filter sheets use a small neutral Button reading *Reset* th
 needs a count or a second colour takes `titleSpan`; a fully custom one takes `titleWidget`. The
 sheet's accessible name still comes from `title`, or from the span's plain text.
 
+### The one sheet convention
+
+Every bottom sheet in the app is the same object: **one** `DabblerSheet`. A sheet's content never
+draws a panel, a background or padding of its own — it passes widgets and the sheet does the rest.
+KAN-434 exists because a sheet whose content padded itself (24 on top of the sheet's 18) read as a
+drawer inside a drawer.
+
+| Part | The rule |
+|---|---|
+| Surface | One rounded surface, one colour: the card fill, a hairline, `xl` top corners, no shadow. `pageBackground` swaps the colour to the page colour **only** where a frame draws it so (the Home Feed sheets); it never adds a second layer. |
+| Handle | Always drawn (`dragHandle` true). |
+| Close button | Shown by default. Omit it (`showCloseButton: false`) only where the frame shows none because the body carries its own Done / Cancel. |
+| Header and title | The sheet draws it: `title` (or `titleSpan` / `titleWidget`) in display type, a `headerAction` at the inline end, and `headerDivider` for the hairline rule under it where the frame has one. Content does not repeat the title in its own header. |
+| Content padding | **The sheet owns it**: 18 (`space6`) on every side of the body. Content passes widgets only — no `Padding`, `Container(padding:)`, `Card`, `Material`, `Ink` or filled `DecoratedBox` around its content. |
+| Detent | Content-sized by default: pass `detent: DabblerSheetDetent.content` and no `detents`. A fixed fraction only where a frame shows one (a tall composer at 94%). |
+| Actions | At the bottom of the body in `DabblerSheetActions` — full-width buttons, primary first, 9 apart, 12 below the content — or in the pinned `footer` when the body scrolls. |
+
+`DabblerSheetBody` and `DabblerSheetActions` are the scaffold that carries this: the body stacks its
+children from the inline start with a uniform gap and adds no inset, no fill and no border; the
+actions part sets the button rhythm. Both lay out in the ambient direction, so Arabic reads from the
+right with nothing mirrored by hand.
+
+@specimen sheet/convention
+
+```dart
+showDabblerSheet<void>(
+  context: context,
+  detent: DabblerSheetDetent.content,
+  builder: (BuildContext context) => DabblerSheetBody(
+    spacing: DabblerSpacing.space2,
+    children: <Widget>[title, description],
+    actions: DabblerSheetActions(children: <Widget>[primary, secondary]),
+  ),
+);
+```
+
+**The app checks this.** `test/sheet_convention_test.dart` in the app scans every sheet call and
+fails on one that passes `detents`, or that goes through a helper outside the convention, unless
+it is on the allow-list with a reason.
+
 ## Axes
 
 ### Presentation
@@ -84,6 +124,8 @@ referenced here.
 
 ## Change log
 
+- KAN-434 — the one sheet convention above, and `DabblerSheetBody` / `DabblerSheetActions` to carry it. Additive: no default of `DabblerSheet` changed. The gallery's own sheet bodies stopped padding themselves.
+- KAN-433 (Home fidelity) — adds `hairlineOutside` (default false): the content starts 1 in and 1 down inside the panel's 1px hairline, as the Home Feed frame's content-box sheet draws it (content at x 19, not 18).
 - Home Feed fidelity — `pageBackground` paints the panel in the page colour, as the Home Feed design's sheets do. Additive; off by default.
 - Home Feed fidelity — `showCloseButton: false` leaves the header close button out. Additive; on by default.
 - Listings fidelity — `headerDivider: true` draws the 1px faint hairline under the header row (`Listings.dc.html:289`). Additive; off by default.
@@ -95,4 +137,4 @@ referenced here.
 
 ## Source
 
-`lib/src/overlays/sheet.dart`, `lib/src/overlays/sheet_detent.dart`
+`lib/src/overlays/sheet.dart`, `lib/src/overlays/sheet_detent.dart`, `lib/src/overlays/sheet_body.dart`

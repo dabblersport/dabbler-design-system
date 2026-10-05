@@ -43,6 +43,10 @@ and the user swipes leftwards to advance, matching the `Tabs` header, which mirr
 
 Header: everything `Tabs` uses. Page transition on tap: `slow` duration on the `easeOut` curve.
 
+## Change log
+
+- KAN-433 (Home fidelity) — passes `variant: DabblerTabsVariant.feed` through, and adds `tabsPadding`, passed to the header's `padding`.
+
 ## Source
 
 `lib/src/layout/tab_pager.dart`

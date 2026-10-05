@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart' show TextInputAction, TextInputType;
 import 'package:flutter/widgets.dart';
 
+import '../tokens/dabbler_home_frame.dart';
 import 'text_field.dart';
 
 /// SearchField — the `search` text field with its inline clear button.
@@ -64,7 +65,12 @@ class DabblerSearchField extends StatelessWidget {
     this.onSaved,
     this.suffixText,
     this.borderOutside = false,
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn]: the Home city sheet's 42 high field. See
+  /// [DabblerTextField.metrics].
+  final DabblerFeedMetrics metrics;
 
   /// The text being edited; see [DabblerTextField.controller].
   final TextEditingController? controller;
@@ -141,6 +147,7 @@ class DabblerSearchField extends StatelessWidget {
     return DabblerTextField(
       variant: DabblerTextFieldVariant.search,
       borderOutside: borderOutside,
+      metrics: metrics,
       controller: controller,
       initialValue: initialValue,
       onChanged: onChanged,

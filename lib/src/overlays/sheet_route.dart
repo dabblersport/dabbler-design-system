@@ -41,6 +41,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     this.detent = DabblerSheetDetent.fractions,
     this.contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
     this.pageBackground = false,
+    this.hairlineOutside = false,
     this.showCloseButton = true,
     this.headerDivider = false,
     super.settings,
@@ -54,6 +55,9 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
 
   /// See [DabblerSheet.pageBackground].
   final bool pageBackground;
+
+  /// See [DabblerSheet.hairlineOutside].
+  final bool hairlineOutside;
 
   /// See [DabblerSheet.showCloseButton].
   final bool showCloseButton;
@@ -129,6 +133,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
       detent: detent,
       contentMaxFraction: contentMaxFraction,
       pageBackground: pageBackground,
+      hairlineOutside: hairlineOutside,
       showCloseButton: showCloseButton,
       headerDivider: headerDivider,
       child: builder(context),
@@ -187,6 +192,7 @@ Future<T?> showDabblerSheet<T>({
   DabblerSheetDetent detent = DabblerSheetDetent.fractions,
   double contentMaxFraction = DabblerSheet.defaultContentMaxFraction,
   bool pageBackground = false,
+  bool hairlineOutside = false,
   bool showCloseButton = true,
   bool headerDivider = false,
 }) {
@@ -206,6 +212,7 @@ Future<T?> showDabblerSheet<T>({
       detent: detent,
       contentMaxFraction: contentMaxFraction,
       pageBackground: pageBackground,
+      hairlineOutside: hairlineOutside,
       showCloseButton: showCloseButton,
       headerDivider: headerDivider,
     ),

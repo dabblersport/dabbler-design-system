@@ -115,6 +115,7 @@ sheet corners.
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `DabblerHomeFrame`, the Home Feed frame's off-grid values as named tokens (the wordmark 110 x 21, the location row's 13 glyph and 4 / 5 gaps, the tab label's 10, the reminder's 34 hide box, 8 bleed, 14 stack, 42 sheets, the post row's 2/8 pill, 5 gaps and 32 sport pill, the news card's 5 gap, the activity tile's 42 and 35 action, the post-options row's 14 and the sub-chip's 14 glyph), each a measured outer size and none a step of the base-3 scale; `DabblerFeedMetrics` (`touch` default, `drawn`) is the opt-in each component reads them under; and `DabblerInsets.feedScreen` (the frame's 18 gutter) and `DabblerInsets.feedBottom` (96 + 24 = 120 under the last row).
 - D-011 (cxo) — confirms Button's own off-grid icon gap and
   paddings as deliberate, documented exceptions rather than drift to snap to the nearest step.
 - D-018 (cxo) — adds the dedicated 16px card-corner step and

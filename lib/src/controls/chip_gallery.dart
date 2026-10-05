@@ -17,6 +17,7 @@ import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
 import '../foundations/vibes.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../gallery/gallery_entry.dart';
 import '../gallery/gallery_specimen.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -39,6 +40,27 @@ const List<GalleryEntry> chipGalleryEntries = <GalleryEntry>[
 Widget _chips(BuildContext context) => GalleryStack(
   children: <Widget>[
     const GallerySpecimen(label: 'filter row', child: _FilterRow()),
+    GallerySpecimen(
+      label:
+          'drawn metrics — the Home sub-chip: 34 high, 14 glyph, regular weight',
+      child: GalleryWrap(
+        children: <Widget>[
+          DabblerChip(
+            metrics: DabblerFeedMetrics.drawn,
+            label: 'Dubai',
+            selected: true,
+            leadingIcon: const DabblerIcon('location'),
+            onTap: () {},
+          ),
+          DabblerChip(
+            metrics: DabblerFeedMetrics.drawn,
+            label: 'UAE',
+            leadingIcon: const DabblerIcon('map'),
+            onTap: () {},
+          ),
+        ],
+      ),
+    ),
     GallerySpecimen(
       label: 'compactHitArea — 40px pill, no 45px box in the layout',
       child: GalleryWrap(

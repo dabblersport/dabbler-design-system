@@ -43,6 +43,7 @@ With `onTap` the whole row is a button; `showChevron` adds the mirrored forward 
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics`. Drawn is the city sheet's area row: the title at the regular weight and 1 between title and subtitle, so a flat row with a subtitle is 62 with its hairline (61 by default).
 - KAN-426 fidelity rebuild — adds these components.
 - KAN-426 closing pass — `flat` and `brand` options for the Change-location sheet rows.
 

@@ -308,6 +308,38 @@ abstract final class DabblerSizing {
   /// [sizingOffGridRulings]).
   static const double articleHeroHeight = 230;
 
+  /// A bottom-bar destination's hit box: **44** (`NavigationBottomBar.jsx:150,152`
+  /// `height: 44` / `width: 44`; measured in `Home Feed.dc.html:467`; off-grid
+  /// ruling, see [sizingOffGridRulings]). One less than `touchTargetMin` (45) on
+  /// purpose: the drawing is 44, and 45 reads as a fatter bar beside the 56
+  /// action.
+  static const double navItem = 44;
+
+  /// The bottom bar's height and its detached action's diameter: **56**
+  /// (`NavigationBottomBar.jsx:184`, `FAB.jsx` `width/height: 56`;
+  /// `Home Feed.dc.html:467` `hint-size="100%,56px"`; off-grid ruling, see
+  /// [sizingOffGridRulings]).
+  static const double navBarHeight = 56;
+
+  /// The bottom bar's action glyph and create-tile glyph: **26**
+  /// (`NavigationBottomBar.jsx:116,193` `size={26}`; off-grid ruling, see
+  /// [sizingOffGridRulings]). Off the 18/24/30 icon ramp: 24 under-fills the
+  /// 56 disc.
+  static const double navGlyphLarge = 26;
+
+  /// The create-menu tile's glyph plate height: **62**
+  /// (`NavigationBottomBar.jsx:110` `height: 62`; off-grid ruling, see
+  /// [sizingOffGridRulings]).
+  static const double navCreateTile = 62;
+
+  /// The wash behind the bottom bar: **80** = [navBarHeight] 56 +
+  /// [DabblerSpacing.listBottomInset] 24 (`Home Feed.dc.html:466` wrapper
+  /// `padding: 0 18px 24px` around the 56 bar; measured 393x80 at y 772;
+  /// off-grid ruling, see [sizingOffGridRulings]). A result of the layout,
+  /// pinned so a change to either part is caught.
+  static const double navFadeHeight =
+      navBarHeight + DabblerSpacing.listBottomInset;
+
   /// App role, `4 × space9` (120): a compact preview / placeholder panel.
   static const double mediaPreviewCompactHeight = DabblerSpacing.space9 * 4;
 

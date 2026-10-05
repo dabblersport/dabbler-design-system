@@ -62,6 +62,7 @@ Ink: primary for the title, secondary for the excerpt, age and figures, error fo
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics`. Drawn: an 18 high action row (glyphs and counts 15 apart, 45 targets as hit-test-only areas) 9 under the hero and 9 over the text, a 5 gap between headline and excerpt, 21 plus the hairline under the text, a regular-weight 11/13 sport pill, and the pill pinned to the hero's *physical* top left as the frame's `left:12px` draws it (it does not mirror in Arabic). The default is unchanged.
 - Added from the Home Feed design file.
 
 ## Source

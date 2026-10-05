@@ -196,24 +196,33 @@ class _DabblerSheetState extends State<DabblerSheet> {
               )
             : DabblerRadius.xlAll,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _header(context, colors, viewportHeight),
-          Flexible(
-            child: SingleChildScrollView(
-              padding: EdgeInsetsDirectional.fromSTEB(
-                DabblerSpacing.space6,
-                widget.dragHandle || _hasTitle ? 0 : DabblerSpacing.space6,
-                DabblerSpacing.space6,
-                DabblerSpacing.space6,
+      child: Padding(
+        padding: widget.hairlineOutside
+            ? EdgeInsetsDirectional.only(
+                start: DabblerSizing.borderDefault,
+                end: DabblerSizing.borderDefault,
+                top: DabblerSizing.borderDefault,
+              )
+            : EdgeInsets.zero,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _header(context, colors, viewportHeight),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: EdgeInsetsDirectional.fromSTEB(
+                  DabblerSpacing.space6,
+                  widget.dragHandle || _hasTitle ? 0 : DabblerSpacing.space6,
+                  DabblerSpacing.space6,
+                  DabblerSpacing.space6,
+                ),
+                child: widget.child ?? const SizedBox.shrink(),
               ),
-              child: widget.child ?? const SizedBox.shrink(),
             ),
-          ),
-          if (widget.footer != null) _footerBar(context, colors),
-        ],
+            if (widget.footer != null) _footerBar(context, colors),
+          ],
+        ),
       ),
     );
 

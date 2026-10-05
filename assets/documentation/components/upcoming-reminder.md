@@ -52,8 +52,11 @@ Surfaces: card for the game and the peeking sheets, sunken for the second sheet 
 
 ## Change log
 
+- KAN-433 (Home fidelity) — adds `metrics` (`DabblerFeedMetrics.touch` default, `.drawn`). Drawn lays the block out as the frame measures it: a 25 high title row whose hide button is a 34 box bleeding 8 past the end edge in English and sitting flush in Arabic (the frame's margin is physical), the front card 82 high (56 of content, 12 of padding, the hairline outside), two 42 high sheets peeking out 7 and 14 inset, a 32 toggle 3 under the stack, and the folded strip 30 high with a brand dot, a divider, the ticker line and a chevron inside the frame's physical `0 6 0 9` padding. Touch is unchanged.
 - Added from the Home Feed design file.
 
 ## Source
 
 `lib/src/feed/upcoming_reminder.dart`
+- KAN-433 (Home fidelity, opened list) — `drawn` also lays the opened list out as the frame measures it (`Home Feed.dc.html:196-216`): each row is **61** (a 1px rule that stays transparent on the first row, 8 / 12 padding, a 44 content floor), a **34 x 39** date tile (42 in Arabic, whose day figure has 23 leading), a 10 gap before the title column and again before the brand countdown, the list's hairline takes its own 1px each side (124 for two rows), the `See all` footer is 36 and `Show less` sits 6 under the list. Named tokens `DabblerHomeFrame.upcomingTileWidth`, `upcomingRowGap`, `upcomingRowPadV`, `upcomingRowMinContent`. Touch is unchanged.
+- KAN-433 (strip fill) — the drawn folded strip fills with the faint step (`--faint`, `DabblerColors.bgTertiary`, `Home Feed.dc.html:82`), not the grey inset panel; light and dark follow the role. Touch is unchanged.

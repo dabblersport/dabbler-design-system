@@ -4,7 +4,9 @@ import '../foundations/icon.dart';
 import '../surfaces/avatar.dart';
 import '../surfaces/badge.dart';
 import '../tokens/dabbler_colors.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 import 'feed_atoms.dart';
 import 'post_detail.dart';
@@ -133,7 +135,18 @@ class DabblerPostRow extends StatelessWidget {
     this.moreLabel = 'More options',
     this.repostLabel = 'Repost',
     this.viewsLabel = 'Views',
+    this.metrics = DabblerFeedMetrics.touch,
   });
+
+  /// [DabblerFeedMetrics.drawn] lays the row out as the Home Feed frame
+  /// measures it (`home-design-measure.md` section 7a): a 2/8 type pill, 5
+  /// gaps in the meta row (the pin 4 further in), the sport pill 32 high, and
+  /// a 20 high action row — glyphs and counts only, 18 apart — under 12 of
+  /// air, with 15 below it. Each action keeps its 45px target as a
+  /// hit-test-only area. The default keeps the 45px action boxes in layout.
+  final DabblerFeedMetrics metrics;
+
+  bool get _drawn => metrics == DabblerFeedMetrics.drawn;
 
   /// The author's name.
   final String name;
@@ -295,6 +308,18 @@ class DabblerPostRow extends StatelessWidget {
     child: DabblerIcon(name, size: metaGlyphSize, color: colors.textTertiary),
   );
 
+  /// The sport pill's body: at the drawing's 32 it centres its content in a
+  /// minimum-height box, so a 12px glyph in place of the frame's emoji keeps
+  /// the pill's height.
+  Widget _sportBox(Widget content) => _drawn
+      ? ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: DabblerHomeFrame.sportPillHeight,
+          ),
+          child: Center(widthFactor: 1, child: content),
+        )
+      : content;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -335,7 +360,13 @@ class DabblerPostRow extends StatelessWidget {
           DabblerBadge(
             label: DabblerType.toWesternDigits(distance!),
             status: colors.info,
-            paddingInline: DabblerSpacing.space3,
+            paddingInline: _drawn
+                ? DabblerHomeFrame.postBadgePaddingInline
+                : DabblerSpacing.space3,
+            paddingBlock: _drawn
+                ? DabblerHomeFrame.postBadgePaddingBlock
+                : null,
+            metrics: metrics,
           ),
         ],
         if (kindBadge != null) ...<Widget>[
@@ -349,12 +380,24 @@ class DabblerPostRow extends StatelessWidget {
     final Widget meta = Row(
       children: <Widget>[
         _metaGlyph('global', colors),
-        const SizedBox(width: DabblerSpacing.space2),
+        SizedBox(
+          width: _drawn ? DabblerHomeFrame.postMetaGap : DabblerSpacing.space2,
+        ),
         Text(DabblerType.toWesternDigits(time), maxLines: 1, style: caption),
-        const SizedBox(width: DabblerSpacing.space1),
-        const SizedBox(width: DabblerSpacing.space1),
+        if (_drawn)
+          const SizedBox(
+            width:
+                DabblerHomeFrame.postMetaGap +
+                DabblerHomeFrame.postMetaPinInset,
+          )
+        else ...<Widget>[
+          const SizedBox(width: DabblerSpacing.space1),
+          const SizedBox(width: DabblerSpacing.space1),
+        ],
         _metaGlyph('location', colors),
-        const SizedBox(width: DabblerSpacing.space2),
+        SizedBox(
+          width: _drawn ? DabblerHomeFrame.postMetaGap : DabblerSpacing.space2,
+        ),
         Flexible(
           child: Text(
             place,
@@ -396,30 +439,48 @@ class DabblerPostRow extends StatelessWidget {
                   width: DabblerSizing.borderDefault,
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(
-                  DabblerSpacing.space3,
-                  DabblerSpacing.space2,
-                  DabblerSpacing.space4,
-                  DabblerSpacing.space2,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    if (sportLeading != null) ...<Widget>[
-                      sportLeading!,
-                      const SizedBox(width: DabblerSpacing.space2),
+              child: _sportBox(
+                Padding(
+                  padding: _drawn
+                      ? const EdgeInsetsDirectional.fromSTEB(
+                          DabblerSpacing.space3 + DabblerSizing.borderDefault,
+                          DabblerHomeFrame.sportPillPaddingBlock +
+                              DabblerSizing.borderDefault,
+                          DabblerHomeFrame.sportPillPaddingEnd +
+                              DabblerSizing.borderDefault,
+                          DabblerHomeFrame.sportPillPaddingBlock +
+                              DabblerSizing.borderDefault,
+                        )
+                      : const EdgeInsetsDirectional.fromSTEB(
+                          DabblerSpacing.space3,
+                          DabblerSpacing.space2,
+                          DabblerSpacing.space4,
+                          DabblerSpacing.space2,
+                        ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (sportLeading != null) ...<Widget>[
+                        sportLeading!,
+                        SizedBox(
+                          width: _drawn
+                              ? DabblerHomeFrame.sportPillGap
+                              : DabblerSpacing.space2,
+                        ),
+                      ],
+                      Text(sportLabel!, maxLines: 1, style: caption),
                     ],
-                    Text(sportLabel!, maxLines: 1, style: caption),
-                  ],
+                  ),
                 ),
               ),
             ),
           );
 
     final Widget actions = Row(
+      spacing: _drawn ? DabblerSpacing.space6 : 0,
       children: <Widget>[
         DabblerFeedAction(
+          metrics: metrics,
           icon: 'heart',
           count: likes,
           weight: liked ? DabblerIconWeight.bold : DabblerIconWeight.linear,
@@ -428,6 +489,7 @@ class DabblerPostRow extends StatelessWidget {
           semanticLabel: likeLabel,
         ),
         DabblerFeedAction(
+          metrics: metrics,
           icon: 'add-square',
           weight: vibed ? DabblerIconWeight.bold : DabblerIconWeight.linear,
           color: vibed ? colors.brandPrimary : null,
@@ -435,6 +497,7 @@ class DabblerPostRow extends StatelessWidget {
           semanticLabel: vibeLabel,
         ),
         DabblerFeedAction(
+          metrics: metrics,
           icon: 'message-text',
           count: replies,
           onTap: onComment,
@@ -442,6 +505,7 @@ class DabblerPostRow extends StatelessWidget {
         ),
         if (onRepost != null)
           DabblerFeedAction(
+            metrics: metrics,
             icon: 'refresh',
             count: reposts,
             weight: reposted
@@ -456,18 +520,21 @@ class DabblerPostRow extends StatelessWidget {
         // 45px touch floor.
         if (onShare != null || onRepost == null)
           DabblerFeedAction(
+            metrics: metrics,
             icon: 'share',
             onTap: onShare,
             semanticLabel: shareLabel,
           ),
         if (views != null)
           DabblerFeedAction(
+            metrics: metrics,
             icon: 'eye',
             count: views,
             semanticLabel: viewsLabel,
           ),
         const Spacer(),
         DabblerFeedAction(
+          metrics: metrics,
           icon: 'more-circle',
           onTap: onMore,
           semanticLabel: moreLabel,
@@ -487,9 +554,12 @@ class DabblerPostRow extends StatelessWidget {
             : null,
       ),
       child: Padding(
-        padding: const EdgeInsetsDirectional.only(
+        padding: EdgeInsetsDirectional.only(
           top: paddingBlock,
-          bottom: DabblerSpacing.space1,
+          // Drawn: the 15 of padding (plus the hairline the frame's content-
+          // box row counts in its own height) closes the content column
+          // instead, so the action row's hit area has the room it needs.
+          bottom: _drawn ? 0 : DabblerSpacing.space1,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,11 +600,32 @@ class DabblerPostRow extends StatelessWidget {
                     sport,
                   ],
                   if (detail != null) DabblerPostDetailLine(detail: detail!),
-                  if (showActions) actions,
+                  // 6 of gap plus the action row's own 6 margin.
+                  if (showActions && _drawn)
+                    const SizedBox(height: DabblerSpacing.space4),
+                  if (showActions)
+                    // Drawn: the row lays out at 20 and the 45 target is a
+                    // hit-test-only band over it, vertical slop included (a
+                    // parent that is only 20 high would clip it).
+                    _drawn
+                        ? DabblerExpandedHitArea(
+                            minimum: const Size(
+                              0,
+                              DabblerSizing.touchTargetMin,
+                            ),
+                            child: actions,
+                          )
+                        : actions,
                   if (reactions != null) ...<Widget>[
                     const SizedBox(height: DabblerSpacing.space2),
                     reactions!,
                   ],
+                  if (_drawn)
+                    SizedBox(
+                      height:
+                          paddingBlock +
+                          (divider ? DabblerSizing.borderDefault : 0),
+                    ),
                 ],
               ),
             ),
