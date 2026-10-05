@@ -465,7 +465,12 @@ class _DabblerChipState extends State<DabblerChip> {
               .resolveForDirection(direction)
               .copyWith(
                 fontWeight: DabblerType.medium,
-                color: colors.textSecondary,
+                // A selected dense chip sits on the brand fill, so its label
+                // takes the on-brand ink (the Create meetup When pill,
+                // `Home Feed.dc.html:1163`).
+                color: widget.selected && widget.dense
+                    ? colors.onBrand
+                    : colors.textSecondary,
               )
         : _sizedLabelStyle(colors, direction, accentInk, accent != null);
     final double? pillHeight = widget.compact

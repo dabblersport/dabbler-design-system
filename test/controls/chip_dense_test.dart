@@ -1,4 +1,6 @@
 import 'package:dabbler_design_system/dabbler_design_system.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart'
+    show DabblerColors, DabblerTheme;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -67,4 +69,23 @@ void tagTests() {
       expect(await height(tag: true), lessThan(await height(tag: false)));
     });
   }
+
+  testWidgets('a selected dense chip draws its label in the on-brand ink', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const DabblerChip(label: 'Today', dense: true, selected: true),
+        TextDirection.ltr,
+      ),
+    );
+    final Text t = tester.widget(find.text('Today'));
+    expect(
+      t.style!.color,
+      DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      ).onBrand,
+    );
+  });
 }
