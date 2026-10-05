@@ -57,6 +57,10 @@ The post editor: `DabblerComposerBox`, a card with a multi-line field, a counter
 
 @specimen text-field/composer-box
 
+The create sheets (Create meet-up, Create game): `DabblerEmojiTile`, a 71 square choice with an emoji over a short label, tinted with the info surface while chosen; `DabblerComposerField`, the plain card input at 48 high (or a 96 floor for a description); `DabblerComposerRow`, a setting with a 20 glyph, a name over a caption and a control at the end, closed by a faint rule; and `DabblerComposerSubmit`, the 48 pill call to action whose disabled state is its own sunken paint rather than a dimmed button. `DabblerSelectPill(brandInk: true)` draws a value in the brand ink, and `DabblerStepperPill(valueLabel:)` names a value in its own words — the open-ended capacity shows `DabblerStepperPill.unlimited` at 0.
+
+@specimen text-field/create-sheet
+
 ## Using it
 
 **Reach for the variant, not a manually composed field.** `search` supplies its own leading glyph,

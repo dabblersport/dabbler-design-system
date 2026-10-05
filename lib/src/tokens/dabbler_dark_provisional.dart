@@ -89,6 +89,23 @@ abstract final class DabblerProvisionalDark {
   /// `--t-info-surface` (dark) — `#16243F`.
   static const Color infoSurface = Color(0xFF16243F);
 
+  // --- Dark decorative tiles. The light `--tile-*-surface` values are pale
+  //     pastels drawn for dark ink; under the dark ramp the glyph ink turns
+  //     light (`textPrimary`) and a pale plate drops it to about 1.2:1. Each
+  //     dark tile is the same hue at the depth of the dark status surfaces,
+  //     so the create-menu plates read as one family. ---
+
+  /// `--tile-info-surface` (dark) — the dark info surface, `#16243F`.
+  static const Color tileInfoSurface = infoSurface;
+
+  /// `--tile-accent-surface` (dark) — `#3A1730`, the accent (pink) hue at the
+  /// dark status surfaces' depth.
+  static const Color tileAccentSurface = Color(0xFF3A1730);
+
+  /// `--tile-amber-surface` (dark) — `#3A2E06`, the amber hue at the dark
+  /// status surfaces' depth.
+  static const Color tileAmberSurface = Color(0xFF3A2E06);
+
   // --- Per-theme dark status overrides ---
 
   /// `[data-theme="sport"][data-mode="dark"] --t-success-surface` — `#0E3A2E`.

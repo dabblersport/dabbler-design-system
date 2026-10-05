@@ -143,6 +143,7 @@ export 'src/feed/comment_row.dart';
 export 'src/feed/game_link_row.dart';
 export 'src/feed/open_post.dart';
 export 'src/forms/composer_box.dart';
+export 'src/forms/composer_parts.dart';
 export 'src/forms/select_pill.dart';
 export 'src/forms/stepper_pill.dart';
 export 'src/feed/post_detail.dart';

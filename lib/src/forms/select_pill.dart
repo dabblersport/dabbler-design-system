@@ -31,6 +31,7 @@ class DabblerSelectPill extends StatelessWidget {
     this.tone,
     this.trailingIcon = 'arrow-circle-down',
     this.semanticLabel,
+    this.brandInk = false,
   });
 
   /// The current value.
@@ -54,6 +55,11 @@ class DabblerSelectPill extends StatelessWidget {
   /// The accessible name; falls back to [label].
   final String? semanticLabel;
 
+  /// Draws the neutral pill's value and arrow in the brand ink — the Create
+  /// meet-up Advanced rows (`Home Feed.dc.html:1213-1263`: card fill, card
+  /// hairline, `color: var(--color-brand-primary)`). Ignored with a [tone].
+  final bool brandInk;
+
   /// Leading glyph side — `size="15"`.
   static const double glyphSize = 15;
 
@@ -64,7 +70,8 @@ class DabblerSelectPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
-    final Color ink = tone?.strong ?? colors.textSecondary;
+    final Color ink =
+        tone?.strong ?? (brandInk ? colors.brandPrimary : colors.textSecondary);
     return DabblerFeedTappable(
       onTap: onTap,
       semanticLabel: semanticLabel ?? label,

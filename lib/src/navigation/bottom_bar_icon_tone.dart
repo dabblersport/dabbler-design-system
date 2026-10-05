@@ -29,13 +29,33 @@ enum DabblerNavigationIconTone {
 }
 
 /// The plate fill for [tone], resolved off [colors].
+///
+/// The decorative `--tile-*-surface` values are light-only pastels. Under the
+/// dark ramp the glyph ink ([DabblerColors.textPrimary]) is light, so a pale
+/// plate would leave it at about 1.2:1; the dark ramp therefore takes each
+/// tile's dark surface ([DabblerProvisionalDark.tileInfoSurface] and its
+/// siblings), the depth of the success plate's dark status surface.
+/// `test/navigation/bottom_bar_tone_contrast_test.dart` pins the glyph's
+/// contrast on every plate in both brightnesses.
 Color dabblerNavigationIconPlateFor(
   DabblerNavigationIconTone tone,
   DabblerColors colors,
-) => switch (tone) {
-  DabblerNavigationIconTone.neutral => colors.surfaceSunken,
-  DabblerNavigationIconTone.info => DabblerColors.tileInfo.surface,
-  DabblerNavigationIconTone.success => colors.success.surface,
-  DabblerNavigationIconTone.accent => DabblerColors.tileAccent.surface,
-  DabblerNavigationIconTone.amber => DabblerColors.tileAmber.surface,
-};
+) {
+  final bool dark = colors.brightness == Brightness.dark;
+  return switch (tone) {
+    DabblerNavigationIconTone.neutral => colors.surfaceSunken,
+    DabblerNavigationIconTone.info =>
+      dark
+          ? DabblerProvisionalDark.tileInfoSurface
+          : DabblerColors.tileInfo.surface,
+    DabblerNavigationIconTone.success => colors.success.surface,
+    DabblerNavigationIconTone.accent =>
+      dark
+          ? DabblerProvisionalDark.tileAccentSurface
+          : DabblerColors.tileAccent.surface,
+    DabblerNavigationIconTone.amber =>
+      dark
+          ? DabblerProvisionalDark.tileAmberSurface
+          : DabblerColors.tileAmber.surface,
+  };
+}

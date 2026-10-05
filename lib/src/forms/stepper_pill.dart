@@ -34,6 +34,7 @@ class DabblerStepperPill extends StatelessWidget {
     this.suffix,
     this.decreaseLabel = 'Decrease',
     this.increaseLabel = 'Increase',
+    this.valueLabel,
   });
 
   /// The current value.
@@ -56,6 +57,15 @@ class DabblerStepperPill extends StatelessWidget {
 
   /// The plus button's name.
   final String increaseLabel;
+
+  /// Draws the value in its own words — the Create meet-up capacity shows
+  /// `\u221e` at 0 (`spotsLabel`, `Home Feed.dc.html:3448`). Null draws the
+  /// number.
+  final String Function(int value)? valueLabel;
+
+  /// The open-ended value's words, `\u221e` (`spotsLabel`,
+  /// `Home Feed.dc.html:3448`), for a [valueLabel] that names 0 "no limit".
+  static const String unlimited = '\u221e';
 
   /// Glyph side — `size="14"`.
   static const double glyphSize = 14;
@@ -107,7 +117,8 @@ class DabblerStepperPill extends StatelessWidget {
             constraints: const BoxConstraints(minWidth: DabblerSpacing.space6),
             child: Text(
               DabblerType.toWesternDigits(
-                suffix == null ? '$value' : '$value $suffix',
+                valueLabel?.call(value) ??
+                    (suffix == null ? '$value' : '$value $suffix'),
               ),
               textAlign: TextAlign.center,
               maxLines: 1,

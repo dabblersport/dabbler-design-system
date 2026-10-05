@@ -10,6 +10,7 @@ import '../gallery/gallery_specimen.dart';
 import '../tokens/dabbler_colors.dart';
 import 'code_input.dart';
 import 'composer_box.dart';
+import 'composer_parts.dart';
 import 'select_pill.dart';
 import 'stepper_pill.dart';
 import 'text_field.dart';
@@ -35,6 +36,16 @@ const List<GalleryEntry> formExtrasGalleryEntries = <GalleryEntry>[
         'The editor card with its counter and tool row, and the tinted '
         'pills that open the post type and audience.',
     builder: _composer,
+  ),
+  GalleryEntry(
+    id: 'text-field/create-sheet',
+    page: 'components/text-field',
+    group: GalleryPurpose.selectionAndInput,
+    title: 'EmojiTile, ComposerField and ComposerSubmit — the create sheets',
+    description:
+        'The sport tiles, the title and description fields and the call to '
+        'action of the Create meet-up and Create game sheets.',
+    builder: _createSheet,
   ),
   GalleryEntry(
     id: 'code-input/full-width',
@@ -178,3 +189,81 @@ Widget _composer(BuildContext context) {
     ],
   );
 }
+
+Widget _createSheet(BuildContext context) => GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'emoji tiles — selected, idle',
+      child: Wrap(
+        spacing: 9,
+        children: <Widget>[
+          DabblerEmojiTile(
+            emoji: '\u{1F3C3}',
+            label: 'Running',
+            selected: true,
+            onTap: () {},
+          ),
+          DabblerEmojiTile(
+            emoji: '\u{1F6B4}',
+            label: 'Cycling',
+            selected: false,
+            onTap: () {},
+          ),
+        ],
+      ),
+    ),
+    GallerySpecimen(
+      label: 'fields — title, description',
+      child: SizedBox(
+        width: _width,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 12,
+          children: <Widget>[
+            DabblerComposerField(
+              controller: TextEditingController(),
+              placeholder: 'Meet up title',
+            ),
+            DabblerComposerField(
+              controller: TextEditingController(),
+              placeholder: 'Add short description for participations...',
+              multiline: true,
+            ),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'call to action — enabled, disabled',
+      child: SizedBox(
+        width: _width,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 12,
+          children: <Widget>[
+            DabblerComposerSubmit(label: 'Create meet-up', onPressed: () {}),
+            DabblerComposerSubmit(
+              label: 'Create meet-up',
+              enabled: false,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    ),
+    GallerySpecimen(
+      label: 'brand-ink select pill, open-ended stepper',
+      child: Wrap(
+        spacing: 6,
+        children: <Widget>[
+          DabblerSelectPill(label: 'Open', brandInk: true, onTap: () {}),
+          DabblerStepperPill(
+            value: 0,
+            valueLabel: (int v) => v > 0 ? '$v' : '\u221e',
+            onChanged: (_) {},
+          ),
+        ],
+      ),
+    ),
+  ],
+);
