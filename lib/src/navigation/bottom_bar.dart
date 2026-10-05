@@ -533,6 +533,19 @@ class _DabblerNavigationBottomBarState
   /// The nav pill: `padding: '6px 9px'` (`--space-2` / `--space-3`),
   /// `gap: 6` (`--space-2`), `borderRadius: 9999`
   /// (`NavigationBottomBar.jsx:131-137`).
+  ///
+  ///
+  /// The pill **hugs its content** — `display: flex` with no `flex-grow`
+  /// (`NavigationBottomBar.jsx:131-137`): it ends [DabblerSpacing.space3]
+  /// after its last item, and the row's `space-between` leaves the free space
+  /// between the pill and the action, never inside the pill. The active chip
+  /// is as wide as its padding, glyph, gap and label; it never fills.
+  ///
+  /// On a column too narrow for that natural width the pill degrades in a
+  /// fixed order, and never overflows: first the active label ellipsizes (the
+  /// inactive squares keep KAN-240's 44 touch floor); only once the active
+  /// chip is down to its padding, glyph and gap do the inactive squares give
+  /// way, down to their glyph ([_inactiveExtent]).
   Widget _pill(DabblerColors colors) {
     final int active = _activeIndex;
     return Focus(
@@ -548,22 +561,58 @@ class _DabblerNavigationBottomBarState
           color: colors.brandPrimary,
           borderRadius: DabblerRadius.pillAll,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: DabblerSpacing.space2,
-          children: <Widget>[
-            for (int i = 0; i < widget.items.length; i++)
-              // Only the active item flexes: it takes whatever the fixed
-              // 44px inactive squares leave. Sharing the space equally capped
-              // an active chip (padding + icon + label) at a third of the
-              // pill, so its label collapsed to nothing and overflowed.
-              if (i == active)
-                Flexible(child: _item(colors, index: i, active: true))
-              else
-                _item(colors, index: i, active: false),
-          ],
+        child: LayoutBuilder(
+          builder: (_, BoxConstraints constraints) {
+            final double inactive = _inactiveExtent(constraints.maxWidth);
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: DabblerSpacing.space2,
+              children: <Widget>[
+                for (int i = 0; i < widget.items.length; i++)
+                  // Only the active item is Flexible, and loose: it hugs its
+                  // content whenever the content fits, and only ellipsizes on
+                  // a column too narrow for it. Sharing the space equally
+                  // capped an active chip at a third of the pill and collapsed
+                  // its label.
+                  if (i == active)
+                    Flexible(child: _item(colors, index: i, active: true))
+                  else
+                    _item(colors, index: i, active: false, extent: inactive),
+              ],
+            );
+          },
         ),
       ),
+    );
+  }
+
+  /// The active chip's floor: `padding: '0 18px'` around the glyph and the
+  /// `gap: 8`, its label ellipsized away. Below it the chip's own row would
+  /// overflow.
+  static const double _activeFloor =
+      DabblerSpacing.space6 * 2 +
+      DabblerSizing.iconMd +
+      DabblerNavigationBottomBar.activeGap;
+
+  /// The inactive items' width in a pill whose content box may be at most
+  /// [available] wide: [DabblerNavigationBottomBar.itemSize] (the 44 square,
+  /// KAN-240's touch floor) whenever the active chip can still keep its
+  /// [_activeFloor] beside them, else the equal share left over, floored at
+  /// the glyph ([DabblerSizing.iconMd]). Only a narrow column with four or
+  /// more destinations (320 wide) ever reaches the share.
+  double _inactiveExtent(double available) {
+    final int count = widget.items.length;
+    final int inactiveCount = _activeIndex < 0 ? count : count - 1;
+    if (inactiveCount == 0 || !available.isFinite) {
+      return DabblerNavigationBottomBar.itemSize;
+    }
+    final double activeFloor = _activeIndex < 0 ? 0 : _activeFloor;
+    final double share =
+        (available - DabblerSpacing.space2 * (count - 1) - activeFloor) /
+        inactiveCount;
+    return share.clamp(
+      DabblerSizing.iconMd,
+      DabblerNavigationBottomBar.itemSize,
     );
   }
 
@@ -571,6 +620,7 @@ class _DabblerNavigationBottomBarState
     DabblerColors colors, {
     required int index,
     required bool active,
+    double extent = DabblerNavigationBottomBar.itemSize,
   }) {
     final DabblerNavigationItem item = widget.items[index];
     final Duration duration = DabblerMotion.reduceMotion(context)
@@ -666,7 +716,18 @@ class _DabblerNavigationBottomBarState
           child: DabblerFocusRing(
             focusNode: _nodes[index],
             borderRadius: DabblerRadius.pillAll,
-            child: DabblerPressScale.gesture(child: body),
+            // An inactive item is exactly [extent] wide: the 44 square, or the
+            // narrower share [_inactiveExtent] gives it on a column too narrow
+            // even for an ellipsized active chip. Always a ConstrainedBox (a no-op
+            // when active) so switching items keeps the tree, and the fill
+            // fade, intact; outside the AnimatedContainer, which cannot tween
+            // a finite width against an unbounded one.
+            child: ConstrainedBox(
+              constraints: active
+                  ? const BoxConstraints()
+                  : BoxConstraints.tightFor(width: extent),
+              child: DabblerPressScale.gesture(child: body),
+            ),
           ),
         ),
       ),

@@ -102,6 +102,14 @@ with 24 icons (`DabblerSizing.navItem`), the action is a 56 circle with a 26 gly
 captions. Every one of these off-grid values is a named token in `sizingOffGridRulings`, with its
 source line.
 
+**The pill hugs its content; it never stretches.** The active chip is exactly its padding, icon,
+gap and label wide, the inactive destinations stay 44 squares, the pill ends one pill-padding after
+its last destination, and all the free width sits between the pill and the action. With three
+destinations the gap to the action is wide, and that is the drawing, not slack to fill. On a column
+too narrow for the natural width the pill degrades without overflowing: the active label ellipsizes
+first, so the inactive squares keep the 44 touch floor, and only once the chip is down to its icon
+do the inactive squares give way, never below their icon.
+
 
 Nav pill: brand fill, pill radius. Inactive destination: the default border-tone icon colour.
 Active destination: card surface chip, brand-tinted icon and label, `bold` icon weight. Create
@@ -120,6 +128,10 @@ action: the same size and shadow as `Fab` — see *Change log*.
 - KAN-433 — the frame's geometry pinned (`DabblerSizing.nav*` off-grid tokens, tested in
   `test/navigation/bottom_bar_frame_test.dart` in LTR, RTL mirrored and RTL pinned with the Arabic
   frame's strings) and the `mirrorInRtl` option, default unchanged.
+- KAN-437 — the active chip hugs its content at every destination count (three, four, five), in
+  LTR and pinned Arabic RTL, at 393, 320 and in a wide window's phone column; a narrow column
+  ellipsizes and then narrows rather than overflowing. Tested in
+  `test/navigation/bottom_bar_hug_test.dart`.
 
 ## Source
 
