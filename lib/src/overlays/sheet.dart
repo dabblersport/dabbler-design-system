@@ -124,6 +124,23 @@ class DabblerSheet extends StatefulWidget {
   /// 0.8 is the nearer-the-majority value and 0.78 is passable exactly.
   static const double defaultContentMaxFraction = 0.8;
 
+  /// The frames' create drawers (create post, create game, create meet-up):
+  /// `max-height: 94%`, `height: auto` (`Home Feed.dc.html` `sheetP94`, at
+  /// `:472`, `:927`, `:1134`) — content-sized, capped at 0.94.
+  static const double contentMaxFractionFull = 0.94;
+
+  /// The vibes picker's cap: `max-height: 82%`, `height: auto`
+  /// (`Home Feed.dc.html` `sheetP82`, `:650`).
+  static const double contentMaxFractionTall = 0.82;
+
+  /// The place picker's cap: `max-height: 74%`, `height: auto`
+  /// (`Home Feed.dc.html` `sheetP74`, `:818`).
+  static const double contentMaxFractionMedium = 0.74;
+
+  /// The city sheet's cap: `max-height: 66%`, `height: auto`
+  /// (`Home Feed.dc.html` `sheetP66`, `:763`).
+  static const double contentMaxFractionCompact = 0.66;
+
   /// The default English semantics label for the close affordance. The package
   /// ships no localised strings; a host app passes its own.
   static const String defaultCloseLabel = 'Close';

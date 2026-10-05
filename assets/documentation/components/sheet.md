@@ -74,7 +74,7 @@ drawer inside a drawer.
 | Close button | Shown by default. Omit it (`showCloseButton: false`) only where the frame shows none because the body carries its own Done / Cancel. |
 | Header and title | The sheet draws it: `title` (or `titleSpan` / `titleWidget`) in display type, a `headerAction` at the inline end, and `headerDivider` for the hairline rule under it where the frame has one. Content does not repeat the title in its own header. |
 | Content padding | **The sheet owns it**: 18 (`space6`) on every side of the body. Content passes widgets only — no `Padding`, `Container(padding:)`, `Card`, `Material`, `Ink` or filled `DecoratedBox` around its content. |
-| Detent | Content-sized by default: pass `detent: DabblerSheetDetent.content` and no `detents`. A fixed fraction only where a frame shows one (a tall composer at 94%). |
+| Detent | Content-sized: pass `detent: DabblerSheetDetent.content` and no `detents`. The frames draw every sheet `height: auto` under a `max-height` cap, so a frame's percentage is the cap (`contentMaxFraction`), never a fixed height: `contentMaxFractionFull` for the create drawers (94%), `contentMaxFractionTall` for the vibes picker (82%), the default for the 80% pickers, `contentMaxFractionMedium` for the place picker (74%) and `contentMaxFractionCompact` for the city sheet (66%). |
 | Actions | At the bottom of the body in `DabblerSheetActions` — full-width buttons, primary first, 9 apart, 12 below the content — or in the pinned `footer` when the body scrolls. |
 
 `DabblerSheetBody` and `DabblerSheetActions` are the scaffold that carries this: the body stacks its
@@ -124,6 +124,7 @@ referenced here.
 
 ## Change log
 
+- Home sheet fit — `contentMaxFractionFull` (0.94), `contentMaxFractionTall` (0.82), `contentMaxFractionMedium` (0.74) and `contentMaxFractionCompact` (0.66): the Home Feed frame's `sheetP94` / `sheetP82` / `sheetP74` / `sheetP66` caps as named constants, so a content-sized sheet takes the frame's cap with no literal. Additive; no default changed.
 - KAN-434 — the one sheet convention above, and `DabblerSheetBody` / `DabblerSheetActions` to carry it. Additive: no default of `DabblerSheet` changed. The gallery's own sheet bodies stopped padding themselves.
 - KAN-433 (Home fidelity) — adds `hairlineOutside` (default false): the content starts 1 in and 1 down inside the panel's 1px hairline, as the Home Feed frame's content-box sheet draws it (content at x 19, not 18).
 - Home Feed fidelity — `pageBackground` paints the panel in the page colour, as the Home Feed design's sheets do. Additive; off by default.
