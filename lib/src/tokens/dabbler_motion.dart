@@ -46,6 +46,17 @@ abstract final class DabblerMotion {
   /// that value itself and must not be normalised onto this one.
   static const double pressScale = 0.98;
 
+  /// `--action-area-hold: 260ms` — how long the Action Area's collapsed
+  /// circle shows before it expands, and again before it returns to idle
+  /// (`status-feedback.card.html` — *Action Area · Geometry and tokens*).
+  ///
+  /// One of the **two structural tokens** the Action Area adds (the other is
+  /// `DabblerSizing.actionAreaSize`); the card is explicit that it adds no
+  /// colours. It is a **hold**, i.e. timing rather than animation, so reduced
+  /// motion does not zero it: the collapsed circle is still shown for this
+  /// long, only the size transitions around it are dropped.
+  static const Duration actionAreaHold = Duration(milliseconds: 260);
+
   // --- App roles (zero-literal pass) ---------------------------------------
   //
   // Everything below is an **app role**, not a design-source transcription:

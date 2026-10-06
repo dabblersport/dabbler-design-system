@@ -6,6 +6,7 @@ import '../interaction/press_scale.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import 'status_tones.dart';
 
 /// The tones a [DabblerBanner] can take, transcribed from
 /// `components/feedback/Banner.d.ts`.
@@ -187,17 +188,17 @@ class DabblerBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final DabblerStatusTone? status = tone.status;
-    final DabblerStatusColor? resolved = status == null
-        ? null
-        : colors.status(status);
 
-    // `statusTones` / `statusHairline` in overlay.jsx:160-173.
-    final Color surface = resolved?.surface ?? colors.surfaceCard;
-    final Color ink = resolved?.strong ?? colors.textPrimary;
-    final Color hairline = resolved == null
-        ? colors.borderDefault
-        : resolved.strong.withValues(alpha: 0.20);
+    // `statusTones` / `statusHairline` in overlay.jsx:160-173, resolved once
+    // in [DabblerStatusToneColors] (shared with Toast and the
+    // navigation-integrated presentation).
+    final DabblerStatusToneColors resolved = DabblerStatusToneColors.of(
+      colors,
+      tone.status,
+    );
+    final Color surface = resolved.surface;
+    final Color ink = resolved.ink;
+    final Color hairline = resolved.hairline;
 
     final TextDirection direction = Directionality.of(context);
 

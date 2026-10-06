@@ -332,6 +332,23 @@ abstract final class DabblerSizing {
   /// [sizingOffGridRulings]).
   static const double navCreateTile = 62;
 
+  /// `--action-area-size: 56px` — the Action Area's footprint: the collapsed
+  /// circle's diameter and the height of every row it grows into
+  /// (`status-feedback.card.html` — *Action Area · Geometry and tokens*).
+  ///
+  /// It **is** the bottom bar's action, so it is defined as [navBarHeight]
+  /// rather than restated: the surface sits exactly over the detached action,
+  /// and a footprint that drifted from the action would show the plus beside
+  /// the circle.
+  static const double actionAreaSize = navBarHeight;
+
+  /// The `ring` presentation's progress ring on the action footprint: **32**
+  /// (`status-feedback.card.html` — *"the ring presentation puts it on the
+  /// action footprint at 32px"*). Derived rather than restated: the
+  /// [actionAreaSize] circle inset by [DabblerSpacing.space4] on every side.
+  static const double actionAreaRing =
+      actionAreaSize - DabblerSpacing.space4 * 2;
+
   /// The wash behind the bottom bar: **80** = [navBarHeight] 56 +
   /// [DabblerSpacing.listBottomInset] 24 (`Home Feed.dc.html:466` wrapper
   /// `padding: 0 18px 24px` around the 56 bar; measured 393x80 at y 772;

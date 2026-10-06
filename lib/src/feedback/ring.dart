@@ -1,9 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
+import 'progress_bar.dart';
+import 'spinner.dart';
 
 /// Which neutral role paints the part of a [DabblerRing] that is not filled.
 ///
@@ -21,11 +25,11 @@ enum DabblerRingTrack {
   outline,
 }
 
-enum _RingStyle { ticks, arc }
+enum _RingStyle { ticks, arc, progress }
 
 /// Ring — a gauge drawn as a ring, with an optional centre.
 ///
-/// Two forms, one widget, both painted with a [CustomPainter] and **no SVG and
+/// Three forms, one widget, both painted with a [CustomPainter] and **no SVG and
 /// no image** (the design system forbids inline SVG; the source screens draw
 /// the same thing with CSS-rotated divs and an inline `<svg>`):
 ///
@@ -38,10 +42,22 @@ enum _RingStyle { ticks, arc }
 ///   [track] role and a round-capped [DabblerColors.brandPrimary] arc of
 ///   `fraction` of the circle on top (Sport Profile's `r=20 stroke=5` SVG
 ///   circle with a `stroke-dasharray` of the circumference).
+/// * [DabblerRing.progress] — the design source's **`ProgressRing`**
+///   (`components/feedback/ProgressRing.jsx`, *"the one new primitive"* of
+///   `status-feedback.card.html`): the [DabblerSpinner]'s geometry — a
+///   [DabblerSpinner.strokeWidth] (2px) ring whose track is the indicator
+///   colour at [DabblerSpinner.trackOpacity] (25%) — carrying a **value**.
+///   With no value it *is* the spinner: a [DabblerSpinner.arcFraction] arc
+///   turning every [DabblerSpinner.rotationPeriod], pulsing under reduced
+///   motion. It is a form of this widget rather than a sibling class because
+///   it is a ring gauge with a centre slot and a 0–1 value, which is exactly
+///   what this widget already is; only the paint differs.
 ///
 /// ```dart
 /// DabblerRing.ticks(fraction: 0.4, diameter: 54, child: Text('3'));
 /// DabblerRing.arc(fraction: 0.72, child: Text('72%'));
+/// DabblerRing.progress(value: 0.35);              // determinate
+/// DabblerRing.progress(semanticLabel: 'Syncing'); // indeterminate, spins
 /// ```
 ///
 /// ## Values
@@ -74,12 +90,23 @@ enum _RingStyle { ticks, arc }
 /// counter-clockwise fill under [TextDirection.rtl] — the contract is tested
 /// both ways. The centre [child] lays out in the ambient direction as normal.
 ///
+/// The progress form **never** mirrors and has no `mirrorInRtl`: the card is
+/// explicit that *"the arc runs clockwise in both directions — progress
+/// direction is not mirrored"*.
+///
 /// ## Accessibility
 ///
 /// The ring announces its value as a rounded percentage (`'65%'`), overridable
 /// with `semanticValue` — a countdown will usually want `'3 days left'` — and
 /// is named by `semanticLabel`. The painted ticks themselves are never
 /// separate semantic nodes. The centre [child] keeps its own semantics.
+///
+/// The progress form follows `ProgressRing`'s own contract instead:
+/// `role="progressbar"` with the value exposed when determinate
+/// ([SemanticsRole.progressBar], `0`–`100`, the rounded percentage), and
+/// `role="status"` when not — announced as the spinner announces itself, a
+/// polite live region named by `semanticLabel` (default
+/// [DabblerSpinner.defaultLabel]).
 class DabblerRing extends StatelessWidget {
   /// The countdown tick ring: [count] radial ticks whose outer ends lie on a
   /// circle of [diameter].
@@ -97,7 +124,9 @@ class DabblerRing extends StatelessWidget {
   }) : assert(count > 0, 'a tick ring needs at least one tick'),
        assert(diameter > 0, 'diameter must be positive'),
        _style = _RingStyle.ticks,
-       strokeWidth = tickWidth;
+       strokeWidth = tickWidth,
+       indeterminate = false,
+       tone = DabblerProgressBarTone.brand;
 
   /// The completion ring: a track circle and a round-capped brand arc.
   ///
@@ -117,7 +146,36 @@ class DabblerRing extends StatelessWidget {
        assert(strokeWidth > 0, 'strokeWidth must be positive'),
        _style = _RingStyle.arc,
        count = 0,
-       tickLength = 0;
+       tickLength = 0,
+       indeterminate = false,
+       tone = DabblerProgressBarTone.brand;
+
+  /// The progress ring — `ProgressRing` (`status-feedback.card.html`).
+  ///
+  /// [value] is a fraction 0–1, or null for an indeterminate ring that spins.
+  /// [diameter] is explicit, like the spinner's size, never fluid: the card
+  /// draws it at [DabblerSizing.iconMd] (24), [DabblerSizing.iconXl] (36) and
+  /// — on the Action Area — [DabblerSizing.actionAreaRing] (32). [tone] reuses
+  /// the progress bar's tone family, so a ring and a bar of the same tone are
+  /// the same colour: `brand`, a status `base`, or `onBrand` for a ring
+  /// sitting on a brand fill.
+  const DabblerRing.progress({
+    super.key,
+    double? value,
+    this.diameter = DabblerSizing.iconMd,
+    this.tone = DabblerProgressBarTone.brand,
+    this.semanticLabel,
+    this.child,
+  }) : assert(diameter > 0, 'diameter must be positive'),
+       _style = _RingStyle.progress,
+       fraction = value ?? 0,
+       indeterminate = value == null,
+       strokeWidth = DabblerSpinner.strokeWidth,
+       count = 0,
+       tickLength = 0,
+       track = DabblerRingTrack.faint,
+       mirrorInRtl = false,
+       semanticValue = null;
 
   /// Progress as a fraction from 0 to 1, clamped.
   final double fraction;
@@ -150,6 +208,14 @@ class DabblerRing extends StatelessWidget {
   /// Centred inside the ring — typically a big number over a small unit.
   final Widget? child;
 
+  /// Whether a [DabblerRing.progress] ring has no value and spins. Always
+  /// false for the other two forms.
+  final bool indeterminate;
+
+  /// The indicator colour of a [DabblerRing.progress] ring. Ignored by the
+  /// other two forms, which are always [DabblerColors.brandPrimary].
+  final DabblerProgressBarTone tone;
+
   final _RingStyle _style;
 
   /// The design's tick width — `width: 2px`. Not a token; see the class doc.
@@ -173,6 +239,16 @@ class DabblerRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (_style == _RingStyle.progress) {
+      return _ProgressRing(
+        fraction: clampFraction(fraction),
+        indeterminate: indeterminate,
+        diameter: diameter,
+        tone: tone,
+        semanticLabel: semanticLabel,
+        child: child,
+      );
+    }
     final DabblerColors colors = DabblerColors.of(context);
     final double f = clampFraction(fraction);
     final bool rtl = Directionality.of(context) == TextDirection.rtl;
@@ -310,4 +386,184 @@ class _RingPainter extends CustomPainter {
       old.fill != fill ||
       old.trackColor != trackColor ||
       old.direction != direction;
+}
+
+/// The progress form's state: the rotation (or reduced-motion pulse) of an
+/// indeterminate ring, and the value transition of a determinate one.
+class _ProgressRing extends StatefulWidget {
+  const _ProgressRing({
+    required this.fraction,
+    required this.indeterminate,
+    required this.diameter,
+    required this.tone,
+    required this.semanticLabel,
+    required this.child,
+  });
+
+  final double fraction;
+  final bool indeterminate;
+  final double diameter;
+  final DabblerProgressBarTone tone;
+  final String? semanticLabel;
+  final Widget? child;
+
+  @override
+  State<_ProgressRing> createState() => _ProgressRingState();
+}
+
+class _ProgressRingState extends State<_ProgressRing>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _spin = AnimationController(vsync: this);
+
+  @override
+  void dispose() {
+    _spin.dispose();
+    super.dispose();
+  }
+
+  /// Runs the spinner's rotation, its reduced-motion pulse, or nothing — the
+  /// same periods [DabblerSpinner] runs, read from its constants.
+  void _sync({required bool reduceMotion}) {
+    if (!widget.indeterminate) {
+      if (_spin.isAnimating) _spin.stop();
+      return;
+    }
+    final Duration period = reduceMotion
+        ? DabblerSpinner.pulsePeriod
+        : DabblerSpinner.rotationPeriod;
+    if (_spin.duration != period) {
+      _spin.duration = period;
+      if (_spin.isAnimating) _spin.repeat();
+    }
+    if (!_spin.isAnimating) _spin.repeat();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool reduceMotion = DabblerMotion.reduceMotion(context);
+    _sync(reduceMotion: reduceMotion);
+    final Color indicator = DabblerProgressBar.fillFor(
+      widget.tone,
+      DabblerColors.of(context),
+    );
+
+    Widget paint(double fraction) => CustomPaint(
+      painter: _ProgressRingPainter(
+        color: indicator,
+        fraction: widget.indeterminate ? DabblerSpinner.arcFraction : fraction,
+      ),
+    );
+
+    Widget ring;
+    if (widget.indeterminate) {
+      ring = AnimatedBuilder(
+        animation: _spin,
+        builder: (BuildContext context, Widget? child) => reduceMotion
+            // The spinner's substitution: hold still and breathe.
+            ? Opacity(
+                opacity: DabblerMotion.pulseOpacityAt(
+                  _spin.value,
+                  minOpacity: DabblerSpinner.pulseMinOpacity,
+                ),
+                child: child,
+              )
+            : Transform.rotate(angle: _spin.value * 2 * math.pi, child: child),
+        child: paint(0),
+      );
+    } else {
+      // A determinate value moves over `--motion-base`, as the progress bar's
+      // width does; under reduced motion it snaps.
+      ring = TweenAnimationBuilder<double>(
+        tween: Tween<double>(end: widget.fraction),
+        duration: DabblerMotion.durationOf(context, DabblerMotion.base),
+        curve: DabblerMotion.easeOut,
+        builder: (BuildContext context, double f, Widget? _) => paint(f),
+      );
+    }
+
+    final Widget sized = SizedBox.square(
+      dimension: widget.diameter,
+      child: widget.child == null
+          ? ring
+          : Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                ring,
+                Center(child: widget.child),
+              ],
+            ),
+    );
+
+    if (widget.indeterminate) {
+      // `role="status"` — announced the way DabblerSpinner announces itself.
+      return Semantics(
+        container: true,
+        liveRegion: true,
+        label: widget.semanticLabel ?? DabblerSpinner.defaultLabel,
+        child: ExcludeSemantics(child: sized),
+      );
+    }
+    return Semantics(
+      container: true,
+      role: SemanticsRole.progressBar,
+      label: widget.semanticLabel,
+      minValue: '0',
+      maxValue: '100',
+      value: '${(widget.fraction * 100).round()}%',
+      child: ExcludeSemantics(child: sized),
+    );
+  }
+}
+
+/// Paints the progress ring: a full track at [DabblerSpinner.trackOpacity] of
+/// [color], and a round-capped arc of [fraction] from twelve o'clock,
+/// clockwise — inset by half the stroke so it stays inside its box, the
+/// spinner's own `r = (px - stroke) / 2`. Never mirrored.
+class _ProgressRingPainter extends CustomPainter {
+  const _ProgressRingPainter({required this.color, required this.fraction});
+
+  final Color color;
+  final double fraction;
+
+  static const double _top = -math.pi / 2;
+
+  /// The sweep, in radians, the arc covers for [fraction] — always positive,
+  /// i.e. clockwise, whatever the ambient direction. Exposed for the test.
+  static double sweepFor(double fraction) => fraction * 2 * math.pi;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const double stroke = DabblerSpinner.strokeWidth;
+    final double radius = (size.shortestSide - stroke) / 2;
+    if (radius <= 0) return;
+    final Rect rect = Rect.fromCircle(
+      center: Offset(size.width / 2, size.height / 2),
+      radius: radius,
+    );
+    canvas.drawCircle(
+      rect.center,
+      radius,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..color = color.withValues(alpha: color.a * DabblerSpinner.trackOpacity),
+    );
+    // A round cap would draw a dot at 0.
+    if (fraction <= 0) return;
+    canvas.drawArc(
+      rect,
+      _top,
+      sweepFor(fraction),
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..strokeCap = StrokeCap.round
+        ..color = color,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ProgressRingPainter old) =>
+      old.color != color || old.fraction != fraction;
 }

@@ -10,8 +10,8 @@ import '../interaction/press_scale.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
-import '../tokens/dabbler_neutral_status.dart';
 import '../tokens/dabbler_type.dart';
+import 'status_tones.dart';
 
 /// The tones a [DabblerToast] can take, transcribed from `ToastTone` in
 /// `components/feedback/Toast.d.ts`.
@@ -714,20 +714,18 @@ class _DabblerToastState extends State<DabblerToast>
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
-    final DabblerStatusTone? status = widget.tone.status;
-    final DabblerStatusColor? resolved = status == null
-        ? null
-        : colors.status(status);
 
-    // `statusTones` / `statusHairline` in overlay.jsx:160-173. The neutral
-    // triple is not re-derived here: it is the one shared definition
-    // [dabblerNeutralStatus], which Badge composes too (KAN-266).
-    final DabblerStatusColor tone = resolved ?? dabblerNeutralStatus(colors);
+    // `statusTones` / `statusHairline` in overlay.jsx:160-173, resolved once
+    // in [DabblerStatusToneColors] — the definition Banner and the
+    // navigation-integrated presentation read too. Neutral is the shared
+    // [dabblerNeutralStatus] triple (KAN-266).
+    final DabblerStatusToneColors tone = DabblerStatusToneColors.of(
+      colors,
+      widget.tone.status,
+    );
     final Color surface = tone.surface;
-    final Color ink = tone.strong;
-    final Color hairline = resolved == null
-        ? tone.base
-        : tone.strong.withValues(alpha: 0.20);
+    final Color ink = tone.ink;
+    final Color hairline = tone.hairline;
 
     final bool reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
