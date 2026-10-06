@@ -1,6 +1,6 @@
 /// Gallery entries for the Action Area family — [DabblerActionArea],
-/// [DabblerNavigationFeedback], [DabblerNavigationActivity] — and the
-/// progress form of [DabblerRing].
+/// [DabblerNavigationStatus], [DabblerNavigationFeedback],
+/// [DabblerNavigationActivity] — and the progress form of [DabblerRing].
 ///
 /// Laid out to mirror `components/feedback/status-feedback.card.html`: every
 /// state the card draws is a specimen here, each in the card's own `Screen`
@@ -19,9 +19,12 @@ import '../gallery/gallery_specimen.dart';
 import '../navigation/bottom_bar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_motion.dart';
+import '../tokens/dabbler_type.dart';
 import 'action_area.dart';
 import 'navigation_activity.dart';
 import 'navigation_feedback.dart';
+import 'navigation_status.dart';
 import 'ring.dart';
 import 'toast.dart';
 
@@ -115,6 +118,18 @@ const List<GalleryEntry> actionAreaGalleryEntries = <GalleryEntry>[
         'How activity resolves into feedback: the collapsed circle changes '
         'tone, then expands; the ring closes, then becomes the tone glyph.',
     builder: _completion,
+  ),
+  GalleryEntry(
+    id: 'navigation-status/sequences',
+    page: 'components/navigation-status',
+    group: GalleryPurpose.statusAndFeedback,
+    title: 'NavigationStatus — sequences',
+    description:
+        'One persistent surface carrying an operation to its result: '
+        'processing → success; processing → error + retry → processing → '
+        'success; progress 0 → 100 → success; a sticky info banner and its '
+        'dismiss. Each plays once and can be replayed.',
+    builder: _statusSequences,
   ),
   GalleryEntry(
     id: 'navigation-feedback/toast',
@@ -233,7 +248,11 @@ Widget _systemStates(BuildContext context) => GalleryWrap(
   children: <Widget>[
     _screen(
       'idle navigation',
-      const DabblerNavigationActivity(active: false, bar: _bar, safeArea: false),
+      const DabblerNavigationActivity(
+        active: false,
+        bar: _bar,
+        safeArea: false,
+      ),
     ),
     _screen(
       'loading · compact',
@@ -300,7 +319,8 @@ Widget _collapsedToast(DabblerNavigationFeedbackData data) =>
 Widget _completion(BuildContext context) => GalleryWrap(
   children: <Widget>[
     GallerySpecimen(
-      label: 'loading → success · the collapsed circle changes tone, then '
+      label:
+          'loading → success · the collapsed circle changes tone, then '
           'expands',
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -338,7 +358,8 @@ Widget _completion(BuildContext context) => GalleryWrap(
       ),
     ),
     GallerySpecimen(
-      label: 'progress 100% → success icon · the ring closes, then becomes '
+      label:
+          'progress 100% → success icon · the ring closes, then becomes '
           'the tone glyph',
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -381,7 +402,10 @@ Widget _completion(BuildContext context) => GalleryWrap(
 Widget _toasts(BuildContext context) => GalleryWrap(
   children: <Widget>[
     for (int i = 0; i < _navToasts.length; i++)
-      _screen(_navToasts[i].toneFor(DabblerNavigationFeedbackPresentation.toast).name, _toastAt(i)),
+      _screen(
+        _navToasts[i].toneFor(DabblerNavigationFeedbackPresentation.toast).name,
+        _toastAt(i),
+      ),
   ],
 );
 
@@ -435,7 +459,8 @@ Widget _sequence(BuildContext context) => GalleryStack(
       ],
     ),
     const GallerySpecimen(
-      label: 'live · fire one and watch the sequence; the toast holds 3s, '
+      label:
+          'live · fire one and watch the sequence; the toast holds 3s, '
           'the banner until dismissed',
       child: _LiveFeedback(),
     ),
@@ -732,7 +757,8 @@ class _LiveFeedbackState extends State<_LiveFeedback> {
         children: <Widget>[
           for (final DabblerNavigationFeedbackData t in _navToasts)
             DabblerButton(
-              label: 'toast · ${t.toneFor(DabblerNavigationFeedbackPresentation.toast).name}',
+              label:
+                  'toast · ${t.toneFor(DabblerNavigationFeedbackPresentation.toast).name}',
               tone: DabblerButtonTone.neutral,
               size: DabblerButtonSize.small,
               onPressed: () =>
@@ -740,7 +766,8 @@ class _LiveFeedbackState extends State<_LiveFeedback> {
             ),
           for (final DabblerNavigationFeedbackData b in _navBanners)
             DabblerButton(
-              label: 'banner · ${b.toneFor(DabblerNavigationFeedbackPresentation.banner).name}',
+              label:
+                  'banner · ${b.toneFor(DabblerNavigationFeedbackPresentation.banner).name}',
               tone: DabblerButtonTone.neutral,
               size: DabblerButtonSize.small,
               onPressed: () =>
@@ -813,4 +840,258 @@ class _LiveRingState extends State<_LiveRing> {
       ),
     ],
   );
+}
+
+// ── NavigationStatus ─────────────────────────────────────────────────────────
+
+/// The sequences' demonstration cadences — how long the pretend work takes.
+/// Gallery values built from the motion scale, not component timings: the
+/// component's own hold, growth and dismissal come from the component.
+abstract final class _Demo {
+  /// How long a pretend operation runs before it resolves.
+  static const Duration work = DabblerMotion.ambientLoop;
+
+  /// The interval between pretend progress ticks.
+  static const Duration tick = DabblerMotion.delaySettle;
+
+  /// One pretend progress step, as a fraction.
+  static const double step = 0.25;
+}
+
+/// One step of a scripted sequence: a payload, and how long to stay on it.
+/// A null [stay] waits for the surface — its action, its dismiss or its own
+/// timeout — before the next step.
+class _Step {
+  const _Step(this.payload, {this.stay});
+
+  final DabblerNavigationStatusPayload? payload;
+  final Duration? stay;
+}
+
+Widget _statusSequences(BuildContext context) => GalleryWrap(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'processing → success',
+      child: _Sequence(
+        steps: (VoidCallback next, VoidCallback stop) => const <_Step>[
+          _Step(
+            DabblerNavigationStatusActivity(
+              presentation: DabblerNavigationActivityPresentation.spinnerLabel,
+              label: 'joining game',
+            ),
+            stay: _Demo.work,
+          ),
+          _Step(
+            DabblerNavigationStatusFeedback(
+              DabblerNavigationFeedbackData(
+                tone: DabblerToastTone.success,
+                message: 'joined game',
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+    GallerySpecimen(
+      label: 'processing → error + retry → processing → success',
+      child: _Sequence(
+        steps: (VoidCallback next, VoidCallback stop) => <_Step>[
+          const _Step(
+            DabblerNavigationStatusActivity(label: 'joining'),
+            stay: _Demo.work,
+          ),
+          _Step(
+            DabblerNavigationStatusFeedback(
+              DabblerNavigationFeedbackData(
+                tone: DabblerToastTone.error,
+                message: "couldn't join",
+                // Sticky until the retry: the user decides.
+                duration: DabblerToastSpec.sticky,
+                action: DabblerToastAction(label: 'retry', onPressed: next),
+              ),
+            ),
+          ),
+          const _Step(
+            DabblerNavigationStatusActivity(
+              presentation: DabblerNavigationActivityPresentation.spinnerLabel,
+              label: 'joining game',
+            ),
+            stay: _Demo.work,
+          ),
+          const _Step(
+            DabblerNavigationStatusFeedback(
+              DabblerNavigationFeedbackData(
+                tone: DabblerToastTone.success,
+                message: 'joined game',
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+    GallerySpecimen(
+      label: 'progress 0 → 100 → success, with cancel',
+      child: _Sequence(
+        steps: (VoidCallback next, VoidCallback stop) {
+          final DabblerToastAction cancel = DabblerToastAction(
+            label: 'cancel',
+            onPressed: stop,
+          );
+          return <_Step>[
+            for (double v = 0; v <= 1; v += _Demo.step)
+              _Step(
+                DabblerNavigationStatusActivity(
+                  presentation: DabblerNavigationActivityPresentation.progress,
+                  label: 'uploading',
+                  value: v,
+                  action: cancel,
+                ),
+                stay: _Demo.tick,
+              ),
+            const _Step(
+              DabblerNavigationStatusFeedback(
+                DabblerNavigationFeedbackData(
+                  tone: DabblerToastTone.success,
+                  message: 'photos uploaded',
+                ),
+              ),
+            ),
+          ];
+        },
+      ),
+    ),
+    GallerySpecimen(
+      label: 'information · sticky banner, dismissed by the user (RTL)',
+      child: _Sequence(
+        rtl: true,
+        steps: (VoidCallback next, VoidCallback stop) => const <_Step>[
+          _Step(
+            DabblerNavigationStatusFeedback(
+              DabblerNavigationFeedbackData(
+                title: 'new season starting',
+                message: 'fixtures for the winter league are open.',
+                dismissible: true,
+              ),
+              presentation: DabblerNavigationFeedbackPresentation.banner,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+);
+
+/// A screen running one scripted sequence on a single
+/// [DabblerNavigationStatus], once on mount and again on *replay*; under it,
+/// how the last payload ended.
+class _Sequence extends StatefulWidget {
+  const _Sequence({required this.steps, this.rtl = false});
+
+  /// The script; `next` advances it (a retry's `onPressed`) and `stop` ends
+  /// it (a cancel's).
+  final List<_Step> Function(VoidCallback next, VoidCallback stop) steps;
+  final bool rtl;
+
+  @override
+  State<_Sequence> createState() => _SequenceState();
+}
+
+class _SequenceState extends State<_Sequence> {
+  late List<_Step> _steps = widget.steps(_next, _stop);
+  int _at = -1;
+  DabblerNavigationStatusEndReason? _ended;
+  Timer? _timer;
+
+  DabblerNavigationStatusPayload? get _payload =>
+      _at >= 0 && _at < _steps.length ? _steps[_at].payload : null;
+
+  @override
+  void initState() {
+    super.initState();
+    _go(0);
+  }
+
+  void _go(int i) {
+    _timer?.cancel();
+    _timer = null;
+    _at = i;
+    final Duration? stay = i < _steps.length ? _steps[i].stay : null;
+    if (stay != null) _timer = Timer(stay, _next);
+  }
+
+  void _next() {
+    if (!mounted) return;
+    setState(() => _go(_at + 1));
+  }
+
+  void _stop() {
+    if (!mounted) return;
+    setState(() => _go(_steps.length));
+  }
+
+  void _replay() {
+    setState(() {
+      _steps = widget.steps(_next, _stop);
+      _ended = null;
+      _go(0);
+    });
+  }
+
+  void _onDone(DabblerNavigationStatusEndReason reason) {
+    if (!mounted) return;
+    setState(() {
+      _ended = reason;
+      // A retry or a cancel has already moved the script; a timeout or a
+      // dismiss moves it on.
+      if (reason != DabblerNavigationStatusEndReason.action &&
+          reason != DabblerNavigationStatusEndReason.replaced) {
+        _go(_at + 1);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: DabblerSpacing.space3,
+      children: <Widget>[
+        _Screen(
+          rtl: widget.rtl,
+          child: DabblerNavigationStatus(
+            payload: _payload,
+            onDone: _onDone,
+            bar: _bar,
+            safeArea: false,
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: DabblerSpacing.space3,
+          children: <Widget>[
+            DabblerButton(
+              label: 'replay',
+              tone: DabblerButtonTone.neutral,
+              size: DabblerButtonSize.small,
+              onPressed: _replay,
+            ),
+            Text(
+              _ended == null ? 'running' : 'ended · ${_ended!.name}',
+              style: DabblerType.caption1
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(color: colors.textSecondary),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }

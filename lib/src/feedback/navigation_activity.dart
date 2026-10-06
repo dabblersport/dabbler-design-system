@@ -1,14 +1,15 @@
 import 'package:flutter/widgets.dart';
 
-import '../foundations/icon.dart';
 import '../navigation/bottom_bar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
-import '../tokens/dabbler_type.dart';
 import 'action_area.dart';
+import 'navigation_feedback.dart';
+import 'navigation_status.dart';
 import 'progress_bar.dart';
 import 'ring.dart';
 import 'spinner.dart';
+import 'toast.dart';
 
 /// The six ways the Action Area reports activity, transcribed from
 /// `NavigationActivity`'s `presentation` (`status-feedback.card.html` —
@@ -80,6 +81,12 @@ enum DabblerNavigationActivityPresentation {
 /// the order of states (*"No lifecycle is implemented here"*). Pass [phase]
 /// to pin a state.
 ///
+/// A thin wrapper over [DabblerNavigationStatus] with an activity payload.
+/// To resolve an activity into its result on the **same** surface, place
+/// [DabblerNavigationStatus] itself and hand it the result: swapping this
+/// widget for a [DabblerNavigationFeedback] replaces the surface and its
+/// growth.
+///
 /// ## Accessibility
 ///
 /// The surface carries `role="status"`; the [DabblerSpinner],
@@ -97,6 +104,8 @@ class DabblerNavigationActivity extends StatefulWidget {
     this.icon,
     this.tone = DabblerSpinnerTone.brand,
     this.phase,
+    this.action,
+    this.onEnded,
     this.bar = const DabblerNavigationBottomBar(),
     this.safeArea = true,
   });
@@ -130,6 +139,17 @@ class DabblerNavigationActivity extends StatefulWidget {
   /// Pins a phase. Null derives it from [active] and [presentation].
   final DabblerActionAreaPhase? phase;
 
+  /// An optional action on the expanded rows — *Cancel* — with the toast
+  /// action's treatment, after the row's content. Ignored by the compact
+  /// presentations. Pressing it runs [DabblerToastAction.onPressed], contracts
+  /// the surface back to the bar and reports
+  /// [DabblerNavigationStatusEndReason.action] through [onEnded].
+  final DabblerToastAction? action;
+
+  /// The activity ended by its [action]. An activity has no other end: the
+  /// application replaces it.
+  final ValueChanged<DabblerNavigationStatusEndReason>? onEnded;
+
   /// The real bottom navigation, rendered verbatim beneath.
   final DabblerNavigationBottomBar bar;
 
@@ -142,158 +162,22 @@ class DabblerNavigationActivity extends StatefulWidget {
 }
 
 class _DabblerNavigationActivityState extends State<DabblerNavigationActivity> {
-  /// `phase`: pinned, else idle when inactive, collapsed for the compact
-  /// presentations, expanded for the rest — exactly as the source derives it.
-  DabblerActionAreaPhase get _phase {
-    if (widget.phase != null) return widget.phase!;
-    if (!widget.active) return DabblerActionAreaPhase.idle;
-    return widget.presentation.compact
-        ? DabblerActionAreaPhase.collapsed
-        : DabblerActionAreaPhase.expanded;
-  }
-
   @override
-  Widget build(BuildContext context) {
-    final DabblerColors colors = DabblerColors.of(context);
-    final DabblerNavigationActivityPresentation p = widget.presentation;
-    final DabblerActionAreaPhase phase = _phase;
-    final bool expanded = phase == DabblerActionAreaPhase.expanded;
-    final bool ring = p == DabblerNavigationActivityPresentation.ring;
-    final bool content =
-        p == DabblerNavigationActivityPresentation.progressExpanded;
-
-    return DabblerActionArea(
-      bar: widget.bar,
-      phase: phase,
-      fit: content ? DabblerActionAreaFit.content : DabblerActionAreaFit.row,
-      // Collapsed: the action, working. Expanded: the create menu's card.
-      surface: expanded ? colors.surfaceCard : colors.brandPrimary,
-      hairline: expanded
-          ? colors.borderDefault
-          // `hairline: transparent`.
-          : colors.brandPrimary.withValues(alpha: 0),
-      ink: expanded ? colors.textPrimary : colors.onBrand,
-      safeArea: widget.safeArea,
-      glyphSize: ring ? DabblerSizing.actionAreaRing : DabblerSizing.iconMd,
-      glyphAtTop: content,
-      role: DabblerActionAreaRole.status,
-      glyph: _glyph(expanded: expanded),
-      children: p.compact ? const <Widget>[] : _content(context, colors),
-    );
-  }
-
-  /// The indicator: a [DabblerSpinner] (md) for `spinner` and `spinnerLabel`,
-  /// a 32 [DabblerRing.progress] for `ring`, and **none** for the expanded
-  /// progress presentations — the bar is the indicator there.
-  Widget? _glyph({required bool expanded}) {
-    final DabblerColors colors = DabblerColors.of(context);
-    switch (widget.presentation) {
-      case DabblerNavigationActivityPresentation.ring:
-        return DabblerRing.progress(
-          value: widget.value,
-          diameter: DabblerSizing.actionAreaRing,
-          tone: expanded ? DabblerRingTone.brand : DabblerRingTone.onBrand,
-          semanticLabel: widget.label,
-          child: widget.icon == null
-              ? null
-              : DabblerIcon(
-                  widget.icon!,
-                  weight: DabblerIconWeight.bold,
-                  // `size 16` — half the 32 ring.
-                  size: DabblerSizing.actionAreaRing / 2,
-                  color: expanded ? colors.textPrimary : colors.onBrand,
-                ),
-        );
-      case DabblerNavigationActivityPresentation.spinner:
-      case DabblerNavigationActivityPresentation.spinnerLabel:
-        return DabblerSpinner(
-          tone: expanded ? widget.tone : DabblerSpinnerTone.onBrand,
-          label: widget.label,
-        );
-      case DabblerNavigationActivityPresentation.indeterminate:
-      case DabblerNavigationActivityPresentation.progress:
-      case DabblerNavigationActivityPresentation.progressExpanded:
-        return null;
-    }
-  }
-
-  List<Widget> _content(BuildContext context, DabblerColors colors) {
-    final TextDirection direction = Directionality.of(context);
-    switch (widget.presentation) {
-      case DabblerNavigationActivityPresentation.spinnerLabel:
-        return <Widget>[
-          Expanded(
-            // The spinner already announces the label; this is its visible
-            // twin.
-            child: ExcludeSemantics(
-              child: Text(
-                widget.label ?? '',
-                maxLines: 1,
-                softWrap: false,
-                overflow: TextOverflow.ellipsis,
-                style: DabblerType.subheadline
-                    .resolveForDirection(direction)
-                    .copyWith(color: colors.textPrimary),
-              ),
-            ),
-          ),
-        ];
-      case DabblerNavigationActivityPresentation.indeterminate:
-        return <Widget>[
-          Expanded(
-            child: DabblerProgressBar.indeterminate(
-              size: DabblerProgressBarSize.sm,
-              label: widget.label,
-            ),
-          ),
-        ];
-      case DabblerNavigationActivityPresentation.progress:
-        return <Widget>[
-          Expanded(
-            child: widget.value == null
-                ? DabblerProgressBar.indeterminate(
-                    size: DabblerProgressBarSize.sm,
-                    label: widget.label,
-                  )
-                : DabblerProgressBar(
-                    value: widget.value!,
-                    size: DabblerProgressBarSize.sm,
-                    label: widget.label,
-                    showValue: true,
-                  ),
-          ),
-        ];
-      case DabblerNavigationActivityPresentation.progressExpanded:
-        return <Widget>[
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: DabblerSpacing.space2,
-              children: <Widget>[
-                // The value is shown only when determinate.
-                if (widget.value == null)
-                  DabblerProgressBar.indeterminate(label: widget.label)
-                else
-                  DabblerProgressBar(
-                    value: widget.value!,
-                    label: widget.label,
-                    showValue: true,
-                  ),
-                if (widget.status != null)
-                  Text(
-                    widget.status!,
-                    style: DabblerType.caption1
-                        .resolveForDirection(direction)
-                        .copyWith(color: colors.textSecondary),
-                  ),
-              ],
-            ),
-          ),
-        ];
-      case DabblerNavigationActivityPresentation.spinner:
-      case DabblerNavigationActivityPresentation.ring:
-        return const <Widget>[];
-    }
-  }
+  Widget build(BuildContext context) => DabblerNavigationStatus(
+    payload: DabblerNavigationStatusActivity(
+      presentation: widget.presentation,
+      label: widget.label,
+      value: widget.value,
+      status: widget.status,
+      icon: widget.icon,
+      spinnerTone: widget.tone,
+      action: widget.action,
+    ),
+    // Inactive is idle navigation; the payload is kept, as it always was.
+    suspended: !widget.active,
+    phase: widget.phase,
+    bar: widget.bar,
+    safeArea: widget.safeArea,
+    onDone: widget.onEnded,
+  );
 }

@@ -225,6 +225,8 @@ lot about the rest.
   bottom navigation, grown out of the action footprint.
 - [NavigationActivity](components/navigation-activity.md) — loading and progress on the bottom
   navigation's action footprint: a spinner, a ring, or a grown progress row.
+- [NavigationStatus](components/navigation-status.md) — one persistent surface on the bottom
+  navigation that carries an operation from loading or progress to its result.
 - [Spinner](components/spinner.md) — the system's only indeterminate loading indicator.
 - [Refresh](components/refresh.md) — pull-to-refresh, drawn with the system Spinner.
 - [ProgressBar](components/progress-bar.md) — progress with a known end, or a busy bar when there

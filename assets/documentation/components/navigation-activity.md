@@ -46,9 +46,15 @@ is; `progressExpanded` adds a status line for a longer operation.
 ring appears only in the collapsed circle the row grows from. Only the labelled spinner keeps its
 glyph, turning from on-brand to brand as it lands on the card.
 
-**Resolve into feedback, don't append to it.** When the work finishes, swap this for
-`NavigationFeedback` with the result — the circle changes tone, then expands. There is no failure
-or paused state here, by design.
+**Resolve into feedback, don't append to it — on the same surface.** When the work finishes, the
+circle changes tone, then expands into the result. Swapping this widget for `NavigationFeedback`
+cannot do that, because it replaces the surface; place `NavigationStatus` and hand it the activity
+and then the result. This widget is a thin wrapper over it. There is no failure or paused state
+here, by design.
+
+**Give long work a cancel.** An expanded row takes one action, drawn like the toast's text action;
+pressing it runs its callback, contracts the row back to the bar and reports `action` through
+`onEnded`. The compact presentations have no room for one.
 
 ## Axes
 
@@ -61,6 +67,9 @@ A fraction from zero to one, or none — the ring then spins and the bars sweep.
 
 ### Active
 Inactive is idle navigation: the bar alone.
+
+### Action
+None, or one action on an expanded row — typically a cancel.
 
 ## Direction
 

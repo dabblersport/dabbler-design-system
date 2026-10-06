@@ -137,6 +137,7 @@ export 'src/feedback/toast.dart';
 export 'src/feedback/toast_gallery.dart';
 export 'src/feedback/navigation_activity.dart';
 export 'src/feedback/navigation_feedback.dart';
+export 'src/feedback/navigation_status.dart';
 export 'src/feedback/status_tones.dart';
 export 'src/feed/activity_row.dart';
 export 'src/feed/feed_atoms.dart';

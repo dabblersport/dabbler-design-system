@@ -21,9 +21,10 @@ The bar moves from navigation, to loading, to progress, to status, and every one
 the same container. In the collapsed phase the action button's circle becomes the surface — a
 brand circle with a spinner while something is working, a tone circle with a glyph once there is a
 result. In the expanded phase that circle grows along the bar to the bar's full width, carrying a
-toast, a banner, a labelled spinner or a progress row. Two components are built on it and are what
-an app normally places: `NavigationFeedback` for toasts and banners, `NavigationActivity` for
-loading and progress.
+toast, a banner, a labelled spinner or a progress row. Three components are built on it and are
+what an app places: `NavigationStatus`, which carries an operation from loading to its result on one
+surface, and the two it wraps — `NavigationFeedback` for toasts and banners alone,
+`NavigationActivity` for loading and progress alone.
 
 ## Specimen
 
@@ -34,16 +35,18 @@ indeterminate and on the ring, and the four status tones — see `action_area_ga
 @specimen action-area/system-states
 
 How activity resolves into feedback: the brand circle changes tone, then expands; or the ring
-closes, then becomes the tone glyph. The application composes these steps; nothing here runs them
-in sequence for you.
+closes, then becomes the tone glyph. This widget does not run these steps in sequence for you;
+`NavigationStatus` does, on one surface.
 
 @specimen action-area/completion
 
 ## Using it
 
-**Reach for `NavigationFeedback` or `NavigationActivity`, not this widget.** ActionArea is the
-shared base: it takes a phase, a fit, three colours, a glyph and the expanded content, and nothing
-else. The two components above it know which colours, glyphs and content each state draws.
+**Reach for `NavigationStatus`, `NavigationFeedback` or `NavigationActivity`, not this widget.**
+ActionArea is the shared base: it takes a phase, a fit, three colours, a glyph and the expanded
+content, and nothing else. The components above it know which colours, glyphs and content each state
+draws, and `NavigationStatus` keeps one of these alive across the whole operation so the result
+morphs out of the work instead of replacing it.
 
 **The bar is hidden only while expanded.** Collapsed, the destinations beside the circle stay live;
 expanded, the bar fades out and takes no input, focus or announcement until the phase changes.
@@ -57,7 +60,8 @@ surface. The device's bottom inset is applied once, below both; the bar's own in
 the two cannot stack.
 
 **Don't put it over a create menu, a dialog or a sheet.** The bar must be in its ordinary state,
-and the screen must have one.
+and the screen must have one. Nothing here can see the create menu; `NavigationStatus` takes a
+`suspended` flag the host sets while it is open.
 
 ## Axes
 

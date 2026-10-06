@@ -53,7 +53,13 @@ One that must survive navigation is still the inline `Banner`.
 **Let it run its own sequence, and clear the feedback in `onDone`.** Hand it a feedback payload and
 it holds the tone circle briefly, grows, stays readable, contracts and returns to idle, then calls
 `onDone`. Hover and focus pause the toast's timer. The action and the dismiss button start the
-contraction at once. Pin `phase` only for a specimen.
+contraction at once. Pin `phase` only for a specimen. `onEnded` additionally says why it ended —
+timeout, dismissed, action, or replaced by a new message — the moment it ends.
+
+**When the message is the result of work the bar was already showing, place `NavigationStatus`
+instead.** Swapping a `NavigationActivity` for this widget replaces the surface, so the result
+cannot grow out of the working circle; `NavigationStatus` carries both on one surface, and this
+widget is a thin wrapper over it.
 
 ## Axes
 
