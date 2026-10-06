@@ -158,7 +158,7 @@ class DabblerListingTag extends StatelessWidget {
                 : DabblerType.tag.resolveForDirection(direction))
             .copyWith(color: ink);
     final Widget text = Text(
-      label,
+      DabblerType.toWesternDigits(label),
       maxLines: 1,
       softWrap: false,
       overflow: TextOverflow.ellipsis,

@@ -228,7 +228,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
                   children: <Widget>[
                     // `14/19 600` (`:462`).
                     Text(
-                      title,
+                      DabblerType.toWesternDigits(title),
                       style: DabblerType.smallTight
                           .resolveForDirection(Directionality.of(context))
                           .copyWith(
@@ -241,7 +241,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
                     if (time != null)
                       // `11/15` (`:463`) — the tag step at regular weight.
                       Text(
-                        time!,
+                        DabblerType.toWesternDigits(time!),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: DabblerType.tag
@@ -259,7 +259,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
           // `:466-468` — the venue alone, 12/16 in `--ink-soft`; no glyph.
           if (place != null)
             Text(
-              place!,
+              DabblerType.toWesternDigits(place!),
               style: DabblerType.caption1
                   .resolveForDirection(Directionality.of(context))
                   .copyWith(color: ink.textSecondary),

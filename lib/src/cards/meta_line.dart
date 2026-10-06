@@ -115,7 +115,7 @@ class DabblerMetaLine extends StatelessWidget {
       }
       final bool strong = i == 0 && emphasizeFirst && !compact;
       final Widget text = Text(
-        facts[i],
+        DabblerType.toWesternDigits(facts[i]),
         maxLines: 1,
         softWrap: false,
         overflow: TextOverflow.ellipsis,

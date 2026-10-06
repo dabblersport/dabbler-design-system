@@ -206,14 +206,14 @@ class DabblerCardUpcoming extends StatelessWidget {
             // The numeral is the display face — `font-family: var(--font-display);
             // font-size: 18px` (`:150`, `:433`).
             Text(
-              countdownValue,
+              DabblerType.toWesternDigits(countdownValue),
               style: DabblerType.displayLabel
                   .resolveForDirection(Directionality.of(context))
                   .copyWith(color: ink.textPrimary),
               maxLines: 1,
             ),
             Text(
-              countdownUnit,
+              DabblerType.toWesternDigits(countdownUnit),
               style: DabblerType.caption2
                   .resolveForDirection(Directionality.of(context))
                   .copyWith(color: ink.textSecondary),
@@ -230,7 +230,7 @@ class DabblerCardUpcoming extends StatelessWidget {
       spacing: rail ? DabblerSizing.borderDefault : DabblerSpacing.space1,
       children: <Widget>[
         Text(
-          title,
+          DabblerType.toWesternDigits(title),
           style: (rail ? DabblerType.smallTight : DabblerType.subheadline)
               .resolveForDirection(Directionality.of(context))
               .copyWith(
@@ -243,7 +243,7 @@ class DabblerCardUpcoming extends StatelessWidget {
         if (when != null)
           if (rail)
             Text(
-              when!,
+              DabblerType.toWesternDigits(when!),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               // `11/15` — the tag step at regular weight.
@@ -256,7 +256,7 @@ class DabblerCardUpcoming extends StatelessWidget {
             )
           else
             Text(
-              when!,
+              DabblerType.toWesternDigits(when!),
               style: DabblerType.caption1
                   .resolveForDirection(Directionality.of(context))
                   .copyWith(color: ink.textSecondary),
@@ -311,14 +311,14 @@ class DabblerCardUpcoming extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            month!,
+            DabblerType.toWesternDigits(month!),
             maxLines: 1,
             style: DabblerType.tagTight
                 .resolveForDirection(direction)
                 .copyWith(color: ink.brandPrimary),
           ),
           Text(
-            day!,
+            DabblerType.toWesternDigits(day!),
             maxLines: 1,
             style: DabblerType.figure
                 .resolveForDirection(direction)
@@ -341,14 +341,14 @@ class DabblerCardUpcoming extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              countdownValue,
+              DabblerType.toWesternDigits(countdownValue),
               style: DabblerType.displayLabel
                   .resolveForDirection(Directionality.of(context))
                   .copyWith(color: ink.textPrimary),
               maxLines: 1,
             ),
             Text(
-              countdownUnit,
+              DabblerType.toWesternDigits(countdownUnit),
               style: DabblerType.caption2
                   .resolveForDirection(Directionality.of(context))
                   .copyWith(color: ink.textSecondary),
@@ -382,7 +382,7 @@ class DabblerCardUpcoming extends StatelessWidget {
                 spacing: DabblerSpacing.space1,
                 children: <Widget>[
                   Text(
-                    title,
+                    DabblerType.toWesternDigits(title),
                     style: DabblerType.subheadline
                         .resolveForDirection(Directionality.of(context))
                         .copyWith(
@@ -394,7 +394,7 @@ class DabblerCardUpcoming extends StatelessWidget {
                   ),
                   if (line.isNotEmpty)
                     Text(
-                      line,
+                      DabblerType.toWesternDigits(line),
                       style: DabblerType.caption1
                           .resolveForDirection(Directionality.of(context))
                           .copyWith(color: ink.textSecondary),

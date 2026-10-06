@@ -657,6 +657,34 @@ void main() {
     });
   });
 
+  testWidgets(
+    'tile, tag and meta line draw Western digits, as DabblerText does',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _scaled(
+          const Column(
+            children: <Widget>[
+              DabblerCardUpcoming(
+                title: 'جري',
+                fraction: 0.4,
+                countdownValue: '19',
+                countdownUnit: 'ساعات',
+                when: '٧ أكتوبر · ٧:٤١ ص',
+                place: 'شاطئ كايت',
+              ),
+              DabblerListingTag(label: 'على بعد ٤ كم'),
+              DabblerMetaLine(items: <String>['شاطئ كايت', '٣ كم']),
+            ],
+          ),
+          direction: TextDirection.rtl,
+        ),
+      );
+      expect(find.text('7 أكتوبر · 7:41 ص'), findsOneWidget);
+      expect(find.text('على بعد 4 كم'), findsOneWidget);
+      expect(find.text('3 كم'), findsOneWidget);
+    },
+  );
+
   group('ListingSkeleton', () {
     for (final TextDirection d in TextDirection.values) {
       testWidgets('venue: 160 media then 58% / 38% lines ($d)', (
