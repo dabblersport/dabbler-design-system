@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundations/icon.dart';
 import '../foundations/text.dart';
+import '../interaction/expanded_hit_area.dart';
+import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'chip.dart';
@@ -26,10 +29,15 @@ class DabblerFilterRailItem {
   final String? removeSemanticLabel;
 }
 
-/// FilterRail — the applied-filters rail under a listing's tabs: one selected
-/// removable [DabblerChip] per filter, then a "Clear all" text action.
+/// FilterRail — the applied-filters rail under a listing's tabs: one solid
+/// brand pill per filter with its own remove glyph, then a "Clear all" text
+/// action.
 ///
-/// Drawn from `Listings.dc.html:101-111` (Alpha fidelity rebuild, KAN-426).
+/// Drawn from `Listings.dc.html:97-107`: each pill 32 tall ([pillHeight]),
+/// `padding: 7px 9px 7px 14px`, 13/18 weight 500 on-brand, a bold 16px
+/// `close-circle` at 80% ([removeIconSize]); pills `gap: 6`. (Until the
+/// Listings fidelity pass the pills were the small [DabblerChip], 34 tall with
+/// an 18px glyph.)
 ///
 /// ```dart
 /// DabblerFilterRail(
@@ -42,7 +50,7 @@ class DabblerFilterRailItem {
 /// ```
 ///
 /// Renders nothing when [items] is empty. The rail scrolls horizontally when
-/// the chips overflow; the chips keep their own press and focus.
+/// the pills overflow; each remove glyph is a button with a 45 target.
 ///
 /// ## RTL
 ///
@@ -73,6 +81,26 @@ class DabblerFilterRail extends StatelessWidget {
   /// Finds the clear-all action in a test.
   static const Key clearAllKey = ValueKey<String>('dabbler-filter-rail-clear');
 
+  /// An applied filter's pill height — `padding: 7px` around the 18px line
+  /// (`Listings.dc.html:100`): 32.
+  static const double pillHeight = 32;
+
+  /// The pill's padding at its inline start — `14px`.
+  static const double pillPaddingStart = 14;
+
+  /// The pill's padding at its inline end, before the remove glyph — `9px`.
+  static const double pillPaddingEnd = DabblerSpacing.space3;
+
+  /// The remove glyph — `close-circle`, bold, `size="16"`, at 80% opacity.
+  static const double removeIconSize = 16;
+
+  /// See [removeIconSize].
+  static const double removeIconOpacity = 0.8;
+
+  /// Key of each applied pill, by label.
+  static Key pillKeyFor(String label) =>
+      ValueKey<String>('dabbler-filter-rail-pill/$label');
+
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox.shrink();
@@ -83,13 +111,7 @@ class DabblerFilterRail extends StatelessWidget {
         spacing: DabblerSpacing.space2,
         children: <Widget>[
           for (final DabblerFilterRailItem item in items)
-            DabblerChip(
-              label: item.label,
-              selected: true,
-              size: DabblerChipSize.small,
-              onRemove: item.onRemove,
-              removeSemanticLabel: item.removeSemanticLabel,
-            ),
+            _AppliedPill(item: item),
           if (onClearAll != null)
             DabblerTextLink(
               key: clearAllKey,
@@ -157,6 +179,74 @@ class DabblerFilterGroup extends StatelessWidget {
           children: children,
         ),
       ],
+    );
+  }
+}
+
+/// One applied filter (`Listings.dc.html:100-104`): a solid brand pill,
+/// 13/18 weight 500 on-brand, `gap: 6` to a bold `close-circle` at 16 and 80%
+/// opacity. The glyph is its own button with a 45 hit-test-only target.
+class _AppliedPill extends StatelessWidget {
+  const _AppliedPill({required this.item});
+
+  final DabblerFilterRailItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    final TextDirection direction = Directionality.of(context);
+    return Container(
+      key: DabblerFilterRail.pillKeyFor(item.label),
+      height: DabblerFilterRail.pillHeight,
+      padding: const EdgeInsetsDirectional.only(
+        start: DabblerFilterRail.pillPaddingStart,
+        end: DabblerFilterRail.pillPaddingEnd,
+      ),
+      decoration: BoxDecoration(
+        color: colors.brandPrimary,
+        borderRadius: DabblerRadius.pillAll,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: DabblerSpacing.space2,
+        children: <Widget>[
+          Text(
+            item.label,
+            maxLines: 1,
+            softWrap: false,
+            style: DabblerType.footnote
+                .resolveForDirection(direction)
+                .copyWith(
+                  color: colors.onBrand,
+                  fontWeight: DabblerType.medium,
+                ),
+          ),
+          Semantics(
+            button: true,
+            label:
+                item.removeSemanticLabel ??
+                DabblerChip.defaultRemoveLabelFor(item.label),
+            onTap: item.onRemove,
+            excludeSemantics: true,
+            child: DabblerExpandedHitArea(
+              minimum: const Size.square(DabblerSizing.touchTargetMin),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: item.onRemove,
+                child: Opacity(
+                  opacity: DabblerFilterRail.removeIconOpacity,
+                  child: DabblerIcon(
+                    DabblerChip.removeIconName,
+                    weight: DabblerIconWeight.bold,
+                    size: DabblerFilterRail.removeIconSize,
+                    color: colors.onBrand,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

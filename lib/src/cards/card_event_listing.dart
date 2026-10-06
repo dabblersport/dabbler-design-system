@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../controls/button.dart';
@@ -62,6 +63,18 @@ import '../tokens/dabbler_type.dart';
 /// controls, which is what the design draws (`onClick="{{ stop }}"` stops the
 /// join tap from opening the card).
 abstract final class DabblerCardEventListing {
+  /// A listing card's corner — `border-radius: var(--radius-xl)` (18), on
+  /// every card of `Listings.dc.html` (`:207`, `:520`, `:752`).
+  static const double cardRadius = DabblerRadius.xl;
+
+  /// A listing card's body padding — `padding: 15px` inside the 1px
+  /// `--outline-card` hairline. `DabblerSurface` paints its border inside its
+  /// box, so the padding is the hairline plus 15: content starts 16 from the
+  /// card's edge, as the frame measures.
+  static const EdgeInsets cardPadding = EdgeInsets.all(
+    DabblerSpacing.space5 + DabblerSizing.borderDefault,
+  );
+
   /// Gap between the progress block and the price block — `gap: 15`
   /// (`Listings.dc.html:242`), [DabblerSpacing.space5].
   static const double rowGap = DabblerSpacing.space5;
@@ -209,13 +222,10 @@ class DabblerCardEventPlayers extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              // `13/17, 600, --ink` — `.t-footnote` at semibold.
-              style: DabblerType.footnote
+              // `13/17, 600, --ink` — `.t-footnote-tight`.
+              style: DabblerType.footnoteTight
                   .resolveForDirection(direction)
-                  .copyWith(
-                    color: colors.textPrimary,
-                    fontWeight: DabblerType.semibold,
-                  ),
+                  .copyWith(color: colors.textPrimary),
             ),
             // `height: 6`, pill — the bar's `md` track.
             DabblerProgressBar(value: fraction, tone: tone),
@@ -224,13 +234,10 @@ class DabblerCardEventPlayers extends StatelessWidget {
                 note!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                // `11/15, 600` — `.t-caption-2` at semibold.
-                style: DabblerType.caption2
+                // `11/15, 600` — the tag step.
+                style: DabblerType.tag
                     .resolveForDirection(direction)
-                    .copyWith(
-                      color: noteColorFor(colors, tone),
-                      fontWeight: DabblerType.semibold,
-                    ),
+                    .copyWith(color: noteColorFor(colors, tone)),
               ),
           ],
         ),
@@ -241,10 +248,9 @@ class DabblerCardEventPlayers extends StatelessWidget {
 
 /// The price block: the amount over its unit (`Listings.dc.html:250-253`).
 ///
-/// **Deviation:** the design sets the amount at 22/27 weight 700 in the sans
-/// face. The ramp's 22 step (`.t-title-2`) is the display face at 400, so the
-/// amount takes `.t-headline` (17/22, sans) at [DabblerType.bold] — the
-/// nearest sans step — rather than inventing a size.
+/// The amount is `22/27` weight 700 in the sans face — [DabblerType.figureXl];
+/// the unit `11/15` — [DabblerType.tag] at regular weight. (Before the
+/// Listings fidelity pass the amount fell back to `.t-headline`, 17/22.)
 class DabblerCardEventPrice extends StatelessWidget {
   /// A price block showing [price].
   const DabblerCardEventPrice({
@@ -279,25 +285,148 @@ class DabblerCardEventPrice extends StatelessWidget {
             Text(
               price,
               maxLines: 1,
-              style: DabblerType.headline
+              // `22/27, 700` — the figure-XL step.
+              style: DabblerType.figureXl
                   .resolveForDirection(direction)
                   .copyWith(
                     color: free ? colors.success.strong : colors.textPrimary,
-                    fontWeight: DabblerType.bold,
                   ),
             ),
             if (note != null)
               Text(
                 note!,
                 maxLines: 1,
-                // `11/15, --muted`.
-                style: DabblerType.caption2
+                // `11/15, --muted` — the tag step at regular weight.
+                style: DabblerType.tag
                     .resolveForDirection(direction)
-                    .copyWith(color: colors.textSecondary),
+                    .copyWith(
+                      color: colors.textSecondary,
+                      fontWeight: DabblerType.regular,
+                    ),
               ),
           ],
         ),
       ),
     );
   }
+}
+
+/// The listing card's action row: the Join button beside the social counts
+/// (`Listings.dc.html:256-266`).
+///
+/// The frame gives the button `flex: 1` (basis 0) and the counts
+/// `flex-grow: 1` at their own width, so the free space is shared equally and
+/// the button ends up half of what the counts leave:
+/// `button = (width − gap − counts) / 2`. The counts sit at the inline end of
+/// their share. The row is the button's height ([DabblerSizing.touchTargetMin],
+/// the medium button's 45).
+class DabblerListingActionRow extends StatelessWidget {
+  /// An action row of [action] and [trailing].
+  const DabblerListingActionRow({
+    super.key,
+    required this.action,
+    required this.trailing,
+  });
+
+  /// The button — typically [DabblerCardEventListing.joinButton].
+  final Widget action;
+
+  /// The social counts.
+  final Widget trailing;
+
+  /// `gap: 9px` (`Listings.dc.html:256`).
+  static const double gap = DabblerSpacing.space3;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: DabblerSizing.touchTargetMin,
+      child: _ActionRow(
+        direction: Directionality.of(context),
+        children: <Widget>[action, trailing],
+      ),
+    );
+  }
+}
+
+class _ActionRowParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _ActionRow extends MultiChildRenderObjectWidget {
+  const _ActionRow({required this.direction, required super.children});
+
+  final TextDirection direction;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderActionRow(direction);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderActionRow row) {
+    row.direction = direction;
+  }
+}
+
+/// Lays out `button = (width − gap − counts) / 2`, never narrower than the
+/// button's own label needs (a large text scale), the counts at the inline
+/// end.
+class _RenderActionRow extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _ActionRowParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _ActionRowParentData> {
+  _RenderActionRow(this._direction);
+
+  TextDirection _direction;
+  set direction(TextDirection value) {
+    if (value == _direction) return;
+    _direction = value;
+    markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _ActionRowParentData) {
+      child.parentData = _ActionRowParentData();
+    }
+  }
+
+  @override
+  void performLayout() {
+    final double width = constraints.maxWidth;
+    final double height = constraints.maxHeight;
+    const double gap = DabblerListingActionRow.gap;
+    final RenderBox action = firstChild!;
+    final RenderBox counts = childAfter(action)!;
+    counts.layout(
+      BoxConstraints.loose(Size(width / 2, height)),
+      parentUsesSize: true,
+    );
+    final double half = (width - gap - counts.size.width) / 2;
+    final double natural = action.getMaxIntrinsicWidth(height);
+    final double button = (natural > half ? natural : half).clamp(
+      0.0,
+      (width - gap - counts.size.width).clamp(0.0, width),
+    );
+    action.layout(
+      BoxConstraints.tightFor(width: button, height: height),
+      parentUsesSize: true,
+    );
+    final bool rtl = _direction == TextDirection.rtl;
+    (action.parentData! as _ActionRowParentData).offset = Offset(
+      rtl ? width - button : 0,
+      0,
+    );
+    (counts.parentData! as _ActionRowParentData).offset = Offset(
+      rtl ? 0 : width - counts.size.width,
+      (height - counts.size.height) / 2,
+    );
+    size = constraints.constrain(Size(width, height));
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
 }

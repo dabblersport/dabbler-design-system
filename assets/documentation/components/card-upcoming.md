@@ -46,6 +46,7 @@ track. Gap `space4`.
 
 - Alpha fidelity rebuild (KAN-426) — adds this component, and a `fill` override on `Card`.
 - KAN-429 (Meetups) — `CardUpcomingRail` is the multi-tile state of the same Upcoming section.
+- Listings fidelity pass — the frame's tile: a 1px `--outline-card` hairline, the 12 corner (`--radius-lg`) and 12 padding; a 62 ring with 7px ticks (32 single, 24 on the rail) and the display numeral; the place row a compact `MetaLine`; `rail` sets the rail metrics, and a rail card in a horizontal scroller hugs its content.
 
 ## Source
 

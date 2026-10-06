@@ -31,6 +31,13 @@ enum DabblerTabsVariant {
   /// rail — a 33 tall strip (36 in Arabic, whose leading is 23). The 45px
   /// target is kept as a hit-test-only area around each label.
   feed,
+
+  /// The listing screens' tab rail (`Listings.dc.html:91-95`): label-width
+  /// tabs 21 apart, 15/20 at weight **600** when active and **500** otherwise,
+  /// 9 under the label and the 2px brand underline over the 1px `--faint`
+  /// rail — a 31 tall strip. As [feed], the 45px target is a hit-test-only
+  /// area around each label.
+  listing,
 }
 
 /// One tab, transcribed from `TabItem` in `components/layout/Tabs.d.ts`.
@@ -275,6 +282,10 @@ class _DabblerTabsState extends State<DabblerTabs> {
 
   bool get _segmented => widget.variant == DabblerTabsVariant.segmented;
   bool get _feed => widget.variant == DabblerTabsVariant.feed;
+  bool get _listing => widget.variant == DabblerTabsVariant.listing;
+
+  /// Label-width tabs with a hit-test-only 45 target: [feed] and [listing].
+  bool get _compact => _feed || _listing;
 
   /// Segmented tabs are always full width (`Tabs.prompt.md` — *Responsive*),
   /// and the source never scrolls them.
@@ -556,7 +567,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: _segmented
           ? DabblerSpacing.space1
-          : (_feed ? DabblerSpacing.space7 : DabblerSpacing.space5),
+          : (_compact ? DabblerSpacing.space7 : DabblerSpacing.space5),
       children: tabs,
     );
 
@@ -716,7 +727,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
         .resolveForDirection(direction)
         .copyWith(
           color: foreground,
-          fontWeight: active && !_feed
+          fontWeight: _listing
+              ? (active ? DabblerType.semibold : DabblerType.medium)
+              : active && !_feed
               ? DabblerType.medium
               : DabblerType.regular,
           fontSize: _fitting && _baseLabelSize(direction) != null
@@ -765,6 +778,14 @@ class _DabblerTabsState extends State<DabblerTabs> {
             ),
             child: content,
           )
+        : _listing
+        ? Padding(
+            // `padding: 0 0 9px`, the 2px underline riding below it.
+            padding: const EdgeInsetsDirectional.only(
+              bottom: DabblerSpacing.space3 + _indicatorHeight,
+            ),
+            child: content,
+          )
         : _feed
         ? Padding(
             // 10 under the label, plus the 3px underline that rides over it.
@@ -792,7 +813,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
               widget.onChanged!.call(item.id);
               _nodes[index].requestFocus();
             },
-      child: _feed
+      child: _compact
           ? DabblerFocusRing(
               focusNode: _nodes[index],
               borderRadius: BorderRadius.zero,
@@ -836,7 +857,7 @@ class _DabblerTabsState extends State<DabblerTabs> {
     // Feed: the tab lays out at the frame's 33 and the 45 target is a
     // hit-test-only area around the whole tab (every wrapper inside it would
     // otherwise gate the hit at the label's own bounds).
-    if (_feed) {
+    if (_compact) {
       final Widget wide = DabblerExpandedHitArea(
         minimum: const Size.square(DabblerSizing.touchTargetMin),
         child: tab,

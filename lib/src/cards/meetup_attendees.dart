@@ -89,24 +89,22 @@ class DabblerMeetupAttendees extends StatelessWidget {
           goingLabel,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          // `13/17, 600, --ink` — `.t-footnote` at semibold.
-          style: DabblerType.footnote
+          // `13/17, 600, --ink` — `.t-footnote-tight`.
+          style: DabblerType.footnoteTight
               .resolveForDirection(direction)
-              .copyWith(
-                color: colors.textPrimary,
-                fontWeight: DabblerType.semibold,
-              ),
+              .copyWith(color: colors.textPrimary),
         ),
         if (capacityLabel != null)
           Text(
             capacityLabel!,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            // `11/15, --muted` — `.t-caption-2`.
-            style: DabblerType.caption2
+            // `11/15, --muted` — the tag step at regular weight.
+            style: DabblerType.tag
                 .resolveForDirection(direction)
                 .copyWith(
                   color: full ? colors.error.strong : colors.textSecondary,
+                  fontWeight: DabblerType.regular,
                 ),
           ),
       ],

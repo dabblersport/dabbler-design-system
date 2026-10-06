@@ -25,9 +25,9 @@ With a cover and without — see `listing_cards_gallery.dart`'s *CardVenue* sect
 
 ## Using it
 
-**Compose the tags from parts you already have.** `tags` takes widgets: `DabblerCardVenue.rating`
-for the star, score and review count, and `Chip` or `Badge` for distance, sports and badges such as
-"Top rated". The row wraps.
+**Compose the tags from parts you already have.** `tags` takes widgets: `DabblerCardVenue.distanceTag`
+for the brand distance chip, `DabblerCardVenue.rating` for the star, score and review count, and
+`ListingTag` for badges such as "Top rated". `sports` takes `ListingTag.outlined`. The rows wrap.
 
 **Leave `cover` null for a venue without a photo.** The card then starts at the name, as the design
 does; it does not draw an empty grey box.
@@ -38,8 +38,8 @@ semantics and do not open the card. Give the favourite a localised `semanticLabe
 **Pass formatted, localised strings.** `area`, `distance`, `price` and `priceCaption` are drawn as
 given; the card formats nothing.
 
-**Deviation:** the design's card corner is 18 and its body padding 15. The card keeps `Card`'s own
-corner (16) and padding (18) so every card in a list matches.
+The shell is the white card at the listing corner (18) with the frame's 15 of body padding inside
+the hairline — the same shell as `CardGame`, so a mixed list reads as one family.
 
 ## Axes
 
@@ -59,15 +59,17 @@ Arabic all of it mirrors.
 
 ## Tokens used
 
-Name: headline step in `textPrimary`, two lines. Place and caption: footnote and caption-2 in
-`textSecondary`; the location glyph in `textTertiary`. Price: callout at semibold. Rating star: the
-warning status base. Hairline: `borderDefault`. Gaps: the 12 stack gap and 6/9 spacing steps.
+Name: headline step in `textPrimary`, two lines. Place: footnote in `textSecondary`; caption: the
+tag step at regular weight; the location glyph in `textTertiary`. Price: body at semibold (16/21).
+Rating: footnote-tight; star the warning status base. Price rule: `bgTertiary` (`--faint`). Shell:
+`surfaceCard` inside `borderDefault`. Gaps: the 12 stack gap and 6/9 spacing steps.
 
 ## Change log
 
 - Alpha DS gaps 6 — adds this component, from `Listings.dc.html:750-820`.
 - KAN-426 (Seat B) — adds `accent` (a sport-tinted card fill, a derivation, not a frame); the `favourite` slot now takes `DabblerFavouriteButton`.
 - Alpha fidelity rebuild (KAN-426) — adds the `sports` and `facilities` rows and `facility()`, from `Listings.dc.html:795-808`.
+- Listings fidelity pass — the white listing shell at 18 (was the tonal card at 16); name block and tags 6 apart; `distanceTag`; outlined `ListingTag` sport chips; facility glyph 16, 5 from its caption; price 16/21 under a `--faint` rule; caption 11/15.
 
 ## Source
 

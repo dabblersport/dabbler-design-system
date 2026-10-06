@@ -14,7 +14,7 @@ Sources  : lib/src/navigation/page_header.dart (class dartdoc)
 PageHeader is the heading of a listing screen: a display title, a tappable location row beneath
 it, and outlined icon actions at the inline end, one of which can carry a count badge.
 
-It composes `Button`'s icon tone and `Badge`; the location row and the title are `Text` and `Icon`.
+Its actions are 42 `--surface-card` circles inside the card hairline with a 45 hit-test-only target, and its count is an 18 brand pill; the location row and the title are `Text` and `Icon`.
 
 ## Specimen
 
@@ -45,11 +45,12 @@ inline end of its action. Nothing names a physical side.
 ## Tokens used
 
 Gutter `space6` (18) inline, `space2` top, `space4` bottom. Action gap `space2`. Title
-`DabblerType.title1`, location `caption2` in `textSecondary`, glyph `brandPrimary`.
+`DabblerType.title1`, location `tagTight` at medium (11/14) in `textSecondary`, glyph 13 in `brandPrimary`; actions `surfaceCard` with `borderDefault`; count `brandPrimary` with `onBrand`.
 
 ## Change log
 
 - Alpha fidelity rebuild (KAN-426) — adds this component.
+- Listings fidelity pass — actions are the frame's 42 circles (were 60×45 outlined pills); the count badge is 18 in brand (was the accent pill); the location row is 11/14 at 500 with a 13 pin.
 
 ## Source
 

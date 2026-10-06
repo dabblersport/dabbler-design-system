@@ -5,7 +5,10 @@ import '../foundations/sport_accent.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import '../surfaces/listing_tag.dart';
 import 'card.dart';
+import 'card_event_listing.dart';
+import 'meta_line.dart';
 
 /// CardVenue — a venue in a listing: a cover photo, the venue's name, where
 /// it is, a row of tags (rating, distance, sports, badges), a favourite
@@ -46,11 +49,14 @@ import 'card.dart';
 /// The shell — surface, border, radius, padding, press, focus and the
 /// tap target — is [DabblerCard]'s; this file declares none of it.
 ///
-/// **Deviation:** the design's card corner is `--radius-xl` (18) and its body
-/// padding 15; the card shell's are [DabblerRadius.card] (16) and
-/// [DabblerSpacing.cardPadding] (18). The shell is not re-themed per card, so
-/// the venue card reads as the same family as every other card in the list.
-/// The design's 170px cover height is transcribed as [coverHeight].
+/// The shell is the white card (`--surface-card` inside the 1px
+/// `--outline-card` hairline, `Listings.dc.html:752`) at the listing corner,
+/// `--radius-xl` (18, [DabblerCardEventListing.cardRadius]), with the body's
+/// `padding: 15` inside the hairline ([DabblerCardEventListing.cardPadding]) —
+/// the same shell as [DabblerCardGame], so a mixed list reads as one family.
+/// (Until the Listings fidelity pass it sat on the tonal `standard` variant at
+/// 16, which drew it grey-on-cream and borderless.) The design's 170px cover
+/// height is transcribed as [coverHeight].
 ///
 /// ## Slots, not data
 ///
@@ -171,6 +177,23 @@ class DabblerCardVenue extends StatelessWidget {
     semanticLabel: semanticLabel,
   );
 
+  /// The facility glyph — `size="16"` (`Listings.dc.html:806`).
+  static const double facilityIconSize = 16;
+
+  /// Facility glyph to caption — `gap: 5px` (`Listings.dc.html:804`).
+  static const double facilityGap = 5;
+
+  /// The design's distance chip: a solid brand [DabblerListingTag] with a
+  /// bold pin (`Listings.dc.html:779-781`). Pass the formatted label —
+  /// `4 km away`.
+  static Widget distanceTag({Key? key, required String label}) =>
+      DabblerListingTag(
+        key: key,
+        label: label,
+        tone: DabblerListingTagTone.solid,
+        icon: 'location',
+      );
+
   /// One facility: a brand-ink glyph and a caption (`Listings.dc.html:803-806`).
   static Widget facility({
     Key? key,
@@ -195,7 +218,7 @@ class DabblerCardVenue extends StatelessWidget {
         .copyWith(color: colors.textSecondary);
     final String place = <String>[?area, ?distance].join(' · ');
 
-    final Widget head = Row(
+    final Widget nameRow = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: DabblerSpacing.space3,
       children: <Widget>[
@@ -215,7 +238,8 @@ class DabblerCardVenue extends StatelessWidget {
               ),
               if (place.isNotEmpty)
                 Row(
-                  spacing: DabblerSpacing.iconGap,
+                  // `gap: 5px` (`Listings.dc.html:767`).
+                  spacing: DabblerMetaLine.gap,
                   children: <Widget>[
                     DabblerIcon(
                       'location',
@@ -239,13 +263,33 @@ class DabblerCardVenue extends StatelessWidget {
       ],
     );
 
+    // Name block and tag row share one column at `gap: 7`
+    // (`Listings.dc.html:763`); the sections below sit at the card's 12.
+    final Widget head = tags.isEmpty
+        ? nameRow
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: DabblerSpacing.space2,
+            children: <Widget>[
+              nameRow,
+              Wrap(
+                spacing: DabblerSpacing.space2,
+                runSpacing: DabblerSpacing.space2,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: tags,
+              ),
+            ],
+          );
+
     final Widget? priceRow = price == null && trailing == null
         ? null
         : DecoratedBox(
             decoration: BoxDecoration(
               border: BorderDirectional(
                 top: BorderSide(
-                  color: colors.borderDefault,
+                  // `border-top: 1px solid var(--faint)` (`:813`).
+                  color: colors.bgTertiary,
                   width: DabblerSizing.borderDefault,
                 ),
               ),
@@ -266,17 +310,21 @@ class DabblerCardVenue extends StatelessWidget {
                           Text(
                             priceCaption!,
                             maxLines: 1,
-                            style: DabblerType.caption2
+                            // `11/15` — the tag step at regular weight.
+                            style: DabblerType.tag
                                 .resolveForDirection(direction)
-                                .copyWith(color: colors.textSecondary),
+                                .copyWith(
+                                  color: colors.textSecondary,
+                                  fontWeight: DabblerType.regular,
+                                ),
                           ),
                         if (price != null)
                           Text(
                             price!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            // `16/21 600` — `.t-callout` at semibold.
-                            style: DabblerType.callout
+                            // `16/21 600` — `.t-body` at semibold.
+                            style: DabblerType.body
                                 .resolveForDirection(direction)
                                 .copyWith(
                                   color: colors.textPrimary,
@@ -293,8 +341,11 @@ class DabblerCardVenue extends StatelessWidget {
           );
 
     return DabblerCard(
+      variant: DabblerCardVariant.white,
+      radius: DabblerCardEventListing.cardRadius,
+      padding: DabblerCardEventListing.cardPadding,
       fill: accent?.surfaceOver(
-        DabblerCard.fillOf(colors, DabblerCardVariant.standard),
+        DabblerCard.fillOf(colors, DabblerCardVariant.white),
       ),
       width: width,
       onTap: onTap,
@@ -317,13 +368,6 @@ class DabblerCardVenue extends StatelessWidget {
         spacing: DabblerSpacing.stackDefault,
         children: <Widget>[
           head,
-          if (tags.isNotEmpty)
-            Wrap(
-              spacing: DabblerSpacing.space2,
-              runSpacing: DabblerSpacing.space2,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: tags,
-            ),
           if (sports.isNotEmpty)
             Wrap(
               spacing: DabblerSpacing.space2,
@@ -367,7 +411,7 @@ class _Rating extends StatelessWidget {
       child: ExcludeSemantics(
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: DabblerSpacing.space1,
+          spacing: DabblerListingTag.iconGap,
           children: <Widget>[
             DabblerIcon(
               'star',
@@ -377,12 +421,10 @@ class _Rating extends StatelessWidget {
             ),
             Text(
               rating,
-              style: DabblerType.footnote
+              // `13/17 600` — `.t-footnote-tight`.
+              style: DabblerType.footnoteTight
                   .resolveForDirection(direction)
-                  .copyWith(
-                    color: colors.textPrimary,
-                    fontWeight: DabblerType.semibold,
-                  ),
+                  .copyWith(color: colors.textPrimary),
             ),
             if (reviews != null)
               Text(
@@ -410,18 +452,22 @@ class _Facility extends StatelessWidget {
     final TextDirection direction = Directionality.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: DabblerSpacing.space1,
+      spacing: DabblerCardVenue.facilityGap,
       children: <Widget>[
         DabblerIcon(
           icon,
-          size: DabblerSizing.iconInline,
+          size: DabblerCardVenue.facilityIconSize,
           color: colors.brandPrimary,
         ),
-        Text(
-          label,
-          style: DabblerType.caption1
-              .resolveForDirection(direction)
-              .copyWith(color: colors.textSecondary),
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: DabblerType.caption1
+                .resolveForDirection(direction)
+                .copyWith(color: colors.textSecondary),
+          ),
         ),
       ],
     );

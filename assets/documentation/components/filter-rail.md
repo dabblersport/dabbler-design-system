@@ -15,7 +15,7 @@ FilterRail is the applied-filters rail under a listing's tabs, one selected remo
 filter followed by a "Clear all" action, and its companion FilterGroup is the labelled group of
 option chips inside a filter sheet.
 
-Both compose `Chip` and `Button`; they paint nothing of their own.
+The rail draws its own applied pills (the frame's solid brand pill with a remove glyph); the group composes `Chip`.
 
 ## Specimen
 
@@ -45,6 +45,7 @@ Chip gap `space2` (rail), `space3` (group). Caption `footnote` semibold in `text
 ## Change log
 
 - Alpha fidelity rebuild (KAN-426) — adds these components.
+- Listings fidelity pass — applied filters are the frame's 32-tall brand pills (7/9/7/14 padding, 13/18 medium, a bold 16 `close-circle` at 80%), not the 34-tall small `Chip`.
 
 ## Source
 

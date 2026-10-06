@@ -6,6 +6,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'card.dart';
+import 'card_event_listing.dart';
 
 /// The two shapes an empty state takes.
 ///
@@ -25,6 +26,15 @@ enum DabblerEmptyStateSize {
   /// title and copy, centred, with 48/36 padding. The empty replies area of
   /// `Post.dc.html` (lines 82-87), where the state sits straight on the page.
   plain,
+
+  /// A listing's empty answer (`Listings.dc.html:192-203, 505-516,
+  /// 737-748`): the listing card shell (`--surface-card`, 1px
+  /// `--outline-card`, `--radius-xl`), `36 24` padding and `gap: 15`; a 60²
+  /// brand-tinted well (brand 10% fill, brand 28% hairline, `--radius-lg`)
+  /// holding a 30px bold brand glyph; the title at `.t-title-3` in the display
+  /// face; the copy at 14/21 capped at 250, 6 under the title. The screen
+  /// places it — the frame sets it 60 below the chrome.
+  listing,
 }
 
 /// The tone of an empty state's icon well.
@@ -253,14 +263,41 @@ class DabblerEmptyState extends StatelessWidget {
     DabblerEmptyStateSize size,
     TextDirection direction,
   ) => switch (size) {
-    DabblerEmptyStateSize.page => DabblerType.title3.resolveForDirection(
-      direction,
-    ),
+    DabblerEmptyStateSize.page || DabblerEmptyStateSize.listing =>
+      DabblerType.title3.resolveForDirection(direction),
     DabblerEmptyStateSize.inline || DabblerEmptyStateSize.plain =>
       DabblerType.body
           .resolveForDirection(direction)
           .copyWith(fontWeight: DabblerType.semibold),
   };
+
+  /// [DabblerEmptyStateSize.listing]'s padding — `padding: 36px 24px`.
+  static const EdgeInsetsDirectional listingPadding =
+      EdgeInsetsDirectional.symmetric(
+        vertical: DabblerSpacing.space10,
+        horizontal: DabblerSpacing.space8,
+      );
+
+  /// [DabblerEmptyStateSize.listing]'s gap — `gap: 15px`.
+  static const double listingGap = DabblerSpacing.space5;
+
+  /// [DabblerEmptyStateSize.listing]'s title-to-copy gap — `gap: 6px`.
+  static const double listingTextGap = DabblerSpacing.space2;
+
+  /// [DabblerEmptyStateSize.listing]'s well — `60 × 60`.
+  static const double listingWellSide = DabblerSpacing.space9 * 2;
+
+  /// [DabblerEmptyStateSize.listing]'s glyph — `size="30"`, bold.
+  static const double listingGlyph = DabblerSizing.iconLg;
+
+  /// The listing well's brand share in its fill — `10%`.
+  static const double listingWellFillMix = 0.10;
+
+  /// The listing well's brand share in its hairline — `28%`.
+  static const double listingWellLineMix = 0.28;
+
+  /// [DabblerEmptyStateSize.listing]'s copy measure — `max-width: 250px`.
+  static const double listingTextMaxWidth = 250;
 
   /// The copy's style — `fontSize: 14, lineHeight: '19px'` at both sizes.
   ///
@@ -281,6 +318,12 @@ class DabblerEmptyState extends StatelessWidget {
           vertical: DabblerSpacing.space11,
           horizontal: DabblerSpacing.space10,
         ),
+        child: Center(child: content),
+      ),
+      DabblerEmptyStateSize.listing => DabblerCard(
+        variant: DabblerCardVariant.white,
+        radius: DabblerCardEventListing.cardRadius,
+        padding: listingPadding,
         child: Center(child: content),
       ),
       DabblerEmptyStateSize.inline => DabblerCard(
@@ -304,9 +347,12 @@ class DabblerEmptyState extends StatelessWidget {
   /// and the copy's measure.
   Widget _content(DabblerColors colors, TextDirection direction) {
     final bool page = size == DabblerEmptyStateSize.page;
+    final bool listing = size == DabblerEmptyStateSize.listing;
+    final double step = listing ? listingGap : gap;
     final List<Widget> children = <Widget>[];
 
-    void add(Widget child, {double space = gap}) {
+    void add(Widget child, {double? space}) {
+      space ??= step;
       if (children.isNotEmpty) children.add(SizedBox(height: space));
       children.add(child);
     }
@@ -334,15 +380,23 @@ class DabblerEmptyState extends StatelessWidget {
       final Widget copy = Text(
         text!,
         textAlign: TextAlign.center,
-        style: textStyleFor(direction).copyWith(color: colors.textSecondary),
+        // The listing copy is `14/21` — `.t-small-relaxed`.
+        style:
+            (listing
+                    ? DabblerType.smallRelaxed.resolveForDirection(direction)
+                    : textStyleFor(direction))
+                .copyWith(color: colors.textSecondary),
       );
       add(
-        page
+        page || listing
             ? ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: pageTextMaxWidth),
+                constraints: BoxConstraints(
+                  maxWidth: listing ? listingTextMaxWidth : pageTextMaxWidth,
+                ),
                 child: copy,
               )
             : copy,
+        space: listing && title != null ? listingTextGap : null,
       );
     }
 
@@ -355,7 +409,7 @@ class DabblerEmptyState extends StatelessWidget {
                 tone: DabblerButtonTone.secondary,
                 onPressed: onRetry,
               ));
-    if (act != null) add(act, space: gap + actionGap);
+    if (act != null) add(act, space: listing ? listingGap : gap + actionGap);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -376,6 +430,42 @@ class DabblerEmptyState extends StatelessWidget {
   /// [DabblerColors.error]'s `surface` (fill and hairline) and `strong` (ink).
   Widget _well(DabblerColors colors) {
     final bool error = tone == DabblerEmptyStateTone.error;
+    if (size == DabblerEmptyStateSize.listing && !error) {
+      // `Listings.dc.html:194`: brand 10% over white, a brand 28% hairline,
+      // `--radius-lg`, the glyph bold in brand ink.
+      return Container(
+        width: listingWellSide,
+        height: listingWellSide,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Color.lerp(
+            colors.surfaceCard,
+            colors.brandPrimary,
+            listingWellFillMix,
+          ),
+          borderRadius: DabblerRadius.lgAll,
+          border: Border.all(
+            color: Color.lerp(
+              colors.surfaceCard,
+              colors.brandPrimary,
+              listingWellLineMix,
+            )!,
+            width: DabblerSizing.borderDefault,
+          ),
+        ),
+        child: IconTheme.merge(
+          data: IconThemeData(color: colors.brandPrimary),
+          child:
+              iconWidget ??
+              DabblerIcon(
+                icon!,
+                weight: DabblerIconWeight.bold,
+                size: listingGlyph,
+                color: colors.brandPrimary,
+              ),
+        ),
+      );
+    }
     final Color fill = error ? colors.error.surface : colors.bgPrimary;
     final Color line = error ? colors.error.surface : colors.bgTertiary;
     final Color ink = error ? colors.error.strong : colors.textTertiary;

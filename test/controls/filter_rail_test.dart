@@ -32,6 +32,8 @@ void main() {
   testWidgets('renders nothing when empty', (tester) async {
     await tester.pumpWidget(_rail(labels: const <String>[]));
     expect(find.byType(DabblerChip), findsNothing);
+    expect(find.byKey(DabblerFilterRail.clearAllKey), findsNothing);
+    expect(find.byType(DabblerIcon), findsNothing);
   });
 
   testWidgets('Clear all fires and is hidden without a handler', (
@@ -64,15 +66,18 @@ void main() {
     expect(first, greaterThan(clear));
   });
 
-  testWidgets('chips are the small size and Clear all is muted text (frame)', (
+  testWidgets('pills are the frame\'s 32 and Clear all is muted text', (
     tester,
   ) async {
     await tester.pumpWidget(_rail(onClearAll: () {}));
-    for (final DabblerChip c in tester.widgetList<DabblerChip>(
-      find.byType(DabblerChip),
-    )) {
-      expect(c.size, DabblerChipSize.small);
+    // `Listings.dc.html:100`: 7 + 18 + 7.
+    for (final String l in <String>['Within 5 km', 'Today']) {
+      expect(
+        tester.getSize(find.byKey(DabblerFilterRail.pillKeyFor(l))).height,
+        DabblerFilterRail.pillHeight,
+      );
     }
+    expect(DabblerFilterRail.pillHeight, 32);
     final DabblerTextLink link = tester.widget<DabblerTextLink>(
       find.byKey(DabblerFilterRail.clearAllKey),
     );

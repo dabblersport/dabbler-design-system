@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 
 import '../feedback/ring.dart';
-import '../foundations/icon.dart';
 import '../foundations/text.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'card.dart';
+import 'meta_line.dart';
 
 /// The decorative tile tone an [DabblerCardUpcoming] is tinted with.
 enum DabblerCardUpcomingTone {
@@ -70,6 +70,7 @@ class DabblerCardUpcoming extends StatelessWidget {
     this.onTap,
     this.semanticLabel,
     this.width,
+    this.rail = false,
   });
 
   /// The game's title.
@@ -102,16 +103,26 @@ class DabblerCardUpcoming extends StatelessWidget {
   /// The accessible label of a tappable tile.
   final String? semanticLabel;
 
-  /// Fixed width, for a horizontal rail. Null sizes to the constraints.
+  /// Fixed width, for a horizontal rail. Null sizes to the constraints, or —
+  /// under unbounded width, inside a horizontal scroller — to the content, as
+  /// the frame's rail cards do (`flex-shrink: 0`, no width).
   final double? width;
 
-  /// The ring's diameter — the design's 24-tick ring.
-  static const double ringDiameter =
-      DabblerSizing.touchTargetMin +
-      DabblerSpacing.space3 +
-      DabblerSpacing.space1;
+  /// The rail metrics (`Listings.dc.html:143-167`): a 24-tick ring, a 14/19
+  /// title over an 11/15 time line, 1 apart. False is the single card
+  /// (`:427-449`): a 32-tick ring, a 15/20 title over a 12/16 time line, 3
+  /// apart.
+  final bool rail;
 
-  /// The ring's tick count.
+  /// The ring's diameter — `width: 62px; height: 62px`.
+  static const double ringDiameter = 62;
+
+  /// A tick's length — `height: 7px`.
+  static const double tickLength = 7;
+
+  /// The single card's tick count — `gaugeLg`, 32.
+  static const int singleRingTicks = 32;
+
   static const int ringTicks = 24;
 
   /// The share of the amber tile kept over the card surface —
@@ -131,19 +142,34 @@ class DabblerCardUpcoming extends StatelessWidget {
         DabblerCardUpcomingTone.accent => DabblerColors.tileAccent.surface,
       };
 
+  /// The shell's corner — `--radius-lg` (12).
+  static const double radius = DabblerRadius.lg;
+
+  /// The shell's padding — `padding: 12px` inside the 1px hairline.
+  static const EdgeInsets padding = EdgeInsets.all(
+    DabblerSpacing.space4 + DabblerSizing.borderDefault,
+  );
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final Widget ring = DabblerRing.ticks(
       fraction: fraction,
       diameter: ringDiameter,
-      count: ringTicks,
+      count: rail ? ringTicks : singleRingTicks,
+      tickLength: tickLength,
       track: DabblerRingTrack.faint,
       semanticValue: '$countdownValue $countdownUnit',
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          DabblerText(countdownValue, style: DabblerType.headline, maxLines: 1),
+          // The numeral is the display face — `font-family: var(--font-display);
+          // font-size: 18px` (`:150`, `:433`).
+          DabblerText(
+            countdownValue,
+            style: DabblerType.displayLabel,
+            maxLines: 1,
+          ),
           DabblerText(
             countdownUnit,
             style: DabblerType.caption2,
@@ -154,59 +180,67 @@ class DabblerCardUpcoming extends StatelessWidget {
       ),
     );
     final bool hasPlace = place != null || distance != null;
+    Widget column() => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: rail ? DabblerSizing.borderDefault : DabblerSpacing.space1,
+      children: <Widget>[
+        DabblerText(
+          title,
+          style: rail ? DabblerType.smallTight : DabblerType.subheadline,
+          weight: DabblerTextWeight.semibold,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (when != null)
+          if (rail)
+            Text(
+              when!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              // `11/15` — the tag step at regular weight.
+              style: DabblerType.tag
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(
+                    color: colors.textSecondary,
+                    fontWeight: DabblerType.regular,
+                  ),
+            )
+          else
+            DabblerText(
+              when!,
+              style: DabblerType.caption1,
+              tone: DabblerTextTone.secondary,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+        if (hasPlace)
+          DabblerMetaLine(
+            items: <String>[?place, ?distance],
+            size: DabblerMetaLineSize.compact,
+          ),
+      ],
+    );
     return DabblerCard(
       width: width,
+      variant: DabblerCardVariant.outlined,
+      radius: radius,
+      padding: padding,
       fill: fillOf(colors, tone),
       onTap: onTap,
       semanticLabel: onTap == null ? null : (semanticLabel ?? title),
-      child: Row(
-        spacing: DabblerSpacing.space4,
-        children: <Widget>[
-          ring,
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                DabblerText(
-                  title,
-                  style: DabblerType.subheadline,
-                  weight: DabblerTextWeight.semibold,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (when != null)
-                  DabblerText(
-                    when!,
-                    style: DabblerType.caption2,
-                    tone: DabblerTextTone.secondary,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                if (hasPlace)
-                  Row(
-                    spacing: DabblerSpacing.space1,
-                    children: <Widget>[
-                      DabblerIcon(
-                        'location',
-                        size: DabblerSizing.iconInline,
-                        color: colors.textTertiary,
-                      ),
-                      Flexible(
-                        child: DabblerText(
-                          <String>[?place, ?distance].join(' · '),
-                          style: DabblerType.caption1,
-                          tone: DabblerTextTone.secondary,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints c) {
+          final bool bounded = c.hasBoundedWidth;
+          return Row(
+            mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
+            spacing: rail ? DabblerSpacing.space3 : DabblerSpacing.space4,
+            children: <Widget>[
+              ring,
+              if (bounded) Expanded(child: column()) else column(),
+            ],
+          );
+        },
       ),
     );
   }

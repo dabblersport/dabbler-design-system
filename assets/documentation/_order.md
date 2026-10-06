@@ -103,6 +103,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [CardEvent](components/card-event.md) — the event card, in three densities.
 - [CardEventResult](components/card-event-result.md) — a game or meet-up in a search result: date tile, kind, title, place and a pill action.
 - [CardVenue](components/card-venue.md) — a venue in a listing: cover, name, place, tags and price.
+- [MetaLine](components/meta-line.md) — a glyph and short facts split by dots: where, how far, how long.
 - [CardGame](components/card-game.md) — a game in a listing: title, tags, day and time, progress, price and join.
 - [CardUpcoming](components/card-upcoming.md) — a game you are in, on a tinted tile with a countdown ring.
 - [CardUpcomingRail](components/card-upcoming-rail.md) — the narrow upcoming tile for a rail: date block, title, venue and a small ring.
@@ -142,6 +143,7 @@ sitting beside it as another entry in `Card`'s own variant list.
 - [Avatar](components/avatar.md) — a person's circular, deterministically generated portrait.
 - [ProviderMark](components/provider-mark.md) — the vendors' own Google and Apple sign-in marks, unmodified.
 - [Badge](components/badge.md) — the pill that labels a row, a card or a tab.
+- [ListingTag](components/listing-tag.md) — the small pill a listing card labels itself with.
 - [Rating](components/rating.md) — a score, shown or collected.
 - [HeroIcon](components/hero-icon.md) — the large round glyph that heads a success or empty screen.
 - [ConversationRow](components/conversation-row.md) — one conversation in the inbox: identity, latest activity, unread and status.
@@ -223,6 +225,7 @@ lot about the rest.
   isn't one.
 - [ProgressStages](components/progress-stages.md) — the named stages of a setup, each pending, running, done or failed.
 - [Skeleton](components/skeleton.md) — placeholder geometry for content that hasn't arrived yet.
+- [ListingSkeleton](components/listing-skeleton.md) — one listing card's loading placeholder, in that card's shape.
 - [EmptyState](components/empty-state.md) — the "nothing here yet" state, and the only one this
   system has.
 - [SystemMessage](components/system-message.md) — product-generated activity in a conversation, never a bubble.

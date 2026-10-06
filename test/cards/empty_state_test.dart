@@ -71,17 +71,14 @@ void main() {
               matching: find.byType(Container),
             )
             .first;
-        expect(
-          tester.getSize(well).width,
-          DabblerEmptyState.wellSide,
-          reason: '$size',
-        );
-        expect(
-          tester.getSize(well).height,
-          DabblerEmptyState.wellSide,
-          reason: '$size',
-        );
-        expect(DabblerEmptyState.wellSide, lessThan(120.0));
+        // The listing size's well is the frame's 60² (`Listings.dc.html:194`);
+        // still far under the 120 illustration floor.
+        final double side = size == DabblerEmptyStateSize.listing
+            ? DabblerEmptyState.listingWellSide
+            : DabblerEmptyState.wellSide;
+        expect(tester.getSize(well).width, side, reason: '$size');
+        expect(tester.getSize(well).height, side, reason: '$size');
+        expect(side, lessThan(120.0));
       }
     });
 
@@ -332,7 +329,14 @@ void main() {
               find.text('widen the distance filter or create your own.'),
             )
             .style!;
-        expect(style.fontSize, DabblerType.footnote.fontSize, reason: '$size');
+        // The listing size sets its copy at 14/21 (`Listings.dc.html:199`).
+        expect(
+          style.fontSize,
+          size == DabblerEmptyStateSize.listing
+              ? DabblerType.smallRelaxed.fontSize
+              : DabblerType.footnote.fontSize,
+          reason: '$size',
+        );
         expect(style.color, _colors().textSecondary, reason: '$size');
       }
     });

@@ -66,8 +66,7 @@ the inline end; Join sits under them. A card with none of the three renders exac
 **The note's words carry the status, not its colour.** The bar and note take a status tone
 (`warning` for almost full, `error` for full), but "1 spot left" must say so in text.
 
-**Deviation:** the design draws the price at 22/27 bold in the sans face (`Listings.dc.html:251`).
-The ramp's 22 step is the display face, so the price takes the headline step (17) at bold.
+The price is `figureXl` — 22/27 bold in the sans face, as `Listings.dc.html:251` draws it.
 
 @specimen card-event/listing
 
@@ -114,6 +113,7 @@ Overlay well fill: the card surface colour.
   densities, with `DabblerCardEventPlayers`, `DabblerCardEventPrice` and
   `DabblerCardEventListing` (`Listings.dc.html:242-259`). Large's own `footer` still renders,
   under the slots.
+- Listings fidelity pass — the price is `figureXl` (22/27) and its unit 11/15; the players label `footnoteTight` (13/17) and its note 11/15; `DabblerCardEventListing.cardRadius` / `cardPadding` name the listing shell.
 
 ## Source
 

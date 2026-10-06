@@ -8,6 +8,7 @@ import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'card.dart';
 import 'card_event_listing.dart';
+import 'meta_line.dart';
 
 /// CardGame — a game in a listing: title with a verified mark and a tag row
 /// on the start side, the day and time on the end side, a place line, the
@@ -21,7 +22,7 @@ import 'card_event_listing.dart';
 /// DabblerCardGame(
 ///   title: 'Tuesday 5-a-side',
 ///   verified: true,
-///   tags: <Widget>[DabblerChip(label: 'Football'), DabblerChip(label: 'Futsal 5s')],
+///   tags: <Widget>[DabblerListingTag(label: 'Football'), DabblerListingTag(label: 'Futsal 5s', tone: DabblerListingTagTone.brandTint)],
 ///   dayLabel: 'Today',
 ///   timeLabel: '7:30 PM',
 ///   meta: <String>['Dubai Sports City', '2.1 km', '90 min'],
@@ -38,13 +39,21 @@ import 'card_event_listing.dart';
 /// |---|---|---|
 /// | title 17/22 600, verified tick 16 in success | `:212-218` | `.t-headline`, `tick-circle` bold in `success` |
 /// | tag row, gap 6, wraps | `:220-224` | the [tags] slot, a [Wrap] |
-/// | day (12, brand) over time (20 bold), at the end | `:227-230` | [dayLabel] and [timeLabel]; the time takes `.t-headline` at bold — the nearest sans step, as the price block does |
-/// | place line: pin, venue, dot-separated distance and duration | `:234-243` | [meta], entries joined by dots |
+/// | day (12, brand) over time (20/26 bold), at the end | `:227-230` | [dayLabel] (`.t-caption-1` semibold) and [timeLabel] ([DabblerType.figureLarge]) |
+/// | place line: pin, venue, dot-separated distance and duration | `:234-243` | [meta] on a [DabblerMetaLine] |
 /// | progress, price, join | `:245-262` | [DabblerCardEventListing.compose] |
 /// | social counts at the end of the action row | `:263-275` | the [trailing] slot |
 ///
-/// The shell — surface, border, radius, padding, press, focus — is
-/// [DabblerCard]'s.
+/// The shell — surface, border, press, focus — is [DabblerCard]'s, on the
+/// white variant at the listing corner and padding
+/// ([DabblerCardEventListing.cardRadius], 18, and
+/// [DabblerCardEventListing.cardPadding]). Tags are [DabblerListingTag]s.
+///
+/// ## The action row
+///
+/// `:256-266`: the Join button is `flex: 1` (basis 0) and the social counts
+/// `flex-grow: 1` at their own width, so the button takes half of what the
+/// counts leave. With no [trailing] the button fills the row.
 ///
 /// ## RTL
 ///
@@ -189,76 +198,26 @@ class DabblerCardGame extends StatelessWidget {
             maxLines: 1,
           ),
         if (timeLabel != null)
-          DabblerText(
-            timeLabel!,
-            style: DabblerType.headline,
-            weight: DabblerTextWeight.bold,
-            maxLines: 1,
-          ),
+          DabblerText(timeLabel!, style: DabblerType.figureLarge, maxLines: 1),
       ],
     );
   }
 
-  Widget? _place(DabblerColors colors) {
+  Widget? _place() {
     if (meta.isEmpty) return null;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      spacing: DabblerSpacing.space1,
-      children: <Widget>[
-        DabblerIcon('location', size: pinSize, color: colors.textTertiary),
-        Flexible(
-          child: Wrap(
-            spacing: DabblerSpacing.space1,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: <Widget>[
-              for (int i = 0; i < meta.length; i++) ...<Widget>[
-                if (i > 0)
-                  DabblerText(
-                    '·',
-                    style: DabblerType.footnote,
-                    tone: DabblerTextTone.tertiary,
-                  ),
-                DabblerText(
-                  meta[i],
-                  style: DabblerType.footnote,
-                  weight: i == 0
-                      ? DabblerTextWeight.medium
-                      : DabblerTextWeight.regular,
-                  tone: i == 0
-                      ? DabblerTextTone.primary
-                      : DabblerTextTone.secondary,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
+    return DabblerMetaLine(items: meta);
   }
 
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final Widget? when = _when();
-    final Widget? place = _place(colors);
+    final Widget? place = _place();
     final Widget? actionRow = action == null
         ? null
         : trailing == null
         ? action
-        : Row(
-            spacing: DabblerSpacing.space3,
-            children: <Widget>[
-              Expanded(child: action!),
-              Expanded(
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: trailing,
-                ),
-              ),
-            ],
-          );
+        : DabblerListingActionRow(action: action!, trailing: trailing!);
     final Widget? lower = DabblerCardEventListing.compose(
       progress: progress,
       price: price,
@@ -268,6 +227,8 @@ class DabblerCardGame extends StatelessWidget {
       // `background: var(--surface-card)` with the card hairline
       // (`Listings.dc.html:524`) — the white variant, not the tonal one.
       variant: DabblerCardVariant.white,
+      radius: DabblerCardEventListing.cardRadius,
+      padding: DabblerCardEventListing.cardPadding,
       fill: accent?.surfaceOver(
         DabblerCard.fillOf(colors, DabblerCardVariant.white),
       ),

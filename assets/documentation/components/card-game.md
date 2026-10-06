@@ -19,6 +19,8 @@ It composes `Card`, `Text`, `Icon` and the listing slots of the event cards.
 
 ## Specimen
 
+@specimen card-game/social
+
 Full, and title-and-time only — see `card_game_gallery.dart`'s *CardGame* section.
 
 @specimen card-game
@@ -29,7 +31,7 @@ As a meetup — badges, attendees, an RSVP action and social counts:
 
 ## Using it
 
-**Pass tags as `Chip`s.** The tag row wraps; the card does not model sport, format or skill.
+**Pass tags as `ListingTag`s.** The tag row wraps; the card does not model sport, format or skill.
 
 **Fill only the slots the screen has.** Every slot except the title is optional; absent progress,
 price and action drop their rows with their gaps.
@@ -50,9 +52,10 @@ With `onTap` the whole card is one button; `action` and `trailing` keep their ow
 ## Tokens used
 
 Row gap `space4`, section gap `stackDefault`, tag gap `space2`. Title `headline` semibold, time
-`headline` bold, day `caption1` in brand ink, place line `footnote`.
+`figureLarge` (20/26 bold), day `caption1` in brand ink, place line a `MetaLine`. Shell: the white
+card at the listing corner (`DabblerCardEventListing.cardRadius`, 18) and padding.
 
-Deviation: the time is `headline` bold (17) where the design draws 20/26 sans bold — the ramp's 20 step is the display face. The verified tick is `iconInline` (15) where the design draws 16.
+Deviation: the verified tick is `iconInline` (15) where the design draws 16.
 
 ## Change log
 
@@ -60,6 +63,7 @@ Deviation: the time is `headline` bold (17) where the design draws 20/26 sans bo
 - Alpha fidelity rebuild (KAN-426) — adds this component.
 - KAN-429 (Meetups) — no change to the card: a meetup is this card with badges as `tags`, `MeetupAttendees` as `progress`, an `RsvpCta` as `action` and `FeedAction`s as `trailing`.
 - KAN-426 (Seat B) — adds `accent`: tints the card fill with a sport's accent at 12% over the card fill. A derivation of the persona-card recipe, not a Listings frame.
+- Listings fidelity pass — the time is `figureLarge` (20/26) as the frame draws it; the corner is the listing card's 18; the place line is a `MetaLine` with 3px dots; tags are `ListingTag`s; with `trailing`, Join takes half of what the social counts leave (`DabblerListingActionRow`).
 
 ## Source
 

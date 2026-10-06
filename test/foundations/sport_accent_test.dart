@@ -320,14 +320,14 @@ void main() {
         final List<DabblerCard> cards = tester
             .widgetList<DabblerCard>(find.byType(DabblerCard))
             .toList();
-        // CardGame is the white card (KAN-429); the venue card is tonal.
-        expect(
-          cards[0].fill,
-          DabblerSportAccent.padel.surfaceOver(
-            DabblerCard.fillOf(c, DabblerCardVariant.white),
-          ),
+        // Both listing cards are the white card (KAN-429; the venue card since
+        // the Listings fidelity pass, `Listings.dc.html:752`).
+        final Color white = DabblerSportAccent.padel.surfaceOver(
+          DabblerCard.fillOf(c, DabblerCardVariant.white),
         );
-        expect(cards[1].fill, tinted);
+        expect(cards[0].fill, white);
+        expect(cards[1].fill, white);
+        expect(cards[1].variant, DabblerCardVariant.white);
         expect(cards[2].fill, isNull);
       });
     }

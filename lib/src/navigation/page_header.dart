@@ -1,11 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-import '../controls/button.dart';
 import '../foundations/icon.dart';
 import '../foundations/text.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../interaction/focus_ring.dart';
 import '../interaction/press_scale.dart';
-import '../surfaces/badge.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -61,8 +60,8 @@ class DabblerPageHeaderAction {
 /// |---|---|
 /// | title, display 28/34 | [DabblerType.title1] |
 /// | location row: bold `location` glyph in brand, caption, `arrow-circle-down` | [locationLabel] row; absent when [locationLabel] is null |
-/// | actions, 40 circles, gap 6 | [DabblerButton.icon] outlined |
-/// | count badge on an action | [DabblerBadge] pill at the action's top inline end |
+/// | actions, 40 circles in a 1px hairline (42), gap 6 | a [actionDiameter] `--surface-card` circle with a 45 hit-test-only target |
+/// | count badge on an action, 18 brand pill at -3/-3 | [badgeKey], `--color-brand-primary` with on-brand 11 600 |
 ///
 /// ## RTL
 ///
@@ -114,6 +113,24 @@ class DabblerPageHeader extends StatelessWidget {
   /// The badge's minimum width, keeping a single digit round.
   static const double badgeMinWidth = DabblerSizing.iconSm;
 
+  /// The action circle — `40px` inside a 1px hairline (`Listings.dc.html:77`).
+  static const double actionDiameter = 42;
+
+  /// The action glyph — `size="20"`.
+  static const double actionIconSize = 20;
+
+  /// The count badge's offset — `top: -3px; right: -3px`.
+  static const double badgeInset = DabblerSpacing.space1;
+
+  /// The count badge's inline padding — `padding: 0 5px`.
+  static const double badgePadding = 5;
+
+  /// The location pin — `size="13"` (`Listings.dc.html:68`).
+  static const double locationIconSize = 13;
+
+  /// The location row's gap — `gap: 4px`.
+  static const double locationGap = 4;
+
   /// Finds the count badge in a test.
   static const Key badgeKey = ValueKey<String>('dabbler-page-header-badge');
 
@@ -124,20 +141,22 @@ class DabblerPageHeader extends StatelessWidget {
         DabblerIcon(
           'location',
           weight: DabblerIconWeight.bold,
-          size: DabblerSizing.iconXs,
+          size: locationIconSize,
           color: colors.brandPrimary,
         ),
-        const SizedBox(width: DabblerSpacing.space1),
+        const SizedBox(width: locationGap),
         Flexible(
           child: DabblerText(
             locationLabel!,
-            style: DabblerType.caption2,
+            // `11/14 500` (`Listings.dc.html:70`) — `.t-tag-tight` at medium.
+            style: DabblerType.tagTight,
+            weight: DabblerTextWeight.medium,
             tone: DabblerTextTone.secondary,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(width: DabblerSpacing.space1),
+        const SizedBox(width: locationGap),
         DabblerIcon(
           'arrow-circle-down',
           size: DabblerSizing.iconXs,
@@ -164,34 +183,81 @@ class DabblerPageHeader extends StatelessWidget {
     );
   }
 
-  Widget _action(DabblerPageHeaderAction a) {
-    final Widget button = DabblerButton.icon(
-      icon: a.icon,
-      semanticLabel: a.count > 0
-          ? '${a.semanticLabel}, ${a.count}'
-          : a.semanticLabel,
-      tone: DabblerButtonTone.outlined,
-      onPressed: a.onPressed,
+  Widget _action(BuildContext context, DabblerPageHeaderAction a) {
+    final DabblerColors colors = DabblerColors.of(context);
+    final TextDirection direction = Directionality.of(context);
+    final bool enabled = a.onPressed != null;
+    // `width: 40px; height: 40px` inside a 1px `--outline-card` hairline on
+    // `--surface-card`, `--radius-pill` (`Listings.dc.html:77-85`): a 42
+    // circle. The 45 target is a hit-test-only area around it.
+    final Widget circle = Container(
+      width: actionDiameter,
+      height: actionDiameter,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: colors.surfaceCard,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: colors.borderDefault,
+          width: DabblerSizing.borderDefault,
+        ),
+      ),
+      child: DabblerIcon(
+        a.icon,
+        size: actionIconSize,
+        color: enabled ? colors.textPrimary : colors.textTertiary,
+      ),
+    );
+    Widget button = Semantics(
+      button: true,
+      enabled: enabled,
+      label: a.count > 0 ? '${a.semanticLabel}, ${a.count}' : a.semanticLabel,
+      onTap: a.onPressed,
+      excludeSemantics: true,
+      child: DabblerExpandedHitArea(
+        minimum: const Size.square(DabblerSizing.touchTargetMin),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: a.onPressed,
+          child: DabblerFocusRing(
+            borderRadius: DabblerRadius.pillAll,
+            child: DabblerPressScale.gesture(enabled: enabled, child: circle),
+          ),
+        ),
+      ),
     );
     if (a.count <= 0) return button;
-    return Stack(
+    button = Stack(
       clipBehavior: Clip.none,
       children: <Widget>[
         button,
         PositionedDirectional(
-          top: -DabblerSpacing.space1,
-          end: -DabblerSpacing.space1,
+          top: -badgeInset,
+          end: -badgeInset,
           child: IgnorePointer(
-            child: DabblerBadge(
+            child: Container(
               key: badgeKey,
-              label: '${a.count}',
-              tone: DabblerBadgeTone.pill,
-              minWidth: badgeMinWidth,
+              height: badgeMinWidth,
+              constraints: const BoxConstraints(minWidth: badgeMinWidth),
+              padding: const EdgeInsets.symmetric(horizontal: badgePadding),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: colors.brandPrimary,
+                borderRadius: DabblerRadius.pillAll,
+              ),
+              child: Text(
+                '${a.count}',
+                maxLines: 1,
+                style: DabblerType.tag
+                    .resolveForDirection(direction)
+                    .copyWith(color: colors.onBrand),
+              ),
             ),
           ),
         ),
       ],
     );
+    return button;
   }
 
   @override
@@ -219,7 +285,7 @@ class DabblerPageHeader extends StatelessWidget {
               ],
             ),
           ),
-          for (final DabblerPageHeaderAction a in actions) _action(a),
+          for (final DabblerPageHeaderAction a in actions) _action(context, a),
         ],
       ),
     );

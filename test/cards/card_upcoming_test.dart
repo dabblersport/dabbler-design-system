@@ -31,7 +31,10 @@ void main() {
     expect(find.text('hours'), findsOneWidget);
     expect(find.text('Tuesday 5-a-side'), findsOneWidget);
     expect(find.text('Sep 2 · 7:30 PM'), findsOneWidget);
-    expect(find.text('Dubai Sports City · 3.1 km'), findsOneWidget);
+    // Place and distance are separate facts on a MetaLine, split by a dot.
+    expect(find.text('Dubai Sports City'), findsOneWidget);
+    expect(find.text('3.1 km'), findsOneWidget);
+    expect(find.byType(DabblerMetaLine), findsOneWidget);
   });
 
   testWidgets('fills with the tile tone', (tester) async {

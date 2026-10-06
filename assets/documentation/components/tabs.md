@@ -30,6 +30,8 @@ into them directly, which is what those two slots have always been designed to a
 
 ## Specimen
 
+@specimen tabs/listing
+
 Both variants — see `tabs_gallery.dart`'s *Tabs* section.
 
 @specimen tabs/variants
@@ -92,6 +94,7 @@ label.
 - D-026 (cxo) — confirms the underline-only brand signal is
   correct as built and refuses a competing kit treatment that would triple the signal for one state.
 - DS gaps 6 — `labelFit` (`DabblerTabsLabelFit.ellipsis` default, `.fit`). Additive.
+- Listings fidelity pass — adds the `listing` variant: label-width tabs 21 apart, 600 active and 500 otherwise, 9 above the 2px underline, a 31 tall strip with 45 hit-test-only targets.
 
 ## Source
 

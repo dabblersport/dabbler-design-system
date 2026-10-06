@@ -28,6 +28,8 @@ the card shell, which is the whole of its visual vocabulary on purpose.
 
 ## Specimen
 
+@specimen empty-state/listing
+
 Both sizes — see `cards_gallery.dart`'s *EmptyState* section.
 
 @specimen empty-state
@@ -47,6 +49,10 @@ asset slot to work around that — an icon inside the card shell is the entire v
 component is allowed, and that's an intentional constraint, not an unfinished feature.
 
 **`plain` is the bare form.** It draws a 42px glyph, the title and the copy straight on the page with no frame and no icon well — the empty replies area of a post.
+
+**Use `listing` for an empty listing (games, meetups, venues).** It is the Listings frame's own
+answer — the listing card shell with a brand well and a display title — and the screen places it
+60 below its chrome.
 
 **Use `page` for a whole empty screen, `inline` for an empty section or list.** `page` drops the
 card frame entirely and centres in the viewport; `inline` keeps the bordered card shell so it reads
@@ -75,6 +81,10 @@ frame exists for it; the design files carry only an error `Banner`.
 
 `inline` composes `Card` at the `white` variant. `page` composes no card at all — transparent
 background, no border, no radius, matching the source exactly.
+
+## Change log
+
+- Listings fidelity pass — adds the `listing` size: the listing card shell at 18, 36/24 padding, gap 15, a 60 brand-tinted well with a 30 bold glyph, the title at `title3`, copy 14/21 capped at 250.
 
 ## Source
 
