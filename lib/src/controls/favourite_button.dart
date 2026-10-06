@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
+import '../interaction/expanded_hit_area.dart';
 import '../interaction/focus_ring.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
@@ -29,10 +30,12 @@ import '../tokens/dabbler_geometry.dart';
 /// state is never carried by colour or weight alone. The caller owns the
 /// state; the button only reports a tap, Enter or Space.
 ///
-/// **Deviation (target).** The painted well is [wellSide] (32) as designed,
-/// which is under the 45 floor; it is laid out inside a [DabblerSizing.touchTargetMin]
-/// square so the hit area clears it, exactly as `DabblerChip` does. In a card
-/// header this makes the row 45 tall where the design's well is 32.
+/// **Target.** The painted well is [wellSide] (32) as designed, which is
+/// under the 45 floor. It lays out at 32 — so a card header is as tall as the
+/// design's — and the 45 target is a hit-test-only area around it
+/// ([DabblerExpandedHitArea]). (Until the Listings fidelity pass it was laid
+/// out inside a 45 square, which made the venue card's name row 45 tall and
+/// pushed the well 6.5 in from the card's edge.)
 ///
 /// ## RTL
 ///
@@ -127,32 +130,31 @@ class DabblerFavouriteButton extends StatelessWidget {
       well = Opacity(opacity: disabledOpacity, child: well);
     }
 
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      toggled: selected,
-      label: semanticLabel,
-      excludeSemantics: true,
-      onTap: onPressed,
-      child: Actions(
-        actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (ActivateIntent _) {
-              onPressed?.call();
-              return null;
-            },
-          ),
-        },
-        child: MouseRegion(
-          cursor: enabled ? SystemMouseCursors.click : MouseCursor.defer,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onPressed,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                minWidth: DabblerSizing.touchTargetMin,
-                minHeight: DabblerSizing.touchTargetMin,
-              ),
+    // The 45 target is a hit-test-only area around the whole button: it must
+    // be the outermost render box, or a 32-wide ancestor rejects the margin.
+    return DabblerExpandedHitArea(
+      minimum: const Size.square(DabblerSizing.touchTargetMin),
+      child: Semantics(
+        button: true,
+        enabled: enabled,
+        toggled: selected,
+        label: semanticLabel,
+        excludeSemantics: true,
+        onTap: onPressed,
+        child: Actions(
+          actions: <Type, Action<Intent>>{
+            ActivateIntent: CallbackAction<ActivateIntent>(
+              onInvoke: (ActivateIntent _) {
+                onPressed?.call();
+                return null;
+              },
+            ),
+          },
+          child: MouseRegion(
+            cursor: enabled ? SystemMouseCursors.click : MouseCursor.defer,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onPressed,
               child: Center(
                 widthFactor: 1,
                 heightFactor: 1,

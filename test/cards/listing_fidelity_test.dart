@@ -416,6 +416,34 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('the favourite well lays out at 32, flush with the padding', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _scaled(
+          DabblerCardVenue(
+            name: 'Elite Football Arena',
+            area: 'Dubai Silicon Oasis',
+            favourite: DabblerFavouriteButton(
+              key: const Key('fav'),
+              selected: false,
+              semanticLabel: 'Save',
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('fav'))),
+        const Size.square(32),
+      );
+      expect(
+        tester.getTopRight(find.byType(DabblerCard)).dx -
+            tester.getTopRight(find.byKey(const Key('fav'))).dx,
+        DabblerCardEventListing.cardPadding.right,
+      );
+    });
+
     testWidgets('dark: text on the card clears 4.5:1', (
       WidgetTester tester,
     ) async {
@@ -645,6 +673,38 @@ void main() {
       },
     );
 
+    testWidgets('a header action fires from the 45 margin around its 42', (
+      WidgetTester tester,
+    ) async {
+      int taps = 0;
+      await tester.pumpWidget(
+        host(
+          DabblerPageHeader(
+            title: 'Games',
+            safeArea: false,
+            actions: <DabblerPageHeaderAction>[
+              DabblerPageHeaderAction(
+                icon: 'search-normal',
+                semanticLabel: 'Search',
+                onPressed: () => taps++,
+              ),
+            ],
+          ),
+          width: 393,
+        ),
+      );
+      final Rect circle = tester.getRect(
+        find.byWidgetPredicate(
+          (Widget w) =>
+              w is Container &&
+              w.decoration is BoxDecoration &&
+              (w.decoration! as BoxDecoration).shape == BoxShape.circle,
+        ),
+      );
+      await tester.tapAt(circle.centerLeft - const Offset(1, 0));
+      expect(taps, 1);
+    });
+
     testWidgets('listing tabs: 600 / 500, 21 apart, 9 under the label', (
       WidgetTester tester,
     ) async {
@@ -676,8 +736,20 @@ void main() {
             tester.getTopRight(find.text('All sports')).dx,
         DabblerSpacing.space7,
       );
-      // 20 line + 9 + the 2px underline: a 31 tall strip.
-      expect(tester.getSize(find.byType(DabblerTabs)).height, 31);
+      // The indicator is placed after the first frame measures the tabs.
+      await tester.pumpAndSettle();
+      // 20 line + 9 + the 2px underline + the 1px rail: a 32 tall strip.
+      expect(tester.getSize(find.byType(DabblerTabs)).height, 32);
+      // The underline sits on the rail, 1 above the strip's bottom.
+      final Finder underline = find.byWidgetPredicate(
+        (Widget w) => w is ColoredBox && w.color == testColors().brandPrimary,
+      );
+      expect(
+        tester.getBottomLeft(find.byType(DabblerTabs)).dy -
+            tester.getBottomLeft(underline).dy,
+        DabblerSizing.borderDefault,
+      );
+      expect(tester.getSize(underline).height, 2);
     });
 
     testWidgets('applied filters are 32 tall brand pills with a 16 glyph', (

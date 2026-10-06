@@ -64,6 +64,7 @@ Fill and hairline: the card surface. Corner: `lg` (12). Padding: 6 plus the 1px 
 ## Change log
 
 - KAN-426 (Seat B) — adds this component, replacing the icon `Button` the venue card's favourite slot used.
+- Listings fidelity pass — lays out at the 32 well with the 45 target as a hit-test-only area around it, so a venue card's name row is the design's height.
 
 ## Source
 

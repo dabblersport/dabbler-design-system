@@ -89,9 +89,43 @@ void main() {
         ),
       ),
     );
+    // Lays out at the 32 well (the design's header height) …
     final Size s = tester.getSize(find.byType(DabblerFavouriteButton));
-    expect(s.width, DabblerSizing.touchTargetMin);
-    expect(s.height, DabblerSizing.touchTargetMin);
+    expect(s.width, DabblerFavouriteButton.wellSide);
+    expect(s.height, DabblerFavouriteButton.wellSide);
+  });
+
+  testWidgets('… and a tap anywhere in the 45 square around it fires', (
+    WidgetTester tester,
+  ) async {
+    int taps = 0;
+    await tester.pumpWidget(
+      _wrap(
+        // Room around the well, so the margin is inside the host.
+        Padding(
+          padding: const EdgeInsets.all(DabblerSpacing.space8),
+          child: DabblerFavouriteButton(
+            selected: false,
+            semanticLabel: 'Save',
+            onPressed: () => taps++,
+          ),
+        ),
+      ),
+    );
+    final Rect well = tester.getRect(find.byType(DabblerFavouriteButton));
+    final double margin =
+        (DabblerSizing.touchTargetMin - DabblerFavouriteButton.wellSide) / 2;
+    // Just inside opposite corners of the 45 square, outside the 32 well.
+    for (final Offset p in <Offset>[
+      well.topLeft - Offset(margin - 0.5, margin - 0.5),
+      well.bottomRight + Offset(margin - 0.5, margin - 0.5),
+    ]) {
+      await tester.tapAt(p);
+    }
+    expect(taps, 2);
+    // Outside the 45 square nothing fires.
+    await tester.tapAt(well.centerRight + Offset(margin + 2, 0));
+    expect(taps, 2);
   });
 
   testWidgets('tap, Enter and Space fire it; disabled does not', (

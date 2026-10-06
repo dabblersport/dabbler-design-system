@@ -94,7 +94,7 @@ label.
 - D-026 (cxo) — confirms the underline-only brand signal is
   correct as built and refuses a competing kit treatment that would triple the signal for one state.
 - DS gaps 6 — `labelFit` (`DabblerTabsLabelFit.ellipsis` default, `.fit`). Additive.
-- Listings fidelity pass — adds the `listing` variant: label-width tabs 21 apart, 600 active and 500 otherwise, 9 above the 2px underline, a 31 tall strip with 45 hit-test-only targets.
+- Listings fidelity pass — adds the `listing` variant: label-width tabs 21 apart, 600 active and 500 otherwise, 9 above the 2px underline, which sits on the 1px rail — a 32 tall strip with 45 hit-test-only targets.
 
 ## Source
 

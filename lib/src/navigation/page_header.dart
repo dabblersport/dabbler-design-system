@@ -208,14 +208,16 @@ class DabblerPageHeader extends StatelessWidget {
         color: enabled ? colors.textPrimary : colors.textTertiary,
       ),
     );
-    Widget button = Semantics(
-      button: true,
-      enabled: enabled,
-      label: a.count > 0 ? '${a.semanticLabel}, ${a.count}' : a.semanticLabel,
-      onTap: a.onPressed,
-      excludeSemantics: true,
-      child: DabblerExpandedHitArea(
-        minimum: const Size.square(DabblerSizing.touchTargetMin),
+    // The hit area is the outermost box, so no 42-wide ancestor rejects the
+    // margin before it is reached.
+    Widget button = DabblerExpandedHitArea(
+      minimum: const Size.square(DabblerSizing.touchTargetMin),
+      child: Semantics(
+        button: true,
+        enabled: enabled,
+        label: a.count > 0 ? '${a.semanticLabel}, ${a.count}' : a.semanticLabel,
+        onTap: a.onPressed,
+        excludeSemantics: true,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: a.onPressed,

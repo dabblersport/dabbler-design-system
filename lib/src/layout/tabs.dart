@@ -35,7 +35,8 @@ enum DabblerTabsVariant {
   /// The listing screens' tab rail (`Listings.dc.html:91-95`): label-width
   /// tabs 21 apart, 15/20 at weight **600** when active and **500** otherwise,
   /// 9 under the label and the 2px brand underline over the 1px `--faint`
-  /// rail — a 31 tall strip. As [feed], the 45px target is a hit-test-only
+  /// rail — a 32 tall strip (the underline above the rail, not over it). As
+  /// [feed], the 45px target is a hit-test-only
   /// area around each label.
   listing,
 }
@@ -655,7 +656,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
                 : DabblerMotion.base,
             curve: DabblerMotion.easeOut,
             start: _start,
-            bottom: 0,
+            // The listing underline is the tab's own border and sits on top
+            // of the container's rail, not over it (`Listings.dc.html:91-93`).
+            bottom: _listing ? DabblerSizing.borderDefault : 0,
             width: _size,
             height: _feed ? DabblerSpacing.space1 : _indicatorHeight,
             child: ColoredBox(color: colors.brandPrimary),
@@ -780,9 +783,13 @@ class _DabblerTabsState extends State<DabblerTabs> {
           )
         : _listing
         ? Padding(
-            // `padding: 0 0 9px`, the 2px underline riding below it.
+            // `padding: 0 0 9px`, the 2px underline riding below it, and
+            // the container's 1px `--faint` rail below that.
             padding: const EdgeInsetsDirectional.only(
-              bottom: DabblerSpacing.space3 + _indicatorHeight,
+              bottom:
+                  DabblerSpacing.space3 +
+                  _indicatorHeight +
+                  DabblerSizing.borderDefault,
             ),
             child: content,
           )

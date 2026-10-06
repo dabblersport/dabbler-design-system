@@ -221,15 +221,15 @@ class _AppliedPill extends StatelessWidget {
                   fontWeight: DabblerType.medium,
                 ),
           ),
-          Semantics(
-            button: true,
-            label:
-                item.removeSemanticLabel ??
-                DabblerChip.defaultRemoveLabelFor(item.label),
-            onTap: item.onRemove,
-            excludeSemantics: true,
-            child: DabblerExpandedHitArea(
-              minimum: const Size.square(DabblerSizing.touchTargetMin),
+          DabblerExpandedHitArea(
+            minimum: const Size.square(DabblerSizing.touchTargetMin),
+            child: Semantics(
+              button: true,
+              label:
+                  item.removeSemanticLabel ??
+                  DabblerChip.defaultRemoveLabelFor(item.label),
+              onTap: item.onRemove,
+              excludeSemantics: true,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: item.onRemove,
