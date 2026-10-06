@@ -498,7 +498,9 @@ class _DabblerChipState extends State<DabblerChip> {
           };
     final double glyph = drawn
         ? DabblerHomeFrame.subChipGlyph
-        : (widget.compact || widget.dense)
+        : widget.compact
+        ? DabblerSizing.iconXs
+        : widget.dense
         ? DabblerSizing.iconInline
         : DabblerSizing.iconSm;
     final bool removable = widget.onRemove != null;

@@ -32,7 +32,7 @@ Selected, unselected, and a leading-icon variant — see `chip_gallery.dart`'s *
 
 @specimen chip
 
-**Use `compact` for a static facility tag.** Sunken fill, 13/18 label, brand glyph.
+**Use `compact` for a static facility tag.** Sunken fill, 13/18 label, a 16 brand glyph 6 before the label, 8 / 14 padding (`Details.dc.html:441`).
 
 @specimen chip/compact
 
@@ -112,6 +112,8 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 - Alpha fidelity (Article) — adds `tag`: 12/16 label, 6 / 12 padding, card fill and outline (Article tag pill).
 - Alpha fidelity (Search/Article) — adds `dense`: 7 / 11 padding, 13px label, 13px leading glyph, 14px remove glyph, card fill kept (Search recent chip, Article tag pill).
 - Alpha fidelity (Search) — adds `mutedRemove`: the remove glyph in the muted ink (`Search.dc.html` recent chips).
+
+- Alpha fix (Venue facilities) — the leading glyph now follows the slot: `DabblerIcon` with no `size` reads the ambient `IconTheme` size before its 24 default, so the chip's glyph box (and a `compact` chip's 16 glyph, from the design's `size="16"`) is what is drawn. Before, a 24 glyph overflowed an 18 or 20 box and landed on the label. Pass an explicit `size` to override.
 
 ## Source
 

@@ -532,7 +532,11 @@ class DabblerIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double side = size ?? DabblerSizing.iconMd;
+    // An ambient IconTheme size (a slot such as the Chip's leading box sets
+    // one) is honoured before the 24 default; without it a 24 glyph painted
+    // over a smaller slot and landed on top of the neighbouring label.
+    final double side =
+        size ?? IconTheme.of(context).size ?? DabblerSizing.iconMd;
     final bool mirror =
         mirrorInRtl && Directionality.maybeOf(context) == TextDirection.rtl;
     final String? mirroredName = mirror
