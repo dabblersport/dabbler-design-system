@@ -35,6 +35,7 @@ void main() {
 /// `*_gallery.dart` from the barrel and adding its spread here, alphabetically.
 const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...accordionGalleryEntries,
+  ...actionAreaGalleryEntries,
   ...avatarGalleryEntries,
   ...badgeGalleryEntries,
   ...ratingGalleryEntries,
