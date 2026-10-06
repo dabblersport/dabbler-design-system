@@ -178,23 +178,27 @@ class DabblerCardUpcoming extends StatelessWidget {
       tickLength: tickLength,
       track: DabblerRingTrack.faint,
       semanticValue: '$countdownValue $countdownUnit',
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          // The numeral is the display face — `font-family: var(--font-display);
-          // font-size: 18px` (`:150`, `:433`).
-          DabblerText(
-            countdownValue,
-            style: DabblerType.displayLabel,
-            maxLines: 1,
-          ),
-          DabblerText(
-            countdownUnit,
-            style: DabblerType.caption2,
-            tone: DabblerTextTone.secondary,
-            maxLines: 1,
-          ),
-        ],
+      // A large text scale shrinks the countdown into the fixed ring.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            // The numeral is the display face — `font-family: var(--font-display);
+            // font-size: 18px` (`:150`, `:433`).
+            DabblerText(
+              countdownValue,
+              style: DabblerType.displayLabel,
+              maxLines: 1,
+            ),
+            DabblerText(
+              countdownUnit,
+              style: DabblerType.caption2,
+              tone: DabblerTextTone.secondary,
+              maxLines: 1,
+            ),
+          ],
+        ),
       ),
     );
     final bool hasPlace = place != null || distance != null;
@@ -301,21 +305,25 @@ class DabblerCardUpcoming extends StatelessWidget {
       tickLength: tickLength,
       track: DabblerRingTrack.faint,
       semanticValue: '$countdownValue $countdownUnit',
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          DabblerText(
-            countdownValue,
-            style: DabblerType.displayLabel,
-            maxLines: 1,
-          ),
-          DabblerText(
-            countdownUnit,
-            style: DabblerType.caption2,
-            tone: DabblerTextTone.secondary,
-            maxLines: 1,
-          ),
-        ],
+      // A large text scale shrinks the countdown into the fixed ring.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            DabblerText(
+              countdownValue,
+              style: DabblerType.displayLabel,
+              maxLines: 1,
+            ),
+            DabblerText(
+              countdownUnit,
+              style: DabblerType.caption2,
+              tone: DabblerTextTone.secondary,
+              maxLines: 1,
+            ),
+          ],
+        ),
       ),
     );
     final String line = <String>[?place, ?when].join(' · ');

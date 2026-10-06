@@ -161,34 +161,38 @@ class DabblerCardUpcomingRail extends StatelessWidget {
       count: ringTicks,
       track: DabblerRingTrack.faint,
       semanticValue: '$countdownValue $countdownUnit',
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            countdownValue,
-            maxLines: 1,
-            // `12/13`, display face (`Listings.dc.html:476`).
-            style: DabblerType.footnote
-                .resolveForDirection(direction)
-                .copyWith(
-                  color: colors.textPrimary,
-                  fontSize: ringValueSize,
-                  height: ringValueLeading / ringValueSize,
-                ),
-          ),
-          Text(
-            countdownUnit,
-            maxLines: 1,
-            // `6/7`, muted (`Listings.dc.html:477`): the ring is 40 wide.
-            style: DabblerType.caption2
-                .resolveForDirection(direction)
-                .copyWith(
-                  color: colors.textSecondary,
-                  fontSize: ringUnitSize,
-                  height: ringUnitLeading / ringUnitSize,
-                ),
-          ),
-        ],
+      // A large text scale shrinks the countdown into the fixed ring.
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              countdownValue,
+              maxLines: 1,
+              // `12/13`, display face (`Listings.dc.html:476`).
+              style: DabblerType.footnote
+                  .resolveForDirection(direction)
+                  .copyWith(
+                    color: colors.textPrimary,
+                    fontSize: ringValueSize,
+                    height: ringValueLeading / ringValueSize,
+                  ),
+            ),
+            Text(
+              countdownUnit,
+              maxLines: 1,
+              // `6/7`, muted (`Listings.dc.html:477`): the ring is 40 wide.
+              style: DabblerType.caption2
+                  .resolveForDirection(direction)
+                  .copyWith(
+                    color: colors.textSecondary,
+                    fontSize: ringUnitSize,
+                    height: ringUnitLeading / ringUnitSize,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
     return DabblerCard(

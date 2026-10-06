@@ -551,6 +551,36 @@ void main() {
       });
     }
 
+    testWidgets('2x text: the countdown shrinks into the fixed ring', (
+      WidgetTester tester,
+    ) async {
+      for (final Widget w in <Widget>[
+        const DabblerCardUpcoming(
+          title: 'Tuesday 5-a-side',
+          month: 'OCT',
+          day: '6',
+          fraction: 0.4,
+          countdownValue: '14',
+          countdownUnit: 'hours',
+          when: '4:18 PM',
+          place: 'Dubai Sports City',
+        ),
+        const DabblerCardUpcoming(
+          title: 'Sunrise run',
+          fraction: 0.4,
+          countdownValue: '19',
+          countdownUnit: 'hours',
+          when: 'Oct 7 · 6:35 AM',
+          place: 'Kite Beach',
+        ),
+      ]) {
+        await tester.pumpWidget(
+          _scaled(SingleChildScrollView(child: w), scale: 2),
+        );
+        expect(tester.takeException(), isNull);
+      }
+    });
+
     testWidgets('rail tile: outlined 12 shell, 14/19 title, no place glyph', (
       WidgetTester tester,
     ) async {
