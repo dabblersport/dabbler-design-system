@@ -196,6 +196,7 @@ class DabblerNavigationBottomBar extends StatefulWidget {
     this.defaultActive,
     this.onSelect,
     this.actionIcon = 'add',
+    this.actionOpenIcon,
     this.actionLabel = 'Create',
     this.onAction,
     this.closeLabel = 'Close menu',
@@ -257,6 +258,20 @@ class DabblerNavigationBottomBar extends StatefulWidget {
 
   /// Iconsax name for the detached action. `add` by default.
   final String actionIcon;
+
+  /// Iconsax name the action draws **while the menu is open**, in the same
+  /// `bold` weight and [DabblerColors.onBrand] tint as [actionIcon]. Null (the
+  /// default) keeps [actionIcon] in both states, so existing callers are
+  /// unchanged.
+  ///
+  /// The Home Feed frame passes `close-circle` (its `fabIcon: createMenuOpen ?
+  /// 'close-circle' : 'add'`, `Home Feed.dc.html`): the bold glyph is a
+  /// filled disc with the ✕ cut out, so on the brand action it reads as an
+  /// [DabblerColors.onBrand] disc carrying a brand ✕. The swap cross-fades
+  /// over [DabblerMotion.slow] on [DabblerMotion.easeOut] — the duration the
+  /// rotation uses — and is instant under reduced motion. Pair it with
+  /// `rotateActionOnOpen: false`, or the open glyph turns 45° as well.
+  final String? actionOpenIcon;
 
   /// The action's accessible name while the menu is closed. It is icon-only,
   /// so this is its only name.
@@ -736,7 +751,8 @@ class _DabblerNavigationBottomBarState
   }
 
   /// The detached action: [DabblerFab.size] (56) round, brand-filled, its glyph
-  /// rotating 45° into an ✕ while the menu is open.
+  /// rotating 45° into an ✕ while the menu is open, or swapping to
+  /// [DabblerNavigationBottomBar.actionOpenIcon] when one is set.
   Widget _action(DabblerColors colors, {required bool open}) {
     final Duration duration = DabblerMotion.reduceMotion(context)
         ? Duration.zero
@@ -776,13 +792,13 @@ class _DabblerNavigationBottomBarState
                       : 0,
                   duration: duration,
                   curve: DabblerMotion.easeOut,
-                  child: DabblerIcon(
-                    widget.actionIcon,
-                    weight: DabblerIconWeight.bold,
-                    // `size={26}` (`NavigationBottomBar.jsx:193`) — off the
-                    // 18/24/30 ramp, transcribed: 24 under-fills the 56 disc.
-                    size: DabblerNavigationBottomBar.glyph26,
-                    color: colors.onBrand,
+                  // Cross-fades closed glyph <-> [actionOpenIcon]. With no
+                  // open icon the key never changes, so nothing animates.
+                  child: AnimatedSwitcher(
+                    duration: duration,
+                    switchInCurve: DabblerMotion.easeOut,
+                    switchOutCurve: DabblerMotion.easeOut,
+                    child: _actionGlyph(colors, _actionGlyphName(open)),
                   ),
                 ),
               ),
@@ -792,6 +808,21 @@ class _DabblerNavigationBottomBarState
       ),
     );
   }
+
+  /// The glyph the action draws: [DabblerNavigationBottomBar.actionOpenIcon]
+  /// while open when one is set, else [DabblerNavigationBottomBar.actionIcon].
+  String _actionGlyphName(bool open) =>
+      open ? (widget.actionOpenIcon ?? widget.actionIcon) : widget.actionIcon;
+
+  Widget _actionGlyph(DabblerColors colors, String name) => DabblerIcon(
+    name,
+    key: ValueKey<String>(name),
+    weight: DabblerIconWeight.bold,
+    // `size={26}` (`NavigationBottomBar.jsx:193`) — off the 18/24/30 ramp,
+    // transcribed: 24 under-fills the 56 disc.
+    size: DabblerNavigationBottomBar.glyph26,
+    color: colors.onBrand,
+  );
 
   /// The create menu: a card of tiles that replaces the pill **in flow**.
   ///

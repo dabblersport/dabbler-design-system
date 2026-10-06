@@ -104,6 +104,12 @@ Plain `arrow-right` draws a chevron inside a square at linear and a circled arro
 is never the forward chevron. The per-name table of what each glyph draws is on
 `DabblerIconMirror`.
 
+**Calendar: the dot grid is `calendar-1`.** The labels lie here too. In the pinned release
+`calendar` at linear draws a calendar with a day number printed on it, while `calendar-1` at linear
+draws the calendar with two rows of three dots that the web Iconsax set calls `calendar` and the
+Home Feed create menu draws on its *Create meetup* tile. Ask for `calendar-1` when the design shows
+the dot grid.
+
 Deviation: the horizontal flip goes against the icon card's "mirror by name, not by transform"
 rule. It is only the fallback for a glyph with no mirror in the set.
 
@@ -113,6 +119,8 @@ rule. It is only the fallback for a glyph with no mirror in the set.
   source and rules the weight-fallback contract this page describes.
 - D-034 (cxo) — rules the Foundations page template this page
   follows.
+- The calendar audit — `calendar-1` is the dot-grid calendar the Home Feed create menu draws;
+  pinned in `test/foundations/calendar_glyph_test.dart`.
 
 ## Source
 

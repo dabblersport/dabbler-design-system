@@ -33,7 +33,10 @@ Destinations with an active state and the create menu open — see `navigation_g
 
 Each create tile can tint its glyph plate with `iconTone` (`neutral` by default, or `info`,
 `success`, `accent`, `amber`), and `rotateActionOnOpen: false` holds the action glyph upright while
-the menu is open — the Home Feed treatment.
+the menu is open — the Home Feed treatment. `actionOpenIcon` names a second glyph the action shows
+while the menu is open (the Home Feed passes `close-circle`: a light disc carrying a brand ✕); the
+two cross-fade on the slow motion step and swap instantly under reduced motion. Leave it unset and the
+action keeps one glyph in both states.
 
 @specimen bottom-bar/icon-tones
 
@@ -128,6 +131,9 @@ action: the same size and shadow as `Fab` — see *Change log*.
 - KAN-433 — the frame's geometry pinned (`DabblerSizing.nav*` off-grid tokens, tested in
   `test/navigation/bottom_bar_frame_test.dart` in LTR, RTL mirrored and RTL pinned with the Arabic
   frame's strings) and the `mirrorInRtl` option, default unchanged.
+- `actionOpenIcon` — an optional open-state glyph for the action, default unset (unchanged). The Home
+  Feed design's open menu shows `close-circle` on the action; tested in
+  `test/navigation/bottom_bar_open_glyph_test.dart` in LTR and RTL, light and dark.
 - KAN-437 — the active chip hugs its content at every destination count (three, four, five), in
   LTR and pinned Arabic RTL, at 393, 320 and in a wide window's phone column; a narrow column
   ellipsizes and then narrows rather than overflowing. Tested in

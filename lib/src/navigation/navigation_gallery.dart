@@ -50,8 +50,9 @@ const List<GalleryEntry> navigationGalleryEntries = <GalleryEntry>[
     title: 'Navigation — bottom bar, toned create menu',
     description:
         'createItems with iconTone info / success / accent, and the '
-        'action held upright (rotateActionOnOpen: false), as the Home Feed '
-        'design draws it (DSG-NEW-001).',
+        'action held upright (rotateActionOnOpen: false) showing its open '
+        'glyph (actionOpenIcon: close-circle), as the Home Feed design '
+        'draws it (DSG-NEW-001).',
     builder: _bottomBarTones,
   ),
   GalleryEntry(
@@ -134,6 +135,7 @@ Widget _bottomBarTones(BuildContext context) => const GallerySpecimen(
       safeArea: false,
       defaultMenuOpen: true,
       rotateActionOnOpen: false,
+      actionOpenIcon: 'close-circle',
       createItems: <DabblerNavigationCreateItem>[
         DabblerNavigationCreateItem(
           id: 'post',
