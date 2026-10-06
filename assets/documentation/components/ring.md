@@ -66,7 +66,8 @@ Determinate, it announces as a progress bar with its value; indeterminate, as a 
 no value).
 
 ### Progress tone
-The progress bar's tones: `brand`, a status tone, or `onBrand` for a ring on a brand fill.
+`brand` (the default), `inherit` (the ambient ink), `onBrand` for a ring on a brand fill, or a
+status tone, which paints that status's base.
 
 ### Track
 `outline` (the unfilled ticks' default, the card outline role) and `faint` (the arc's default, the

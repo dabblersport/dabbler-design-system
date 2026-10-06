@@ -30,13 +30,14 @@ enum DabblerNavigationFeedbackPresentation {
 /// **Tone is [DabblerToastTone].** Toast and Banner each carry their own tone
 /// enum with identical members (`banner.dart` documents why); this payload is
 /// shared by both presentations, so it reuses the existing Toast tone rather
-/// than adding a third copy of the same five values. Its default is Toast's,
-/// `neutral`.
+/// than adding a third copy of the same five values. Null takes the
+/// presentation's default, as `NavigationFeedback.jsx` does: `neutral` for a
+/// toast, `info` for a banner.
 @immutable
 class DabblerNavigationFeedbackData {
   /// Describes one message.
   const DabblerNavigationFeedbackData({
-    this.tone = DabblerToastTone.neutral,
+    this.tone,
     this.title,
     this.message,
     this.icon,
@@ -45,8 +46,16 @@ class DabblerNavigationFeedbackData {
     this.duration,
   });
 
-  /// The status tone; colours come from [DabblerStatusToneColors].
-  final DabblerToastTone tone;
+  /// The status tone; colours come from [DabblerStatusToneColors]. Null is
+  /// the presentation's default — see [toneFor].
+  final DabblerToastTone? tone;
+
+  /// The tone this payload resolves to under [presentation].
+  DabblerToastTone toneFor(DabblerNavigationFeedbackPresentation presentation) =>
+      tone ??
+      (presentation == DabblerNavigationFeedbackPresentation.banner
+          ? DabblerToastTone.info
+          : DabblerToastTone.neutral);
 
   /// The banner's `.t-headline` line. A toast shows [message] only.
   final String? title;
@@ -105,9 +114,9 @@ class DabblerNavigationFeedbackData {
 /// | step | what happens | timing |
 /// |---|---|---|
 /// | collapsed | the tone circle over the action | [DabblerMotion.actionAreaHold] |
-/// | expanded | the surface grows, then the content fades in | [DabblerActionArea.expandDuration] |
-/// | hold | readable; hover and focus pause the timer | toast 4000ms · banner sticky |
-/// | contract | content fades, then the surface shrinks | [DabblerActionArea.contractDuration], then the hold |
+/// | expanded | the surface grows, then the content fades in; the dismissal timer starts | toast 4000ms · banner sticky |
+/// | hold | readable; hover and focus on the surface pause the timer | — |
+/// | close | collapsed, then idle after [DabblerMotion.slow] (0 under reduced motion) + the hold | — |
 /// | idle | [onDone] | — |
 ///
 /// The action and the dismiss button start the contraction at once. Pass
@@ -164,10 +173,20 @@ class DabblerNavigationFeedback extends StatefulWidget {
   /// Identifies the dismiss button's touch target.
   static const Key dismissTargetKey = Key('DabblerNavigationFeedback.dismiss');
 
-  /// The inset that centres a [DabblerSizing.touchTargetMin] dismiss target
-  /// on the glyph row's centre line — `(56 - 45) / 2`, from tokens.
-  static const double dismissInset =
-      (DabblerActionArea.glyphSlot - DabblerSizing.touchTargetMin) / 2;
+  /// The dismiss target's offset from the content box's top:
+  /// `paddingBlock 15` + `marginBlock calc(--space-5 * -1 + --space-1)` =
+  /// [DabblerSpacing.space1] (3).
+  static const double dismissTop =
+      DabblerSpacing.space5 - DabblerSpacing.space5 + DabblerSpacing.space1;
+
+  /// The dismiss target's offset from the content box's inline end:
+  /// `paddingInlineEnd 15` + `marginInlineEnd calc(--space-3 * -1)` = 6.
+  static const double dismissEnd =
+      DabblerSpacing.space5 - DabblerSpacing.space3;
+
+  /// The row space the dismiss takes with its negative inline-end margin.
+  static const double dismissReserve =
+      DabblerSizing.touchTargetMin - DabblerSpacing.space3;
 
   @override
   State<DabblerNavigationFeedback> createState() =>
@@ -182,8 +201,8 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
   /// True while expanded and readable — the only stage the dismissal timer
   /// and its pause apply to.
   bool _holding = false;
-  bool _hovered = false;
-  bool _focused = false;
+  /// Pointer or focus on the surface (the Action Area merges the two).
+  bool _engaged = false;
 
   bool get _pinned => widget.phase != null;
 
@@ -246,18 +265,14 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
   void _open() {
     if (!mounted) return;
     setState(() => _phase = DabblerActionAreaPhase.expanded);
-    _timer = Timer(
-      DabblerActionArea.expandDuration(reduceMotion: _reduceMotion),
-      () {
-        _holding = true;
-        _arm();
-      },
-    );
+    _holding = true;
+    _arm();
   }
 
   Duration get _duration {
     final DabblerNavigationFeedbackData? data = _shown;
     if (data?.duration != null) return data!.duration!;
+    // `duration` default: 4000 toast, 0 (sticky) banner.
     return widget.presentation == DabblerNavigationFeedbackPresentation.toast
         ? DabblerToastSpec.defaultDuration
         : DabblerToastSpec.sticky;
@@ -268,7 +283,7 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
   void _arm() {
     _timer?.cancel();
     _timer = null;
-    if (!mounted || !_holding || _hovered || _focused) return;
+    if (!mounted || !_holding || _engaged) return;
     if (_duration <= Duration.zero) return;
     _timer = Timer(_duration, _close);
   }
@@ -279,17 +294,12 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
     _timer = null;
   }
 
-  void _setHovered(bool value) {
-    if (_hovered == value) return;
-    _hovered = value;
+  void _setEngaged(bool value) {
+    if (_engaged == value) return;
+    _engaged = value;
     value ? _pause() : _arm();
   }
 
-  void _setFocused(bool value) {
-    if (_focused == value) return;
-    _focused = value;
-    value ? _pause() : _arm();
-  }
 
   /// expanded → contract → collapsed (hold) → idle, then [onDone].
   void _close() {
@@ -300,8 +310,9 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
     }
     _cancel();
     setState(() => _phase = DabblerActionAreaPhase.collapsed);
+    // `close()`: collapsed, then after `(reducedMotion ? 0 : 200) + HOLD` idle.
     _timer = Timer(
-      DabblerActionArea.contractDuration(reduceMotion: _reduceMotion) +
+      (_reduceMotion ? Duration.zero : DabblerMotion.slow) +
           DabblerMotion.actionAreaHold,
       () {
         if (!mounted) return;
@@ -325,9 +336,11 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
     final DabblerActionAreaPhase phase = data == null
         ? DabblerActionAreaPhase.idle
         : widget.phase ?? _phase;
+    final DabblerToastTone toneName =
+        data?.toneFor(widget.presentation) ?? DabblerToastTone.neutral;
     final DabblerStatusToneColors tone = DabblerStatusToneColors.of(
       colors,
-      (data?.tone ?? DabblerToastTone.neutral).status,
+      toneName.status,
     );
     final bool banner =
         widget.presentation == DabblerNavigationFeedbackPresentation.banner;
@@ -340,6 +353,10 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
       hairline: tone.hairline,
       ink: tone.ink,
       safeArea: widget.safeArea,
+      onPause: () => _setEngaged(true),
+      onResume: () => _setEngaged(false),
+      // The card draws the banner's glyph at the top-leading corner.
+      glyphAtTop: banner,
       role: banner && (data?.interrupts ?? false)
           ? DabblerActionAreaRole.alert
           : DabblerActionAreaRole.status,
@@ -349,126 +366,96 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
           // "24px bold glyph"). Decorative — the message names the state.
           : ExcludeSemantics(
               child: DabblerIcon(
-                data.icon ?? data.tone.glyph,
+                data.icon ?? toneName.glyph,
                 weight: DabblerIconWeight.bold,
                 size: DabblerSizing.iconMd,
                 color: tone.ink,
               ),
             ),
-      child: data == null
-          ? null
-          : MouseRegion(
-              onEnter: (_) => _setHovered(true),
-              onExit: (_) => _setHovered(false),
-              child: Focus(
-                canRequestFocus: false,
-                skipTraversal: true,
-                onFocusChange: _setFocused,
-                child: banner
-                    ? _banner(context, data, tone)
-                    : _toast(context, data, tone),
-              ),
-            ),
+      overlay: data != null && banner && data.dismissible
+          ? PositionedDirectional(
+              top: DabblerNavigationFeedback.dismissTop,
+              end: DabblerNavigationFeedback.dismissEnd,
+              child: _dismiss(tone),
+            )
+          : null,
+      children: data == null
+          ? const <Widget>[]
+          : banner
+          ? _banner(context, data, tone)
+          : _toast(context, data, tone),
     );
   }
 
-  /// The toast row: message on one line, the action at the inline end.
-  Widget _toast(
+  /// The toast row: `t-subheadline` message, flex 1, one line with an
+  /// ellipsis; the action after it. The Action Area supplies the padding and
+  /// the `--space-3` gap.
+  List<Widget> _toast(
     BuildContext context,
     DabblerNavigationFeedbackData data,
     DabblerStatusToneColors tone,
   ) {
     final TextDirection direction = Directionality.of(context);
-    return Padding(
-      padding: EdgeInsetsDirectional.only(
-        start: DabblerActionArea.glyphSlot,
-        end: data.action == null ? DabblerSpacing.space5 : DabblerSpacing.space3,
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              data.message ?? data.title ?? '',
-              // The geometry is the bar's: one line, anything longer is a
-              // banner.
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.ellipsis,
-              style: DabblerType.subheadline
-                  .resolveForDirection(direction)
-                  .copyWith(color: tone.ink),
-            ),
-          ),
-          if (data.action != null) ...<Widget>[
-            const SizedBox(width: DabblerSpacing.space3),
-            _textAction(context, data.action!, tone),
-          ],
-        ],
-      ),
-    );
-  }
-
-  /// The banner body: title, message and outlined action in the tone's
-  /// strong ink, the dismiss target at the top-trailing corner.
-  Widget _banner(
-    BuildContext context,
-    DabblerNavigationFeedbackData data,
-    DabblerStatusToneColors tone,
-  ) {
-    final TextDirection direction = Directionality.of(context);
-    final List<Widget> column = <Widget>[
-      if (data.title != null)
-        Text(
-          data.title!,
-          style: DabblerType.headline
-              .resolveForDirection(direction)
-              .copyWith(color: tone.ink),
-        ),
-      if (data.title != null && data.message != null)
-        // `gap: var(--space-1)` — the Banner's own content column.
-        const SizedBox(height: DabblerSpacing.space1),
-      if (data.message != null)
-        Text(
-          data.message!,
+    return <Widget>[
+      Expanded(
+        child: Text(
+          data.message ?? data.title ?? '',
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.ellipsis,
           style: DabblerType.subheadline
               .resolveForDirection(direction)
               .copyWith(color: tone.ink),
         ),
-      if (data.action != null) ...<Widget>[
-        // `marginBlockStart: var(--space-2)` on the Banner's action.
-        const SizedBox(height: DabblerSpacing.space2),
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: _outlinedAction(context, data.action!, tone),
-        ),
-      ],
+      ),
+      if (data.action != null) _textAction(context, data.action!, tone),
     ];
+  }
 
-    return Stack(
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsetsDirectional.only(
-            start: DabblerActionArea.glyphSlot,
-            top: DabblerSpacing.space5,
-            bottom: DabblerSpacing.space5,
-            end: data.dismissible
-                ? DabblerActionArea.glyphSlot
-                : DabblerSpacing.space5,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: column,
-          ),
+  /// The banner row: a column (`--space-1` gap) of `t-headline` title and
+  /// `t-subheadline` message, the outlined action below at `--space-2`; then
+  /// the space the dismiss takes (the dismiss itself is the Action Area's
+  /// overlay, because the source pulls it out with negative margins).
+  List<Widget> _banner(
+    BuildContext context,
+    DabblerNavigationFeedbackData data,
+    DabblerStatusToneColors tone,
+  ) {
+    final TextDirection direction = Directionality.of(context);
+    return <Widget>[
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          spacing: DabblerSpacing.space1,
+          children: <Widget>[
+            if (data.title != null)
+              Text(
+                data.title!,
+                style: DabblerType.headline
+                    .resolveForDirection(direction)
+                    .copyWith(color: tone.ink),
+              ),
+            if (data.message != null)
+              Text(
+                data.message!,
+                style: DabblerType.subheadline
+                    .resolveForDirection(direction)
+                    .copyWith(color: tone.ink),
+              ),
+            if (data.action != null)
+              Padding(
+                // `marginBlockStart: --space-2`, which CSS adds to the
+                // column's `--space-1` gap.
+                padding: const EdgeInsets.only(top: DabblerSpacing.space2),
+                child: _outlinedAction(context, data.action!, tone),
+              ),
+          ],
         ),
-        if (data.dismissible)
-          PositionedDirectional(
-            top: DabblerNavigationFeedback.dismissInset,
-            end: DabblerNavigationFeedback.dismissInset,
-            child: _dismiss(tone),
-          ),
-      ],
-    );
+      ),
+      if (data.dismissible)
+        const SizedBox(width: DabblerNavigationFeedback.dismissReserve),
+    ];
   }
 
   Widget _interactive({required Widget child}) => DabblerFocusRing(
@@ -495,7 +482,6 @@ class _DabblerNavigationFeedbackState extends State<DabblerNavigationFeedback> {
           onTap: _invokeAction,
           child: Container(
             constraints: const BoxConstraints(
-              minWidth: DabblerSizing.touchTargetMin,
               minHeight: DabblerSizing.touchTargetMin,
             ),
             padding: const EdgeInsetsDirectional.symmetric(

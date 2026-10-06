@@ -6,7 +6,6 @@ import 'package:flutter/semantics.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_motion.dart';
-import 'progress_bar.dart';
 import 'spinner.dart';
 
 /// Which neutral role paints the part of a [DabblerRing] that is not filled.
@@ -26,6 +25,33 @@ enum DabblerRingTrack {
 }
 
 enum _RingStyle { ticks, arc, progress }
+
+/// The indicator colour of a [DabblerRing.progress] ring — `ProgressRing`'s
+/// `tone`: `brand`, `inherit` (`currentColor`), `on-brand`, or any status
+/// tone, which paints that status's **base**.
+enum DabblerRingTone {
+  /// [DabblerColors.brandPrimary]. The default.
+  brand,
+
+  /// `currentColor` — the enclosing [IconTheme], then [DefaultTextStyle], as
+  /// [DabblerSpinnerTone.inherit] resolves it.
+  inherit,
+
+  /// [DabblerColors.onBrand], for a ring on a brand fill.
+  onBrand,
+
+  /// [DabblerStatusColor.base] of `success`.
+  success,
+
+  /// [DabblerStatusColor.base] of `warning`.
+  warning,
+
+  /// [DabblerStatusColor.base] of `error`.
+  error,
+
+  /// [DabblerStatusColor.base] of `info`.
+  info,
+}
 
 /// Ring — a gauge drawn as a ring, with an optional centre.
 ///
@@ -126,7 +152,7 @@ class DabblerRing extends StatelessWidget {
        _style = _RingStyle.ticks,
        strokeWidth = tickWidth,
        indeterminate = false,
-       tone = DabblerProgressBarTone.brand;
+       tone = DabblerRingTone.brand;
 
   /// The completion ring: a track circle and a round-capped brand arc.
   ///
@@ -148,22 +174,21 @@ class DabblerRing extends StatelessWidget {
        count = 0,
        tickLength = 0,
        indeterminate = false,
-       tone = DabblerProgressBarTone.brand;
+       tone = DabblerRingTone.brand;
 
   /// The progress ring — `ProgressRing` (`status-feedback.card.html`).
   ///
   /// [value] is a fraction 0–1, or null for an indeterminate ring that spins.
   /// [diameter] is explicit, like the spinner's size, never fluid: the card
   /// draws it at [DabblerSizing.iconMd] (24), [DabblerSizing.iconXl] (36) and
-  /// — on the Action Area — [DabblerSizing.actionAreaRing] (32). [tone] reuses
-  /// the progress bar's tone family, so a ring and a bar of the same tone are
-  /// the same colour: `brand`, a status `base`, or `onBrand` for a ring
-  /// sitting on a brand fill.
+  /// — on the Action Area — [DabblerSizing.actionAreaRing] (32). [tone] is
+  /// `ProgressRing`'s: `brand`, `inherit` (`currentColor`), `onBrand` for a
+  /// ring on a brand fill, or a status tone's `base`.
   const DabblerRing.progress({
     super.key,
     double? value,
     this.diameter = DabblerSizing.iconMd,
-    this.tone = DabblerProgressBarTone.brand,
+    this.tone = DabblerRingTone.brand,
     this.semanticLabel,
     this.child,
   }) : assert(diameter > 0, 'diameter must be positive'),
@@ -214,7 +239,7 @@ class DabblerRing extends StatelessWidget {
 
   /// The indicator colour of a [DabblerRing.progress] ring. Ignored by the
   /// other two forms, which are always [DabblerColors.brandPrimary].
-  final DabblerProgressBarTone tone;
+  final DabblerRingTone tone;
 
   final _RingStyle _style;
 
@@ -403,7 +428,7 @@ class _ProgressRing extends StatefulWidget {
   final double fraction;
   final bool indeterminate;
   final double diameter;
-  final DabblerProgressBarTone tone;
+  final DabblerRingTone tone;
   final String? semanticLabel;
   final Widget? child;
 
@@ -442,10 +467,19 @@ class _ProgressRingState extends State<_ProgressRing>
   Widget build(BuildContext context) {
     final bool reduceMotion = DabblerMotion.reduceMotion(context);
     _sync(reduceMotion: reduceMotion);
-    final Color indicator = DabblerProgressBar.fillFor(
-      widget.tone,
-      DabblerColors.of(context),
-    );
+    final DabblerColors colors = DabblerColors.of(context);
+    final Color indicator = switch (widget.tone) {
+      DabblerRingTone.brand => colors.brandPrimary,
+      DabblerRingTone.onBrand => colors.onBrand,
+      DabblerRingTone.success => colors.success.base,
+      DabblerRingTone.warning => colors.warning.base,
+      DabblerRingTone.error => colors.error.base,
+      DabblerRingTone.info => colors.info.base,
+      DabblerRingTone.inherit =>
+        IconTheme.of(context).color ??
+            DefaultTextStyle.of(context).style.color ??
+            colors.textPrimary,
+    };
 
     Widget paint(double fraction) => CustomPaint(
       painter: _ProgressRingPainter(

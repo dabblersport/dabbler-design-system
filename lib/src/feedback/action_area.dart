@@ -9,8 +9,8 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_motion.dart';
 
-/// The three states the Action Area's surface can be in, transcribed from the
-/// *Sequence* table of `status-feedback.card.html`.
+/// The three states the Action Area's surface can be in
+/// (`ActionArea.jsx` `phase`).
 enum DabblerActionAreaPhase {
   /// The real [DabblerNavigationBottomBar], untouched. No surface.
   idle,
@@ -25,19 +25,21 @@ enum DabblerActionAreaPhase {
   expanded,
 }
 
-/// How tall an expanded surface is.
+/// How tall an expanded surface is (`ActionArea.jsx` `fit`).
 enum DabblerActionAreaFit {
-  /// A row: [DabblerSizing.actionAreaSize] tall, [DabblerRadius.pill]. Toast,
-  /// a labelled spinner, a progress row.
+  /// A row: [DabblerSizing.actionAreaSize] tall, radius `9999` (the
+  /// [DabblerRadius.pill] token). Toast, a labelled spinner, a progress row.
+  /// The content row is centred on the cross axis.
   row,
 
-  /// Grown up to its content, never shorter than a row, radius easing to
-  /// [DabblerRadius.xxl] — the create menu's radius. Banner and the expanded
-  /// progress card.
+  /// `max(contentHeight, S)` tall, radius [DabblerRadius.xxl], the content row
+  /// aligned to its top with [DabblerSpacing.space5] block padding. Banner and
+  /// the expanded progress card.
   content,
 }
 
-/// The accessible role the surface announces itself with.
+/// The accessible role the surface announces itself with — given by the
+/// caller, as in the source.
 enum DabblerActionAreaRole {
   /// `role="status"` — polite. Activity, toasts and non-interrupting banners.
   status,
@@ -50,77 +52,70 @@ enum DabblerActionAreaRole {
 /// and status: the **real** [DabblerNavigationBottomBar], and one morphing
 /// surface over its action footprint.
 ///
-/// Transcribed from `components/feedback/ActionArea.jsx` as rendered on
-/// `components/feedback/status-feedback.card.html` (*Action Area · system
-/// states*, *Navigation interaction preview* — the `.jsx` itself was not
-/// readable from this session, so the card's sequence table, geometry table
-/// and usage notes are the source). It is the shared base behind
-/// `DabblerNavigationFeedback` and `DabblerNavigationActivity`; an app does not
-/// normally place it directly.
+/// Transcribed from `components/feedback/ActionArea.jsx` (values relayed by the
+/// orchestrator from the source file, 2026-10-06) and its specimen
+/// `components/feedback/status-feedback.card.html`. It is the shared base
+/// behind `DabblerNavigationFeedback` and `DabblerNavigationActivity`; an app
+/// does not normally place it directly.
 ///
-/// ## Phases
+/// ## Geometry — `S = --action-area-size`
 ///
-/// | [phase] | what is drawn |
+/// | source | here |
 /// |---|---|
-/// | [DabblerActionAreaPhase.idle] | the bar alone |
-/// | [DabblerActionAreaPhase.collapsed] | a [DabblerSizing.actionAreaSize] circle over the action, [glyph] centred |
-/// | [DabblerActionAreaPhase.expanded] | the surface grown to the bar's width; [fit] decides the height |
+/// | surface: absolute, inline-end 0, bottom 0, 1px hairline, overflow hidden | bottom/inline-end aligned over [bar], [DabblerSizing.borderDefault] border, clipped |
+/// | collapsed: `S × S`, radius 9999 | [DabblerSizing.actionAreaSize], [DabblerRadius.pill] |
+/// | expanded width | the bar's width |
+/// | expanded height: row `S`, content `max(contentHeight, S)` | the same |
+/// | expanded radius: 9999 rows, `--radius-xxl` content | [DabblerRadius.pill] / [DabblerRadius.xxl] |
+/// | `glyphInset = (S − 2 − glyphSize) / 2` (border counted) | [glyphInsetFor] |
+/// | glyph: inline-start `glyphInset`, bottom `glyphInset` — or top 15 when `glyphAtTop` and expanded | the same; 15 is [DabblerSpacing.space5] |
+/// | content box: absolute, insetInline 0, bottom 0, flex row, gap `--space-3`, minHeight `S − 2` | a bottom-pinned [Row], [DabblerSpacing.space3] apart |
+/// | alignItems: center (row) / flex-start (content) | [CrossAxisAlignment.center] / [CrossAxisAlignment.start] |
+/// | paddingBlock 15, content fit only | [DabblerSpacing.space5] |
+/// | paddingInlineStart `glyph ? glyphInset × 2 + glyphSize + 6 : 15`; end 15 | [contentStartFor] (6 is [DabblerSpacing.space2]); [DabblerSpacing.space5] |
 ///
-/// The surface **originates on the action** at the inline end and grows
-/// toward the inline start (and, for [DabblerActionAreaFit.content], upward
-/// from the bar's baseline). [glyph] sits in a [DabblerSizing.actionAreaSize]
-/// square anchored to the surface's **leading** edge, so it rides the growth
-/// rather than staying behind on the action.
-///
-/// ## Sequence
-///
-/// * **Expand** — the surface's width (and height) grow over
-///   [DabblerMotion.slow] on [DabblerMotion.easeOut]; only once it has room
-///   does [child] fade in, over [DabblerMotion.base]. The bar fades under the
-///   surface and becomes inert.
-/// * **Contract** — [child] fades out first, over [DabblerMotion.fast], then
-///   the surface shrinks back to the circle over [DabblerMotion.slow].
-///
-/// The phase itself is the caller's: this widget holds no lifecycle beyond
-/// the order of those two steps. `DabblerNavigationFeedback` adds the
-/// [DabblerMotion.actionAreaHold] timing; an app composes the rest.
+/// Absolute children are placed in the surface's padding box, i.e. inside the
+/// 1px border, exactly as CSS places them; that is why the glyph inset counts
+/// the border twice and the content box is `S − 2` tall.
 ///
 /// ## Motion
 ///
-/// Only width, height, radius, background, border colour and opacity
-/// animate — **never a scale**, so text never zooms. Under reduced motion
-/// ([MediaQueryData.disableAnimations]) the size transitions are dropped and
-/// only opacity animates.
+/// | change | duration |
+/// |---|---|
+/// | width, height, border-radius | [DabblerMotion.slow], [DabblerMotion.easeOut] |
+/// | background, border-color, color | [DabblerMotion.base] |
+/// | expanding: content opacity | [DabblerMotion.base], **after** the growth ([DabblerMotion.slow]) |
+/// | collapsing: content opacity | [DabblerMotion.fast]; the size change waits that long first |
+/// | bar opacity | [DabblerMotion.base] |
 ///
-/// ## Colours are the caller's
+/// Never a scale. Under reduced motion only background, colour and opacity
+/// animate — the size jumps.
 ///
-/// [surface], [hairline] and [ink] are passed in; this widget paints no
-/// colour of its own. `DabblerNavigationFeedback` passes the status tone
-/// triple ([DabblerStatusToneColors]); `DabblerNavigationActivity` passes the
-/// brand circle or the card row.
+/// ## The bar underneath
+///
+/// Opacity 0, inert (no hit testing, no focus) and `aria-hidden` (excluded
+/// from semantics) **only while [phase] is expanded**. Collapsed, it stays
+/// live beside the circle.
 ///
 /// ## Direction
 ///
-/// The surface follows the bar: anchored at the inline end, so under RTL it
+/// The surface follows the bar: inline-end anchored, so under RTL it
 /// originates on the left and grows rightward with the glyph leading on the
 /// right. If [bar] pins its layout ([DabblerNavigationBottomBar.mirrorInRtl]
 /// false) the surface pins with it, so it always sits over the action.
 ///
-/// ## Safe area and width
+/// ## Safe area
 ///
-/// The surface takes the bar's width and never sets a fixed width. The
-/// device's bottom inset is applied **once, here**, below both the bar and
-/// the surface ([safeArea]); the bar's own inset is removed so the two cannot
-/// stack.
+/// The device's bottom inset is applied once, below both the bar and the
+/// surface ([safeArea]); the bar's own inset is removed so they cannot stack.
 ///
 /// ## Accessibility
 ///
 /// The surface carries [SemanticsRole.status] or [SemanticsRole.alert]
 /// ([role]) — a live region by definition — and is excluded from semantics
-/// while idle. While the surface is wider than the circle the navigation
-/// underneath is excluded from semantics, focus and hit testing (the
-/// source's `aria-hidden` + `inert`), and it recovers the moment the surface
-/// is a circle again.
+/// while idle. The content is out of the focus order unless expanded (the
+/// source's `tabIndex = -1`). [onPause] / [onResume] are the source's
+/// mouse-enter/focus and leave/blur on the surface.
 class DabblerActionArea extends StatefulWidget {
   /// Creates an Action Area over [bar].
   const DabblerActionArea({
@@ -132,10 +127,14 @@ class DabblerActionArea extends StatefulWidget {
     this.hairline,
     this.ink,
     this.glyph,
-    this.keepGlyph = true,
-    this.child,
+    this.glyphSize = DabblerSizing.iconMd,
+    this.glyphAtTop = false,
+    this.children = const <Widget>[],
+    this.overlay,
     this.role = DabblerActionAreaRole.status,
     this.semanticLabel,
+    this.onPause,
+    this.onResume,
     this.safeArea = true,
   });
 
@@ -155,59 +154,80 @@ class DabblerActionArea extends StatefulWidget {
   /// The 1px outline. Defaults to [DabblerColors.borderDefault].
   final Color? hairline;
 
-  /// The ink [glyph] and [child] inherit, through [IconTheme] and
+  /// The ink [glyph] and [children] inherit, through [IconTheme] and
   /// [DefaultTextStyle]. Defaults to [DabblerColors.textPrimary].
   final Color? ink;
 
-  /// The circle's content — a tone glyph, a spinner, a ring — centred in the
-  /// [DabblerSizing.actionAreaSize] square at the surface's leading edge.
+  /// The glyph — a tone icon, a spinner, a ring. Null draws none, and the
+  /// content then starts [DabblerSpacing.space5] in.
   final Widget? glyph;
 
-  /// Whether [glyph] stays once expanded. Toasts, banners and the labelled
-  /// spinner keep it; the progress rows drop it (*"the bar is the indicator;
-  /// the ring or Spinner appears only in the collapsed circle"*), in which
-  /// case it fades out as [child] fades in.
-  final bool keepGlyph;
+  /// The glyph's box — 24 by default, 32 for the ring.
+  final double glyphSize;
 
-  /// The expanded content, laid out across the full surface width. Reserve
-  /// [glyphSlot] at the inline start when [keepGlyph] is true. It fades in
-  /// only after the surface has grown, and out before it shrinks.
-  final Widget? child;
+  /// Whether the glyph moves to the top (15 in) once expanded. Otherwise it
+  /// stays bottom-anchored.
+  final bool glyphAtTop;
+
+  /// The content box's flex row. They fade in only after the surface has
+  /// grown, and out before it shrinks.
+  final List<Widget> children;
+
+  /// Painted over the content box (in its own padding-free frame), for a
+  /// target the source pulls out with negative margins — the banner's
+  /// dismiss. Position it with [PositionedDirectional].
+  final Widget? overlay;
 
   /// `role="status"` or `role="alert"`.
   final DabblerActionAreaRole role;
 
-  /// An optional accessible name for the surface. The content normally
-  /// names itself.
+  /// An optional accessible name for the surface.
   final String? semanticLabel;
+
+  /// Pointer entered, or focus arrived inside, the surface.
+  final VoidCallback? onPause;
+
+  /// Pointer left and focus left the surface.
+  final VoidCallback? onResume;
 
   /// Whether to pad the block end by the device's bottom inset. Zero under an
   /// ancestor [SafeArea].
   final bool safeArea;
 
-  /// The leading square the glyph occupies — [DabblerSizing.actionAreaSize].
-  /// Content that keeps the glyph starts after it.
-  static const double glyphSlot = DabblerSizing.actionAreaSize;
+  /// `glyphInset = (S − 2 − glyphSize) / 2` — the border counted on both
+  /// sides, so the glyph is centred in the collapsed circle.
+  static double glyphInsetFor(double glyphSize) =>
+      (DabblerSizing.actionAreaSize -
+          DabblerSizing.borderDefault * 2 -
+          glyphSize) /
+      2;
+
+  /// `paddingInlineStart = glyph ? glyphInset × 2 + glyphSize + 6 : 15`.
+  static double contentStartFor({required bool hasGlyph, double? glyphSize}) {
+    if (!hasGlyph) return DabblerSpacing.space5;
+    final double size = glyphSize ?? DabblerSizing.iconMd;
+    return glyphInsetFor(size) * 2 + size + DabblerSpacing.space2;
+  }
 
   /// Identifies the morphing surface, so a test can measure it.
   static const Key surfaceKey = Key('DabblerActionArea.surface');
 
-  /// Identifies the glyph's square.
+  /// Identifies the glyph's box.
   static const Key glyphKey = Key('DabblerActionArea.glyph');
 
-  /// Identifies the content layer whose opacity fades.
+  /// Identifies the content box whose opacity fades.
   static const Key contentKey = Key('DabblerActionArea.content');
 
   /// Identifies the bar layer.
   static const Key barKey = Key('DabblerActionArea.bar');
 
-  /// How long an expansion takes from the circle to content visible:
-  /// growth, then the content fade. Under reduced motion only the fade.
+  /// From the expanded phase to content fully visible: the growth, then the
+  /// content fade. Under reduced motion only the fade.
   static Duration expandDuration({required bool reduceMotion}) =>
       (reduceMotion ? Duration.zero : DabblerMotion.slow) + DabblerMotion.base;
 
-  /// How long a contraction takes from content visible to the circle: the
-  /// content fade, then the shrink. Under reduced motion only the fade.
+  /// From content visible to the circle: the content fade, then the shrink.
+  /// Under reduced motion only the fade.
   static Duration contractDuration({required bool reduceMotion}) =>
       DabblerMotion.fast + (reduceMotion ? Duration.zero : DabblerMotion.slow);
 
@@ -224,11 +244,13 @@ class _DabblerActionAreaState extends State<DabblerActionArea>
     value: widget.phase == DabblerActionAreaPhase.expanded ? 1 : 0,
   );
 
-  /// Whether [DabblerActionArea.child] is (fading) in. True from the first
-  /// frame when mounted expanded, so a pinned specimen renders complete.
+  /// Whether the content box is (fading) in. True from the first frame when
+  /// mounted expanded, so a pinned specimen renders complete.
   late bool _contentShown = widget.phase == DabblerActionAreaPhase.expanded;
 
   Timer? _step;
+  bool _hovered = false;
+  bool _focused = false;
 
   bool get _reduceMotion => DabblerMotion.reduceMotion(context);
 
@@ -236,25 +258,18 @@ class _DabblerActionAreaState extends State<DabblerActionArea>
   void didUpdateWidget(DabblerActionArea oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.phase != oldWidget.phase) {
-      _toPhase(widget.phase);
+      _step?.cancel();
+      _step = null;
+      widget.phase == DabblerActionAreaPhase.expanded ? _expand() : _contract();
     }
   }
 
-  void _toPhase(DabblerActionAreaPhase phase) {
-    _step?.cancel();
-    _step = null;
-    if (phase == DabblerActionAreaPhase.expanded) {
-      _expand();
-    } else {
-      _contract();
-    }
-  }
-
-  /// Grow first, then let the content in.
+  /// Grow first (`--motion-slow`), then let the content in — the source's
+  /// opacity transition delayed by `--motion-slow`.
   void _expand() {
     if (_reduceMotion) {
       _growth.value = 1;
-      setState(() => _contentShown = true);
+      _contentShown = true;
       return;
     }
     _growth.animateTo(1, curve: DabblerMotion.easeOut).whenCompleteOrCancel(() {
@@ -266,14 +281,13 @@ class _DabblerActionAreaState extends State<DabblerActionArea>
     });
   }
 
-  /// Let the content out first, then shrink.
+  /// Let the content out first (`--motion-fast`), then shrink — the source's
+  /// size transition delayed by `--motion-fast`.
   void _contract() {
     final bool wasShown = _contentShown;
-    setState(() => _contentShown = false);
+    _contentShown = false;
     void shrink() {
-      if (!mounted || widget.phase == DabblerActionAreaPhase.expanded) {
-        return;
-      }
+      if (!mounted || widget.phase == DabblerActionAreaPhase.expanded) return;
       if (_reduceMotion) {
         _growth.value = 0;
       } else {
@@ -288,6 +302,15 @@ class _DabblerActionAreaState extends State<DabblerActionArea>
     }
   }
 
+  void _engage({bool? hovered, bool? focused}) {
+    final bool before = _hovered || _focused;
+    _hovered = hovered ?? _hovered;
+    _focused = focused ?? _focused;
+    final bool after = _hovered || _focused;
+    if (after == before) return;
+    after ? widget.onPause?.call() : widget.onResume?.call();
+  }
+
   @override
   void dispose() {
     _step?.cancel();
@@ -300,22 +323,22 @@ class _DabblerActionAreaState extends State<DabblerActionArea>
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection ambient = Directionality.of(context);
     // The surface sits over the action, so it follows the bar's layout
-    // direction — which is pinned LTR when the bar does not mirror.
+    // direction — pinned LTR when the bar does not mirror.
     final TextDirection layout = widget.bar.mirrorInRtl
         ? ambient
         : TextDirection.ltr;
-    final bool reduceMotion = _reduceMotion;
     final bool idle = widget.phase == DabblerActionAreaPhase.idle;
+    final bool expanded = widget.phase == DabblerActionAreaPhase.expanded;
 
-    // Idle borrows the action's own fill, so idle → collapsed cross-fades
-    // the brand action into the tone circle instead of popping.
-    final Color surface = idle
-        ? colors.brandPrimary
-        : widget.surface ?? colors.surfaceCard;
-    final Color hairline = idle
-        ? colors.brandPrimary
-        : widget.hairline ?? colors.borderDefault;
-    final Color ink = widget.ink ?? colors.textPrimary;
+    // Idle borrows the action's own fill, so idle → collapsed cross-fades the
+    // brand action into the surface instead of popping.
+    final _SurfacePaint paint = _SurfacePaint(
+      fill: idle ? colors.brandPrimary : widget.surface ?? colors.surfaceCard,
+      hairline: idle
+          ? colors.brandPrimary
+          : widget.hairline ?? colors.borderDefault,
+      ink: widget.ink ?? colors.textPrimary,
+    );
 
     final Widget bar = MediaQuery.removePadding(
       context: context,
@@ -323,185 +346,206 @@ class _DabblerActionAreaState extends State<DabblerActionArea>
       child: widget.bar,
     );
 
-    final Widget area = AnimatedBuilder(
-      animation: _growth,
-      builder: (BuildContext context, Widget? _) {
-        final double t = _growth.value;
-        // Grown past the circle (or growing): the navigation is covered.
-        final bool covered =
-            widget.phase == DabblerActionAreaPhase.expanded || t > 0;
-        final bool surfaceVisible = !idle || t > 0;
-
-        return Stack(
-          alignment: layout == TextDirection.ltr
-              ? Alignment.bottomRight
-              : Alignment.bottomLeft,
-          children: <Widget>[
-            KeyedSubtree(
-              key: DabblerActionArea.barKey,
-              child: AnimatedOpacity(
-                opacity: covered ? 0 : 1,
-                duration: DabblerMotion.slow,
-                curve: DabblerMotion.easeOut,
-                child: IgnorePointer(
-                  ignoring: covered,
-                  child: ExcludeFocus(
-                    excluding: covered,
-                    child: ExcludeSemantics(excluding: covered, child: bar),
-                  ),
-                ),
+    final Widget area = Stack(
+      alignment: layout == TextDirection.ltr
+          ? Alignment.bottomRight
+          : Alignment.bottomLeft,
+      children: <Widget>[
+        KeyedSubtree(
+          key: DabblerActionArea.barKey,
+          child: AnimatedOpacity(
+            opacity: expanded ? 0 : 1,
+            duration: DabblerMotion.base,
+            curve: DabblerMotion.easeOut,
+            child: IgnorePointer(
+              ignoring: expanded,
+              child: ExcludeFocus(
+                excluding: expanded,
+                child: ExcludeSemantics(excluding: expanded, child: bar),
               ),
             ),
-            AnimatedOpacity(
-              opacity: surfaceVisible ? 1 : 0,
+          ),
+        ),
+        AnimatedBuilder(
+          animation: _growth,
+          builder: (BuildContext context, Widget? _) {
+            final bool visible = !idle || _growth.value > 0;
+            return AnimatedOpacity(
+              opacity: visible ? 1 : 0,
               duration: DabblerMotion.base,
               curve: DabblerMotion.easeOut,
               child: IgnorePointer(
-                ignoring: !surfaceVisible,
+                ignoring: !visible,
                 child: ExcludeSemantics(
                   excluding: idle,
-                  child: _surface(
-                    t: t,
-                    layout: layout,
-                    surface: surface,
-                    hairline: hairline,
-                    ink: ink,
-                    reduceMotion: reduceMotion,
-                  ),
+                  child: _surface(_growth.value, layout, paint),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+            );
+          },
+        ),
+      ],
     );
 
-    if (!widget.safeArea) {
-      return area;
-    }
+    if (!widget.safeArea) return area;
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
       child: area,
     );
   }
 
-  Widget _surface({
-    required double t,
-    required TextDirection layout,
-    required Color surface,
-    required Color hairline,
-    required Color ink,
-    required bool reduceMotion,
-  }) {
+  Widget _surface(double t, TextDirection layout, _SurfacePaint target) {
     const double size = DabblerSizing.actionAreaSize;
+    const double border = DabblerSizing.borderDefault;
     final bool content = widget.fit == DabblerActionAreaFit.content;
-    // Rows stay a pill; a content-fitted surface eases from the circle's own
-    // radius to the create menu's.
-    final BorderRadius radius = content
-        ? BorderRadius.circular(
-            lerpDouble(size / 2, DabblerRadius.xxl, t) ?? DabblerRadius.xxl,
-          )
-        : DabblerRadius.pillAll;
+    final bool expanded = widget.phase == DabblerActionAreaPhase.expanded;
+    // `border-radius` transitions with the size: 9999 → xxl for content.
+    final BorderRadius radius = BorderRadius.circular(
+      content
+          ? lerpDouble(DabblerRadius.pill, DabblerRadius.xxl, t)!
+          : DabblerRadius.pill,
+    );
     final bool leadingLeft = layout == TextDirection.ltr;
-    final Duration fade = _contentShown
-        ? DabblerMotion.base
-        : DabblerMotion.fast;
+    final bool hasGlyph = widget.glyph != null;
+    final double inset = DabblerActionArea.glyphInsetFor(widget.glyphSize);
+    final bool atTop = widget.glyphAtTop && expanded;
 
-    final Widget? glyph = widget.glyph == null
-        ? null
-        : Positioned(
-            key: DabblerActionArea.glyphKey,
-            top: 0,
-            left: leadingLeft ? 0 : null,
-            right: leadingLeft ? null : 0,
-            width: DabblerActionArea.glyphSlot,
-            height: DabblerActionArea.glyphSlot,
-            child: AnimatedOpacity(
-              opacity: widget.keepGlyph || !_contentShown ? 1 : 0,
-              duration: fade,
-              curve: DabblerMotion.easeOut,
-              child: Center(child: widget.glyph),
-            ),
-          );
-
-    final Widget layer = AnimatedOpacity(
+    final Widget contentBox = AnimatedOpacity(
       key: DabblerActionArea.contentKey,
       opacity: _contentShown ? 1 : 0,
-      duration: fade,
+      duration: _contentShown ? DabblerMotion.base : DabblerMotion.fast,
       curve: DabblerMotion.easeOut,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: size,
-          maxHeight: content ? double.infinity : size,
-        ),
-        child: widget.child ?? const SizedBox.shrink(),
-      ),
-    );
-
-    final Widget surfaceBox = TweenAnimationBuilder<_SurfacePaint>(
-      tween: _SurfacePaintTween(
-        end: _SurfacePaint(fill: surface, hairline: hairline),
-      ),
-      duration: DabblerMotion.base,
-      curve: DabblerMotion.easeOut,
-      builder: (BuildContext context, _SurfacePaint paint, Widget? child) =>
-          DecoratedBox(
-            key: DabblerActionArea.surfaceKey,
-            decoration: BoxDecoration(
-              color: paint.fill,
-              borderRadius: radius,
-              border: Border.all(
-                color: paint.hairline,
-                width: DabblerSizing.borderDefault,
+      child: ExcludeFocus(
+        excluding: !expanded,
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsetsDirectional.only(
+                start: DabblerActionArea.contentStartFor(
+                  hasGlyph: hasGlyph,
+                  glyphSize: widget.glyphSize,
+                ),
+                end: DabblerSpacing.space5,
+                top: content ? DabblerSpacing.space5 : 0,
+                bottom: content ? DabblerSpacing.space5 : 0,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: content
+                      ? 0
+                      : size - border * 2,
+                ),
+                child: Row(
+                  crossAxisAlignment: content
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.center,
+                  spacing: DabblerSpacing.space3,
+                  children: widget.children,
+                ),
               ),
             ),
-            child: ClipRRect(borderRadius: radius, child: child),
-          ),
-      child: _GrowingSurface(
-        t: t,
-        extent: size,
-        fitContent: content,
-        leadingLeft: leadingLeft,
-        child: IconTheme.merge(
-          data: IconThemeData(color: ink),
-          child: DefaultTextStyle.merge(
-            style: TextStyle(color: ink),
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: <Widget>[layer, ?glyph],
-            ),
-          ),
+            ?widget.overlay,
+          ],
         ),
       ),
     );
 
-    return Semantics(
-      container: true,
-      explicitChildNodes: true,
-      role: widget.role == DabblerActionAreaRole.alert
-          ? SemanticsRole.alert
-          : SemanticsRole.status,
-      label: widget.semanticLabel,
-      child: surfaceBox,
+    return TweenAnimationBuilder<_SurfacePaint>(
+      tween: _SurfacePaintTween(end: target),
+      duration: DabblerMotion.base,
+      curve: DabblerMotion.easeOut,
+      builder: (BuildContext context, _SurfacePaint p, Widget? _) {
+        final Widget inner = Stack(
+          children: <Widget>[
+            _GrowingSurface(
+              t: t,
+              extent: size - border * 2,
+              fitContent: content,
+              leadingLeft: leadingLeft,
+              border: border,
+              child: contentBox,
+            ),
+            if (hasGlyph)
+              Positioned(
+                key: DabblerActionArea.glyphKey,
+                left: leadingLeft ? inset : null,
+                right: leadingLeft ? null : inset,
+                top: atTop ? DabblerSpacing.space5 : null,
+                bottom: atTop ? null : inset,
+                width: widget.glyphSize,
+                height: widget.glyphSize,
+                child: Center(child: widget.glyph),
+              ),
+          ],
+        );
+        return Semantics(
+          container: true,
+          explicitChildNodes: true,
+          role: widget.role == DabblerActionAreaRole.alert
+              ? SemanticsRole.alert
+              : SemanticsRole.status,
+          label: widget.semanticLabel,
+          child: MouseRegion(
+            onEnter: (_) => _engage(hovered: true),
+            onExit: (_) => _engage(hovered: false),
+            child: Focus(
+              canRequestFocus: false,
+              skipTraversal: true,
+              onFocusChange: (bool f) => _engage(focused: f),
+              child: DecoratedBox(
+                key: DabblerActionArea.surfaceKey,
+                decoration: BoxDecoration(
+                  color: p.fill,
+                  borderRadius: radius,
+                  border: Border.all(color: p.hairline, width: border),
+                ),
+                child: ClipRRect(
+                  borderRadius: radius,
+                  child: Padding(
+                    // Absolute children sit in the padding box, inside the
+                    // 1px border.
+                    padding: const EdgeInsets.all(border),
+                    child: IconTheme.merge(
+                      data: IconThemeData(color: p.ink),
+                      child: DefaultTextStyle.merge(
+                        style: TextStyle(color: p.ink),
+                        child: inner,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
-/// The surface's two colours, interpolated together so background and
-/// border cross-fade as one.
+/// Background, border colour and ink, interpolated together over
+/// `--motion-base`.
 @immutable
 class _SurfacePaint {
-  const _SurfacePaint({required this.fill, required this.hairline});
+  const _SurfacePaint({
+    required this.fill,
+    required this.hairline,
+    required this.ink,
+  });
 
   final Color fill;
   final Color hairline;
+  final Color ink;
 
   @override
   bool operator ==(Object other) =>
-      other is _SurfacePaint && other.fill == fill && other.hairline == hairline;
+      other is _SurfacePaint &&
+      other.fill == fill &&
+      other.hairline == hairline &&
+      other.ink == ink;
 
   @override
-  int get hashCode => Object.hash(fill, hairline);
+  int get hashCode => Object.hash(fill, hairline, ink);
 }
 
 class _SurfacePaintTween extends Tween<_SurfacePaint> {
@@ -511,27 +555,29 @@ class _SurfacePaintTween extends Tween<_SurfacePaint> {
   _SurfacePaint lerp(double t) => _SurfacePaint(
     fill: Color.lerp(begin!.fill, end!.fill, t)!,
     hairline: Color.lerp(begin!.hairline, end!.hairline, t)!,
+    ink: Color.lerp(begin!.ink, end!.ink, t)!,
   );
 }
 
-/// Lays its child out at the **full** grown size — the available width, and
-/// either one [extent] row or the child's own height — and sizes itself
-/// between the [extent] circle (t = 0) and that full size (t = 1).
+/// The surface's padding box. Lays the content box out at the **full**
+/// grown width and its natural height, and sizes itself between the
+/// collapsed `S − 2` square (t = 0) and the expanded padding box (t = 1):
+/// the offered width, and for a content fit `max(contentHeight, S) − 2`.
 ///
-/// The child is pinned to the surface's **leading, top** corner, so whatever
-/// the child draws in its leading [extent] square (the glyph) stays at the
-/// surface's leading edge while the surface grows: it rides the growth. The
-/// part of the child beyond the current size is clipped by the caller.
+/// The content box is pinned to the **bottom, leading** corner — the source's
+/// `insetInline: 0; bottom: 0` — so whatever overflows the current size is
+/// clipped at the top and at the trailing edge by the surface.
 ///
-/// This is a render object rather than an implicit size animation because
-/// the target height of a content-fitted surface is the child's measured
-/// height, which no implicit widget exposes before the growth starts.
+/// A render object rather than an implicit size animation because the
+/// content-fit target is the content's measured height, which no implicit
+/// widget exposes before the growth starts.
 class _GrowingSurface extends SingleChildRenderObjectWidget {
   const _GrowingSurface({
     required this.t,
     required this.extent,
     required this.fitContent,
     required this.leadingLeft,
+    required this.border,
     super.child,
   });
 
@@ -539,6 +585,7 @@ class _GrowingSurface extends SingleChildRenderObjectWidget {
   final double extent;
   final bool fitContent;
   final bool leadingLeft;
+  final double border;
 
   @override
   _RenderGrowingSurface createRenderObject(BuildContext context) =>
@@ -547,6 +594,7 @@ class _GrowingSurface extends SingleChildRenderObjectWidget {
         extent: extent,
         fitContent: fitContent,
         leadingLeft: leadingLeft,
+        border: border,
       );
 
   @override
@@ -558,7 +606,8 @@ class _GrowingSurface extends SingleChildRenderObjectWidget {
       ..t = t
       ..extent = extent
       ..fitContent = fitContent
-      ..leadingLeft = leadingLeft;
+      ..leadingLeft = leadingLeft
+      ..border = border;
   }
 }
 
@@ -568,10 +617,12 @@ class _RenderGrowingSurface extends RenderShiftedBox {
     required double extent,
     required bool fitContent,
     required bool leadingLeft,
+    required double border,
   }) : _t = t,
        _extent = extent,
        _fitContent = fitContent,
        _leadingLeft = leadingLeft,
+       _border = border,
        super(null);
 
   double _t;
@@ -602,7 +653,13 @@ class _RenderGrowingSurface extends RenderShiftedBox {
     markNeedsLayout();
   }
 
-  /// The grown width: everything offered, never less than the circle.
+  double _border;
+  set border(double value) {
+    if (value == _border) return;
+    _border = value;
+    markNeedsLayout();
+  }
+
   double _fullWidth(BoxConstraints constraints) =>
       constraints.hasBoundedWidth && constraints.maxWidth > _extent
       ? constraints.maxWidth
@@ -615,19 +672,25 @@ class _RenderGrowingSurface extends RenderShiftedBox {
     maxHeight: _fitContent ? double.infinity : _extent,
   );
 
-  Size _sizeFor(BoxConstraints constraints, Size full) => constraints.constrain(
-    Size(
-      lerpDouble(_extent, full.width, _t)!,
-      lerpDouble(_extent, full.height, _t)!,
-    ),
-  );
+  /// `max(contentHeight, S)` on the border box, i.e. minus both borders here.
+  double _fullHeight(double childHeight) => _fitContent
+      ? (childHeight - _border * 2).clamp(_extent, double.infinity)
+      : _extent;
+
+  Size _sizeFor(BoxConstraints constraints, double width, double childH) =>
+      constraints.constrain(
+        Size(
+          lerpDouble(_extent, width, _t)!,
+          lerpDouble(_extent, _fullHeight(childH), _t)!,
+        ),
+      );
 
   @override
   Size computeDryLayout(BoxConstraints constraints) {
     final double width = _fullWidth(constraints);
-    final Size full =
-        child?.getDryLayout(_childConstraints(width)) ?? Size(width, _extent);
-    return _sizeFor(constraints, full);
+    final double childH =
+        child?.getDryLayout(_childConstraints(width)).height ?? _extent;
+    return _sizeFor(constraints, width, childH);
   }
 
   @override
@@ -635,13 +698,15 @@ class _RenderGrowingSurface extends RenderShiftedBox {
     final double width = _fullWidth(constraints);
     final RenderBox? box = child;
     if (box == null) {
-      size = _sizeFor(constraints, Size(width, _extent));
+      size = _sizeFor(constraints, width, _extent);
       return;
     }
     box.layout(_childConstraints(width), parentUsesSize: true);
-    size = _sizeFor(constraints, box.size);
+    size = _sizeFor(constraints, width, box.size.height);
     final BoxParentData data = box.parentData! as BoxParentData;
-    // Pinned to the leading, top corner of the current size.
-    data.offset = Offset(_leadingLeft ? 0 : size.width - box.size.width, 0);
+    data.offset = Offset(
+      _leadingLeft ? 0 : size.width - box.size.width,
+      size.height - box.size.height,
+    );
   }
 }

@@ -24,21 +24,28 @@ const DabblerNavigationBottomBar _bar = DabblerNavigationBottomBar(
 Widget _area(
   DabblerActionAreaPhase phase, {
   DabblerActionAreaFit fit = DabblerActionAreaFit.row,
-  bool keepGlyph = true,
+  bool withGlyph = true,
+  bool glyphAtTop = false,
   Widget? child,
   DabblerNavigationBottomBar bar = _bar,
 }) => DabblerActionArea(
   bar: bar,
   phase: phase,
   fit: fit,
-  keepGlyph: keepGlyph,
+  glyphAtTop: glyphAtTop,
   safeArea: false,
-  glyph: const SizedBox.square(
-    key: Key('glyph-probe'),
-    dimension: DabblerSizing.iconMd,
-  ),
-  child: child,
+  glyph: withGlyph
+      ? const SizedBox.square(
+          key: Key('glyph-probe'),
+          dimension: DabblerSizing.iconMd,
+        )
+      : null,
+  children: <Widget>[?child],
 );
+
+/// `glyphInset` for the default 24 glyph — `(S − 2 − 24) / 2`.
+final double _inset = DabblerActionArea.glyphInsetFor(DabblerSizing.iconMd);
+const double _b = DabblerSizing.borderDefault;
 
 Widget _hosted(
   Widget child, {
@@ -134,7 +141,8 @@ void main() {
       );
       final Rect s = _surface(tester);
       expect(s.width, _width);
-      expect(s.height, tall);
+      // `max(contentHeight, S)`: the content box carries 15 block padding.
+      expect(s.height, tall + DabblerSpacing.space5 * 2);
       // Bottom-anchored on the bar's baseline.
       expect(s.bottom, _barRect(tester).bottom);
       expect(
@@ -193,14 +201,63 @@ void main() {
       });
     }
 
-    testWidgets('LTR expanded: the glyph square is at the left edge', (
+    test('glyphInset = (S − 2 − glyphSize) / 2; content start from it', () {
+      expect(DabblerActionArea.glyphInsetFor(DabblerSizing.iconMd), 15);
+      expect(DabblerActionArea.glyphInsetFor(DabblerSizing.actionAreaRing), 11);
+      expect(DabblerActionArea.contentStartFor(hasGlyph: true), 60);
+      expect(DabblerActionArea.contentStartFor(hasGlyph: false), 15);
+    });
+
+    testWidgets('LTR expanded: inline-start glyphInset, bottom glyphInset', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(_hosted(_area(DabblerActionAreaPhase.expanded)));
       final Rect glyph = tester.getRect(find.byKey(DabblerActionArea.glyphKey));
       final Rect s = _surface(tester);
-      expect(glyph.left, s.left);
-      expect(glyph.size, const Size(_s, _s));
+      expect(glyph.left, s.left + _b + _inset);
+      expect(glyph.bottom, s.bottom - _b - _inset);
+      expect(glyph.size, const Size.square(DabblerSizing.iconMd));
+    });
+
+    testWidgets('glyphAtTop moves it to top 15 only once expanded', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _hosted(
+          _area(
+            DabblerActionAreaPhase.expanded,
+            fit: DabblerActionAreaFit.content,
+            glyphAtTop: true,
+            child: const SizedBox(
+              height: DabblerSizing.mediaPreviewCompactHeight,
+            ),
+          ),
+        ),
+      );
+      final Rect s = _surface(tester);
+      expect(
+        tester.getRect(find.byKey(DabblerActionArea.glyphKey)).top,
+        s.top + _b + DabblerSpacing.space5,
+      );
+    });
+
+    testWidgets('content starts at glyphInset × 2 + glyphSize + 6', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _hosted(
+          _area(
+            DabblerActionAreaPhase.expanded,
+            child: const SizedBox(key: Key('c'), width: 1, height: 1),
+          ),
+        ),
+      );
+      expect(
+        tester.getRect(find.byKey(const Key('c'))).left,
+        _surface(tester).left + _b + DabblerActionArea.contentStartFor(
+          hasGlyph: true,
+        ),
+      );
     });
 
     testWidgets('RTL expanded: at the right edge, the surface on the left', (
@@ -224,7 +281,7 @@ void main() {
       await tester.pumpAndSettle();
       final Rect glyph = tester.getRect(find.byKey(DabblerActionArea.glyphKey));
       final Rect s = _surface(tester);
-      expect(glyph.right, s.right);
+      expect(glyph.right, s.right - _b - _inset);
       expect(s.left, _barRect(tester).left);
     });
 
@@ -238,7 +295,10 @@ void main() {
       expect(s.width, greaterThan(_s));
       expect(s.width, lessThan(_width));
       expect(s.right, _barRect(tester).right);
-      expect(tester.getRect(find.byKey(DabblerActionArea.glyphKey)).left, s.left);
+      expect(
+        tester.getRect(find.byKey(DabblerActionArea.glyphKey)).left,
+        s.left + _b + _inset,
+      );
     });
 
     testWidgets('a bar pinned unmirrored keeps the surface on the right', (
@@ -304,19 +364,23 @@ void main() {
       expect(_surface(tester).size, const Size(_s, _s));
     });
 
-    testWidgets('a progress row drops its glyph as the content arrives', (
+    testWidgets('without a glyph the content starts 15 in', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _hosted(_area(DabblerActionAreaPhase.expanded, keepGlyph: false)),
-      );
-      final AnimatedOpacity glyph = tester.widget<AnimatedOpacity>(
-        find.descendant(
-          of: find.byKey(DabblerActionArea.glyphKey),
-          matching: find.byType(AnimatedOpacity),
+        _hosted(
+          _area(
+            DabblerActionAreaPhase.expanded,
+            withGlyph: false,
+            child: const SizedBox(key: Key('c'), width: 1, height: 1),
+          ),
         ),
       );
-      expect(glyph.opacity, 0);
+      expect(find.byKey(DabblerActionArea.glyphKey), findsNothing);
+      expect(
+        tester.getRect(find.byKey(const Key('c'))).left,
+        _surface(tester).left + _b + DabblerSpacing.space5,
+      );
     });
   });
 
@@ -425,7 +489,7 @@ void main() {
               role: role,
               safeArea: false,
               bar: _bar,
-              child: const Text('message'),
+              children: const <Widget>[Text('message')],
             ),
           ),
         );
@@ -433,7 +497,9 @@ void main() {
           find
               .ancestor(
                 of: find.byKey(DabblerActionArea.surfaceKey),
-                matching: find.byType(Semantics),
+                matching: find.byWidgetPredicate(
+                  (Widget w) => w is Semantics && w.properties.role != null,
+                ),
               )
               .first,
         );
@@ -478,18 +544,23 @@ void main() {
       expect(_surface(tester).width, _width);
       expect(_contentOpacity(tester), 1);
 
-      // Not before its 4000ms.
+      // The 4000ms runs from the expanded phase; not before it.
       await tester.pump(
-        DabblerToastSpec.defaultDuration - DabblerMotion.slow,
+        DabblerToastSpec.defaultDuration -
+            DabblerActionArea.expandDuration(reduceMotion: false) -
+            DabblerMotion.slow,
       );
       expect(_surface(tester).width, _width);
       expect(done, 0);
 
+      // close(): collapsed now, idle + onDone after 200 + HOLD.
       await tester.pump(DabblerMotion.slow);
-      await tester.pump(DabblerActionArea.contractDuration(reduceMotion: false));
+      await tester.pump(DabblerMotion.slow);
+      expect(done, 0);
       await tester.pump(DabblerMotion.actionAreaHold);
-      await tester.pumpAndSettle();
+      await tester.pump();
       expect(done, 1);
+      await tester.pumpAndSettle();
       expect(_surface(tester).size, const Size(_s, _s));
     });
 
@@ -523,7 +594,9 @@ void main() {
       await mouse.moveTo(Offset.zero);
       await tester.pump();
       await tester.pump(DabblerToastSpec.defaultDuration);
-      await tester.pumpAndSettle();
+      // close(): idle after 200 + HOLD — timers, not frames.
+      await tester.pump(DabblerMotion.slow + DabblerMotion.actionAreaHold);
+      await tester.pump();
       expect(done, 1);
       await mouse.removePointer();
     });
@@ -556,12 +629,41 @@ void main() {
       final Size target = tester.getSize(
         find.byKey(DabblerNavigationFeedback.actionTargetKey),
       );
+      // `minHeight: --touch-target-min`, `paddingInline: --space-2`.
       expect(target.height, greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
-      expect(target.width, greaterThanOrEqualTo(DabblerSizing.touchTargetMin));
       await tester.tap(find.byKey(DabblerNavigationFeedback.actionTargetKey));
       await tester.pumpAndSettle();
       expect(pressed, 1);
       expect(done, 1);
+    });
+
+    testWidgets('tone defaults: neutral for a toast, info for a banner', (
+      WidgetTester tester,
+    ) async {
+      const DabblerNavigationFeedbackData untoned =
+          DabblerNavigationFeedbackData(message: 'm');
+      expect(
+        untoned.toneFor(DabblerNavigationFeedbackPresentation.toast),
+        DabblerToastTone.neutral,
+      );
+      expect(
+        untoned.toneFor(DabblerNavigationFeedbackPresentation.banner),
+        DabblerToastTone.info,
+      );
+      final DabblerColors c = testColors();
+      await tester.pumpWidget(
+        _hosted(
+          const DabblerNavigationFeedback(
+            presentation: DabblerNavigationFeedbackPresentation.banner,
+            feedback: untoned,
+            phase: DabblerActionAreaPhase.expanded,
+            bar: _bar,
+            safeArea: false,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(_surfaceDecoration(tester).color, c.info.surface);
     });
 
     testWidgets('the toast message stays on one line', (
@@ -620,15 +722,20 @@ void main() {
         dismiss.size,
         const Size.square(DabblerSizing.touchTargetMin),
       );
-      // At the top-trailing corner.
+      // The content box is bottom-pinned in a padding box of
+      // `max(contentHeight, S) − 2`, so its top sits one border above the
+      // surface's outer top; the dismiss is 3 below that (15 padding − 12
+      // margin) and 6 in from the content box's inline end (15 − 9).
       expect(
-        dismiss.top - _surface(tester).top,
-        DabblerNavigationFeedback.dismissInset,
+        dismiss.top,
+        _surface(tester).top - _b + DabblerNavigationFeedback.dismissTop,
       );
       expect(
-        _surface(tester).right - dismiss.right,
-        DabblerNavigationFeedback.dismissInset,
+        _surface(tester).right - _b - dismiss.right,
+        DabblerNavigationFeedback.dismissEnd,
       );
+      expect(DabblerNavigationFeedback.dismissTop, 3);
+      expect(DabblerNavigationFeedback.dismissEnd, 6);
       await tester.tap(find.byKey(DabblerNavigationFeedback.dismissTargetKey));
       await tester.pumpAndSettle();
       expect(done, 1);
@@ -651,8 +758,8 @@ void main() {
       );
       final Rect s = _surface(tester);
       final Rect glyph = tester.getRect(find.byKey(DabblerActionArea.glyphKey));
-      expect(glyph.top, s.top);
-      expect(glyph.right, s.right);
+      expect(glyph.top, s.top + _b + DabblerSpacing.space5);
+      expect(glyph.right, s.right - _b - _inset);
       expect(s.width, _width);
     });
 
@@ -826,7 +933,7 @@ void main() {
       expect(_surface(tester).size, const Size(_s, _s));
       final Finder ring = find.byType(DabblerRing);
       expect(tester.getSize(ring), const Size.square(DabblerSizing.actionAreaRing));
-      expect(tester.widget<DabblerRing>(ring).tone, DabblerProgressBarTone.onBrand);
+      expect(tester.widget<DabblerRing>(ring).tone, DabblerRingTone.onBrand);
     });
 
     testWidgets('spinner-label: a card row with a brand spinner and a label', (
@@ -857,10 +964,8 @@ void main() {
       expect(bar.value, 0.35);
       expect(bar.size, DabblerProgressBarSize.sm);
       expect(bar.showValue, isTrue);
-      final DabblerActionArea area = tester.widget(
-        find.byType(DabblerActionArea),
-      );
-      expect(area.keepGlyph, isFalse);
+      // The bar is the indicator: no glyph once expanded.
+      expect(find.byKey(DabblerActionArea.glyphKey), findsNothing);
       expect(_surface(tester).height, _s);
     });
 
@@ -896,7 +1001,7 @@ void main() {
       expect(_surface(tester).width, _width);
     });
 
-    testWidgets('from idle, an expanded presentation grows from the circle', (
+    testWidgets('activating an expanded presentation grows straight out', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -906,10 +1011,32 @@ void main() {
         activity(DabblerNavigationActivityPresentation.progress, value: 0.2),
       );
       await tester.pump();
-      expect(_surface(tester).size, const Size(_s, _s));
-      await tester.pump(DabblerMotion.actionAreaHold);
+      final DabblerActionArea area = tester.widget(
+        find.byType(DabblerActionArea),
+      );
+      expect(area.phase, DabblerActionAreaPhase.expanded);
       await tester.pumpAndSettle();
       expect(_surface(tester).width, _width);
+    });
+
+    testWidgets('collapsed: transparent hairline; the ring is 32 at inset 11', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        activity(DabblerNavigationActivityPresentation.ring, value: 0.5),
+      );
+      await tester.pump(DabblerMotion.base);
+      final BoxDecoration d = _surfaceDecoration(tester);
+      expect((d.border! as Border).top.color.a, 0);
+      final Rect glyph = tester.getRect(find.byKey(DabblerActionArea.glyphKey));
+      final Rect s = _surface(tester);
+      expect(glyph.size, const Size.square(DabblerSizing.actionAreaRing));
+      expect(
+        glyph.left,
+        s.left + _b + DabblerActionArea.glyphInsetFor(
+          DabblerSizing.actionAreaRing,
+        ),
+      );
     });
 
     testWidgets('expanded rows: ink clears AA on the card, dark too', (

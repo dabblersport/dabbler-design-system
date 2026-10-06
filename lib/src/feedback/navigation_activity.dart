@@ -1,12 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 
 import '../foundations/icon.dart';
 import '../navigation/bottom_bar.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
-import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 import 'action_area.dart';
 import 'progress_bar.dart';
@@ -66,7 +63,7 @@ enum DabblerNavigationActivityPresentation {
 ///
 /// | phase | surface | ink |
 /// |---|---|---|
-/// | collapsed | [DabblerColors.brandPrimary] — the action, working | [DabblerColors.onBrand] |
+/// | collapsed | [DabblerColors.brandPrimary], transparent hairline — the action, working | [DabblerColors.onBrand] |
 /// | expanded | [DabblerColors.surfaceCard] + [DabblerColors.borderDefault] — the create-menu precedent | [DabblerColors.textPrimary] |
 ///
 /// ## The indicator is never doubled
@@ -78,11 +75,10 @@ enum DabblerNavigationActivityPresentation {
 ///
 /// ## Lifecycle
 ///
-/// None beyond the order of states: the application composes them
-/// (*"No lifecycle is implemented here"*). When an expanded presentation
-/// follows idle, the circle shows for [DabblerMotion.actionAreaHold] before
-/// it grows, so the row always reads as grown **from** the action. Pass
-/// [phase] to pin a state.
+/// None: the phase follows [active] and [presentation] directly — compact
+/// presentations collapsed, the rest expanded — and the application composes
+/// the order of states (*"No lifecycle is implemented here"*). Pass [phase]
+/// to pin a state.
 ///
 /// ## Accessibility
 ///
@@ -146,113 +142,87 @@ class DabblerNavigationActivity extends StatefulWidget {
 }
 
 class _DabblerNavigationActivityState extends State<DabblerNavigationActivity> {
-  late DabblerActionAreaPhase _phase = _target(widget);
-  Timer? _hold;
-
-  static DabblerActionAreaPhase _target(DabblerNavigationActivity w) {
-    if (w.phase != null) return w.phase!;
-    if (!w.active) return DabblerActionAreaPhase.idle;
-    return w.presentation.compact
+  /// `phase`: pinned, else idle when inactive, collapsed for the compact
+  /// presentations, expanded for the rest — exactly as the source derives it.
+  DabblerActionAreaPhase get _phase {
+    if (widget.phase != null) return widget.phase!;
+    if (!widget.active) return DabblerActionAreaPhase.idle;
+    return widget.presentation.compact
         ? DabblerActionAreaPhase.collapsed
         : DabblerActionAreaPhase.expanded;
-  }
-
-  @override
-  void didUpdateWidget(DabblerNavigationActivity oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final DabblerActionAreaPhase next = _target(widget);
-    if (next == _phase && _hold == null) return;
-    _hold?.cancel();
-    _hold = null;
-    if (widget.phase == null &&
-        next == DabblerActionAreaPhase.expanded &&
-        _phase == DabblerActionAreaPhase.idle) {
-      // Grown FROM the action: show the circle first.
-      _phase = DabblerActionAreaPhase.collapsed;
-      _hold = Timer(DabblerMotion.actionAreaHold, () {
-        if (!mounted) return;
-        setState(() {
-          _hold = null;
-          _phase = _target(widget);
-        });
-      });
-      return;
-    }
-    _phase = next;
-  }
-
-  @override
-  void dispose() {
-    _hold?.cancel();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final DabblerNavigationActivityPresentation p = widget.presentation;
-    final bool expanded = _phase == DabblerActionAreaPhase.expanded;
+    final DabblerActionAreaPhase phase = _phase;
+    final bool expanded = phase == DabblerActionAreaPhase.expanded;
+    final bool ring = p == DabblerNavigationActivityPresentation.ring;
+    final bool content =
+        p == DabblerNavigationActivityPresentation.progressExpanded;
 
     return DabblerActionArea(
       bar: widget.bar,
-      phase: _phase,
-      fit: p == DabblerNavigationActivityPresentation.progressExpanded
-          ? DabblerActionAreaFit.content
-          : DabblerActionAreaFit.row,
+      phase: phase,
+      fit: content ? DabblerActionAreaFit.content : DabblerActionAreaFit.row,
+      // Collapsed: the action, working. Expanded: the create menu's card.
       surface: expanded ? colors.surfaceCard : colors.brandPrimary,
-      hairline: expanded ? colors.borderDefault : colors.brandPrimary,
+      hairline: expanded
+          ? colors.borderDefault
+          // `hairline: transparent`.
+          : colors.brandPrimary.withValues(alpha: 0),
       ink: expanded ? colors.textPrimary : colors.onBrand,
       safeArea: widget.safeArea,
-      keepGlyph: p == DabblerNavigationActivityPresentation.spinnerLabel,
-      glyph: AnimatedSwitcher(
-        duration: DabblerMotion.base,
-        switchInCurve: DabblerMotion.easeOut,
-        switchOutCurve: DabblerMotion.easeOut,
-        child: _glyph(onBrand: !expanded),
-      ),
-      child: p.compact ? null : _content(context, colors),
+      glyphSize: ring ? DabblerSizing.actionAreaRing : DabblerSizing.iconMd,
+      glyphAtTop: content,
+      role: DabblerActionAreaRole.status,
+      glyph: _glyph(expanded: expanded),
+      children: p.compact ? const <Widget>[] : _content(context, colors),
     );
   }
 
-  /// The circle's indicator: a ring when there is (or will be) a value, a
-  /// spinner otherwise. `onBrand` on the brand circle; the labelled spinner
-  /// lands on the card in its own tone.
-  Widget _glyph({required bool onBrand}) {
+  /// The indicator: a [DabblerSpinner] (md) for `spinner` and `spinnerLabel`,
+  /// a 32 [DabblerRing.progress] for `ring`, and **none** for the expanded
+  /// progress presentations — the bar is the indicator there.
+  Widget? _glyph({required bool expanded}) {
     final DabblerColors colors = DabblerColors.of(context);
-    if (widget.presentation.determinate) {
-      return DabblerRing.progress(
-        key: const ValueKey<String>('ring'),
-        value: widget.value,
-        diameter: DabblerSizing.actionAreaRing,
-        tone: DabblerProgressBarTone.onBrand,
-        semanticLabel: widget.label,
-        child: widget.icon == null
-            ? null
-            : DabblerIcon(
-                widget.icon!,
-                size: DabblerSizing.iconSm,
-                color: colors.onBrand,
-              ),
-      );
+    switch (widget.presentation) {
+      case DabblerNavigationActivityPresentation.ring:
+        return DabblerRing.progress(
+          value: widget.value,
+          diameter: DabblerSizing.actionAreaRing,
+          tone: expanded ? DabblerRingTone.brand : DabblerRingTone.onBrand,
+          semanticLabel: widget.label,
+          child: widget.icon == null
+              ? null
+              : DabblerIcon(
+                  widget.icon!,
+                  weight: DabblerIconWeight.bold,
+                  // `size 16` — half the 32 ring.
+                  size: DabblerSizing.actionAreaRing / 2,
+                  color: expanded ? colors.textPrimary : colors.onBrand,
+                ),
+        );
+      case DabblerNavigationActivityPresentation.spinner:
+      case DabblerNavigationActivityPresentation.spinnerLabel:
+        return DabblerSpinner(
+          tone: expanded ? widget.tone : DabblerSpinnerTone.onBrand,
+          label: widget.label,
+        );
+      case DabblerNavigationActivityPresentation.indeterminate:
+      case DabblerNavigationActivityPresentation.progress:
+      case DabblerNavigationActivityPresentation.progressExpanded:
+        return null;
     }
-    return DabblerSpinner(
-      key: ValueKey<bool>(onBrand),
-      tone: onBrand ? DabblerSpinnerTone.onBrand : widget.tone,
-      label: widget.label,
-    );
   }
 
-  Widget _content(BuildContext context, DabblerColors colors) {
+  List<Widget> _content(BuildContext context, DabblerColors colors) {
     final TextDirection direction = Directionality.of(context);
     switch (widget.presentation) {
       case DabblerNavigationActivityPresentation.spinnerLabel:
-        return Padding(
-          padding: const EdgeInsetsDirectional.only(
-            start: DabblerActionArea.glyphSlot,
-            end: DabblerSpacing.space6,
-          ),
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
+        return <Widget>[
+          Expanded(
             // The spinner already announces the label; this is its visible
             // twin.
             child: ExcludeSemantics(
@@ -267,62 +237,63 @@ class _DabblerNavigationActivityState extends State<DabblerNavigationActivity> {
               ),
             ),
           ),
-        );
+        ];
       case DabblerNavigationActivityPresentation.indeterminate:
-      case DabblerNavigationActivityPresentation.progress:
-        final double? value =
-            widget.presentation ==
-                DabblerNavigationActivityPresentation.progress
-            ? widget.value
-            : null;
-        return Padding(
-          padding: const EdgeInsetsDirectional.symmetric(
-            horizontal: DabblerSpacing.space8,
+        return <Widget>[
+          Expanded(
+            child: DabblerProgressBar.indeterminate(
+              size: DabblerProgressBarSize.sm,
+              label: widget.label,
+            ),
           ),
-          child: Center(
-            child: value == null
+        ];
+      case DabblerNavigationActivityPresentation.progress:
+        return <Widget>[
+          Expanded(
+            child: widget.value == null
                 ? DabblerProgressBar.indeterminate(
                     size: DabblerProgressBarSize.sm,
                     label: widget.label,
                   )
                 : DabblerProgressBar(
-                    value: value,
+                    value: widget.value!,
                     size: DabblerProgressBarSize.sm,
                     label: widget.label,
                     showValue: true,
                   ),
           ),
-        );
+        ];
       case DabblerNavigationActivityPresentation.progressExpanded:
-        return Padding(
-          padding: const EdgeInsets.all(DabblerSpacing.cardPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              if (widget.value == null)
-                DabblerProgressBar.indeterminate(label: widget.label)
-              else
-                DabblerProgressBar(
-                  value: widget.value!,
-                  label: widget.label,
-                  showValue: true,
-                ),
-              if (widget.status != null) ...<Widget>[
-                const SizedBox(height: DabblerSpacing.space2),
-                Text(
-                  widget.status!,
-                  style: DabblerType.caption1
-                      .resolveForDirection(direction)
-                      .copyWith(color: colors.textSecondary),
-                ),
+        return <Widget>[
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: DabblerSpacing.space2,
+              children: <Widget>[
+                // The value is shown only when determinate.
+                if (widget.value == null)
+                  DabblerProgressBar.indeterminate(label: widget.label)
+                else
+                  DabblerProgressBar(
+                    value: widget.value!,
+                    label: widget.label,
+                    showValue: true,
+                  ),
+                if (widget.status != null)
+                  Text(
+                    widget.status!,
+                    style: DabblerType.caption1
+                        .resolveForDirection(direction)
+                        .copyWith(color: colors.textSecondary),
+                  ),
               ],
-            ],
+            ),
           ),
-        );
+        ];
       case DabblerNavigationActivityPresentation.spinner:
       case DabblerNavigationActivityPresentation.ring:
-        return const SizedBox.shrink();
+        return const <Widget>[];
     }
   }
 }

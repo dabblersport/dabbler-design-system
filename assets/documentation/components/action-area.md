@@ -45,6 +45,9 @@ in sequence for you.
 shared base: it takes a phase, a fit, three colours, a glyph and the expanded content, and nothing
 else. The two components above it know which colours, glyphs and content each state draws.
 
+**The bar is hidden only while expanded.** Collapsed, the destinations beside the circle stay live;
+expanded, the bar fades out and takes no input, focus or announcement until the phase changes.
+
 **Drive the phase; don't animate it yourself.** `idle`, `collapsed` and `expanded` are the only
 states. The widget owns the order of the two steps inside a change — growth before the content
 fades in, the content fading out before the shrink — and nothing else.
@@ -72,18 +75,22 @@ height, never shorter than a row, with the radius easing to the create menu's.
 ## Direction
 
 **The surface is anchored at the inline end, like the action it replaces.** In Arabic it
-originates on the left and grows rightward, and the glyph leads on the right. The glyph sits in a
-footprint-sized square at the surface's leading edge, so it rides the growth instead of staying
-behind on the action. If the bar is pinned unmirrored, the surface pins with it so it is always over
+originates on the left and grows rightward, and the glyph leads on the right. The glyph is placed
+from the surface's leading edge, inset so that it is centred in the collapsed circle (the border
+counted), so it rides the growth instead of staying behind on the action; it is bottom-anchored,
+or held at the top of a content-fitted surface once expanded. If the bar is pinned unmirrored, the surface pins with it so it is always over
 the action.
 
 ## Tokens used
 
 Two new structural tokens and no new colours: the action-area size (the footprint — the circle's
 diameter and every row's height, defined as the bar's own height) and the action-area hold (how
-long the circle shows before it expands and before it returns to idle). Growth uses the slow motion
-step on the system easing; the content fades in on the base step and out on the fast step. Content
-surfaces end on the extra-large radius; rows stay a pill. Colours are always the caller's.
+long the circle shows before it expands and before it returns to idle). Size and radius move on the
+slow motion step with the system easing; background, border and ink on the base step; the content
+fades in on the base step after the growth, and out on the fast step before the shrink; the bar
+fades on the base step. Content sits after the glyph with the small spacing step between, on the
+medium gap, with the fifteen-pixel step at the inline end (and top and bottom for a content fit).
+Content surfaces end on the extra-large radius; rows stay a pill. Colours are always the caller's.
 
 ## Source
 

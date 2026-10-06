@@ -22,7 +22,6 @@ import '../tokens/dabbler_geometry.dart';
 import 'action_area.dart';
 import 'navigation_activity.dart';
 import 'navigation_feedback.dart';
-import 'progress_bar.dart';
 import 'ring.dart';
 import 'toast.dart';
 
@@ -43,6 +42,7 @@ const List<DabblerNavigationFeedbackData> _navToasts =
         message: 'joined game',
       ),
       DabblerNavigationFeedbackData(
+        tone: DabblerToastTone.neutral,
         message: 'link copied',
         action: DabblerToastAction(label: 'undo'),
       ),
@@ -87,6 +87,7 @@ const List<DabblerNavigationFeedbackData> _navBanners =
         dismissible: true,
       ),
       DabblerNavigationFeedbackData(
+        tone: DabblerToastTone.neutral,
         title: 'profile is private',
         message: 'only followers can see your games.',
       ),
@@ -380,7 +381,7 @@ Widget _completion(BuildContext context) => GalleryWrap(
 Widget _toasts(BuildContext context) => GalleryWrap(
   children: <Widget>[
     for (int i = 0; i < _navToasts.length; i++)
-      _screen(_navToasts[i].tone.name, _toastAt(i)),
+      _screen(_navToasts[i].toneFor(DabblerNavigationFeedbackPresentation.toast).name, _toastAt(i)),
   ],
 );
 
@@ -388,7 +389,7 @@ Widget _banners(BuildContext context) => GalleryWrap(
   children: <Widget>[
     for (final DabblerNavigationFeedbackData banner in _navBanners)
       _screen(
-        banner.tone.name,
+        banner.toneFor(DabblerNavigationFeedbackPresentation.banner).name,
         DabblerNavigationFeedback(
           presentation: DabblerNavigationFeedbackPresentation.banner,
           bar: _bar,
@@ -574,7 +575,7 @@ Widget _progressRings(BuildContext context) {
         label: '24 · complete, success tone',
         child: DabblerRing.progress(
           value: 1,
-          tone: DabblerProgressBarTone.success,
+          tone: DabblerRingTone.success,
           semanticLabel: 'upload',
         ),
       ),
@@ -731,7 +732,7 @@ class _LiveFeedbackState extends State<_LiveFeedback> {
         children: <Widget>[
           for (final DabblerNavigationFeedbackData t in _navToasts)
             DabblerButton(
-              label: 'toast · ${t.tone.name}',
+              label: 'toast · ${t.toneFor(DabblerNavigationFeedbackPresentation.toast).name}',
               tone: DabblerButtonTone.neutral,
               size: DabblerButtonSize.small,
               onPressed: () =>
@@ -739,7 +740,7 @@ class _LiveFeedbackState extends State<_LiveFeedback> {
             ),
           for (final DabblerNavigationFeedbackData b in _navBanners)
             DabblerButton(
-              label: 'banner · ${b.tone.name}',
+              label: 'banner · ${b.toneFor(DabblerNavigationFeedbackPresentation.banner).name}',
               tone: DabblerButtonTone.neutral,
               size: DabblerButtonSize.small,
               onPressed: () =>

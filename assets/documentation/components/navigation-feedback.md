@@ -61,8 +61,9 @@ contraction at once. Pin `phase` only for a specimen.
 `toast` (a pill row along the bar) or `banner` (grown to content).
 
 ### Tone
-`neutral` (the default — card surface and ink), `success`, `warning`, `error`, `info` — the same
-five Toast and Banner take, resolved through the same status tones.
+`neutral`, `success`, `warning`, `error`, `info` — the same five Toast and Banner take, resolved
+through the same status tones. The default follows the reference component: `neutral` for a toast,
+`info` for a banner.
 
 ### Duration
 A toast holds for the toast's default lifetime; a banner is sticky. Pass a duration to override, or
