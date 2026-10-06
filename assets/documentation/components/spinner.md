@@ -45,6 +45,11 @@ spinner sits inside something already tinted.** `inherit` takes the colour of wh
 button without being told what colour that button is — using it outside that context can leave the
 spinner invisible against its background.
 
+**The same spinner can sit on the bottom bar's action footprint.** `NavigationActivity` puts it
+on-brand in the action circle (the action button, working) or brand in a grown card row with a
+label — the same sizes, stroke, rotation and reduced-motion pulse. See
+the `NavigationActivity` page.
+
 ## Axes
 
 ### Size

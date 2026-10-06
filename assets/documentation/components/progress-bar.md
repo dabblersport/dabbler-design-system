@@ -50,6 +50,11 @@ fraction it can't know.
 indicator, not the white-safe solid fill other components need — matching a solid role here would
 just be a colour that doesn't match the token this component actually reads.
 
+**The same bar composes into the bottom navigation.** `NavigationActivity` places this bar —
+its track, fill, caption and percentage — in a row grown out of the action button, or in a card
+with a status line for a longer operation, with no indicator beside it. See
+the `NavigationActivity` page.
+
 ## Axes
 
 ### Size

@@ -219,6 +219,12 @@ lot about the rest.
 - [InlineMessage](components/inline-message.md) — one line of status text with a glyph, under the control it explains.
 - [ReactionGroup](components/reaction-group.md) — the reaction tallies under a message.
 - [Toast](components/toast.md) — a transient, queued notification that survives navigation.
+- [ActionArea](components/action-area.md) — the bottom navigation as one surface for loading,
+  progress and status, morphing out of the action button.
+- [NavigationFeedback](components/navigation-feedback.md) — a Toast or Banner presented from the
+  bottom navigation, grown out of the action footprint.
+- [NavigationActivity](components/navigation-activity.md) — loading and progress on the bottom
+  navigation's action footprint: a spinner, a ring, or a grown progress row.
 - [Spinner](components/spinner.md) — the system's only indeterminate loading indicator.
 - [Refresh](components/refresh.md) — pull-to-refresh, drawn with the system Spinner.
 - [ProgressBar](components/progress-bar.md) — progress with a known end, or a busy bar when there
@@ -230,8 +236,8 @@ lot about the rest.
   system has.
 - [SystemMessage](components/system-message.md) — product-generated activity in a conversation, never a bubble.
 - [TypingIndicator](components/typing-indicator.md) — three dots, with or without a name line, while someone types.
-- [Ring](components/ring.md) — a gauge drawn as a ring: a tick countdown or a completion arc, with a
-  centre slot.
+- [Ring](components/ring.md) — a gauge drawn as a ring: a tick countdown, a completion arc or a
+  progress ring, with a centre slot.
 
 ### 9 · Structure — the one thing that separates, and nothing else
 

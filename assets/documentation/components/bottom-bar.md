@@ -74,6 +74,11 @@ sits in the tab order, arrows move and select with wraparound, Home/End jump to 
 deliberately identical to `Tabs` because both are the same interaction family, and two different
 keyboard contracts for one gesture pattern would be the actual defect.
 
+**The bar is also the Action Area.** Loading, progress, toasts and banners can take over the
+action button's footprint and grow along the bar, with the bar inert underneath while they are
+expanded. Wrap the bar in `NavigationActivity` or `NavigationFeedback` rather than drawing over it;
+see the `ActionArea` page.
+
 ## Axes
 
 ### Destination state

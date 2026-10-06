@@ -51,6 +51,11 @@ or blocking the new one.
 
 **Mount one `DabblerToastProvider` at the app root, above the router.** Wrap the router's output in the `builder` of the app widget, so every screen and every route shares one queue, then call `DabblerToastProvider.of(context).show(...)` from anywhere below it. A screen never mounts its own provider; a second provider gives that screen a second queue and stacks toasts on top of each other.
 
+**For a toast that is a direct consequence of an action on a screen with the bottom bar, consider
+the navigation-integrated presentation.** `NavigationFeedback` shows this same Toast — same tones,
+hairline, type and action — grown out of the bottom bar's action button instead of floating above
+it. The standard toast stays the default; see the `NavigationFeedback` page.
+
 ## Axes
 
 ### Tone

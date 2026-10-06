@@ -45,6 +45,12 @@ message "feel more visible" changes that behaviour along with the colour.
 dismiss affordance and its layout only appear when `onDismiss` is set — building a visually similar
 close control outside that prop duplicates behaviour the component already owns.
 
+**For a condition that arrives while the user is on a screen with the bottom bar, the banner can
+grow out of the bar instead.** `NavigationFeedback` presents this same Banner — same tones, type,
+outlined action and alert role — from the bottom bar's action footprint. A condition that must
+survive navigation is still this inline banner; see
+the `NavigationFeedback` page.
+
 ## Axes
 
 ### Tone
