@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../feedback/ring.dart';
-import '../foundations/icon.dart';
 import '../foundations/text.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
@@ -16,9 +15,10 @@ import 'card_upcoming.dart';
 ///
 /// Drawn from the Listings `Upcoming` multi state, `Listings.dc.html:454-486`
 /// (one tile is 210 wide): a 44-wide date block (month 11/14 600 over day 18/22
-/// 700, brand ink on a brand wash; the day takes `.t-headline` at bold, the
-/// nearest sans step to 18/22), the title 14/19 600 over the time 11/15,
-/// the venue 12/16, and a 40 tick ring with the number and unit. The single
+/// 700 — `.t-tag-tight` over [DabblerType.figure] — brand ink on a brand
+/// wash), the title 14/19 600 over the time 11/15, the venue 12/16 with no
+/// glyph, and a 40 tick ring with the number and unit; the shell is
+/// [DabblerCardUpcoming]'s (1px hairline, 12 corner, 12 padding). The single
 /// state is [DabblerCardUpcoming].
 ///
 /// ```dart
@@ -139,22 +139,18 @@ class DabblerCardUpcomingRail extends StatelessWidget {
           Text(
             month,
             maxLines: 1,
-            style: DabblerType.caption2
+            // `11/14 600` — `.t-tag-tight`.
+            style: DabblerType.tagTight
                 .resolveForDirection(direction)
-                .copyWith(
-                  color: colors.brandPrimary,
-                  fontWeight: DabblerType.semibold,
-                ),
+                .copyWith(color: colors.brandPrimary),
           ),
           Text(
             day,
             maxLines: 1,
-            style: DabblerType.headline
+            // `18/22 700` — the figure step.
+            style: DabblerType.figure
                 .resolveForDirection(direction)
-                .copyWith(
-                  color: colors.brandPrimary,
-                  fontWeight: DabblerType.bold,
-                ),
+                .copyWith(color: colors.brandPrimary),
           ),
         ],
       ),
@@ -197,6 +193,11 @@ class DabblerCardUpcomingRail extends StatelessWidget {
     );
     return DabblerCard(
       width: width,
+      // The frame's tile: 1px `--outline-card`, `--radius-lg`, `padding: 12`
+      // (`Listings.dc.html:455`) — the same shell as [DabblerCardUpcoming].
+      variant: DabblerCardVariant.outlined,
+      radius: DabblerCardUpcoming.radius,
+      padding: DabblerCardUpcoming.padding,
       fill: DabblerCardUpcoming.fillOf(colors, tone),
       onTap: onTap,
       semanticLabel: onTap == null
@@ -215,46 +216,43 @@ class DabblerCardUpcomingRail extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  // `gap: 1px`.
+                  spacing: DabblerSizing.borderDefault,
                   children: <Widget>[
+                    // `14/19 600` (`:462`).
                     DabblerText(
                       title,
-                      style: DabblerType.subheadline,
+                      style: DabblerType.smallTight,
                       weight: DabblerTextWeight.semibold,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (time != null)
-                      DabblerText(
+                      // `11/15` (`:463`) — the tag step at regular weight.
+                      Text(
                         time!,
-                        style: DabblerType.caption2,
-                        tone: DabblerTextTone.secondary,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: DabblerType.tag
+                            .resolveForDirection(direction)
+                            .copyWith(
+                              color: colors.textSecondary,
+                              fontWeight: DabblerType.regular,
+                            ),
                       ),
                   ],
                 ),
               ),
             ],
           ),
+          // `:466-468` — the venue alone, 12/16 in `--ink-soft`; no glyph.
           if (place != null)
-            Row(
-              spacing: DabblerSpacing.space1,
-              children: <Widget>[
-                DabblerIcon(
-                  'location',
-                  size: DabblerSizing.iconInline,
-                  color: colors.textTertiary,
-                ),
-                Flexible(
-                  child: DabblerText(
-                    place!,
-                    style: DabblerType.caption1,
-                    tone: DabblerTextTone.secondary,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            DabblerText(
+              place!,
+              style: DabblerType.caption1,
+              tone: DabblerTextTone.secondary,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           Align(child: ring),
         ],

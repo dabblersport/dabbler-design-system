@@ -21,6 +21,7 @@ import 'card_event_listing.dart';
 import 'card_event_medium.dart';
 import 'card_venue.dart';
 import 'card_game.dart';
+import 'card_upcoming.dart';
 import 'empty_state.dart';
 import 'meta_line.dart';
 import '../feedback/listing_skeleton.dart';
@@ -98,6 +99,14 @@ const List<GalleryEntry> listingCardsGalleryEntries = <GalleryEntry>[
         'The action row: Join takes half of what the counts leave, as the '
         'frame lays it out.',
     builder: _gameSocial,
+  ),
+  GalleryEntry(
+    id: 'card-upcoming/date',
+    page: 'components/card-upcoming',
+    group: GalleryPurpose.contentContainers,
+    title: 'CardUpcoming — the games listing single tile',
+    description: 'Date block first, title over venue and time, 56 ring last.',
+    builder: _upcomingDate,
   ),
   GalleryEntry(
     id: 'tabs/listing',
@@ -445,6 +454,27 @@ Widget _listingTabs(BuildContext context) => GalleryStack(
             DabblerTabItem(id: 'padel', label: 'Padel'),
             DabblerTabItem(id: 'basketball', label: 'Basketball'),
           ],
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _upcomingDate(BuildContext context) => const GalleryStack(
+  children: <Widget>[
+    GallerySpecimen(
+      label: 'date first',
+      child: SizedBox(
+        width: _width,
+        child: DabblerCardUpcoming(
+          title: 'Tuesday 5-a-side',
+          month: 'SEP',
+          day: '2',
+          fraction: 0.4,
+          countdownValue: '4',
+          countdownUnit: 'hours',
+          when: '7:30 PM',
+          place: 'Dubai Sports City',
         ),
       ),
     ),

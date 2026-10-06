@@ -5,6 +5,7 @@ import '../foundations/text.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
+import '../surfaces/surface.dart';
 import 'card.dart';
 import 'meta_line.dart';
 
@@ -71,6 +72,8 @@ class DabblerCardUpcoming extends StatelessWidget {
     this.semanticLabel,
     this.width,
     this.rail = false,
+    this.month,
+    this.day,
   });
 
   /// The game's title.
@@ -113,6 +116,21 @@ class DabblerCardUpcoming extends StatelessWidget {
   /// (`:427-449`): a 32-tick ring, a 15/20 title over a 12/16 time line, 3
   /// apart.
   final bool rail;
+
+  /// The games listing's single tile (`Listings.dc.html:119-137`) leads with a
+  /// date block instead of the ring: [month] over [day] in brand ink on a
+  /// brand wash, then the title over "venue · time", then a 56 ring at the
+  /// inline end. Both must be set; null keeps the ring-first tile.
+  final String? month;
+
+  /// See [month].
+  final String? day;
+
+  /// The date-first tile's ring — `width: 56px`.
+  static const double dateRingDiameter = 56;
+
+  /// The date block — `width: 48px`.
+  static const double dateWidth = 48;
 
   /// The ring's diameter — `width: 62px; height: 62px`.
   static const double ringDiameter = 62;
@@ -221,6 +239,9 @@ class DabblerCardUpcoming extends StatelessWidget {
           ),
       ],
     );
+    if (month != null && day != null && !rail) {
+      return _dateFirst(context, colors);
+    }
     return DabblerCard(
       width: width,
       variant: DabblerCardVariant.outlined,
@@ -241,6 +262,106 @@ class DabblerCardUpcoming extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _dateFirst(BuildContext context, DabblerColors colors) {
+    final TextDirection direction = Directionality.of(context);
+    final Widget date = DabblerSurface(
+      width: dateWidth,
+      fill: DabblerSurface.tintedFillOf(colors, colors.brandPrimary),
+      borderWidth: 0,
+      radius: DabblerRadius.md,
+      padding: const EdgeInsets.symmetric(vertical: DabblerSpacing.space2),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            month!,
+            maxLines: 1,
+            style: DabblerType.tagTight
+                .resolveForDirection(direction)
+                .copyWith(color: colors.brandPrimary),
+          ),
+          Text(
+            day!,
+            maxLines: 1,
+            style: DabblerType.figure
+                .resolveForDirection(direction)
+                .copyWith(color: colors.brandPrimary),
+          ),
+        ],
+      ),
+    );
+    final Widget ring = DabblerRing.ticks(
+      fraction: fraction,
+      diameter: dateRingDiameter,
+      count: singleRingTicks,
+      tickLength: tickLength,
+      track: DabblerRingTrack.faint,
+      semanticValue: '$countdownValue $countdownUnit',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          DabblerText(
+            countdownValue,
+            style: DabblerType.displayLabel,
+            maxLines: 1,
+          ),
+          DabblerText(
+            countdownUnit,
+            style: DabblerType.caption2,
+            tone: DabblerTextTone.secondary,
+            maxLines: 1,
+          ),
+        ],
+      ),
+    );
+    final String line = <String>[?place, ?when].join(' · ');
+    return DabblerCard(
+      width: width,
+      variant: DabblerCardVariant.outlined,
+      radius: radius,
+      padding: padding,
+      fill: fillOf(colors, tone),
+      onTap: onTap,
+      semanticLabel: onTap == null ? null : (semanticLabel ?? title),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: DabblerSpacing.space4,
+          children: <Widget>[
+            date,
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // `gap: 2px` — the nearest grid step, 3.
+                spacing: DabblerSpacing.space1,
+                children: <Widget>[
+                  DabblerText(
+                    title,
+                    style: DabblerType.subheadline,
+                    weight: DabblerTextWeight.semibold,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (line.isNotEmpty)
+                    DabblerText(
+                      line,
+                      style: DabblerType.caption1,
+                      tone: DabblerTextTone.secondary,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+            Center(child: ring),
+          ],
+        ),
       ),
     );
   }

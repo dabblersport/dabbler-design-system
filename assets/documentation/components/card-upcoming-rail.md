@@ -45,6 +45,7 @@ Deviation: the day is `headline` bold (17) where the design draws 18/22.
 
 - KAN-429 (Meetups) — the ring's number is 12/13 and its unit 6/7, as the frame draws them in the 40 ring (the unit overlapped the ticks).
 - KAN-429 (Meetups) — adds this component.
+- Listings fidelity pass — the frame's shell (1px hairline, 12 corner, 12 padding); title 14/19, time 11/15; the day at the figure step; the venue without a glyph.
 
 ## Source
 

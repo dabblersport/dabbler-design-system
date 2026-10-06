@@ -522,6 +522,66 @@ void main() {
     });
   });
 
+  group('Upcoming, games single and the rail tile', () {
+    for (final TextDirection d in TextDirection.values) {
+      testWidgets('date block first, 56 ring at the inline end ($d)', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          _scaled(
+            const DabblerCardUpcoming(
+              title: 'Tuesday 5-a-side',
+              month: 'SEP',
+              day: '2',
+              fraction: 0.4,
+              countdownValue: '4',
+              countdownUnit: 'hours',
+              when: '7:30 PM',
+              place: 'Dubai Sports City',
+            ),
+            direction: d,
+          ),
+        );
+        expect(tester.takeException(), isNull);
+        expect(tester.getSize(find.byType(DabblerRing)).width, 56);
+        final double month = tester.getCenter(find.text('SEP')).dx;
+        final double ring = tester.getCenter(find.byType(DabblerRing)).dx;
+        expect(d == TextDirection.ltr ? month < ring : month > ring, isTrue);
+        expect(find.text('Dubai Sports City · 7:30 PM'), findsOneWidget);
+      });
+    }
+
+    testWidgets('rail tile: outlined 12 shell, 14/19 title, no place glyph', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _scaled(
+          const Align(
+            alignment: AlignmentDirectional.topStart,
+            child: DabblerCardUpcomingRail(
+              month: 'SEP',
+              day: '2',
+              title: 'Sunrise run',
+              time: '6:00 AM',
+              place: 'Kite Beach',
+              fraction: 0.4,
+              countdownValue: '3',
+              countdownUnit: 'hours',
+            ),
+          ),
+        ),
+      );
+      final DabblerCard card = tester.widget<DabblerCard>(
+        find.byType(DabblerCard),
+      );
+      expect(card.variant, DabblerCardVariant.outlined);
+      expect(card.radius, DabblerRadius.lg);
+      expect(tester.widget<Text>(find.text('Sunrise run')).style!.fontSize, 14);
+      expect(find.byType(DabblerIcon), findsNothing);
+      expect(tester.widget<Text>(find.text('2')).style!.fontSize, 18);
+    });
+  });
+
   group('ListingSkeleton', () {
     for (final TextDirection d in TextDirection.values) {
       testWidgets('venue: 160 media then 58% / 38% lines ($d)', (

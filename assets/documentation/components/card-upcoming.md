@@ -18,6 +18,8 @@ It composes `Card` (with a tile-tone fill), `Ring`, `Text` and `Icon`.
 
 ## Specimen
 
+@specimen card-upcoming/date
+
 Amber and info tones — see `card_upcoming_gallery.dart`'s *CardUpcoming* section.
 
 @specimen card-upcoming
@@ -47,6 +49,7 @@ track. Gap `space4`.
 - Alpha fidelity rebuild (KAN-426) — adds this component, and a `fill` override on `Card`.
 - KAN-429 (Meetups) — `CardUpcomingRail` is the multi-tile state of the same Upcoming section.
 - Listings fidelity pass — the frame's tile: a 1px `--outline-card` hairline, the 12 corner (`--radius-lg`) and 12 padding; a 62 ring with 7px ticks (32 single, 24 on the rail) and the display numeral; the place row a compact `MetaLine`; `rail` sets the rail metrics, and a rail card in a horizontal scroller hugs its content.
+- Listings fidelity pass — `month` / `day` draw the games listing's single tile (`Listings.dc.html:119-137`): a date block first, title over "venue · time", a 56 ring last.
 
 ## Source
 
