@@ -581,6 +581,51 @@ void main() {
       }
     });
 
+    testWidgets('dark: the pastel tile reads in the light inks (>= 4.5:1)', (
+      WidgetTester tester,
+    ) async {
+      for (final Widget w in <Widget>[
+        const DabblerCardUpcoming(
+          title: 'Sunrise run',
+          fraction: 0.4,
+          countdownValue: '19',
+          countdownUnit: 'hours',
+          when: 'Oct 7 · 6:35 AM',
+          place: 'Kite Beach',
+          tone: DabblerCardUpcomingTone.accent,
+        ),
+        const DabblerCardUpcomingRail(
+          month: 'OCT',
+          day: '7',
+          title: 'Sunrise run',
+          time: '6:35 AM',
+          place: 'Kite Beach',
+          fraction: 0.4,
+          countdownValue: '19',
+          countdownUnit: 'hours',
+        ),
+      ]) {
+        await tester.pumpWidget(
+          host(
+            Align(alignment: AlignmentDirectional.topStart, child: w),
+            brightness: Brightness.dark,
+            width: 357,
+          ),
+        );
+        final DabblerColors c = testColors(brightness: Brightness.dark);
+        final Color fill = DabblerCardUpcoming.fillOf(
+          c,
+          w is DabblerCardUpcoming
+              ? w.tone
+              : (w as DabblerCardUpcomingRail).tone,
+        );
+        for (final String s in <String>['Sunrise run', 'Kite Beach']) {
+          final Color ink = tester.widget<Text>(find.text(s)).style!.color!;
+          expect(_contrast(ink, fill), greaterThanOrEqualTo(4.5), reason: s);
+        }
+      }
+    });
+
     testWidgets('rail tile: outlined 12 shell, 14/19 title, no place glyph', (
       WidgetTester tester,
     ) async {

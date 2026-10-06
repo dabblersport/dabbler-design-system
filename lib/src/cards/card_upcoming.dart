@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 
 import '../feedback/ring.dart';
-import '../foundations/text.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_palette.dart';
 import '../tokens/dabbler_type.dart';
 import '../surfaces/surface.dart';
 import 'card.dart';
@@ -151,14 +151,32 @@ class DabblerCardUpcoming extends StatelessWidget {
   /// The tile's fill for [tone], resolved against [colors].
   static Color fillOf(DabblerColors colors, DabblerCardUpcomingTone tone) =>
       switch (tone) {
+        // Mixed with white, not the card (`color-mix(..., #FFFFFF)`): a
+        // fixed light pastel in both brightnesses, like the other two.
         DabblerCardUpcomingTone.amber => Color.lerp(
-          colors.surfaceCard,
+          DabblerPalette.paper,
           DabblerColors.tileAmber.surface,
           amberMix,
         )!,
         DabblerCardUpcomingTone.info => DabblerColors.tileInfo.surface,
         DabblerCardUpcomingTone.accent => DabblerColors.tileAccent.surface,
       };
+
+  /// The three tile fills are fixed pastels in both brightnesses, so
+  /// the tile's content reads in the light inks over them ([inkOf]). Before
+  /// the Listings fidelity pass a dark tile drew `--t-text` (a near-white) on
+  /// the light pastel — about 1.2:1.
+  /// The colours the tile's content reads in over [fill]: the ambient
+  /// colours, or — when a dark theme meets a light fill (the three fixed
+  /// pastels) — the same theme at light brightness.
+  static DabblerColors inkOf(DabblerColors colors, Color fill) =>
+      colors.brightness == Brightness.dark &&
+          fill.computeLuminance() > lightFillLuminance
+      ? DabblerColors.resolve(theme: colors.theme, brightness: Brightness.light)
+      : colors;
+
+  /// Above this relative luminance a fill is light and takes the light inks.
+  static const double lightFillLuminance = 0.5;
 
   /// The shell's corner — `--radius-lg` (12).
   static const double radius = DabblerRadius.lg;
@@ -171,6 +189,7 @@ class DabblerCardUpcoming extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
+    final DabblerColors ink = inkOf(colors, fillOf(colors, tone));
     final Widget ring = DabblerRing.ticks(
       fraction: fraction,
       diameter: ringDiameter,
@@ -186,15 +205,18 @@ class DabblerCardUpcoming extends StatelessWidget {
           children: <Widget>[
             // The numeral is the display face — `font-family: var(--font-display);
             // font-size: 18px` (`:150`, `:433`).
-            DabblerText(
+            Text(
               countdownValue,
-              style: DabblerType.displayLabel,
+              style: DabblerType.displayLabel
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(color: ink.textPrimary),
               maxLines: 1,
             ),
-            DabblerText(
+            Text(
               countdownUnit,
-              style: DabblerType.caption2,
-              tone: DabblerTextTone.secondary,
+              style: DabblerType.caption2
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(color: ink.textSecondary),
               maxLines: 1,
             ),
           ],
@@ -207,10 +229,14 @@ class DabblerCardUpcoming extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: rail ? DabblerSizing.borderDefault : DabblerSpacing.space1,
       children: <Widget>[
-        DabblerText(
+        Text(
           title,
-          style: rail ? DabblerType.smallTight : DabblerType.subheadline,
-          weight: DabblerTextWeight.semibold,
+          style: (rail ? DabblerType.smallTight : DabblerType.subheadline)
+              .resolveForDirection(Directionality.of(context))
+              .copyWith(
+                color: ink.textPrimary,
+                fontWeight: DabblerType.semibold,
+              ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -224,15 +250,16 @@ class DabblerCardUpcoming extends StatelessWidget {
               style: DabblerType.tag
                   .resolveForDirection(Directionality.of(context))
                   .copyWith(
-                    color: colors.textSecondary,
+                    color: ink.textSecondary,
                     fontWeight: DabblerType.regular,
                   ),
             )
           else
-            DabblerText(
+            Text(
               when!,
-              style: DabblerType.caption1,
-              tone: DabblerTextTone.secondary,
+              style: DabblerType.caption1
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(color: ink.textSecondary),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -240,6 +267,7 @@ class DabblerCardUpcoming extends StatelessWidget {
           DabblerMetaLine(
             items: <String>[?place, ?distance],
             size: DabblerMetaLineSize.compact,
+            colors: ink,
           ),
       ],
     );
@@ -271,10 +299,11 @@ class DabblerCardUpcoming extends StatelessWidget {
   }
 
   Widget _dateFirst(BuildContext context, DabblerColors colors) {
+    final DabblerColors ink = inkOf(colors, fillOf(colors, tone));
     final TextDirection direction = Directionality.of(context);
     final Widget date = DabblerSurface(
       width: dateWidth,
-      fill: DabblerSurface.tintedFillOf(colors, colors.brandPrimary),
+      fill: DabblerSurface.tintedFillOf(ink, ink.brandPrimary),
       borderWidth: 0,
       radius: DabblerRadius.md,
       padding: const EdgeInsets.symmetric(vertical: DabblerSpacing.space2),
@@ -286,14 +315,14 @@ class DabblerCardUpcoming extends StatelessWidget {
             maxLines: 1,
             style: DabblerType.tagTight
                 .resolveForDirection(direction)
-                .copyWith(color: colors.brandPrimary),
+                .copyWith(color: ink.brandPrimary),
           ),
           Text(
             day!,
             maxLines: 1,
             style: DabblerType.figure
                 .resolveForDirection(direction)
-                .copyWith(color: colors.brandPrimary),
+                .copyWith(color: ink.brandPrimary),
           ),
         ],
       ),
@@ -311,15 +340,18 @@ class DabblerCardUpcoming extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            DabblerText(
+            Text(
               countdownValue,
-              style: DabblerType.displayLabel,
+              style: DabblerType.displayLabel
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(color: ink.textPrimary),
               maxLines: 1,
             ),
-            DabblerText(
+            Text(
               countdownUnit,
-              style: DabblerType.caption2,
-              tone: DabblerTextTone.secondary,
+              style: DabblerType.caption2
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(color: ink.textSecondary),
               maxLines: 1,
             ),
           ],
@@ -349,18 +381,23 @@ class DabblerCardUpcoming extends StatelessWidget {
                 // `gap: 2px` — the nearest grid step, 3.
                 spacing: DabblerSpacing.space1,
                 children: <Widget>[
-                  DabblerText(
+                  Text(
                     title,
-                    style: DabblerType.subheadline,
-                    weight: DabblerTextWeight.semibold,
+                    style: DabblerType.subheadline
+                        .resolveForDirection(Directionality.of(context))
+                        .copyWith(
+                          color: ink.textPrimary,
+                          fontWeight: DabblerType.semibold,
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (line.isNotEmpty)
-                    DabblerText(
+                    Text(
                       line,
-                      style: DabblerType.caption1,
-                      tone: DabblerTextTone.secondary,
+                      style: DabblerType.caption1
+                          .resolveForDirection(Directionality.of(context))
+                          .copyWith(color: ink.textSecondary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

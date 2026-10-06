@@ -50,6 +50,7 @@ class DabblerMetaLine extends StatelessWidget {
     this.icon = 'location',
     this.size = DabblerMetaLineSize.card,
     this.emphasizeFirst = true,
+    this.colors,
   });
 
   /// The facts, already formatted and localised. Empty strings are skipped.
@@ -63,6 +64,10 @@ class DabblerMetaLine extends StatelessWidget {
 
   /// Whether the first fact takes the stronger ink and weight 500.
   final bool emphasizeFirst;
+
+  /// The colours to draw in; null reads the ambient [DabblerColors]. A tile
+  /// with a fixed light fill (the upcoming card) passes its light inks.
+  final DabblerColors? colors;
 
   /// Every child's spacing — `gap: 5px` (`Listings.dc.html:231`).
   static const double gap = 5;
@@ -83,7 +88,7 @@ class DabblerMetaLine extends StatelessWidget {
         if (i.trim().isNotEmpty) i,
     ];
     if (facts.isEmpty) return const SizedBox.shrink();
-    final DabblerColors colors = DabblerColors.of(context);
+    final DabblerColors colors = this.colors ?? DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     final bool compact = size == DabblerMetaLineSize.compact;
     final TextStyle base =

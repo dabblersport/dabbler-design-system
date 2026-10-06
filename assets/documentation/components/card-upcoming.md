@@ -50,6 +50,7 @@ track. Gap `space4`.
 - KAN-429 (Meetups) — `CardUpcomingRail` is the multi-tile state of the same Upcoming section.
 - Listings fidelity pass — the frame's tile: a 1px `--outline-card` hairline, the 12 corner (`--radius-lg`) and 12 padding; a 62 ring with 7px ticks (32 single, 24 on the rail) and the display numeral; the place row a compact `MetaLine`; `rail` sets the rail metrics, and a rail card in a horizontal scroller hugs its content.
 - Listings fidelity pass — `month` / `day` draw the games listing's single tile (`Listings.dc.html:119-137`): a date block first, title over "venue · time", a 56 ring last.
+- Listings fidelity pass — the amber fill is mixed with white as the frame's `color-mix` is, so all three fills are fixed pastels; under a dark theme the tile's content reads in the light inks (it drew a near-white on the pastel, about 1.2:1); the countdown shrinks into its ring at a large text scale.
 
 ## Source
 

@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../feedback/ring.dart';
-import '../foundations/text.dart';
 import '../surfaces/surface.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
@@ -126,10 +125,14 @@ class DabblerCardUpcomingRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
+    final DabblerColors ink = DabblerCardUpcoming.inkOf(
+      colors,
+      DabblerCardUpcoming.fillOf(colors, tone),
+    );
     final TextDirection direction = Directionality.of(context);
     final Widget date = DabblerSurface(
       width: dateWidth,
-      fill: DabblerSurface.tintedFillOf(colors, colors.brandPrimary),
+      fill: DabblerSurface.tintedFillOf(ink, ink.brandPrimary),
       borderWidth: 0,
       radius: DabblerRadius.md,
       padding: const EdgeInsets.symmetric(vertical: DabblerSpacing.space2),
@@ -142,7 +145,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
             // `11/14 600` — `.t-tag-tight`.
             style: DabblerType.tagTight
                 .resolveForDirection(direction)
-                .copyWith(color: colors.brandPrimary),
+                .copyWith(color: ink.brandPrimary),
           ),
           Text(
             day,
@@ -150,7 +153,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
             // `18/22 700` — the figure step.
             style: DabblerType.figure
                 .resolveForDirection(direction)
-                .copyWith(color: colors.brandPrimary),
+                .copyWith(color: ink.brandPrimary),
           ),
         ],
       ),
@@ -174,7 +177,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
               style: DabblerType.footnote
                   .resolveForDirection(direction)
                   .copyWith(
-                    color: colors.textPrimary,
+                    color: ink.textPrimary,
                     fontSize: ringValueSize,
                     height: ringValueLeading / ringValueSize,
                   ),
@@ -186,7 +189,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
               style: DabblerType.caption2
                   .resolveForDirection(direction)
                   .copyWith(
-                    color: colors.textSecondary,
+                    color: ink.textSecondary,
                     fontSize: ringUnitSize,
                     height: ringUnitLeading / ringUnitSize,
                   ),
@@ -224,10 +227,14 @@ class DabblerCardUpcomingRail extends StatelessWidget {
                   spacing: DabblerSizing.borderDefault,
                   children: <Widget>[
                     // `14/19 600` (`:462`).
-                    DabblerText(
+                    Text(
                       title,
-                      style: DabblerType.smallTight,
-                      weight: DabblerTextWeight.semibold,
+                      style: DabblerType.smallTight
+                          .resolveForDirection(Directionality.of(context))
+                          .copyWith(
+                            color: ink.textPrimary,
+                            fontWeight: DabblerType.semibold,
+                          ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -240,7 +247,7 @@ class DabblerCardUpcomingRail extends StatelessWidget {
                         style: DabblerType.tag
                             .resolveForDirection(direction)
                             .copyWith(
-                              color: colors.textSecondary,
+                              color: ink.textSecondary,
                               fontWeight: DabblerType.regular,
                             ),
                       ),
@@ -251,10 +258,11 @@ class DabblerCardUpcomingRail extends StatelessWidget {
           ),
           // `:466-468` — the venue alone, 12/16 in `--ink-soft`; no glyph.
           if (place != null)
-            DabblerText(
+            Text(
               place!,
-              style: DabblerType.caption1,
-              tone: DabblerTextTone.secondary,
+              style: DabblerType.caption1
+                  .resolveForDirection(Directionality.of(context))
+                  .copyWith(color: ink.textSecondary),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
