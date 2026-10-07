@@ -40,9 +40,7 @@ The amber tile band the meetup details frame draws:
 ### Direction
 A column of rows: buttons, pills and the place line all start at the inline start.
 
-## The fill, for the system bars
-
-`DabblerDetailHeader.fillOf(context, tile:, theme:)` returns the colour the band paints (the tile's surface, else the section theme's `brandPrimary`, for the context's brightness). `build()` fills through the same function, so the two cannot drift. Use it so the status bar can follow the header: pass the same `tile` / `theme` the header gets.
+**System bars.** `DabblerDetailHeader.fillOf(context, tile:, theme:)` returns the colour the band paints (the tile's surface, else the section theme's `brandPrimary`, for the context's brightness). `build()` fills through the same function, so the two cannot drift. Use it so the status bar can follow the header: pass the same `tile` / `theme` the header gets.
 
 ## Tokens used
 
