@@ -82,6 +82,7 @@ class DabblerPageHeader extends StatelessWidget {
     this.locationSemanticLabel,
     this.actions = const <DabblerPageHeaderAction>[],
     this.safeArea = true,
+    this.contentPadding,
   });
 
   /// The screen title.
@@ -102,6 +103,11 @@ class DabblerPageHeader extends StatelessWidget {
   /// Whether to pad the block start by the device's top inset.
   final bool safeArea;
 
+  /// Overrides [padding] — the collapsing listing header (Listings design,
+  /// 2026-10-08) pads the title row `6 18 10` and nudges its end by 2 (games,
+  /// meetups) or 3 (venues): see [listingPadding] and [listingVenuesPadding].
+  final EdgeInsetsGeometry? contentPadding;
+
   /// The gutter — `padding: 6px 18px 12px` (`Listings.dc.html:60`).
   static const EdgeInsetsDirectional padding = EdgeInsetsDirectional.fromSTEB(
     DabblerSpacing.space6,
@@ -109,6 +115,26 @@ class DabblerPageHeader extends StatelessWidget {
     DabblerSpacing.space6,
     DabblerSpacing.space4,
   );
+
+  /// The title row of the collapsing listing header — the tinted header block
+  /// pads `6 18 0` and the row carries `margin-bottom: 10` and
+  /// `padding-right: 2px` (`Listings.dc.html`, 2026-10-08, games and meetups).
+  static const EdgeInsetsDirectional listingPadding =
+      EdgeInsetsDirectional.fromSTEB(
+        DabblerSpacing.space6,
+        DabblerSpacing.space2,
+        DabblerSpacing.space6 + 2,
+        10,
+      );
+
+  /// As [listingPadding] with the venues frame's `padding-right: 3px`.
+  static const EdgeInsetsDirectional listingVenuesPadding =
+      EdgeInsetsDirectional.fromSTEB(
+        DabblerSpacing.space6,
+        DabblerSpacing.space2,
+        DabblerSpacing.space6 + DabblerSpacing.space1,
+        10,
+      );
 
   /// The badge's minimum width, keeping a single digit round.
   static const double badgeMinWidth = DabblerSizing.iconSm;
@@ -266,7 +292,7 @@ class DabblerPageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final Widget row = Padding(
-      padding: padding,
+      padding: contentPadding ?? padding,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         spacing: DabblerSpacing.space2,

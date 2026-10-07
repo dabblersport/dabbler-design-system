@@ -42,6 +42,9 @@ inline end of its action. Nothing names a physical side.
 ### Safe area
 `safeArea` (default true) pads the block start by the device inset.
 
+### Padding
+`contentPadding` overrides the gutter. The collapsing listing header uses `DabblerPageHeader.listingPadding` (the end nudged a little) — `listingVenuesPadding` for Venues (nudged a little more) — because its tinted band pads the block with no bottom and the title row carries its own bottom margin; both values are in the class dartdoc.
+
 ## Tokens used
 
 Gutter `space6` (18) inline, `space2` top, `space4` bottom. Action gap `space2`. Title
@@ -51,6 +54,7 @@ Gutter `space6` (18) inline, `space2` top, `space4` bottom. Action gap `space2`.
 
 - Alpha fidelity rebuild (KAN-426) — adds this component.
 - Listings fidelity pass — actions are the frame's 42 circles (were 60×45 outlined pills); the count badge is 18 in brand (was the accent pill); the location row is 11/14 at 500 with a 13 pin.
+- Listings 2026-10-08 — adds `contentPadding` with `listingPadding` and `listingVenuesPadding` for the collapsing listing header.
 
 ## Source
 
