@@ -88,7 +88,7 @@ Corner: the 18px extra-large radius. Fill and ink: the surface, brand, ink, stat
 - KAN-426 — adds the `detail` size and the `success` tone.
 
 - KAN-426 (close) — adds `accent` (a brand tile in a sport's colour).
-- Details dark (Details.dc.html 2026-10-08) — in dark the amber, info, accent and ink tones follow `DabblerColors.tile*Tone` (info `#16243F`/`#BFDBFE`, accent `#3A1A2A`/`#F9C2DB`, ink `#3A3A3A`/`#F5F0E6`, amber stays bright with `#141414` ink) and the sub-line is `tileSubInk`; light is unchanged.
+- Details dark (Details.dc.html 2026-10-08) — in dark the amber, info, accent and ink tones follow `DabblerColors.tile*Tone` (info `#16243F` and accent `#3A1A2A` with cream `#F5F0E6` ink, ink `#3A3A3A`/`#F5F0E6`, amber stays bright with `#141414` ink) and the sub-line is `tileSubInk`; light is unchanged.
 
 ## Source
 

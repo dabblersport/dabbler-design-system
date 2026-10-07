@@ -380,21 +380,21 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
   /// ink `#141414` (`--on-amber`).
   DabblerToneColor get tileAmberTone => tileAmber;
 
-  /// The info tile for this brightness: `--tile-info-*`, dark `#16243F` /
-  /// `#BFDBFE`.
+  /// The info tile for this brightness: dark `#16243F` with the primary text
+  /// ink (cream).
   DabblerToneColor get tileInfoTone => brightness == Brightness.dark
       ? const DabblerToneColor(
           surface: DabblerProvisionalDark.tileInfoSurface,
-          ink: DabblerProvisionalDark.tileInfoInk,
+          ink: DabblerProvisionalDark.textPrimary,
         )
       : tileInfo;
 
-  /// The accent tile for this brightness: `--tile-accent-*`, dark `#3A1A2A` /
-  /// `#F9C2DB` (the Details design's own dark accent).
+  /// The accent tile for this brightness: dark `#3A1A2A` (the Details design's
+  /// own dark accent) with the primary text ink (cream).
   DabblerToneColor get tileAccentTone => brightness == Brightness.dark
       ? const DabblerToneColor(
           surface: DabblerProvisionalDark.detailTileAccentSurface,
-          ink: DabblerProvisionalDark.tileAccentInk,
+          ink: DabblerProvisionalDark.textPrimary,
         )
       : tileAccent;
 

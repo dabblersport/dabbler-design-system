@@ -102,17 +102,10 @@ abstract final class DabblerProvisionalDark {
   /// dark status surfaces' depth.
   static const Color tileAccentSurface = Color(0xFF3A1730);
 
-  /// `--tile-info-ink` (dark) — `#BFDBFE`, the ink on the dark info tile
-  /// (`Details.dc.html` 2026-10-08, `[data-mode="dark"]`).
-  static const Color tileInfoInk = Color(0xFFBFDBFE);
-
   /// `--tile-accent-surface` (dark) on the DETAILS pages — `#3A1A2A`. The
   /// Details design defines its own dark accent tile; [tileAccentSurface]
   /// (`#3A1730`) stays the Listings/create-menu value.
   static const Color detailTileAccentSurface = Color(0xFF3A1A2A);
-
-  /// `--tile-accent-ink` (dark) — `#F9C2DB`.
-  static const Color tileAccentInk = Color(0xFFF9C2DB);
 
   /// `--tile-ink-surface` (dark) — `#3A3A3A`, the neutral "ink" tile
   /// (`Details.dc.html` 2026-10-08): the light ink plate cannot stay `#141414`

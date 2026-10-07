@@ -17,13 +17,13 @@ void main() {
 
   group('detail tile tones — dark follows Details.dc.html 2026-10-08', () {
     final DabblerColors d = c(Brightness.dark);
-    test('info is navy on pale blue', () {
+    test('info is navy with cream ink', () {
       expect(d.tileInfoTone.surface, const Color(0xFF16243F));
-      expect(d.tileInfoTone.ink, const Color(0xFFBFDBFE));
+      expect(d.tileInfoTone.ink, const Color(0xFFF5F0E6));
     });
-    test('accent is maroon on pink', () {
+    test('accent is maroon with cream ink', () {
       expect(d.tileAccentTone.surface, const Color(0xFF3A1A2A));
-      expect(d.tileAccentTone.ink, const Color(0xFFF9C2DB));
+      expect(d.tileAccentTone.ink, const Color(0xFFF5F0E6));
     });
     test('ink is lifted grey on cream', () {
       expect(d.tileInkTone.surface, const Color(0xFF3A3A3A));
