@@ -74,11 +74,15 @@ void main() {
       );
     });
 
+    final DabblerColors c = DabblerColors.resolve(
+      theme: DabblerTheme.sport,
+      brightness: b,
+    );
     for (final (DabblerDetailHeaderTile, DabblerToneColor) e
         in <(DabblerDetailHeaderTile, DabblerToneColor)>[
-          (DabblerDetailHeaderTile.amber, DabblerColors.tileAmber),
-          (DabblerDetailHeaderTile.info, DabblerColors.tileInfo),
-          (DabblerDetailHeaderTile.accent, DabblerColors.tileAccent),
+          (DabblerDetailHeaderTile.amber, c.tileAmberTone),
+          (DabblerDetailHeaderTile.info, c.tileInfoTone),
+          (DabblerDetailHeaderTile.accent, c.tileAccentTone),
         ]) {
       testWidgets('fillOf is the ${e.$1.name} tile surface — $mode', (
         WidgetTester t,

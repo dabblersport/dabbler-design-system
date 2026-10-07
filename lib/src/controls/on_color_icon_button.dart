@@ -154,7 +154,7 @@ class DabblerOnColorIconButton extends StatelessWidget {
     Widget circle = DecoratedBox(
       decoration: BoxDecoration(
         color: onTile
-            ? colors.textPrimary.withValues(alpha: tileFillAlpha)
+            ? colors.tileAmberTone.ink.withValues(alpha: tileFillAlpha)
             : onSurface
             ? colors.bgPrimary
             : fillOf(colors),
@@ -169,7 +169,11 @@ class DabblerOnColorIconButton extends StatelessWidget {
             size: glyphSize,
             color:
                 color ??
-                (onSurface || onTile ? colors.textPrimary : colors.onBrand),
+                (onTile
+                    ? colors.tileAmberTone.ink
+                    : onSurface
+                    ? colors.textPrimary
+                    : colors.onBrand),
             mirrorInRtl: mirrorInRtl,
           ),
         ),

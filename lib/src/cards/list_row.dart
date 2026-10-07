@@ -161,7 +161,15 @@ class DabblerListRow extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: DabblerType.caption2
                 .resolveForDirection(direction)
-                .copyWith(color: colors.textSecondary),
+                .copyWith(
+                  color:
+                      colors.brightness == Brightness.dark &&
+                          (_ListGroupTone.maybeOf(context) ??
+                                  DabblerListGroupTone.sunken) !=
+                              DabblerListGroupTone.sunken
+                      ? colors.tileSubInk
+                      : colors.textSecondary,
+                ),
           ),
         Text(
           title,
@@ -282,28 +290,45 @@ class DabblerListGroup extends StatelessWidget {
   static Color fillOf(DabblerColors colors, DabblerListGroupTone tone) =>
       switch (tone) {
         DabblerListGroupTone.sunken => colors.surfaceSunken,
-        DabblerListGroupTone.info => DabblerColors.tileInfo.surface,
-        DabblerListGroupTone.accent => DabblerColors.tileAccent.surface,
-        DabblerListGroupTone.amber => DabblerColors.tileAmber.surface,
+        DabblerListGroupTone.info => colors.tileInfoTone.surface,
+        DabblerListGroupTone.accent => colors.tileAccentTone.surface,
+        DabblerListGroupTone.amber => colors.tileAmberTone.surface,
       };
 
   @override
   Widget build(BuildContext context) {
     final Color fill = fillOf(DabblerColors.of(context), tone);
-    return DabblerSurface(
-      fill: fill,
-      borderColor: fill,
-      radius: radius,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          for (int i = 0; i < children.length; i++) ...<Widget>[
-            if (i > 0) const DabblerDivider(),
-            children[i],
+    return _ListGroupTone(
+      tone: tone,
+      child: DabblerSurface(
+        fill: fill,
+        borderColor: fill,
+        radius: radius,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            for (int i = 0; i < children.length; i++) ...<Widget>[
+              if (i > 0) const DabblerDivider(),
+              children[i],
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
+}
+
+/// Tells the rows of a [DabblerListGroup] which tone they sit on, so an
+/// overline reads in the tile's sub-ink in dark (`--tile-sub-ink`).
+class _ListGroupTone extends InheritedWidget {
+  const _ListGroupTone({required this.tone, required super.child});
+
+  final DabblerListGroupTone tone;
+
+  static DabblerListGroupTone? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_ListGroupTone>()?.tone;
+
+  @override
+  bool updateShouldNotify(_ListGroupTone old) => old.tone != tone;
 }

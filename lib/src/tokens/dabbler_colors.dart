@@ -372,6 +372,50 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
     ink: DabblerPalette.activeP700,
   );
 
+  // --- The tile tones of THIS brightness (Details.dc.html 2026-10-08, the
+  //     `[data-mode="dark"]` scope). Light is the static tones above, unchanged.
+
+  /// The amber tile for this brightness. The Details design keeps the bright
+  /// amber in dark too (`--tile-amber-surface` is not overridden), with the
+  /// ink `#141414` (`--on-amber`).
+  DabblerToneColor get tileAmberTone => tileAmber;
+
+  /// The info tile for this brightness: `--tile-info-*`, dark `#16243F` /
+  /// `#BFDBFE`.
+  DabblerToneColor get tileInfoTone => brightness == Brightness.dark
+      ? const DabblerToneColor(
+          surface: DabblerProvisionalDark.tileInfoSurface,
+          ink: DabblerProvisionalDark.tileInfoInk,
+        )
+      : tileInfo;
+
+  /// The accent tile for this brightness: `--tile-accent-*`, dark `#3A1A2A` /
+  /// `#F9C2DB` (the Details design's own dark accent).
+  DabblerToneColor get tileAccentTone => brightness == Brightness.dark
+      ? const DabblerToneColor(
+          surface: DabblerProvisionalDark.detailTileAccentSurface,
+          ink: DabblerProvisionalDark.tileAccentInk,
+        )
+      : tileAccent;
+
+  /// The neutral ink tile: `--tile-ink-*`, light the ink plate with white ink,
+  /// dark `#3A3A3A` with `#F5F0E6`.
+  DabblerToneColor get tileInkTone => brightness == Brightness.dark
+      ? const DabblerToneColor(
+          surface: DabblerProvisionalDark.tileInkSurface,
+          ink: DabblerProvisionalDark.tileInkInk,
+        )
+      : const DabblerToneColor(
+          surface: DabblerPalette.ink,
+          ink: DabblerPalette.paper,
+        );
+
+  /// `--tile-sub-ink` — the sub-line on a decorative tile and a host card's
+  /// caption: light `rgba(20,20,20,0.6)`, dark `rgba(245,240,230,0.72)`.
+  Color get tileSubInk => brightness == Brightness.dark
+      ? DabblerProvisionalDark.tileSubInk
+      : DabblerPalette.ink.withValues(alpha: 0.6);
+
   /// The resolved colours for the enclosing theme.
   ///
   /// Throws a [FlutterError] in debug if no [DabblerColors] is installed, which

@@ -102,6 +102,32 @@ abstract final class DabblerProvisionalDark {
   /// dark status surfaces' depth.
   static const Color tileAccentSurface = Color(0xFF3A1730);
 
+  /// `--tile-info-ink` (dark) — `#BFDBFE`, the ink on the dark info tile
+  /// (`Details.dc.html` 2026-10-08, `[data-mode="dark"]`).
+  static const Color tileInfoInk = Color(0xFFBFDBFE);
+
+  /// `--tile-accent-surface` (dark) on the DETAILS pages — `#3A1A2A`. The
+  /// Details design defines its own dark accent tile; [tileAccentSurface]
+  /// (`#3A1730`) stays the Listings/create-menu value.
+  static const Color detailTileAccentSurface = Color(0xFF3A1A2A);
+
+  /// `--tile-accent-ink` (dark) — `#F9C2DB`.
+  static const Color tileAccentInk = Color(0xFFF9C2DB);
+
+  /// `--tile-ink-surface` (dark) — `#3A3A3A`, the neutral "ink" tile
+  /// (`Details.dc.html` 2026-10-08): the light ink plate cannot stay `#141414`
+  /// on the `#141414` page, so it lifts one step.
+  static const Color tileInkSurface = Color(0xFF3A3A3A);
+
+  /// `--tile-ink-ink` (dark) — `#F5F0E6`, the ink on [tileInkSurface].
+  static const Color tileInkInk = DabblerPalette.surfacePage;
+
+  /// `--tile-sub-ink` (dark) — `rgba(245,240,230,0.72)`, the sub-line on the
+  /// dark info, accent and ink tiles and the host card's caption.
+  static final Color tileSubInk = DabblerPalette.surfacePage.withValues(
+    alpha: 0.72,
+  );
+
   /// `--tile-amber-surface` (dark) — `#3A2E06`, the amber hue at the dark
   /// status surfaces' depth.
   static const Color tileAmberSurface = Color(0xFF3A2E06);

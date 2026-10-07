@@ -299,10 +299,13 @@ class DabblerStatTile extends StatefulWidget {
           DabblerStatTileTone.card => colors.surfaceCard,
           DabblerStatTileTone.sunken => colors.surfaceSunken,
           DabblerStatTileTone.brand => colors.brandPrimary,
-          DabblerStatTileTone.ink => colors.textPrimary,
-          DabblerStatTileTone.amber => DabblerColors.tileAmber.surface,
-          DabblerStatTileTone.info => DabblerColors.tileInfo.surface,
-          DabblerStatTileTone.accent => DabblerColors.tileAccent.surface,
+          DabblerStatTileTone.ink =>
+            colors.brightness == Brightness.dark
+                ? colors.tileInkTone.surface
+                : colors.textPrimary,
+          DabblerStatTileTone.amber => colors.tileAmberTone.surface,
+          DabblerStatTileTone.info => colors.tileInfoTone.surface,
+          DabblerStatTileTone.accent => colors.tileAccentTone.surface,
           DabblerStatTileTone.danger => colors.error.surface,
           DabblerStatTileTone.success => colors.success.surface,
         };
@@ -323,10 +326,13 @@ class DabblerStatTile extends StatefulWidget {
         DabblerStatTileTone.card ||
         DabblerStatTileTone.sunken => colors.textPrimary,
         DabblerStatTileTone.brand => colors.onBrand,
-        DabblerStatTileTone.ink => colors.bgPrimary,
-        DabblerStatTileTone.amber => DabblerColors.tileAmber.ink,
-        DabblerStatTileTone.info => DabblerColors.tileInfo.ink,
-        DabblerStatTileTone.accent => DabblerColors.tileAccent.ink,
+        DabblerStatTileTone.ink =>
+          colors.brightness == Brightness.dark
+              ? colors.tileInkTone.ink
+              : colors.bgPrimary,
+        DabblerStatTileTone.amber => colors.tileAmberTone.ink,
+        DabblerStatTileTone.info => colors.tileInfoTone.ink,
+        DabblerStatTileTone.accent => colors.tileAccentTone.ink,
         DabblerStatTileTone.danger => colors.error.strong,
         DabblerStatTileTone.success => colors.success.strong,
       };
@@ -337,9 +343,16 @@ class DabblerStatTile extends StatefulWidget {
         DabblerStatTileTone.brand => DabblerPalette.paper.withValues(
           alpha: 0.8,
         ),
-        DabblerStatTileTone.ink => colors.bgPrimary.withValues(alpha: 0.7),
+        DabblerStatTileTone.ink =>
+          colors.brightness == Brightness.dark
+              ? colors.tileSubInk
+              : colors.bgPrimary.withValues(alpha: 0.7),
         DabblerStatTileTone.amber => DabblerPalette.ink.withValues(alpha: 0.62),
         DabblerStatTileTone.success => colors.success.strong,
+        DabblerStatTileTone.info || DabblerStatTileTone.accent =>
+          colors.brightness == Brightness.dark
+              ? colors.tileSubInk
+              : colors.textSecondary,
         _ => colors.textSecondary,
       };
 

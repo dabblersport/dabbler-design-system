@@ -42,6 +42,7 @@ Fill: the accent tile. Radius `lg`, padding `space5`, gap `space4`. Caption `cap
 ## Change log
 
 - KAN-429 (Meetups) — adds this component.
+- Details dark (Details.dc.html 2026-10-08) — the card fills from `tileAccentTone` and its caption from `tileSubInk` in dark; light is unchanged.
 
 ## Source
 

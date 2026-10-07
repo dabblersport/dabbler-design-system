@@ -75,7 +75,7 @@ class DabblerHostCard extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection direction = Directionality.of(context);
     return DabblerSurface(
-      fill: DabblerColors.tileAccent.surface,
+      fill: colors.tileAccentTone.surface,
       borderWidth: 0,
       radius: DabblerRadius.lg,
       padding: const EdgeInsets.all(DabblerSpacing.space5),
@@ -100,9 +100,11 @@ class DabblerHostCard extends StatelessWidget {
                         style: DabblerType.caption2
                             .resolveForDirection(direction)
                             .copyWith(
-                              color: colors.textPrimary.withValues(
-                                alpha: captionAlpha,
-                              ),
+                              color: colors.brightness == Brightness.dark
+                                  ? colors.tileSubInk
+                                  : colors.textPrimary.withValues(
+                                      alpha: captionAlpha,
+                                    ),
                             ),
                       ),
                     Text(

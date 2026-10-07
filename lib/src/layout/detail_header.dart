@@ -164,9 +164,9 @@ class DabblerDetailHeader extends StatelessWidget {
     DabblerDetailHeaderTile? tile,
     DabblerTheme theme,
   ) => switch (tile) {
-    DabblerDetailHeaderTile.amber => DabblerColors.tileAmber.surface,
-    DabblerDetailHeaderTile.info => DabblerColors.tileInfo.surface,
-    DabblerDetailHeaderTile.accent => DabblerColors.tileAccent.surface,
+    DabblerDetailHeaderTile.amber => outer.tileAmberTone.surface,
+    DabblerDetailHeaderTile.info => outer.tileInfoTone.surface,
+    DabblerDetailHeaderTile.accent => outer.tileAccentTone.surface,
     null => DabblerColors.resolve(
       theme: theme,
       brightness: outer.brightness,
@@ -180,9 +180,9 @@ class DabblerDetailHeader extends StatelessWidget {
         ? outer
         : DabblerColors.resolve(theme: theme, brightness: outer.brightness);
     final DabblerToneColor? tileTone = switch (tile) {
-      DabblerDetailHeaderTile.amber => DabblerColors.tileAmber,
-      DabblerDetailHeaderTile.info => DabblerColors.tileInfo,
-      DabblerDetailHeaderTile.accent => DabblerColors.tileAccent,
+      DabblerDetailHeaderTile.amber => outer.tileAmberTone,
+      DabblerDetailHeaderTile.info => outer.tileInfoTone,
+      DabblerDetailHeaderTile.accent => outer.tileAccentTone,
       null => null,
     };
     final double wash = tileTone == null ? chipAlpha : tileWashAlpha;
@@ -190,7 +190,13 @@ class DabblerDetailHeader extends StatelessWidget {
     final double dotA = tileTone == null ? 0.5 : tileDotAlpha;
     final TextDirection direction = Directionality.of(context);
     final double top = MediaQuery.paddingOf(context).top;
-    final Color on = tileTone == null ? band.onBrand : band.textPrimary;
+    // On the amber band the ink is `--on-amber` (#141414 in both modes), not
+    // the page ink, which turns cream in dark.
+    final Color on = tileTone == null
+        ? band.onBrand
+        : (tile == DabblerDetailHeaderTile.amber
+              ? tileTone.ink
+              : band.textPrimary);
 
     final Widget buttons = Row(
       children: <Widget>[

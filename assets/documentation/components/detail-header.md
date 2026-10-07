@@ -51,6 +51,7 @@ A column of rows: buttons, pills and the place line all start at the inline star
 - KAN-426 fidelity rebuild — adds this component.
 - KAN-429 (Meetups) — adds `tile` (paint the band in a decorative tile instead of a section theme, the meetup frame's amber band) and `extra` (a third fact after the meta). Pair `tile` with `OnColorIconButton.onTile`.
 - Adds `DabblerDetailHeader.fillOf` — the band's fill as an API so the system bars can follow the header fill; `build()` uses the same function. No visual change.
+- Details dark (Details.dc.html 2026-10-08) — the tile bands resolve through `tile*Tone`, and ink on the amber band is the amber tone's ink (`#141414`) in both modes; light is unchanged.
 
 ## Source
 
