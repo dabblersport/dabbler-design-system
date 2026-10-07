@@ -34,7 +34,7 @@ A tinted band with filters applied, and an accent band with none — see `listin
 ## Axes
 
 ### Head
-`DabblerListingHead.tint` is the section's brand mixed over the card colour at the tint share (Games, Venues); `accent` is the accent tile surface (Meetups); `none` paints no band.
+`DabblerListingHead.tint` is the section's brand mixed over the card colour at the tint share (Games, Venues); `accent` is the accent tile surface, in its dark tone in dark mode (Meetups); `none` paints no band.
 
 ### Direction
 The band, tabs and rail follow the reading direction; the tabs mirror on their own.

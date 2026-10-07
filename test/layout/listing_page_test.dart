@@ -76,6 +76,20 @@ void main() {
     );
     await t.pump();
     expect(band, DabblerColors.tileAccent.surface);
+    // Dark: the accent tile's dark surface, not the pale light one.
+    await t.pumpWidget(
+      host(
+        _page(
+          filters: false,
+          head: DabblerListingHead.accent,
+          onBand: (c) => band = c,
+        ),
+        width: 393,
+        brightness: Brightness.dark,
+      ),
+    );
+    await t.pumpAndSettle(); // the theme change animates
+    expect(band, DabblerProvisionalDark.tileAccentSurface);
     await t.pumpWidget(
       host(
         _page(

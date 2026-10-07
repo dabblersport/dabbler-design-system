@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../controls/filter_rail.dart';
 import '../tokens/dabbler_colors.dart';
+import '../tokens/dabbler_dark_provisional.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_geometry.dart';
 import 'tabs.dart';
@@ -178,7 +179,10 @@ class _DabblerListingPageState extends State<DabblerListingPage> {
       colors.brandPrimary,
       DabblerListingPage.tintShare,
     )!,
-    DabblerListingHead.accent => DabblerColors.tileAccent.surface,
+    DabblerListingHead.accent =>
+      colors.brightness == Brightness.dark
+          ? DabblerProvisionalDark.tileAccentSurface
+          : DabblerColors.tileAccent.surface,
   };
 
   void _report(Color? band) {
