@@ -34,6 +34,10 @@ One slide draws no dots. Several draw a long active dot and small idle ones.
 ### Direction
 The pager runs in the reading direction; captions and buttons mirror.
 
+## System bars (decision pending)
+
+An image hero has no single fill colour: each slide is a `DabblerImage` (its sunken ground until the picture loads), so a screen that opens with this hero cannot ask it for a status-bar colour the way it can with `DabblerDetailHeader.fillOf`. Until a decision is made (a scrim colour the hero draws under the status bar, or a seed colour taken from the image), such a screen keeps the page background in the status bar. Not implemented.
+
 ## Tokens used
 
 `bgPrimary`, `textPrimary`, `caption2`, `DabblerImage`'s sunken ground, spacing steps, `DabblerMotion.base`.

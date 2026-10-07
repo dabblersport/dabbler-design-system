@@ -146,6 +146,33 @@ class DabblerDetailHeader extends StatelessWidget {
   /// The dot between place and meta — `3`.
   static const double dotSize = DabblerSpacing.space1;
 
+  /// The colour the band paints for [tile] (else the section [theme]) under
+  /// [context]'s brightness: exactly what [build] fills with, because [build]
+  /// reads it through the same function.
+  ///
+  /// The platform status bar can follow the header: a screen that opens with a
+  /// header reads `DabblerDetailHeader.fillOf(context, tile: ..., theme: ...)`
+  /// and gives it to the system chrome, instead of mirroring this rule.
+  static Color fillOf(
+    BuildContext context, {
+    DabblerDetailHeaderTile? tile,
+    DabblerTheme theme = DabblerTheme.sport,
+  }) => _fill(DabblerColors.of(context), tile, theme);
+
+  static Color _fill(
+    DabblerColors outer,
+    DabblerDetailHeaderTile? tile,
+    DabblerTheme theme,
+  ) => switch (tile) {
+    DabblerDetailHeaderTile.amber => DabblerColors.tileAmber.surface,
+    DabblerDetailHeaderTile.info => DabblerColors.tileInfo.surface,
+    DabblerDetailHeaderTile.accent => DabblerColors.tileAccent.surface,
+    null => DabblerColors.resolve(
+      theme: theme,
+      brightness: outer.brightness,
+    ).brandPrimary,
+  };
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors outer = DabblerColors.of(context);
@@ -304,7 +331,7 @@ class DabblerDetailHeader extends StatelessWidget {
         extensions: <DabblerColors>[band],
       ),
       child: ColoredBox(
-        color: tileTone?.surface ?? band.brandPrimary,
+        color: _fill(outer, tile, theme),
         child: Padding(
           padding: EdgeInsetsDirectional.fromSTEB(
             DabblerSpacing.space6,
