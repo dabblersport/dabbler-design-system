@@ -40,6 +40,22 @@ Widget _rails(BuildContext context) => GalleryStack(
       ),
     ),
     GallerySpecimen(
+      label: 'rail, tappable as a whole (opens the filter sheet)',
+      child: SizedBox(
+        width: 360,
+        child: DabblerFilterRail(
+          items: <DabblerFilterRailItem>[
+            DabblerFilterRailItem(label: 'Within 5 km', onRemove: () {}),
+            DabblerFilterRailItem(label: 'Nearest', onRemove: () {}),
+          ],
+          clearAllLabel: 'Clear all',
+          onClearAll: () {},
+          onTap: () {},
+          tapSemanticLabel: 'Filters',
+        ),
+      ),
+    ),
+    GallerySpecimen(
       label: 'group',
       child: SizedBox(
         width: 360,

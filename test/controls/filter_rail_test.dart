@@ -1,5 +1,6 @@
 import 'package:dabbler_design_system/dabbler_design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../forms/_host.dart';
@@ -9,6 +10,8 @@ Widget _rail({
   List<String> labels = const <String>['Within 5 km', 'Today'],
   List<String>? removed,
   VoidCallback? onClearAll,
+  VoidCallback? onTap,
+  String? tapLabel,
 }) => host(
   DabblerFilterRail(
     items: <DabblerFilterRailItem>[
@@ -17,6 +20,8 @@ Widget _rail({
     ],
     clearAllLabel: direction == TextDirection.rtl ? 'مسح الكل' : 'Clear all',
     onClearAll: onClearAll,
+    onTap: onTap,
+    tapSemanticLabel: tapLabel,
   ),
   direction: direction,
 );
@@ -96,6 +101,92 @@ void main() {
     );
     expect(find.text('مسح الكل'), findsOneWidget);
     expect(find.byType(DabblerButton), findsNothing);
+  });
+
+  for (final TextDirection d in TextDirection.values) {
+    final bool rtl = d == TextDirection.rtl;
+    final List<String> labels = rtl
+        ? const <String>['ضمن 5 كم', 'اليوم']
+        : const <String>['Within 5 km', 'Today'];
+
+    testWidgets('onTap ($d): pill body and background open, glyph and Clear '
+        'all do not double-fire', (tester) async {
+      int taps = 0;
+      int clears = 0;
+      final List<String> removed = <String>[];
+      await tester.pumpWidget(
+        _rail(
+          direction: d,
+          labels: labels,
+          removed: removed,
+          onClearAll: () => clears++,
+          onTap: () => taps++,
+          tapLabel: rtl ? 'التصفية' : 'Filters',
+        ),
+      );
+      // Pill body.
+      await tester.tap(find.text(labels.first));
+      expect(<int>[taps, removed.length, clears], <int>[1, 0, 0]);
+      // Rail background (bottom edge of the rail, outside any pill).
+      final Rect rail = tester.getRect(find.byType(SingleChildScrollView));
+      final Rect pill = tester.getRect(
+        find.byKey(DabblerFilterRail.pillKeyFor(labels.first)),
+      );
+      await tester.tapAt(Offset(pill.center.dx, rail.bottom - 0.5));
+      expect(taps, 2);
+      // Remove glyph: its own handler only.
+      await tester.tap(find.byType(DabblerIcon).first);
+      expect(<int>[taps, removed.length, clears], <int>[2, 1, 0]);
+      // Clear all: its own handler only.
+      await tester.ensureVisible(find.byKey(DabblerFilterRail.clearAllKey));
+      await tester.pump();
+      await tester.tap(find.byKey(DabblerFilterRail.clearAllKey));
+      expect(<int>[taps, removed.length, clears], <int>[2, 1, 1]);
+    });
+  }
+
+  testWidgets('onTap null: pill body does nothing and no button semantics', (
+    tester,
+  ) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await tester.pumpWidget(_rail(onClearAll: () {}, tapLabel: 'Filters'));
+    await tester.tap(find.text('Today'));
+    expect(find.bySemanticsLabel('Filters'), findsNothing);
+    handle.dispose();
+  });
+
+  testWidgets('onTap: button semantics carry the supplied (Arabic) label', (
+    tester,
+  ) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    int taps = 0;
+    await tester.pumpWidget(
+      _rail(
+        direction: TextDirection.rtl,
+        labels: const <String>['ضمن 5 كم'],
+        onTap: () => taps++,
+        tapLabel: 'التصفية',
+      ),
+    );
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('التصفية')),
+      matchesSemantics(label: 'التصفية', isButton: true, hasTapAction: true),
+    );
+    await tester.tap(find.text('ضمن 5 كم'));
+    expect(taps, 1);
+    handle.dispose();
+  });
+
+  testWidgets('onTap: Enter and Space on the focused rail activate it', (
+    tester,
+  ) async {
+    int taps = 0;
+    await tester.pumpWidget(_rail(onTap: () => taps++));
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    expect(taps, 2);
   });
 
   testWidgets('FilterGroup shows caption and chips', (tester) async {

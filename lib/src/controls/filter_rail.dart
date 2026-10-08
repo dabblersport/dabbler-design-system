@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../foundations/icon.dart';
 import '../foundations/text.dart';
 import '../interaction/expanded_hit_area.dart';
+import '../interaction/focus_ring.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
@@ -64,6 +65,8 @@ class DabblerFilterRail extends StatelessWidget {
     required this.clearAllLabel,
     this.onClearAll,
     this.padding = EdgeInsetsDirectional.zero,
+    this.onTap,
+    this.tapSemanticLabel,
   });
 
   /// The applied filters, in order.
@@ -77,6 +80,20 @@ class DabblerFilterRail extends StatelessWidget {
 
   /// Padding around the rail (a screen gutter, say).
   final EdgeInsetsGeometry padding;
+
+  /// Called when the rail itself is tapped: its background or the body of a
+  /// pill (`Listings.2026-10-08.dc.html:111` — the whole applied-filter rail
+  /// opens the filter sheet).
+  ///
+  /// A pill's remove glyph still calls its own [DabblerFilterRailItem.onRemove]
+  /// and "Clear all" still calls [onClearAll]; neither also fires this. Null
+  /// (the default) leaves the rail exactly as it was: not tappable as a whole.
+  /// When set, the rail is also a keyboard-focusable button (Enter / Space).
+  final VoidCallback? onTap;
+
+  /// The accessible name of the rail as a button, already localised — `Filters`.
+  /// Used only when [onTap] is set; the package supplies no English default.
+  final String? tapSemanticLabel;
 
   /// Finds the clear-all action in a test.
   static const Key clearAllKey = ValueKey<String>('dabbler-filter-rail-clear');
@@ -104,7 +121,7 @@ class DabblerFilterRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox.shrink();
-    return SingleChildScrollView(
+    final Widget rail = SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: padding,
       child: Row(
@@ -124,6 +141,68 @@ class DabblerFilterRail extends StatelessWidget {
               onPressed: onClearAll,
             ),
         ],
+      ),
+    );
+    final VoidCallback? tap = onTap;
+    if (tap == null) return rail;
+    return _TappableRail(
+      onTap: tap,
+      semanticLabel: tapSemanticLabel,
+      child: rail,
+    );
+  }
+}
+
+/// Makes the whole rail one button. The remove glyphs and "Clear all" are
+/// deeper in the hit-test tree and own their taps: in the gesture arena the
+/// innermost recogniser wins, so a tap on them never reaches [onTap]; a tap on
+/// a pill body or the empty background reaches only this one.
+class _TappableRail extends StatefulWidget {
+  const _TappableRail({
+    required this.onTap,
+    required this.semanticLabel,
+    required this.child,
+  });
+
+  final VoidCallback onTap;
+  final String? semanticLabel;
+  final Widget child;
+
+  @override
+  State<_TappableRail> createState() => _TappableRailState();
+}
+
+class _TappableRailState extends State<_TappableRail> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      button: true,
+      label: widget.semanticLabel,
+      onTap: widget.onTap,
+      child: FocusableActionDetector(
+        mouseCursor: SystemMouseCursors.click,
+        onShowFocusHighlight: (bool v) => setState(() => _focused = v),
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent intent) {
+              widget.onTap();
+              return null;
+            },
+          ),
+        },
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onTap,
+          child: DabblerFocusRing.visible(
+            visible: _focused,
+            enabled: true,
+            borderRadius: DabblerRadius.pillAll,
+            child: widget.child,
+          ),
+        ),
       ),
     );
   }

@@ -30,13 +30,30 @@ rail renders nothing when there are none.
 
 **Pass a localised `clearAllLabel`.** A null `onClearAll` hides the action.
 
+**Pass `onTap` to make the whole rail open the filter sheet** (`Listings.2026-10-08.dc.html:111`).
+A tap on the rail background or a pill's body calls `onTap`; a pill's remove glyph still calls its
+own `onRemove` and "Clear all" still calls `onClearAll`, and neither also fires `onTap`. Pass a
+localised `tapSemanticLabel` (`Filters`): it names the rail as a button, and the package supplies
+no English default. With `onTap` the rail is keyboard-focusable (Enter / Space) and shows the
+focus ring. Null `onTap`, the default, changes nothing.
+
+```dart
+DabblerFilterRail(
+  items: items,
+  clearAllLabel: l10n.clearAll,
+  onClearAll: clearAll,
+  onTap: openFilterSheet,
+  tapSemanticLabel: l10n.filters,
+)
+```
+
 **Use FilterGroup for the sheet.** One group per filter dimension, the chosen option selected.
 
 ## Axes
 
 ### Direction
 Chips start at the inline start; "Clear all" follows the last chip. The rail scrolls horizontally
-when it overflows.
+when it overflows. The tappable rail (`onTap`) behaves the same in both directions.
 
 ## Tokens used
 
@@ -46,6 +63,7 @@ Chip gap `space2` (rail), `space3` (group). Caption `footnote` semibold in `text
 
 - Alpha fidelity rebuild (KAN-426) — adds these components.
 - Listings fidelity pass — applied filters are the frame's 32-tall brand pills (7/9/7/14 padding, 13/18 medium, a bold 16 `close-circle` at 80%), not the 34-tall small `Chip`.
+- Listings match — optional `onTap` and `tapSemanticLabel`: the whole applied-filter rail is one button that opens the filter sheet; remove glyphs and "Clear all" keep their own taps. Additive; default unchanged.
 
 ## Source
 
