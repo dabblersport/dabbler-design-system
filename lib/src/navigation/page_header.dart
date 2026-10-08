@@ -34,6 +34,73 @@ class DabblerPageHeaderAction {
   final int count;
 }
 
+/// A single header icon button on its own: the same 40 `--surface-card` circle
+/// in a 1px `--outline-card` hairline (`Listings.dc.html:77-85`) that
+/// [DabblerPageHeader] draws for its actions, for a screen whose header row is
+/// not a listing's - the Favourites screen's back button
+/// (`Favourites.dc.html:10-12`). The 45 target is a hit-test-only area around
+/// the circle; the label is required because there is no visible text.
+class DabblerPageHeaderButton extends StatelessWidget {
+  /// An icon button named [icon] in the icon vocabulary.
+  const DabblerPageHeaderButton({
+    super.key,
+    required this.icon,
+    required this.semanticLabel,
+    this.onPressed,
+  });
+
+  /// The glyph's name — `arrow-circle-left`.
+  final String icon;
+
+  /// The accessible name.
+  final String semanticLabel;
+
+  /// Tapped. Null draws it disabled.
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final DabblerColors colors = DabblerColors.of(context);
+    final bool enabled = onPressed != null;
+    final Widget circle = Container(
+      width: DabblerPageHeader.actionDiameter,
+      height: DabblerPageHeader.actionDiameter,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: colors.surfaceCard,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: colors.borderDefault,
+          width: DabblerSizing.borderDefault,
+        ),
+      ),
+      child: DabblerIcon(
+        icon,
+        size: DabblerPageHeader.actionIconSize,
+        color: enabled ? colors.textPrimary : colors.textTertiary,
+      ),
+    );
+    return DabblerExpandedHitArea(
+      minimum: const Size.square(DabblerSizing.touchTargetMin),
+      child: Semantics(
+        button: true,
+        enabled: enabled,
+        label: semanticLabel,
+        onTap: onPressed,
+        excludeSemantics: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onPressed,
+          child: DabblerFocusRing(
+            borderRadius: DabblerRadius.pillAll,
+            child: DabblerPressScale.gesture(enabled: enabled, child: circle),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// PageHeader — the heading of a listing screen: a display title, a tappable
 /// location row beneath it, and outlined icon actions at the inline end.
 ///
