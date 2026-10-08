@@ -113,6 +113,8 @@ export 'src/controls/chip_rail.dart';
 export 'src/controls/chip_rail_gallery.dart';
 export 'src/controls/favourite_button.dart';
 export 'src/controls/favourite_button_gallery.dart';
+export 'src/controls/listing_social.dart';
+export 'src/controls/listing_social_gallery.dart';
 export 'src/controls/filter_rail.dart';
 export 'src/controls/filter_rail_gallery.dart';
 export 'src/controls/fab.dart';
