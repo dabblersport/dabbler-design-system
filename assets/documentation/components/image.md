@@ -62,6 +62,7 @@ Surfaces: sunken for the fill. Overlay: the scrim role. Ink: tertiary for the er
 
 - Added for the Home Feed media surfaces (KAN-410).
 - Gained a fit, for full-screen viewers, and request headers (KAN-412 gaps 5).
+- Gained `placeholderGlyph`: a null or blank url can draw the gallery glyph over the sunken fill (venue covers with no photo yet).
 
 ## Source
 

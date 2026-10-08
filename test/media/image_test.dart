@@ -272,4 +272,22 @@ void main() {
     expect(find.bySemanticsLabel(RegExp('Pitch')), findsOneWidget);
     handle.dispose();
   });
+
+  group('placeholderGlyph', () {
+    testWidgets('null url draws the bare fill by default', (tester) async {
+      await tester.pumpWidget(
+        _host(const DabblerImage(url: null, height: 120)),
+      );
+      expect(find.byType(DabblerIcon), findsNothing);
+    });
+
+    testWidgets('null url draws the gallery glyph when asked', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const DabblerImage(url: null, height: 120, placeholderGlyph: true),
+        ),
+      );
+      expect(find.byType(DabblerIcon), findsOneWidget);
+    });
+  });
 }

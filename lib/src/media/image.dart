@@ -90,6 +90,7 @@ class DabblerImage extends StatelessWidget {
     this.onTap,
     this.fit = BoxFit.cover,
     this.headers,
+    this.placeholderGlyph = false,
   }) : assert(
          aspectRatio == null || aspectRatio > 0,
          'aspectRatio must be positive',
@@ -135,6 +136,12 @@ class DabblerImage extends StatelessWidget {
 
   /// HTTP headers sent with the image request. Null sends none.
   final Map<String, String>? headers;
+
+  /// Whether a null or blank [url] draws the `gallery` glyph over the sunken
+  /// fill (the error state's glyph) instead of the bare fill — for a slot that
+  /// must read as "a photo goes here", such as a venue cover with no photo yet.
+  /// Default false: the bare fill, as before.
+  final bool placeholderGlyph;
 
   /// Error glyph side — [DabblerSizing.iconLg].
   static const double errorGlyphSize = DabblerSizing.iconLg;
@@ -194,6 +201,7 @@ class DabblerImage extends StatelessWidget {
       fit: StackFit.expand,
       children: <Widget>[
         fill,
+        if (!hasUrl && placeholderGlyph) error(context),
         if (hasUrl)
           Image.network(
             trimmed,
