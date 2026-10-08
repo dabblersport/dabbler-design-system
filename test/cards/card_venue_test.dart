@@ -134,4 +134,31 @@ void main() {
       expect(dir == TextDirection.ltr ? a < b : a > b, isTrue);
     });
   }
+
+  for (final TextDirection dir in TextDirection.values) {
+    testWidgets('actionFirst puts the button before the price (${dir.name})', (
+      WidgetTester t,
+    ) async {
+      Widget card({required bool first}) => _host(
+        DabblerCardVenue(
+          name: 'Lane Eight',
+          price: 'AED 120 / hour',
+          priceCaption: 'Starting from',
+          trailing: const SizedBox(key: Key('action'), width: 90, height: 40),
+          actionFirst: first,
+        ),
+        direction: dir,
+      );
+      for (final bool first in <bool>[false, true]) {
+        await t.pumpWidget(card(first: first));
+        final double action = t.getCenter(find.byKey(const Key('action'))).dx;
+        final double price = t.getCenter(find.text('AED 120 / hour')).dx;
+        // Inline start is left in LTR and right in RTL.
+        final bool actionAtStart = dir == TextDirection.ltr
+            ? action < price
+            : action > price;
+        expect(actionAtStart, first);
+      }
+    });
+  }
 }

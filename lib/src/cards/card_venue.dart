@@ -92,6 +92,7 @@ class DabblerCardVenue extends StatelessWidget {
     this.price,
     this.priceCaption,
     this.trailing,
+    this.actionFirst = false,
     this.onTap,
     this.enabled = true,
     this.semanticLabel,
@@ -133,6 +134,11 @@ class DabblerCardVenue extends StatelessWidget {
 
   /// The action beside the price — `View venue`.
   final Widget? trailing;
+
+  /// Puts [trailing] at the inline start of the price row, before the price
+  /// (`Listings.2026-10-08b.dc.html:836-840`: the "View venue" button leads and
+  /// the price block takes the rest). Default false: the button ends the row.
+  final bool actionFirst;
 
   /// Makes the whole card tappable.
   final VoidCallback? onTap;
@@ -301,6 +307,7 @@ class DabblerCardVenue extends StatelessWidget {
               child: Row(
                 spacing: DabblerSpacing.space4,
                 children: <Widget>[
+                  if (actionFirst) ?trailing,
                   Expanded(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -334,7 +341,7 @@ class DabblerCardVenue extends StatelessWidget {
                       ],
                     ),
                   ),
-                  ?trailing,
+                  if (!actionFirst) ?trailing,
                 ],
               ),
             ),
