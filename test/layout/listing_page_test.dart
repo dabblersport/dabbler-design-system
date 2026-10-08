@@ -13,7 +13,14 @@ Widget _page({
   required bool filters,
   DabblerListingHead head = DabblerListingHead.tint,
   ValueChanged<Color?>? onBand,
+  VoidCallback? onFiltersTap,
+  String? tapLabel,
+  List<String> labels = const <String>['Today'],
+  List<String>? removed,
+  VoidCallback? onClearAll,
 }) => DabblerListingPage(
+  onFiltersTap: onFiltersTap,
+  filtersTapSemanticLabel: tapLabel,
   head: head,
   onBandColor: onBand,
   header: const DabblerPageHeader(
@@ -24,11 +31,12 @@ Widget _page({
   tabs: _tabs,
   filters: filters
       ? <DabblerFilterRailItem>[
-          DabblerFilterRailItem(label: 'Today', onRemove: () {}),
+          for (final String l in labels)
+            DabblerFilterRailItem(label: l, onRemove: () => removed?.add(l)),
         ]
       : const <DabblerFilterRailItem>[],
   clearAllLabel: 'Clear all',
-  onClearAll: () {},
+  onClearAll: onClearAll ?? () {},
   pages: <Widget>[
     for (int i = 0; i < 2; i++)
       ListView(children: const <Widget>[SizedBox(height: 2000)]),
@@ -47,6 +55,43 @@ Future<void> _scrollTo(WidgetTester t, double dy) async {
 }
 
 void main() {
+  for (final TextDirection d in TextDirection.values) {
+    final bool rtl = d == TextDirection.rtl;
+    testWidgets('onFiltersTap ($d): pill body fires once; glyph and Clear all '
+        'fire only their own', (t) async {
+      int taps = 0;
+      int clears = 0;
+      final List<String> removed = <String>[];
+      final String label = rtl ? 'اليوم' : 'Today';
+      await t.pumpWidget(
+        host(
+          _page(
+            filters: true,
+            labels: <String>[label],
+            removed: removed,
+            onClearAll: () => clears++,
+            onFiltersTap: () => taps++,
+            tapLabel: rtl ? 'التصفية' : 'Filters',
+          ),
+          width: 393,
+          direction: d,
+        ),
+      );
+      await t.tap(find.text(label));
+      expect(<int>[taps, removed.length, clears], <int>[1, 0, 0]);
+      await t.tap(find.byType(DabblerIcon).last);
+      expect(<int>[taps, removed.length, clears], <int>[1, 1, 0]);
+      await t.tap(find.byKey(DabblerFilterRail.clearAllKey));
+      expect(<int>[taps, removed.length, clears], <int>[1, 1, 1]);
+    });
+  }
+
+  testWidgets('onFiltersTap null: pill body does nothing', (t) async {
+    await t.pumpWidget(host(_page(filters: true), width: 393));
+    await t.tap(find.text('Today'));
+    expect(find.byType(DabblerFilterRail), findsOneWidget);
+  });
+
   testWidgets('band tint is brand 14% over the card colour', (t) async {
     Color? band;
     await t.pumpWidget(

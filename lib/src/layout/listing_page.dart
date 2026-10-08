@@ -79,6 +79,8 @@ class DabblerListingPage extends StatefulWidget {
     required this.onClearAll,
     this.head = DabblerListingHead.tint,
     this.onBandColor,
+    this.onFiltersTap,
+    this.filtersTapSemanticLabel,
   }) : assert(tabs.length == pages.length, 'every tab needs one page');
 
   /// The title row — normally a `DabblerPageHeader` built with
@@ -106,6 +108,16 @@ class DabblerListingPage extends StatefulWidget {
   /// Called after the band's colour changes with it, and with null when the
   /// band goes away ([DabblerListingHead.none], or the page leaves).
   final ValueChanged<Color?>? onBandColor;
+
+  /// Called when the applied-filters rail is tapped (its background or a
+  /// pill's body) — normally opens the filter sheet. Forwarded to
+  /// [DabblerFilterRail.onTap]; remove glyphs and "Clear all" keep their own
+  /// handlers. Null leaves the rail as it was.
+  final VoidCallback? onFiltersTap;
+
+  /// The rail's accessible name as a button; see
+  /// [DabblerFilterRail.tapSemanticLabel]. Used only with [onFiltersTap].
+  final String? filtersTapSemanticLabel;
 
   /// Scrolled past this the band collapses (`y > 40`).
   static const double collapseAt = 40;
@@ -266,6 +278,8 @@ class _DabblerListingPageState extends State<DabblerListingPage> {
                       items: widget.filters,
                       clearAllLabel: widget.clearAllLabel,
                       onClearAll: widget.onClearAll,
+                      onTap: widget.onFiltersTap,
+                      tapSemanticLabel: widget.filtersTapSemanticLabel,
                       padding: const EdgeInsetsDirectional.symmetric(
                         horizontal: DabblerListingPage.gutter,
                       ),

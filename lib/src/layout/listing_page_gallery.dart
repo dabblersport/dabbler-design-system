@@ -63,6 +63,8 @@ Widget _listing(BuildContext context) => GalleryStack(
             ],
             clearAllLabel: 'Clear all',
             onClearAll: () {},
+            onFiltersTap: () {},
+            filtersTapSemanticLabel: 'Filters',
             pages: <Widget>[for (int i = 0; i < 3; i++) const _Rows()],
           ),
         ),

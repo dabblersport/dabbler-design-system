@@ -25,6 +25,8 @@ A tinted band with filters applied, and an accent band with none — see `listin
 
 **Pass a `DabblerPageHeader` built with `safeArea: false` and `contentPadding: DabblerPageHeader.listingPadding` as `header`.** The page pads the status-bar inset itself, inside the band, so the band bleeds under the status bar.
 
+**Pass `onFiltersTap` (and a localised `filtersTapSemanticLabel`) to open the filter sheet from the rail.** It is forwarded to `DabblerFilterRail.onTap`: a tap on the rail background or a pill body calls it; remove glyphs and "Clear all" keep their own handlers. Null changes nothing.
+
 **Pass one page per tab, in order, each inset by the 18 gutter.** Pages run edge to edge so horizontal rails can bleed; each page is kept alive, so its scroll position survives a tab change.
 
 **Read the band's colour from `onBandColor`.** It reports the colour after it changes, and null when the page leaves; the shell can paint it under the status bar (`DabblerTopFill`) and the platform chrome can follow it.
@@ -46,6 +48,7 @@ The band, tabs and rail follow the reading direction; the tabs mirror on their o
 ## Change log
 
 - Listings 2026-10-08 — adds this component: the collapsing, section-tinted header (`data-head`, the `max-height`/`opacity` transitions and the 40/8 scroll hysteresis).
+- Listings match — optional `onFiltersTap` and `filtersTapSemanticLabel` forward to the filter rail's `onTap` and `tapSemanticLabel`.
 
 ## Source
 
