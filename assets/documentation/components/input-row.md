@@ -77,6 +77,8 @@ loss pending a fix. See *Change log*.
 
 **Dense is the Settings rhythm.** Pass `dense: true` for the Settings rows: a 15/20 title over a 12/17 subtitle with a 2-point gap, in a row at least 56 tall. It changes the rhythm only; slots, tone and semantics are unchanged.
 
+**Emoji exception (KAN-478).** `emoji` draws an emoji in the leading position, before the title in reading direction (on the right in Arabic): a 20px glyph on a 25px line in a 26-wide centred box, then the 12 gap — the Create Post sport row (`Home Feed.dc.html:742`). The design system otherwise draws no emoji; this is a documented exception, granted by CEO ruling 2026-10-09 for the Create Post surface only, the same as `DabblerChip.emoji` and `DabblerBadge.emoji`, and not a general permission. With both `leading` and `emoji`, the order is `leading`, emoji, title. The emoji never changes the row's height, is decorative (the title is the accessible name), and defaults to null, so every existing row is unchanged.
+
 ## Axes
 
 ### Content
@@ -144,6 +146,7 @@ shared tokens and primitives every other tappable surface reads.
 
 ## Change log
 
+- KAN-478 — adds `emoji`: an optional leading emoji slot (20px glyph, 25px line, 26 wide) for the Create Post sport rows, a documented Create-Post-only exception to the no-emoji rule (CEO ruling 2026-10-09). Default null; existing rows unchanged.
 - Alpha fidelity (Search) — adds `titleSemibold`: the title in semibold, as the View all people row draws it.
 - KAN-426 (final) — adds `DabblerInputRow.option(title:, selected:, onTap:, textDirection:)`: the sheet option row of the Language and Region lists. `bodyRelaxed` title (400, 600 selected), 9x3 padding around a 52px content box and the 1px hairline, 71 tall, with a bold 22px `tick-circle` while selected. `textDirection` sets the title's own direction so a native-script name sits flush to its own end inside a left-to-right list.
 - Alpha fidelity (Settings) — `DabblerChevron.circled`: the disclosure glyph inside its ring, which the Settings frames draw (`Settings.dc.html:97, 134, 269`).

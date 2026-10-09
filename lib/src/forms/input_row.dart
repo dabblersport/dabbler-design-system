@@ -161,6 +161,7 @@ class DabblerInputRow extends StatelessWidget {
     this.flat = false,
     this.showDivider = true,
     this.dense = false,
+    this.emoji,
   }) : assert(
          title == null || titleSpan == null,
          'Pass title or titleSpan, not both.',
@@ -285,6 +286,28 @@ class DabblerInputRow extends StatelessWidget {
   /// which is also what makes a tappable row a legal target.
   static const double minHeight = DabblerSizing.touchTargetMin;
 
+  // The emoji box is wide but zero tall, so it can never grow the row; the
+  // glyph's 25px line overflows it vertically, centred on the row.
+  Widget _emojiSlot(TextDirection direction) => ExcludeSemantics(
+    child: SizedBox(
+      width: emojiSlotWidth,
+      height: 0,
+      child: OverflowBox(
+        minHeight: 0,
+        maxHeight: emojiLeading,
+        child: Text(
+          emoji!,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          softWrap: false,
+          style: DabblerType.subheadline
+              .resolveForDirection(direction)
+              .copyWith(fontSize: emojiSize, height: emojiLeading / emojiSize),
+        ),
+      ),
+    ),
+  );
+
   /// The first line. Null drops the line; a row with neither [title] nor
   /// [subtitle] is a bare leading/trailing pair, which the source also allows.
   final String? title;
@@ -298,6 +321,38 @@ class DabblerInputRow extends StatelessWidget {
 
   /// The trailing slot — a [DabblerChevron], a toggle or a badge.
   final Widget? trailing;
+
+  /// An emoji drawn in the leading position, before the title in reading
+  /// direction (leading edge, so it sits on the right in Arabic): a 20px glyph
+  /// on a 25px line in a [emojiSlotWidth] (26) wide centred box, then the
+  /// [slotGap] — the Home Feed Create post sport row
+  /// (`Home Feed.dc.html:742`). Additive (KAN-478), default null draws nothing
+  /// and every existing row renders as before.
+  ///
+  /// **If both [emoji] and [leading] are given, both are drawn: [leading]
+  /// first, then the emoji, then the title** — the same rule as
+  /// [DabblerChip.emoji] and [DabblerBadge.emoji] (glyph, then emoji, then
+  /// label).
+  ///
+  /// The emoji never changes the row's height: its box is [emojiSlotWidth]
+  /// wide and takes no height of its own, and is centred on the row's content,
+  /// as the design's `align-items: center` does. Decorative: the title carries
+  /// the accessible name.
+  ///
+  /// **Documented exception to the design system's no-emoji rule**, granted by
+  /// CEO ruling 2026-10-09 ("I need everything in the home screen as is in the
+  /// create post") for the Create Post surface only. It is not a general
+  /// permission to draw emoji elsewhere.
+  final String? emoji;
+
+  /// The emoji slot's width, `26` (`Home Feed.dc.html:742`).
+  static const double emojiSlotWidth = 26;
+
+  /// The emoji's font size, `20`.
+  static const double emojiSize = 20;
+
+  /// The emoji's line height, `25`.
+  static const double emojiLeading = 25;
 
   /// Makes the row tappable and adds the system press and focus affordances.
   /// Null leaves it inert, which is the source's `onClick`-absent default.
@@ -542,7 +597,19 @@ class DabblerInputRow extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          if (leading != null) ...<Widget>[
+          if (emoji != null) ...<Widget>[
+            if (leading != null) ...<Widget>[
+              danger == null
+                  ? leading!
+                  : IconTheme.merge(
+                      data: IconThemeData(color: danger),
+                      child: leading!,
+                    ),
+              const SizedBox(width: slotGap),
+            ],
+            _emojiSlot(direction),
+            const SizedBox(width: slotGap),
+          ] else if (leading != null) ...<Widget>[
             danger == null
                 ? leading!
                 : IconTheme.merge(
