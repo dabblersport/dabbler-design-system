@@ -1,6 +1,7 @@
 import 'package:dabbler_design_system/src/controls/button.dart';
 import 'package:dabbler_design_system/src/overlays/sheet.dart';
 import 'package:dabbler_design_system/src/tokens/dabbler_colors.dart';
+import 'package:dabbler_design_system/src/tokens/dabbler_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -204,4 +205,36 @@ void main() {
       },
     );
   }
+
+  // KAN-461: the Home Feed vibe sheet title is 17/22 semibold (:654).
+  testWidgets('titleStyle sets the title step; default stays title3', (
+    tester,
+  ) async {
+    TextStyle styleOf() =>
+        tester.widget<Text>(find.text('What\'s the vibe?')).style!;
+    await tester.pumpWidget(
+      _host(
+        DabblerSheet(
+          presentation: DabblerSheetPresentation.inline,
+          title: 'What\'s the vibe?',
+          titleStyle: DabblerType.headline,
+          child: const Text('body'),
+        ),
+      ),
+    );
+    expect(styleOf().fontWeight, FontWeight.w600);
+    expect(styleOf().fontSize, 17);
+    expect(styleOf().height! * styleOf().fontSize!, closeTo(22, 0.01));
+    await tester.pumpWidget(
+      _host(
+        const DabblerSheet(
+          presentation: DabblerSheetPresentation.inline,
+          title: 'What\'s the vibe?',
+          child: Text('body'),
+        ),
+      ),
+    );
+    expect(styleOf().fontSize, 20);
+    expect(styleOf().fontWeight, DabblerType.title3.fontWeight);
+  });
 }

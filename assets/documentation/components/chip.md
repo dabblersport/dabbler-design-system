@@ -71,6 +71,8 @@ Wrap(
 
 Every tag is the regular chip, so they share height (40; 43 under Arabic), the 15/20 medium label, `9 15` padding and the vertical centring — only the colour differs: a `vibe` draws the vibe's selected colours, the rest the neutral card fill and hairline. Widths follow the label. The tag is static (no 45 box in the layout); `onRemove` makes it removable with its own hit target. A label wider than the row is ellipsised (`ellipsize`), so a long location never clips or overflows; the tag needs a bounded width (a `Wrap` or `Column`). Do not mix it with `DabblerBadge` or `dense` / `tag` / `compact` chips in the same row — those are different heights.
 
+**Emoji exception (KAN-461).** `emoji` (chip and badge) draws an emoji before the label, with `emojiSize` (the sport rows use 20) and `labelWeight` (the vibe chip is 15/20 at 400). The design system otherwise draws no emoji: this is a documented exception, granted by CEO ruling 2026-10-09 for the Create Post surface only (vibe, sport and tag), and not a general permission. The emoji sits on the label's own line height, so it never changes the height; it is decorative and the label carries the accessible name. All three are opt-in; defaults are unchanged.
+
 ## Axes
 
 ### Size
@@ -125,6 +127,7 @@ Focus ring and touch-target minimum are the same shared tokens every interactive
 
 - KAN-430 (Meetups) — a selected `dense` chip draws its label in the on-brand ink (it was the secondary ink on the brand fill).
 - KAN-457 — adds `DabblerChip.composerTag` and `ellipsize` (both opt-in; defaults unchanged): the Create Post selection tags share the regular chip's geometry so a selected vibe and the sport, location and game tags align.
+- KAN-461 — adds `emoji`, `emojiSize` and `labelWeight` (opt-in; the emoji is a documented, Create-Post-only exception to the no-emoji rule). Defaults unchanged.
 - KAN-433 (Home fidelity) — adds `metrics`. Drawn is the Home sub-chip: 34 high (7 above and below an 18 line, inside the hairline), 14 inline, the 13/18 footnote at the regular weight, a 14 glyph 6 from the label, and the 45 target kept as a hit-test-only area (like `compactHitArea`). Default unchanged.
 - KAN-426 (final) — adds `compactHitArea` (default false): a tappable chip is exactly its 40px pill instead of a 45px box. The target is kept as a hit-tested, not laid-out, area; leave about 2px free above and below.
 - KAN-426 (close) — the regular chip is 40 tall (was 38) and 2px wider: the web `Chip.jsx` pads `9px 15px` inside a 1px hairline that sits outside that padding, so the frames draw 20 + 18 + 2. Both states keep the hairline (transparent when selected).

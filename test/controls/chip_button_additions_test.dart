@@ -291,4 +291,66 @@ void main() {
     );
     expect(find.byType(Flexible), findsNothing);
   });
+
+  // KAN-461: emoji slot and label weight on the chip (Home Feed vibe chip,
+  // :674 — emoji before the label, 15/20 at weight 400).
+  for (final TextDirection dir in _dirs) {
+    for (final Brightness b in Brightness.values) {
+      testWidgets('chip emoji sits before the label, height unchanged '
+          '(${dir.name}, ${b.name})', (WidgetTester tester) async {
+        Future<Size> size(DabblerChip chip) async {
+          await tester.pumpWidget(
+            host(
+              Align(alignment: AlignmentDirectional.topStart, child: chip),
+              direction: dir,
+              brightness: b,
+            ),
+          );
+          return tester.getSize(find.byType(DabblerChip));
+        }
+
+        final Size plain = await size(const DabblerChip(label: 'Calm'));
+        final Size withEmoji = await size(
+          const DabblerChip(label: 'Calm', emoji: '🌊', emojiSize: 20),
+        );
+        expect(
+          withEmoji.height,
+          plain.height,
+          reason: 'emoji never grows the chip',
+        );
+        expect(withEmoji.width, greaterThan(plain.width));
+        final Rect e = tester.getRect(find.text('🌊'));
+        final Rect l = tester.getRect(find.text('Calm'));
+        if (dir == TextDirection.ltr) {
+          expect(e.right, lessThanOrEqualTo(l.left));
+        } else {
+          expect(e.left, greaterThanOrEqualTo(l.right));
+        }
+        expect(tester.widget<Text>(find.text('🌊')).style!.fontSize, 20);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  testWidgets('labelWeight 400 keeps 15/20; default stays medium', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _h(
+        const DabblerChip(label: 'Calm', labelWeight: FontWeight.w400),
+        TextDirection.ltr,
+      ),
+    );
+    final TextStyle s = tester.widget<Text>(find.text('Calm')).style!;
+    expect(s.fontWeight, FontWeight.w400);
+    expect(s.fontSize, 15);
+    expect(s.height! * s.fontSize!, closeTo(20, 0.01));
+    await tester.pumpWidget(
+      _h(const DabblerChip(label: 'Calm'), TextDirection.ltr),
+    );
+    expect(
+      tester.widget<Text>(find.text('Calm')).style!.fontWeight,
+      FontWeight.w500,
+    );
+  });
 }

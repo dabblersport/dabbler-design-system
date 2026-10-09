@@ -33,6 +33,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
     this.title,
     this.titleSpan,
     this.titleWidget,
+    this.titleStyle,
     this.headerActionBuilder,
     this.footerBuilder,
     this.dismissible = true,
@@ -83,6 +84,9 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
   /// See [DabblerSheet.titleWidget].
   final Widget? titleWidget;
 
+  /// See [DabblerSheet.titleStyle].
+  final DabblerTypeStyle? titleStyle;
+
   /// Builds the trailing header action. See [DabblerSheet.headerAction].
   final WidgetBuilder? headerActionBuilder;
 
@@ -125,6 +129,7 @@ class DabblerSheetRoute<T> extends PopupRoute<T> {
       title: title,
       titleSpan: titleSpan,
       titleWidget: titleWidget,
+      titleStyle: titleStyle,
       headerAction: headerActionBuilder?.call(context),
       footer: footerBuilder?.call(context),
       dismissible: dismissible,
@@ -184,6 +189,7 @@ Future<T?> showDabblerSheet<T>({
   String? title,
   InlineSpan? titleSpan,
   Widget? titleWidget,
+  DabblerTypeStyle? titleStyle,
   WidgetBuilder? headerActionBuilder,
   WidgetBuilder? footerBuilder,
   bool dismissible = true,
@@ -204,6 +210,7 @@ Future<T?> showDabblerSheet<T>({
       title: title,
       titleSpan: titleSpan,
       titleWidget: titleWidget,
+      titleStyle: titleStyle,
       headerActionBuilder: headerActionBuilder,
       footerBuilder: footerBuilder,
       dismissible: dismissible,

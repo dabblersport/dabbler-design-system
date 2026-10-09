@@ -157,6 +157,9 @@ class DabblerChip extends StatefulWidget {
     this.compactHitArea = false,
     this.metrics = DabblerFeedMetrics.touch,
     this.ellipsize = false,
+    this.emoji,
+    this.emojiSize,
+    this.labelWeight,
   });
 
   /// A static selection tag for the Create Post composer (KAN-457): the
@@ -207,6 +210,26 @@ class DabblerChip extends StatefulWidget {
   /// never shrinks, as a rail chip must not). Requires a bounded width: use in
   /// a [Wrap] or [Column], not an unbounded horizontal scroller.
   final bool ellipsize;
+
+  /// An emoji drawn before the label, [DabblerChip.iconGap] from it — the
+  /// Home Feed vibe chip (`Home Feed.dc.html:674`) and tag. Additive
+  /// (KAN-461), default null draws nothing.
+  ///
+  /// **Documented exception to the design system's no-emoji rule**, granted
+  /// by CEO ruling 2026-10-09 for the Create Post surface only (vibe, sport and
+  /// tag); it is not a general permission. Drawn at [emojiSize], else the
+  /// label's size, on the label's own line height, so it never changes the
+  /// chip's height. Decorative: the label carries the accessible name.
+  final String? emoji;
+
+  /// The emoji's font size; null uses the label's size. The sport rows draw
+  /// it at 20 (`Home Feed.dc.html:742`).
+  final double? emojiSize;
+
+  /// Overrides the label's weight; null keeps the step's own (medium for the
+  /// regular chip). The Home Feed vibe chip is 15/20 at weight 400
+  /// (`:674`): pass [DabblerType.regular]. Additive, default null.
+  final FontWeight? labelWeight;
 
   /// [DabblerFeedMetrics.drawn] draws the chip as the Home Feed frame's
   /// sub-chip (`home-design-measure.md` section 6): 34 high (7 above and below
@@ -539,6 +562,9 @@ class _DabblerChipState extends State<DabblerChip> {
                     : colors.textSecondary,
               )
         : _sizedLabelStyle(colors, direction, accentInk, accent != null);
+    final TextStyle shownLabel = widget.labelWeight == null
+        ? labelStyle
+        : labelStyle.copyWith(fontWeight: widget.labelWeight);
     final double? pillHeight = widget.compact
         ? null
         : switch (widget.size) {
@@ -574,13 +600,30 @@ class _DabblerChipState extends State<DabblerChip> {
         ],
         // The chip node already carries [label]; with a remove glyph the
         // outer ExcludeSemantics is lifted, so the text must not read twice.
+        if (widget.emoji != null) ...<Widget>[
+          ExcludeSemantics(
+            child: Text(
+              widget.emoji!,
+              maxLines: 1,
+              softWrap: false,
+              style: shownLabel.copyWith(
+                fontSize: widget.emojiSize ?? shownLabel.fontSize,
+                // Keep the label's line height whatever the emoji size.
+                height:
+                    ((shownLabel.height ?? 1) * (shownLabel.fontSize ?? 15)) /
+                    (widget.emojiSize ?? shownLabel.fontSize ?? 15),
+              ),
+            ),
+          ),
+          const SizedBox(width: DabblerChip.iconGap),
+        ],
         _label(
           ExcludeSemantics(
             child: Text(
               widget.label,
               style: vibe == null
-                  ? labelStyle
-                  : labelStyle.copyWith(color: vibe.ink),
+                  ? shownLabel
+                  : shownLabel.copyWith(color: vibe.ink),
               maxLines: 1,
               softWrap: false,
               overflow: widget.ellipsize ? TextOverflow.ellipsis : null,

@@ -61,6 +61,7 @@ class DabblerComposerBox extends StatelessWidget {
     this.counterEmphasised = false,
     this.tags,
     this.minLines = 5,
+    this.minFieldHeight,
   });
 
   /// The field's controller.
@@ -93,6 +94,39 @@ class DabblerComposerBox extends StatelessWidget {
   /// The field's visible lines.
   final int minLines;
 
+  /// The field's own minimum height, inside its padding. Additive (KAN-461),
+  /// default null keeps the [minLines] sizing exactly as it was. The Home Feed
+  /// textarea is `min-height: 132` with 15 padding each side, so an empty box
+  /// field measures [designedHeight] (162): pass [designedFieldMinHeight]. The
+  /// whole minimum area focuses the field on tap when a [focusNode] is given.
+  /// [minLines] is ignored while this is set (the field still grows with its
+  /// text).
+  final double? minFieldHeight;
+
+  /// The Home Feed textarea's `min-height` (`Home Feed.dc.html:499`).
+  static const double designedFieldMinHeight = 132;
+
+  /// The designed minimum height of the field area: [designedFieldMinHeight]
+  /// plus [DabblerSpacing.space5] (15) padding above and below = 162.
+  static const double designedHeight =
+      designedFieldMinHeight + DabblerSpacing.space5 * 2;
+
+  Widget _minHeight(Widget field) {
+    final double? min = minFieldHeight;
+    if (min == null) {
+      return field;
+    }
+    return GestureDetector(
+      key: const ValueKey<String>('dabbler-composer-field-area'),
+      behavior: HitTestBehavior.opaque,
+      onTap: focusNode?.requestFocus,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: min),
+        child: Align(alignment: AlignmentDirectional.topStart, child: field),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -119,24 +153,26 @@ class DabblerComposerBox extends StatelessWidget {
               padding: const EdgeInsets.all(DabblerSpacing.space5),
               child: Material(
                 type: MaterialType.transparency,
-                child: TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  onChanged: onChanged,
-                  minLines: minLines,
-                  maxLines: null,
-                  style: input,
-                  cursorColor: colors.textPrimary,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    isCollapsed: true,
-                    filled: false,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                    hintText: placeholder,
-                    hintStyle: input.copyWith(color: colors.textSecondary),
+                child: _minHeight(
+                  TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    onChanged: onChanged,
+                    minLines: minFieldHeight == null ? minLines : 1,
+                    maxLines: null,
+                    style: input,
+                    cursorColor: colors.textPrimary,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      isCollapsed: true,
+                      filled: false,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      hintText: placeholder,
+                      hintStyle: input.copyWith(color: colors.textSecondary),
+                    ),
                   ),
                 ),
               ),

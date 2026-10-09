@@ -104,6 +104,7 @@ class DabblerSheet extends StatefulWidget {
     this.title,
     this.titleSpan,
     this.titleWidget,
+    this.titleStyle,
     this.headerAction,
     this.footer,
     this.child,
@@ -202,6 +203,12 @@ class DabblerSheet extends StatefulWidget {
   /// [title] as well when the widget carries no text of its own, because the
   /// route's semantics name comes from [title] or [titleSpan] only.
   final Widget? titleWidget;
+
+  /// The type step of [title] and [titleSpan], in place of the default
+  /// [DabblerType.title3]. Additive (KAN-461), default null keeps the title
+  /// exactly as it was. The Home Feed vibe sheet's title is 17/22 semibold
+  /// (`Home Feed.dc.html:654`, weight 600): pass [DabblerType.headline].
+  final DabblerTypeStyle? titleStyle;
 
   /// A trailing header action, drawn at the inline end of the title row —
   /// before the close affordance when that is shown.

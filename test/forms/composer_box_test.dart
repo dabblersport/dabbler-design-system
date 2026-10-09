@@ -44,4 +44,65 @@ void main() {
       expect(taps, 2);
     });
   }
+
+  // KAN-461: the designed 162 minimum (Home Feed.dc.html:499 — min-height
+  // 132 + 15 padding each side), opt-in; the default is unchanged.
+  for (final TextDirection dir in TextDirection.values) {
+    testWidgets('minFieldHeight yields the designed 162 field area ($dir)', (
+      tester,
+    ) async {
+      Future<double> height({double? min}) async {
+        await tester.pumpWidget(
+          threadHost(
+            DabblerComposerBox(
+              controller: TextEditingController(),
+              placeholder: 'Say it',
+              tools: const <DabblerComposerTool>[],
+              minFieldHeight: min,
+            ),
+            direction: dir,
+          ),
+        );
+        return tester
+            .getSize(
+              find
+                  .ancestor(
+                    of: find.byType(TextField),
+                    matching: find.byType(Padding),
+                  )
+                  .first,
+            )
+            .height;
+      }
+
+      expect(DabblerComposerBox.designedHeight, 162);
+      expect(await height(min: DabblerComposerBox.designedFieldMinHeight), 162);
+      // Default unchanged: still sized by minLines (5), not by the minimum.
+      expect(await height(), isNot(162));
+    });
+  }
+
+  testWidgets('tapping the empty minimum area focuses the field', (
+    tester,
+  ) async {
+    final FocusNode node = FocusNode();
+    addTearDown(node.dispose);
+    await tester.pumpWidget(
+      threadHost(
+        DabblerComposerBox(
+          controller: TextEditingController(),
+          focusNode: node,
+          placeholder: 'Say it',
+          tools: const <DabblerComposerTool>[],
+          minFieldHeight: DabblerComposerBox.designedFieldMinHeight,
+        ),
+      ),
+    );
+    expect(node.hasFocus, isFalse);
+    await tester.tap(
+      find.byKey(const ValueKey<String>('dabbler-composer-field-area')),
+    );
+    await tester.pump();
+    expect(node.hasFocus, isTrue);
+  });
 }

@@ -136,6 +136,7 @@ class DabblerBadge extends StatelessWidget {
     this.accent,
     this.paddingBlock,
     this.metrics = DabblerFeedMetrics.touch,
+    this.emoji,
   }) : isDot = false,
        semanticLabel = null;
 
@@ -168,6 +169,7 @@ class DabblerBadge extends StatelessWidget {
        accent = null,
        paddingBlock = null,
        metrics = DabblerFeedMetrics.touch,
+       emoji = null,
        isDot = true;
 
   /// Whether this is the count-less [DabblerBadge.dot] marker.
@@ -179,6 +181,13 @@ class DabblerBadge extends StatelessWidget {
 
   /// The pill's text.
   final String label;
+
+  /// An emoji drawn before the label (after any [icon]), [iconGap] from it —
+  /// the Home Feed tag badge. Additive (KAN-461), default null draws nothing.
+  /// Same documented exception as [DabblerChip.emoji]: CEO ruling 2026-10-09,
+  /// Create Post only, not a general permission. Drawn at the label's size and
+  /// line height, so the badge keeps its height; decorative.
+  final String? emoji;
 
   /// The decorative tone. Ignored when [status] is set. Defaults to
   /// [DabblerBadgeTone.defaultTone].
@@ -439,6 +448,21 @@ class DabblerBadge extends StatelessWidget {
                 IconTheme.merge(
                   data: IconThemeData(color: foreground),
                   child: icon!,
+                ),
+                SizedBox(width: comfortable ? DabblerSpacing.space2 : iconGap),
+              ],
+              if (emoji != null) ...<Widget>[
+                ExcludeSemantics(
+                  child: Text(
+                    emoji!,
+                    maxLines: 1,
+                    softWrap: false,
+                    style: (comfortable
+                        ? DabblerType.caption1.resolveForDirection(direction)
+                        : drawn
+                        ? DabblerType.caption2.resolveForDirection(direction)
+                        : textStyleFor(direction)),
+                  ),
                 ),
                 SizedBox(width: comfortable ? DabblerSpacing.space2 : iconGap),
               ],

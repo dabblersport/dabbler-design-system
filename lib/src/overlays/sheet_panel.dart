@@ -368,7 +368,7 @@ class _DabblerSheetState extends State<DabblerSheet> {
     if (widget.titleWidget != null) {
       return widget.titleWidget!;
     }
-    final TextStyle style = DabblerType.title3
+    final TextStyle style = (widget.titleStyle ?? DabblerType.title3)
         .resolveForDirection(Directionality.of(context))
         .copyWith(color: colors.textPrimary);
     if (widget.titleSpan != null) {

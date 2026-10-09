@@ -491,4 +491,38 @@ void main() {
       expect(text.style!.color, colors.textSecondary);
     });
   });
+
+  // KAN-461: emoji slot on the tag badge (Home Feed.dc.html:896), opt-in.
+  for (final TextDirection dir in TextDirection.values) {
+    for (final Brightness b in Brightness.values) {
+      testWidgets('badge emoji sits before the label, height unchanged '
+          '(${dir.name}, ${b.name})', (WidgetTester tester) async {
+        Future<Size> size(Widget w) async {
+          await tester.pumpWidget(
+            _host(
+              Align(alignment: AlignmentDirectional.topStart, child: w),
+              brightness: b,
+              direction: dir,
+            ),
+          );
+          return tester.getSize(find.byType(DabblerBadge));
+        }
+
+        final Size plain = await size(const DabblerBadge(label: 'GYM'));
+        final Size withEmoji = await size(
+          const DabblerBadge(label: 'GYM', emoji: '🏋️'),
+        );
+        expect(withEmoji.height, plain.height);
+        expect(withEmoji.width, greaterThan(plain.width));
+        final Rect e = tester.getRect(find.text('🏋️'));
+        final Rect l = tester.getRect(find.text('GYM'));
+        if (dir == TextDirection.ltr) {
+          expect(e.right, lessThanOrEqualTo(l.left));
+        } else {
+          expect(e.left, greaterThanOrEqualTo(l.right));
+        }
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
 }
