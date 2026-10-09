@@ -61,6 +61,12 @@ Widget _chips(BuildContext context) => GalleryStack(
         ],
       ),
     ),
+    const GallerySpecimen(
+      label:
+          'composerTag — Create Post selection tags: selected vibe, sport, '
+          'location, game and a long label share one 40 high regular pill',
+      child: _ComposerTags(),
+    ),
     GallerySpecimen(
       label: 'compactHitArea — 40px pill, no 45px box in the layout',
       child: GalleryWrap(
@@ -77,6 +83,26 @@ Widget _chips(BuildContext context) => GalleryStack(
     ),
   ],
 );
+
+class _ComposerTags extends StatelessWidget {
+  const _ComposerTags();
+
+  @override
+  Widget build(BuildContext context) => const GalleryWrap(
+    children: <Widget>[
+      DabblerChip.composerTag(
+        label: 'Disappointed',
+        vibe: DabblerVibe.disappointed,
+      ),
+      DabblerChip.composerTag(label: 'GYM'),
+      DabblerChip.composerTag(label: 'Al Quoz'),
+      DabblerChip.composerTag(label: 'Saturday 5-a-side'),
+      DabblerChip.composerTag(
+        label: 'Al Quoz Industrial Area 3, Sheikh Zayed Road, Dubai',
+      ),
+    ],
+  );
+}
 
 class _FilterRow extends StatefulWidget {
   const _FilterRow();

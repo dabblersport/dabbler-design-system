@@ -156,7 +156,57 @@ class DabblerChip extends StatefulWidget {
     this.size = DabblerChipSize.regular,
     this.compactHitArea = false,
     this.metrics = DabblerFeedMetrics.touch,
+    this.ellipsize = false,
   });
+
+  /// A static selection tag for the Create Post composer (KAN-457): the
+  /// regular chip — 40 tall, 15/20 medium label, `9 15` padding inside the
+  /// hairline — so a selected vibe and the sport, location and game tags are
+  /// one height, one type step and one alignment in the same wrapping row.
+  ///
+  /// ```dart
+  /// Wrap(
+  ///   spacing: DabblerSpacing.space2,
+  ///   runSpacing: DabblerSpacing.space2,
+  ///   children: <Widget>[
+  ///     DabblerChip.composerTag(label: 'Disappointed', vibe: DabblerVibe.disappointed),
+  ///     DabblerChip.composerTag(label: 'GYM'),
+  ///     DabblerChip.composerTag(label: 'Al Quoz'),
+  ///     DabblerChip.composerTag(label: 'Saturday 5-a-side'),
+  ///   ],
+  /// )
+  /// ```
+  ///
+  /// With a [vibe] the tag is drawn selected in that vibe's colours; without
+  /// one it is the neutral card tag (sport, location, game). Nothing is
+  /// tappable, so the tag is exactly its pill — no 45 box in the layout; give
+  /// it [onRemove] for a removable tag, which has its own hit target. Widths
+  /// follow the label; a label wider than the row is ellipsised ([ellipsize]),
+  /// so the row never clips or overflows. Needs a bounded width, as in a
+  /// [Wrap] or [Column]; do not put it in an unbounded horizontal scroller.
+  const DabblerChip.composerTag({
+    Key? key,
+    required String label,
+    DabblerVibe? vibe,
+    Widget? leadingIcon,
+    VoidCallback? onRemove,
+    String? removeSemanticLabel,
+  }) : this(
+         key: key,
+         label: label,
+         vibe: vibe,
+         selected: vibe != null,
+         leadingIcon: leadingIcon,
+         onRemove: onRemove,
+         removeSemanticLabel: removeSemanticLabel,
+         ellipsize: true,
+       );
+
+  /// Shortens a label wider than the space it is given with an ellipsis
+  /// instead of overflowing. Additive and opt-in, default false (the label
+  /// never shrinks, as a rail chip must not). Requires a bounded width: use in
+  /// a [Wrap] or [Column], not an unbounded horizontal scroller.
+  final bool ellipsize;
 
   /// [DabblerFeedMetrics.drawn] draws the chip as the Home Feed frame's
   /// sub-chip (`home-design-measure.md` section 6): 34 high (7 above and below
@@ -524,14 +574,17 @@ class _DabblerChipState extends State<DabblerChip> {
         ],
         // The chip node already carries [label]; with a remove glyph the
         // outer ExcludeSemantics is lifted, so the text must not read twice.
-        ExcludeSemantics(
-          child: Text(
-            widget.label,
-            style: vibe == null
-                ? labelStyle
-                : labelStyle.copyWith(color: vibe.ink),
-            maxLines: 1,
-            softWrap: false,
+        _label(
+          ExcludeSemantics(
+            child: Text(
+              widget.label,
+              style: vibe == null
+                  ? labelStyle
+                  : labelStyle.copyWith(color: vibe.ink),
+              maxLines: 1,
+              softWrap: false,
+              overflow: widget.ellipsize ? TextOverflow.ellipsis : null,
+            ),
           ),
         ),
         if (widget.dot) ...<Widget>[
@@ -774,6 +827,9 @@ class _DabblerChipState extends State<DabblerChip> {
       ),
     );
   }
+
+  // [DabblerChip.ellipsize] lets the label give way to a bounded row.
+  Widget _label(Widget text) => widget.ellipsize ? Flexible(child: text) : text;
 
   Widget _hit(Widget child) =>
       (widget.compactHitArea || widget.metrics == DabblerFeedMetrics.drawn)

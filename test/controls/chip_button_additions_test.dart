@@ -195,4 +195,100 @@ void main() {
     expect(s.fill, isNull);
     expect(find.byType(DabblerIcon), findsNothing);
   });
+
+  // KAN-457: the Create Post composer's selection tags share one geometry.
+  for (final TextDirection dir in _dirs) {
+    for (final Brightness b in Brightness.values) {
+      testWidgets(
+        'composerTag: vibe, sport, location, game are one height and centre '
+        'line, wrap on a phone, and keep their colours '
+        '(${dir.name}, ${b.name})',
+        (WidgetTester tester) async {
+          tester.view.physicalSize = const Size(320, 800);
+          tester.view.devicePixelRatio = 1;
+          addTearDown(tester.view.reset);
+          const String long =
+              'Al Quoz Industrial Area 3, Sheikh Zayed Road, Dubai';
+          await tester.pumpWidget(
+            host(
+              const Align(
+                alignment: AlignmentDirectional.topStart,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: <Widget>[
+                    DabblerChip.composerTag(
+                      label: 'Disappointed',
+                      vibe: DabblerVibe.disappointed,
+                    ),
+                    DabblerChip.composerTag(label: 'GYM'),
+                    DabblerChip.composerTag(label: 'Al Quoz'),
+                    DabblerChip.composerTag(label: 'Saturday 5-a-side'),
+                    DabblerChip.composerTag(label: long),
+                  ],
+                ),
+              ),
+              direction: dir,
+              brightness: b,
+            ),
+          );
+          expect(tester.takeException(), isNull);
+          final List<DabblerChip> chips = tester
+              .widgetList<DabblerChip>(find.byType(DabblerChip))
+              .toList();
+          final List<Rect> rects = <Rect>[
+            for (int i = 0; i < chips.length; i++)
+              tester.getRect(find.byType(DabblerChip).at(i)),
+          ];
+          final double h = rects.first.height;
+          for (final Rect r in rects) {
+            expect(r.height, h, reason: 'one shared height');
+            expect(r.right <= 320 + 0.01 && r.left >= -0.01, isTrue);
+          }
+          // Rows are whole multiples of height + gap: tags on one line share
+          // its top and centre, and the long row wrapped to a later line.
+          for (final Rect r in rects) {
+            expect(((r.top - rects.first.top) % (h + 8)).abs() < 0.01, isTrue);
+          }
+          expect(rects.last.top > rects.first.top, isTrue, reason: 'wrapped');
+          // Same height as the plain static regular chip.
+          expect(h, closeTo(DabblerChip.visualHeight, 3.01));
+          // The long label is bounded by the row, not overflowing it.
+          expect(rects[4].width <= 320, isTrue);
+          // Colours: the vibe keeps its vibe surface, the rest the card.
+          final DabblerColors c = DabblerColors.of(
+            tester.element(find.byType(DabblerChip).first),
+          );
+          final DabblerVibeColors v = DabblerVibe.disappointed.resolve(c);
+          final List<DabblerSurface> s = tester
+              .widgetList<DabblerSurface>(find.byType(DabblerSurface))
+              .toList();
+          expect(s[0].fill, v.selectedSurface);
+          expect(s[1].fill, isNull);
+          expect(s[2].fill, isNull);
+          // Static: no 45 box in the layout.
+          expect(
+            find.byType(ConstrainedBox).evaluate().where((e) {
+              final ConstrainedBox cb = e.widget as ConstrainedBox;
+              return cb.constraints.minHeight == 45;
+            }),
+            isEmpty,
+          );
+        },
+      );
+    }
+  }
+
+  testWidgets('ellipsize is off by default, so existing chips never shrink', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _h(const DabblerChip(label: 'x'), TextDirection.ltr),
+    );
+    expect(
+      tester.widget<DabblerChip>(find.byType(DabblerChip)).ellipsize,
+      isFalse,
+    );
+    expect(find.byType(Flexible), findsNothing);
+  });
 }
