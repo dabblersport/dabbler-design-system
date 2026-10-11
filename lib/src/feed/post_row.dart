@@ -208,7 +208,9 @@ class DabblerPostRow extends StatelessWidget {
   /// The post's age, already formatted (`2h`).
   final String time;
 
-  /// Where the post was made.
+  /// Where the post was made. A blank value (empty or whitespace only) hides
+  /// the location glyph, its gap and the text together; the line then ends on
+  /// the time.
   final String place;
 
   /// The body as plain text; ignored when [segments] is given.
@@ -377,6 +379,7 @@ class DabblerPostRow extends StatelessWidget {
       ],
     );
 
+    final bool hasPlace = place.trim().isNotEmpty;
     final Widget meta = Row(
       children: <Widget>[
         _metaGlyph('global', colors),
@@ -384,29 +387,37 @@ class DabblerPostRow extends StatelessWidget {
           width: _drawn ? DabblerHomeFrame.postMetaGap : DabblerSpacing.space2,
         ),
         Text(DabblerType.toWesternDigits(time), maxLines: 1, style: caption),
-        if (_drawn)
-          const SizedBox(
-            width:
-                DabblerHomeFrame.postMetaGap +
-                DabblerHomeFrame.postMetaPinInset,
-          )
-        else ...<Widget>[
-          const SizedBox(width: DabblerSpacing.space1),
-          const SizedBox(width: DabblerSpacing.space1),
-        ],
-        _metaGlyph('location', colors),
-        SizedBox(
-          width: _drawn ? DabblerHomeFrame.postMetaGap : DabblerSpacing.space2,
-        ),
-        Flexible(
-          child: Text(
-            place,
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            style: caption,
+        // The place segment is one unit: the spacer after the time, the
+        // location glyph, its gap and the place text appear together, only when
+        // there is a place to name. A blank [place] leaves the time as the last
+        // thing on the line.
+        if (hasPlace) ...<Widget>[
+          if (_drawn)
+            const SizedBox(
+              width:
+                  DabblerHomeFrame.postMetaGap +
+                  DabblerHomeFrame.postMetaPinInset,
+            )
+          else ...<Widget>[
+            const SizedBox(width: DabblerSpacing.space1),
+            const SizedBox(width: DabblerSpacing.space1),
+          ],
+          _metaGlyph('location', colors),
+          SizedBox(
+            width: _drawn
+                ? DabblerHomeFrame.postMetaGap
+                : DabblerSpacing.space2,
           ),
-        ),
+          Flexible(
+            child: Text(
+              place,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: caption,
+            ),
+          ),
+        ],
       ],
     );
 
