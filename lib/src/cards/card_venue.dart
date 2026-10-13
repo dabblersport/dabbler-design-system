@@ -242,7 +242,7 @@ class DabblerCardVenue extends StatelessWidget {
                     .resolveForDirection(direction)
                     .copyWith(color: colors.textPrimary),
               ),
-              if (place.isNotEmpty)
+              if (place.trim().isNotEmpty)
                 Row(
                   // `gap: 5px` (`Listings.dc.html:767`).
                   spacing: DabblerMetaLine.gap,

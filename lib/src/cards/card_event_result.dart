@@ -69,7 +69,7 @@ class DabblerCardEventResult extends StatelessWidget {
   /// The typed words highlighted inside [title].
   final String query;
 
-  /// The place line; omitted when null.
+  /// The place line; omitted when null, empty or only whitespace.
   final String? place;
 
   /// The semibold trailing text after the place ("0/10 spots").
@@ -88,6 +88,10 @@ class DabblerCardEventResult extends StatelessWidget {
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
+    // A blank place or meta is absent: no glyph, no gap, no empty text, and
+    // no row at all when both are blank (same rule as DabblerPostRow).
+    final bool showPlace = place != null && place!.trim().isNotEmpty;
+    final bool showMeta = meta != null && meta!.trim().isNotEmpty;
     TextStyle t(DabblerTypeStyle s, Color c, [FontWeight? w]) =>
         s.resolveForDirection(dir).copyWith(color: c, fontWeight: w);
 
@@ -167,11 +171,11 @@ class DabblerCardEventResult extends StatelessWidget {
                     fontWeight: DabblerHighlightedText.matchWeight,
                     maxLines: 1,
                   ),
-                  if (place != null || meta != null)
+                  if (showPlace || showMeta)
                     Row(
                       spacing: DabblerSpacing.space2,
                       children: <Widget>[
-                        if (place != null) ...<Widget>[
+                        if (showPlace) ...<Widget>[
                           DabblerIcon(
                             'location',
                             size: DabblerSizing.iconXs,
@@ -189,14 +193,17 @@ class DabblerCardEventResult extends StatelessWidget {
                             ),
                           ),
                         ],
-                        if (meta != null)
-                          Text(
-                            meta!,
-                            maxLines: 1,
-                            style: t(
-                              DabblerType.caption1,
-                              colors.textSecondary,
-                              DabblerType.semibold,
+                        if (showMeta)
+                          Flexible(
+                            child: Text(
+                              meta!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: t(
+                                DabblerType.caption1,
+                                colors.textSecondary,
+                                DabblerType.semibold,
+                              ),
                             ),
                           ),
                       ],

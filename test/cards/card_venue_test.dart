@@ -24,6 +24,38 @@ Widget _host(Widget child, {TextDirection direction = TextDirection.ltr}) {
 }
 
 void main() {
+  // KAN-519: a whitespace-only area draws no location pin; a real one does.
+  for (final TextDirection d in TextDirection.values) {
+    final String real = d == TextDirection.rtl ? 'القوز' : 'Al Quoz';
+    Finder pin() => find.byWidgetPredicate(
+      (Widget w) => w is DabblerIcon && w.name == 'location',
+    );
+    for (final String blank in <String>['', '   ', '\t ']) {
+      testWidgets('blank area ${blank.codeUnits} draws no pin (${d.name})', (
+        WidgetTester t,
+      ) async {
+        await t.pumpWidget(
+          _host(
+            DabblerCardVenue(name: 'Elite Arena', area: blank),
+            direction: d,
+          ),
+        );
+        expect(pin(), findsNothing);
+      });
+    }
+    testWidgets('real area draws the pin and text (${d.name})', (
+      WidgetTester t,
+    ) async {
+      await t.pumpWidget(
+        _host(
+          DabblerCardVenue(name: 'Elite Arena', area: real),
+          direction: d,
+        ),
+      );
+      expect(pin(), findsOneWidget);
+      expect(find.text(real), findsOneWidget);
+    });
+  }
   test('default semantic label joins name, place and price', () {
     const DabblerCardVenue v = DabblerCardVenue(
       name: 'Elite Arena',

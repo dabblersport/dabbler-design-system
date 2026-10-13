@@ -7,6 +7,7 @@ import '../forms/_host.dart';
 const String _arabic = 'مباراة الثلاثاء';
 
 void main() {
+  _detailPlaceTests();
   for (final TextDirection d in TextDirection.values) {
     final String dir = d == TextDirection.rtl ? 'rtl' : 'ltr';
     final String title = d == TextDirection.rtl ? _arabic : 'Tuesday 5-a-side';
@@ -179,6 +180,62 @@ void main() {
         expect(find.text('Spaces'), findsOneWidget);
         expect(find.text('three'), findsOneWidget);
         expect(t.takeException(), isNull);
+      });
+    });
+  }
+}
+
+// KAN-519: a blank `place` draws no location glyph, gap or dot; a real place is
+// unchanged.
+void _detailPlaceTests() {
+  Finder glyph() => find.byWidgetPredicate(
+    (Widget w) => w is DabblerIcon && w.name == 'location',
+  );
+  for (final TextDirection d in TextDirection.values) {
+    final bool rtl = d == TextDirection.rtl;
+    final String real = rtl ? 'دبي' : 'Dubai';
+    group('DetailHeader place — ${d.name}', () {
+      for (final String blank in <String>['', '   ', '\t ']) {
+        testWidgets('blank place ${blank.codeUnits}: no glyph, meta only', (
+          WidgetTester t,
+        ) async {
+          await t.pumpWidget(
+            host(
+              DabblerDetailHeader(title: 't', place: blank, meta: '2 km'),
+              direction: d,
+            ),
+          );
+          expect(glyph(), findsNothing);
+          expect(find.text('2 km'), findsOneWidget);
+          expect(
+            find.byWidgetPredicate((Widget w) => w is Text && w.data == blank),
+            findsNothing,
+          );
+        });
+        testWidgets('blank place and nothing else: no place row', (
+          WidgetTester t,
+        ) async {
+          await t.pumpWidget(
+            host(
+              DabblerDetailHeader(title: 't', place: blank),
+              direction: d,
+            ),
+          );
+          expect(glyph(), findsNothing);
+        });
+      }
+      testWidgets('real place: glyph and text unchanged', (
+        WidgetTester t,
+      ) async {
+        await t.pumpWidget(
+          host(
+            DabblerDetailHeader(title: 't', place: real, meta: '2 km'),
+            direction: d,
+          ),
+        );
+        expect(glyph(), findsOneWidget);
+        expect(find.text(real), findsOneWidget);
+        expect(find.text('2 km'), findsOneWidget);
       });
     });
   }
