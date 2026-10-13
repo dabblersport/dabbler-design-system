@@ -189,6 +189,10 @@ class DabblerDetailHeader extends StatelessWidget {
     final double metaA = tileTone == null ? metaAlpha : tileMetaAlpha;
     final double dotA = tileTone == null ? 0.5 : tileDotAlpha;
     final TextDirection direction = Directionality.of(context);
+    // A blank place is absent: no glyph, no gap, no dot (KAN-519).
+    final String? place = this.place?.trim().isEmpty ?? true
+        ? null
+        : this.place;
     final double top = MediaQuery.paddingOf(context).top;
     // On the amber band the ink is `--on-amber` (#141414 in both modes), not
     // the page ink, which turns cream in dark.
@@ -267,7 +271,7 @@ class DabblerDetailHeader extends StatelessWidget {
                 const SizedBox(width: DabblerSpacing.space1 + 2),
                 Flexible(
                   child: Text(
-                    place!,
+                    place,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: DabblerType.footnote
