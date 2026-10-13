@@ -210,6 +210,8 @@ lot about the rest.
 - [SheetList](components/sheet-list.md) — a bounded, scrolling list for the body of a sheet.
 - [Menu](components/menu.md) — the anchored popover for a list of actions or options.
 - [Tooltip](components/tooltip.md) — a short label for a control that carries no visible text.
+- [Messaging thread parts](components/messaging-thread-parts.md) — the skeleton, connection notice, older-messages
+  pager, composer state notice and time mark around a message thread.
 
 ### 8 · Status and feedback — telling the user what happened
 
