@@ -5,20 +5,26 @@ library;
 import 'package:flutter/widgets.dart';
 
 import '../feedback/skeleton.dart';
+import '../tokens/dabbler_geometry.dart';
 import 'messaging_foundations.dart';
 
-/// One placeholder row: who sent it and how much of the line its bubble takes.
-typedef _Row = ({bool sent, double fraction});
+/// Bubble widths, as sums of spacing tokens: no literal length lives here.
+const double _short = DabblerSpacing.space11 + DabblerSpacing.space11;
+const double _medium = _short + DabblerSpacing.space11;
+const double _long = _medium + _medium;
 
-/// A fixed, alternating rhythm so the placeholder reads as a conversation. The
-/// fractions are proportions of the line, not lengths.
+/// One placeholder row: who sent it and how wide its bubble is at most.
+typedef _Row = ({bool sent, double width});
+
+/// A fixed, alternating rhythm so the placeholder reads as a conversation.
+/// A bubble never grows past the line, so a narrow screen shrinks it.
 const List<_Row> _rhythm = <_Row>[
-  (sent: false, fraction: 0.62),
-  (sent: false, fraction: 0.4),
-  (sent: true, fraction: 0.5),
-  (sent: false, fraction: 0.74),
-  (sent: true, fraction: 0.34),
-  (sent: true, fraction: 0.58),
+  (sent: false, width: _long),
+  (sent: false, width: _short),
+  (sent: true, width: _medium),
+  (sent: false, width: _long + _short),
+  (sent: true, width: _short),
+  (sent: true, width: _long),
 ];
 
 /// The loading state of a message thread.
@@ -53,8 +59,8 @@ class DabblerThreadSkeleton extends StatelessWidget {
         children.add(const SizedBox(height: DabblerMessagingSpacing.groupGap));
       }
       final _Row row = _rhythm[i % _rhythm.length];
-      final Widget bubble = FractionallySizedBox(
-        widthFactor: row.fraction,
+      final Widget bubble = ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: row.width),
         child: DabblerSkeleton.rect(animate: animate),
       );
       children.add(
