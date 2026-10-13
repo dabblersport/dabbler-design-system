@@ -55,6 +55,7 @@ const List<GalleryEntry> galleryEntries = <GalleryEntry>[
   ...conversationRowGalleryEntries,
   ...messagingAtomsGalleryEntries,
   ...messagingThreadGalleryEntries,
+  ...messagingGapsGalleryEntries,
   ...chipGalleryEntries,
   ...chipRailGalleryEntries,
   ...favouriteButtonGalleryEntries,
