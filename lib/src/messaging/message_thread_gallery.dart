@@ -112,7 +112,7 @@ Widget _messages(BuildContext context) => GalleryStack(
             groupPosition: p,
             content: 'I can take two.',
             timestamp: '17:11',
-            deliveryState: DabblerDeliveryState.read,
+            deliveryState: DabblerDeliveryState.seen,
           ),
         ),
       ),
@@ -255,7 +255,7 @@ const List<DabblerThreadItem> _direct = <DabblerThreadItem>[
     sender: 'You',
     content: 'Yes, see you there.',
     timestamp: '08:16',
-    deliveryState: DabblerDeliveryState.read,
+    deliveryState: DabblerDeliveryState.seen,
   ),
   DabblerThreadMessage(
     direction: DabblerMessageDirection.outgoing,

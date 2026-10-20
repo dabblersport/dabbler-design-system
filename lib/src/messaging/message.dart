@@ -8,10 +8,12 @@ import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 import 'messaging_auto_direction.dart';
 import 'messaging_foundations.dart';
+import 'message_receipts.dart';
 import 'messaging_parts.dart';
 
 part 'message_models.dart';
 part 'message_bubble_body.dart';
+part 'message_meta.dart';
 
 /// Message — the canonical message.
 ///
@@ -26,8 +28,17 @@ part 'message_bubble_body.dart';
 /// the sender's own side tightens to [DabblerRadius.sm] where a message
 /// continues a group, and the block-end own corner is always the tail.
 ///
-/// Delivery metadata is outgoing-only, and in `group` context only `sending`
-/// and `failed` surface.
+/// Delivery metadata is outgoing-only (messaging §11, KAN-580). In `direct`
+/// context every state shows as a glyph, and the newest outgoing message also
+/// spells the word ([showDeliveryLabel]). In `group` context sending, retrying
+/// and failed behave as in direct; once the server has the message the glyph is
+/// replaced by one compact [receipt] count ("Seen by 4 of 9") that opens the
+/// Message info drawer through [onReceipts]. Incoming messages never show
+/// either.
+///
+/// A [fresh] message fades in over `--motion-slow`; a sending or retrying
+/// bubble dims to [sendingOpacity] over `--motion-base`. Both hold still under
+/// reduced motion.
 ///
 /// Source: live Claude Design project 4286affa-bf50-4ff6-9576-917f76a93ca1
 /// (Dabbler Design System), files `components/messaging/Message.jsx` and
@@ -73,6 +84,12 @@ class DabblerMessage extends StatelessWidget {
     this.edited = false,
     this.editedLabel = 'edited',
     this.deliveryState,
+    this.receipt,
+    this.onReceipts,
+    this.showDeliveryLabel = false,
+    this.deliveryLabel,
+    this.lang = 'en',
+    this.fresh = false,
     this.reactions = const <DabblerMessageReaction>[],
     this.state = DabblerMessageState.normal,
     this.showSender,
@@ -80,7 +97,7 @@ class DabblerMessage extends StatelessWidget {
     this.onPress,
     this.onReact,
     this.onRetry,
-    this.retryLabel = 'Retry',
+    this.retryLabel,
   });
 
   /// Ownership.
@@ -120,6 +137,27 @@ class DabblerMessage extends StatelessWidget {
   /// Delivery metadata.
   final DabblerDeliveryState? deliveryState;
 
+  /// Group receipt tally. Used for an outgoing group message once it is no
+  /// longer in flight; ignored in direct context and for incoming messages.
+  final DabblerReceipt? receipt;
+
+  /// Opens the Message info drawer. The receipt count is a 45px button when
+  /// this is set and plain text when it is null.
+  final VoidCallback? onReceipts;
+
+  /// Spells the delivery word beside the glyph (the newest outgoing message in
+  /// a direct chat). A failed message always spells it.
+  final bool showDeliveryLabel;
+
+  /// Overrides the delivery word, for a language beyond `en` and `ar`.
+  final String? deliveryLabel;
+
+  /// `en` or `ar`, for the default delivery and receipt words.
+  final String lang;
+
+  /// A message that has just arrived: it fades in over `--motion-slow`.
+  final bool fresh;
+
   /// Reaction tallies.
   final List<DabblerMessageReaction> reactions;
 
@@ -141,8 +179,8 @@ class DabblerMessage extends StatelessWidget {
   /// Shown as a Retry action when [deliveryState] is `failed`.
   final VoidCallback? onRetry;
 
-  /// The retry text.
-  final String retryLabel;
+  /// The retry text; defaults to the [lang] word.
+  final String? retryLabel;
 
   /// The share of the row a bubble may take — `maxWidth: '76%'`.
   static const double maxWidthFraction = 0.76;
@@ -167,6 +205,9 @@ class DabblerMessage extends StatelessWidget {
 
   /// Identifies the retry target.
   static const Key retryKey = ValueKey<String>('message-retry');
+
+  /// Identifies the group receipt count.
+  static const Key receiptsKey = ValueKey<String>('message-receipts');
 
   static BorderRadiusDirectional _grow(BorderRadiusDirectional r, double by) {
     Radius g(Radius x) => Radius.circular(x.x + by);
@@ -226,7 +267,6 @@ class DabblerMessage extends StatelessWidget {
     final bool lead = leads(groupPosition);
     final bool withAvatar = showAvatar ?? (!out && group && lead);
     final bool withSender = showSender ?? (!out && group && lead);
-    final bool failed = deliveryState == DabblerDeliveryState.failed;
     final bool selected = state == DabblerMessageState.selected;
     final bool readOnly = state == DabblerMessageState.readOnly;
     final bool bare =
@@ -294,9 +334,7 @@ class DabblerMessage extends StatelessWidget {
       );
     }
     bubble = AnimatedOpacity(
-      opacity: deliveryState == DabblerDeliveryState.sending
-          ? sendingOpacity
-          : 1,
+      opacity: (deliveryState?.inFlight ?? false) ? sendingOpacity : 1,
       duration: DabblerMotion.reduceMotion(buildContext)
           ? Duration.zero
           : DabblerMotion.base,
@@ -315,17 +353,7 @@ class DabblerMessage extends StatelessWidget {
       );
     }
 
-    final DabblerDeliveryState? d = deliveryState;
-    final bool showDelivery =
-        out &&
-        d != null &&
-        (context == DabblerMessageContext.direct ||
-            d == DabblerDeliveryState.sending ||
-            failed);
-    final bool withMeta =
-        trails(groupPosition) && (timestamp != null || showDelivery || edited);
-    final Color metaColor = failed ? colors.error.strong : colors.textSecondary;
-    final TextStyle caption1 = DabblerType.caption1.resolveForDirection(dir);
+    final Widget? meta = _meta(buildContext, colors, dir);
 
     final Widget column = Column(
       crossAxisAlignment: out
@@ -342,10 +370,12 @@ class DabblerMessage extends StatelessWidget {
             ),
             child: Text(
               sender!,
-              style: caption1.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colors.textSecondary,
-              ),
+              style: DabblerType.caption1
+                  .resolveForDirection(dir)
+                  .copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.textSecondary,
+                  ),
             ),
           ),
         bubble,
@@ -361,69 +391,11 @@ class DabblerMessage extends StatelessWidget {
               onToggle: onReact,
             ),
           ),
-        if (withMeta)
-          Padding(
-            padding: const EdgeInsets.only(
-              left: DabblerSpacing.space1,
-              right: DabblerSpacing.space1,
-              top: DabblerMessagingSpacing.metaGap,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                if (timestamp != null)
-                  Text(timestamp!, style: caption1.copyWith(color: metaColor)),
-                if (edited) ...<Widget>[
-                  const SizedBox(width: DabblerSpacing.space1),
-                  Text(
-                    '· $editedLabel',
-                    style: caption1.copyWith(color: metaColor),
-                  ),
-                ],
-                if (showDelivery) ...<Widget>[
-                  const SizedBox(width: DabblerSpacing.space1),
-                  Semantics(
-                    label: d.name,
-                    image: true,
-                    child: DabblerIcon(
-                      d.icon,
-                      weight: d.weight,
-                      size: deliveryGlyph,
-                      color: d.colorFor(colors),
-                    ),
-                  ),
-                ],
-                if (failed && onRetry != null) ...<Widget>[
-                  const SizedBox(width: DabblerSpacing.space1),
-                  DabblerMessagingTap(
-                    key: retryKey,
-                    onTap: onRetry,
-                    label: retryLabel,
-                    scale: false,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        minHeight: DabblerSizing.touchTargetMin,
-                      ),
-                      child: Center(
-                        widthFactor: 1,
-                        child: Text(
-                          retryLabel,
-                          style: caption1.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: colors.error.strong,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
+        ?meta,
       ],
     );
 
-    return LayoutBuilder(
+    final Widget row = LayoutBuilder(
       builder: (BuildContext c, BoxConstraints box) {
         final double avail = box.maxWidth.isFinite ? box.maxWidth : 400;
         // `maxWidth: '76%'` on a flex item resolves against the row's full
@@ -456,6 +428,17 @@ class DabblerMessage extends StatelessWidget {
           ],
         );
       },
+    );
+    if (!fresh || DabblerMotion.reduceMotion(buildContext)) return row;
+    // `dbl-fade-in` over `--motion-slow` under `--ease-out`: opacity only, so
+    // the arriving row takes exactly the box a typing row held.
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: DabblerMotion.slow,
+      curve: DabblerMotion.easeOut,
+      builder: (BuildContext _, double v, Widget? child) =>
+          Opacity(opacity: v, child: child),
+      child: row,
     );
   }
 }

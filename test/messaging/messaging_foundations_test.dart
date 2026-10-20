@@ -57,9 +57,15 @@ void main() {
     expect(DabblerDeliveryState.sending.weight, DabblerIconWeight.linear);
     expect(DabblerDeliveryState.sent.icon, 'tick-circle');
     expect(DabblerDeliveryState.sent.weight, DabblerIconWeight.linear);
-    expect(DabblerDeliveryState.delivered.weight, DabblerIconWeight.bold);
-    expect(DabblerDeliveryState.read.weight, DabblerIconWeight.bold);
+    expect(DabblerDeliveryState.retrying.icon, 'clock');
+    expect(DabblerDeliveryState.retrying.weight, DabblerIconWeight.linear);
+    expect(DabblerDeliveryState.delivered.icon, 'tick-circle');
+    expect(DabblerDeliveryState.delivered.weight, DabblerIconWeight.linear);
+    expect(DabblerDeliveryState.seen.icon, 'eye');
+    expect(DabblerDeliveryState.seen.weight, DabblerIconWeight.linear);
     expect(DabblerDeliveryState.failed.icon, 'danger');
+    expect(DabblerDeliveryState.failed.weight, DabblerIconWeight.bold);
+    expect(DabblerDeliveryState.values.length, 6);
   });
 
   for (final Brightness b in Brightness.values) {
@@ -70,9 +76,10 @@ void main() {
       );
       // --muted glyph -> tertiary; --ink-soft -> secondary.
       expect(DabblerDeliveryState.sending.colorFor(c), c.textTertiary);
+      expect(DabblerDeliveryState.retrying.colorFor(c), c.textTertiary);
       expect(DabblerDeliveryState.sent.colorFor(c), c.textTertiary);
       expect(DabblerDeliveryState.delivered.colorFor(c), c.textSecondary);
-      expect(DabblerDeliveryState.read.colorFor(c), c.brandPrimary);
+      expect(DabblerDeliveryState.seen.colorFor(c), c.brandPrimary);
       expect(DabblerDeliveryState.failed.colorFor(c), c.error.strong);
     });
   }

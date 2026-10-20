@@ -263,19 +263,24 @@ void main() {
     testWidgets('direct shows every state', (WidgetTester tester) async {
       for (final DabblerDeliveryState s in DabblerDeliveryState.values) {
         await pump(tester, s, DabblerMessageContext.direct);
-        expect(find.bySemanticsLabel(s.name), findsOneWidget, reason: s.name);
+        expect(
+          find.bySemanticsLabel(DabblerDeliveryCopy.label(s)),
+          findsOneWidget,
+          reason: s.name,
+        );
       }
     });
-    testWidgets('group shows only sending and failed', (
+    testWidgets('group without a receipt shows only in-flight and failed', (
       WidgetTester tester,
     ) async {
       for (final DabblerDeliveryState s in DabblerDeliveryState.values) {
         await pump(tester, s, DabblerMessageContext.group);
         final bool shown =
             s == DabblerDeliveryState.sending ||
+            s == DabblerDeliveryState.retrying ||
             s == DabblerDeliveryState.failed;
         expect(
-          find.bySemanticsLabel(s.name),
+          find.bySemanticsLabel(DabblerDeliveryCopy.label(s)),
           shown ? findsOneWidget : findsNothing,
           reason: s.name,
         );
@@ -284,18 +289,23 @@ void main() {
     testWidgets('incoming never shows delivery', (WidgetTester tester) async {
       await pump(
         tester,
-        DabblerDeliveryState.read,
+        DabblerDeliveryState.seen,
         DabblerMessageContext.direct,
         dir: DabblerMessageDirection.incoming,
       );
-      expect(find.bySemanticsLabel('read'), findsNothing);
+      expect(
+        find.bySemanticsLabel(
+          DabblerDeliveryCopy.label(DabblerDeliveryState.seen),
+        ),
+        findsNothing,
+      );
     });
     testWidgets('delivery glyph is 14px in its tone', (
       WidgetTester tester,
     ) async {
       await pump(
         tester,
-        DabblerDeliveryState.read,
+        DabblerDeliveryState.seen,
         DabblerMessageContext.direct,
       );
       final DabblerIcon icon = tester.widget<DabblerIcon>(
@@ -366,17 +376,18 @@ void main() {
     );
     final Text retry = tester.widget<Text>(find.text('Again'));
     expect(retry.style!.fontWeight, FontWeight.w700);
-    // Inline position: 3px after the glyph, no extra padding.
+    // Inline position: 3px after the "Not sent" word, no extra padding.
+    expect(find.text('Not sent'), findsOneWidget);
     expect(
       tester.getRect(find.text('Again')).left -
-          tester.getRect(find.byType(DabblerIcon)).right,
+          tester.getRect(find.text('Not sent')).right,
       3,
     );
     await tester.tap(find.text('Again'));
     expect(retries, 1);
   });
 
-  testWidgets('Retry under RTL: 45 target, 3px after the glyph, mirrored', (
+  testWidgets('Retry under RTL: 45 target, 3px after the word, mirrored', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -396,9 +407,9 @@ void main() {
       tester.getSize(find.byKey(DabblerMessage.retryKey)).height,
       greaterThanOrEqualTo(45),
     );
-    // In RTL Retry sits to the LEFT of the glyph, 3px away.
+    // In RTL Retry sits to the LEFT of the "Not sent" word, 3px away.
     expect(
-      tester.getRect(find.byType(DabblerIcon)).left -
+      tester.getRect(find.text('Not sent')).left -
           tester.getRect(find.text('Again')).right,
       3,
     );
@@ -541,7 +552,7 @@ void main() {
                     content: ar ? 'في الطريق' : 'On my way',
                     timestamp: s.name,
                     deliveryState: s,
-                    state: s == DabblerDeliveryState.read
+                    state: s == DabblerDeliveryState.seen
                         ? DabblerMessageState.selected
                         : DabblerMessageState.normal,
                     onRetry: s == DabblerDeliveryState.failed ? () {} : null,

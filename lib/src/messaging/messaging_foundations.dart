@@ -112,24 +112,41 @@ enum DabblerActivityStatus {
   final DabblerStatusTone? tone;
 }
 
-/// Delivery metadata — `DELIVERY` in the source. Never a dominant treatment.
+/// Delivery metadata — `DELIVERY` in the source (messaging §11, KAN-580).
+/// Never a dominant treatment.
+///
+/// Sent means the server accepted the message, delivered means at least one
+/// recipient device received it, seen means at least one recipient viewed it.
+/// Sent and delivered share the linear tick and differ by tone; seen is the
+/// eye glyph in the brand colour, so meaning is never colour alone.
 enum DabblerDeliveryState {
-  /// In flight.
+  /// Queued on the device.
   sending('clock', DabblerIconWeight.linear),
 
-  /// Handed to the server.
+  /// A manual retry is in flight.
+  retrying('clock', DabblerIconWeight.linear),
+
+  /// The server accepted it.
   sent('tick-circle', DabblerIconWeight.linear),
 
-  /// Reached the recipient.
-  delivered('tick-circle', DabblerIconWeight.bold),
+  /// At least one recipient device received it.
+  delivered('tick-circle', DabblerIconWeight.linear),
 
-  /// Seen.
-  read('tick-circle', DabblerIconWeight.bold),
+  /// At least one recipient viewed it.
+  seen('eye', DabblerIconWeight.linear),
 
   /// Not sent.
   failed('danger', DabblerIconWeight.bold);
 
   const DabblerDeliveryState(this.icon, this.weight);
+
+  /// The former name of [seen], kept so existing callers still compile.
+  @Deprecated('Use DabblerDeliveryState.seen.')
+  static const DabblerDeliveryState read = seen;
+
+  /// Whether the message is still in flight (sending or retrying), which is
+  /// what dims the bubble and what a group message keeps showing as a glyph.
+  bool get inFlight => this == sending || this == retrying;
 
   /// The Iconsax glyph.
   final String icon;
@@ -143,7 +160,7 @@ enum DabblerDeliveryState {
   /// |---|---|---|
   /// | `--muted` (sending, sent) | [DabblerColors.textTertiary] | `#8C8C8C` |
   /// | `--ink-soft` (delivered) | [DabblerColors.textSecondary] | `#404040` |
-  /// | `--color-brand-primary` (read) | [DabblerColors.brandPrimary] | theme |
+  /// | `--color-brand-primary` (seen) | [DabblerColors.brandPrimary] | theme |
   /// | `--color-status-error-strong` (failed) | error `strong` | theme |
   ///
   /// The glyph is an icon, not text, so `--muted` takes the tertiary role
@@ -153,9 +170,9 @@ enum DabblerDeliveryState {
   /// light-only `DabblerPalette.inkSoft` literal). This keeps the source's
   /// sent/delivered contrast: same glyph family, lighter tone until delivered.
   Color colorFor(DabblerColors colors) => switch (this) {
-    sending || sent => colors.textTertiary,
+    sending || retrying || sent => colors.textTertiary,
     delivered => colors.textSecondary,
-    read => colors.brandPrimary,
+    seen => colors.brandPrimary,
     failed => colors.error.strong,
   };
 }

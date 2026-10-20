@@ -5,6 +5,7 @@ import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_type.dart';
 import 'message.dart';
+import 'message_receipts.dart';
 import 'messaging_atoms.dart';
 import 'messaging_foundations.dart';
 import 'messaging_parts.dart';
@@ -38,8 +39,24 @@ class DabblerThreadMessage extends DabblerThreadItem {
     this.showSender,
     this.showAvatar,
     this.onRetry,
-    this.retryLabel = 'Retry',
+    this.retryLabel,
+    this.receipt,
+    this.onReceipts,
+    this.showDeliveryLabel = false,
+    this.fresh = false,
   });
+
+  /// Group receipt tally for an outgoing group message.
+  final DabblerReceipt? receipt;
+
+  /// Opens this message's info drawer. Overrides the thread's `onReceipts`.
+  final VoidCallback? onReceipts;
+
+  /// Spells the delivery word (the newest outgoing message in a direct chat).
+  final bool showDeliveryLabel;
+
+  /// A message that has just arrived; it fades in.
+  final bool fresh;
 
   /// The `edited` text.
   final String editedLabel;
@@ -53,8 +70,8 @@ class DabblerThreadMessage extends DabblerThreadItem {
   /// Retry for a failed message (the source forwards every item field).
   final VoidCallback? onRetry;
 
-  /// The retry text.
-  final String retryLabel;
+  /// The retry text; defaults to the thread's language word.
+  final String? retryLabel;
 
   /// A stable id, compared with the thread's `selectedId`.
   final String? id;
@@ -228,7 +245,20 @@ class DabblerMessageThread extends StatefulWidget {
     this.onMessagePress,
     this.selectedId,
     this.onReact,
+    this.lang = 'en',
+    this.onReceipts,
+    this.onRetry,
   });
+
+  /// `en` or `ar`, for the default delivery and receipt words.
+  final String lang;
+
+  /// Called with the message when its group receipt count is pressed.
+  final ValueChanged<DabblerThreadMessage>? onReceipts;
+
+  /// Called with a failed message when its Retry is pressed, unless the item
+  /// carries its own `onRetry`.
+  final ValueChanged<DabblerThreadMessage>? onRetry;
 
   /// The rows.
   final List<DabblerThreadItem> items;
@@ -417,9 +447,18 @@ class _DabblerMessageThreadState extends State<DabblerMessageThread> {
           editedLabel: it.editedLabel,
           showSender: it.showSender,
           showAvatar: it.showAvatar,
-          onRetry: it.onRetry,
+          onRetry:
+              it.onRetry ??
+              (widget.onRetry == null ? null : () => widget.onRetry!(it)),
           retryLabel: it.retryLabel,
+          lang: widget.lang,
           deliveryState: it.deliveryState,
+          receipt: it.receipt,
+          showDeliveryLabel: it.showDeliveryLabel,
+          fresh: it.fresh,
+          onReceipts:
+              it.onReceipts ??
+              (widget.onReceipts == null ? null : () => widget.onReceipts!(it)),
           reactions: it.reactions,
           state: selected ? DabblerMessageState.selected : it.state,
           onPress: widget.onMessagePress == null
