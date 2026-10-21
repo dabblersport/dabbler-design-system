@@ -370,6 +370,8 @@ class DabblerMessage extends StatelessWidget {
             ),
             child: Text(
               sender!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: DabblerType.caption1
                   .resolveForDirection(dir)
                   .copyWith(

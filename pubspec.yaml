@@ -1,7 +1,7 @@
 name: dabbler_design_system
 description: "Dabbler design system — a runnable Flutter package whose entry point is the component gallery."
 publish_to: "none"
-version: 0.1.0+1
+version: 0.1.1+1
 
 environment:
   sdk: ^3.8.1
