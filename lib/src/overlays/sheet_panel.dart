@@ -144,6 +144,8 @@ class _DabblerSheetState extends State<DabblerSheet> {
           visible: widget.open,
           onDismiss: _canDismiss ? _close : null,
           dismissLabel: widget.scrimLabel,
+          // The wash leaves over the same time as the panel slide (KAN-619).
+          fadeDuration: DabblerMotion.slow,
           child: Align(
             alignment: Alignment.bottomCenter,
             child: IgnorePointer(ignoring: !widget.open, child: panel),

@@ -56,6 +56,7 @@ class DabblerScrim extends StatelessWidget {
     this.visible = true,
     this.onDismiss,
     this.dismissLabel,
+    this.fadeDuration,
     this.child,
   });
 
@@ -82,6 +83,12 @@ class DabblerScrim extends StatelessWidget {
   /// overlay, which knows what is being dismissed; this package ships no
   /// strings of its own.
   final String? dismissLabel;
+
+  /// How long the fade takes, in both directions. Null keeps
+  /// [DabblerMotion.base]. An overlay whose panel moves over a different time
+  /// passes that time, so the wash and the panel finish together. Ignored
+  /// when reduced motion is on.
+  final Duration? fadeDuration;
 
   /// Optional content drawn on top of the wash — a panel, when the overlay
   /// prefers one widget to a [Stack].
@@ -110,7 +117,9 @@ class DabblerScrim extends StatelessWidget {
 
     final Widget faded = AnimatedOpacity(
       opacity: visible ? 1 : 0,
-      duration: reduceMotion ? Duration.zero : DabblerMotion.base,
+      duration: reduceMotion
+          ? Duration.zero
+          : (fadeDuration ?? DabblerMotion.base),
       curve: DabblerMotion.easeOut,
       // Two reasons to ignore pointers. A faded-out scrim must not keep
       // swallowing them on its way out, or the screen beneath stays dead
