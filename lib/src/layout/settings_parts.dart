@@ -28,6 +28,7 @@ class DabblerSettingsHeader extends StatelessWidget {
     this.versionLabel,
     this.subtitle,
     this.identity,
+    this.tint,
   });
 
   /// The page title, in the display face.
@@ -46,6 +47,10 @@ class DabblerSettingsHeader extends StatelessWidget {
   /// `flat: true` and `showDivider: false`.
   final Widget? identity;
 
+  /// The band's ground. Null paints the brand tint ([tintFor]); a screen with
+  /// its own header colour (Messaging's `surfaceHeaderMessages`) passes it.
+  final Color? tint;
+
   /// The brand share of the tint — `color-mix(brand 14%, #FFF)`.
   static const double tintAlpha = 0.14;
 
@@ -60,7 +65,7 @@ class DabblerSettingsHeader extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
     return ColoredBox(
-      color: tintFor(colors),
+      color: tint ?? tintFor(colors),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

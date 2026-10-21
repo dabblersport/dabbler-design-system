@@ -18,6 +18,7 @@ Widget _host(Widget child, Brightness b, TextDirection dir) => MediaQuery(
 );
 
 void main() {
+  settingsHeaderTintTests();
   group('surfaceHeaderMessages token', () {
     test('is #DCEAFB in light and #16243F in dark, in every theme', () {
       for (final DabblerTheme t in DabblerTheme.values) {
@@ -108,5 +109,48 @@ void main() {
         );
       }
     }
+  });
+}
+
+void settingsHeaderTintTests() {
+  group('DabblerSettingsHeader tint', () {
+    Future<Color> bandColor(WidgetTester t, {Color? tint}) async {
+      await t.pumpWidget(
+        _host(
+          DabblerSettingsHeader(title: 'Messages', tint: tint),
+          Brightness.light,
+          TextDirection.ltr,
+        ),
+      );
+      return t
+          .widget<ColoredBox>(
+            find
+                .descendant(
+                  of: find.byType(DabblerSettingsHeader),
+                  matching: find.byType(ColoredBox),
+                )
+                .first,
+          )
+          .color;
+    }
+
+    testWidgets('null keeps the brand tint', (t) async {
+      final DabblerColors c = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      expect(await bandColor(t), DabblerSettingsHeader.tintFor(c));
+    });
+
+    testWidgets('a given tint paints the band', (t) async {
+      final DabblerColors c = DabblerColors.resolve(
+        theme: DabblerTheme.main,
+        brightness: Brightness.light,
+      );
+      expect(
+        await bandColor(t, tint: c.surfaceHeaderMessages),
+        c.surfaceHeaderMessages,
+      );
+    });
   });
 }
