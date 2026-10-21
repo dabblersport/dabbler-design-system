@@ -195,6 +195,8 @@ class DabblerReceiptsSheet extends StatelessWidget {
     this.groups = const <DabblerReceiptGroup>[],
     this.note,
     this.lang = 'en',
+    this.allLabel,
+    this.nobodyLabel,
   });
 
   /// The message being inspected, drawn as a brand bubble (two lines at most).
@@ -208,6 +210,34 @@ class DabblerReceiptsSheet extends StatelessWidget {
 
   /// `en` or `ar`, for the default headings and captions.
   final String lang;
+
+  /// The tile value shown instead of a count when every recipient is in that
+  /// state (Seen and Delivered tiles). Defaults to `All` / `الجميع`.
+  final String? allLabel;
+
+  /// The tile value shown instead of 0 on the Not yet tile. Defaults to
+  /// `Nobody` / `لا أحد`.
+  final String? nobodyLabel;
+
+  /// The default [allLabel] in [lang].
+  static String defaultAll(String lang) => lang == 'ar' ? 'الجميع' : 'All';
+
+  /// The default [nobodyLabel] in [lang].
+  static String defaultNobody(String lang) =>
+      lang == 'ar' ? 'لا أحد' : 'Nobody';
+
+  /// The value a tile for [g] shows: a word where it reads better than the
+  /// count, else the count. [total] is every recipient across all groups.
+  /// Seen and Delivered read "All" when every recipient is in the state; Not
+  /// yet reads "Nobody" at zero and never "All".
+  String _tileValue(DabblerReceiptGroup g, int total) {
+    final int n = g.people.length;
+    if (g.state == DabblerDeliveryState.seen ||
+        g.state == DabblerDeliveryState.delivered) {
+      return total > 0 && n == total ? (allLabel ?? defaultAll(lang)) : '$n';
+    }
+    return n == 0 ? (nobodyLabel ?? defaultNobody(lang)) : '$n';
+  }
 
   /// Identifies summary tile [index] (for tests and tooling).
   static Key tileKeyAt(int index) => ValueKey<String>('receipts-tile-$index');
@@ -225,6 +255,8 @@ class DabblerReceiptsSheet extends StatelessWidget {
     String? note,
     String lang = 'en',
     String? closeLabel,
+    String? allLabel,
+    String? nobodyLabel,
   }) {
     return showDabblerSheet<void>(
       context: context,
@@ -236,6 +268,8 @@ class DabblerReceiptsSheet extends StatelessWidget {
         groups: groups,
         note: note,
         lang: lang,
+        allLabel: allLabel,
+        nobodyLabel: nobodyLabel,
       ),
     );
   }
@@ -245,6 +279,10 @@ class DabblerReceiptsSheet extends StatelessWidget {
     final DabblerColors colors = DabblerColors.of(context);
     final TextDirection dir = Directionality.of(context);
     final TextStyle caption1 = DabblerType.caption1.resolveForDirection(dir);
+    final int total = groups.fold<int>(
+      0,
+      (int sum, DabblerReceiptGroup g) => sum + g.people.length,
+    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -288,7 +326,9 @@ class DabblerReceiptsSheet extends StatelessWidget {
             spacing: DabblerSpacing.space2,
             children: <Widget>[
               for (int gi = 0; gi < groups.length; gi++)
-                Expanded(child: _tile(groups[gi], gi, colors, dir, caption1)),
+                Expanded(
+                  child: _tile(groups[gi], gi, total, colors, dir, caption1),
+                ),
             ],
           ),
         for (int gi = 0; gi < groups.length; gi++)
@@ -303,48 +343,66 @@ class DabblerReceiptsSheet extends StatelessWidget {
   Widget _tile(
     DabblerReceiptGroup g,
     int gi,
+    int total,
     DabblerColors colors,
     TextDirection dir,
     TextStyle caption1,
   ) {
-    return DecoratedBox(
-      key: tileKeyAt(gi),
-      decoration: BoxDecoration(
-        color: colors.surfaceSunken,
-        borderRadius: DabblerRadius.mdAll,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(DabblerSpacing.space3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          spacing: DabblerSpacing.space1,
-          children: <Widget>[
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: DabblerSpacing.space1,
-              children: <Widget>[
-                DabblerIcon(
-                  g.state.icon,
-                  weight: g.state.weight,
-                  size: 16,
-                  color: g.state.colorFor(colors),
-                ),
-                Text(
-                  '${g.people.length}',
-                  style: DabblerType.headline
-                      .resolveForDirection(dir)
-                      .copyWith(color: colors.textPrimary),
-                ),
-              ],
-            ),
-            Text(
-              g.shortLabel ?? DabblerReceiptGroup.captionFor(g.state, lang),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: caption1.copyWith(color: colors.textSecondary),
-            ),
-          ],
+    final String value = _tileValue(g, total);
+    final String caption =
+        g.shortLabel ?? DabblerReceiptGroup.captionFor(g.state, lang);
+    return Semantics(
+      container: true,
+      excludeSemantics: true,
+      label: '$caption: $value',
+      child: DecoratedBox(
+        key: tileKeyAt(gi),
+        decoration: BoxDecoration(
+          color: colors.surfaceSunken,
+          borderRadius: DabblerRadius.mdAll,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(DabblerSpacing.space3),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            spacing: DabblerSpacing.space1,
+            children: <Widget>[
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: DabblerSpacing.space1,
+                children: <Widget>[
+                  DabblerIcon(
+                    g.state.icon,
+                    weight: g.state.weight,
+                    size: 16,
+                    color: g.state.colorFor(colors),
+                  ),
+                  // A word ("Nobody") is wider than a digit: shrink to fit the
+                  // tile instead of clipping it.
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        value,
+                        maxLines: 1,
+                        style: DabblerType.headline
+                            .resolveForDirection(dir)
+                            .copyWith(color: colors.textPrimary),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                caption,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: caption1.copyWith(color: colors.textSecondary),
+              ),
+            ],
+          ),
         ),
       ),
     );
