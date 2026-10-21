@@ -33,6 +33,16 @@ enum DabblerNavigationActionTone {
   subtle,
 }
 
+/// The tint a [DabblerNavigationTopBar] paints behind its bar while the page is
+/// at the top, when `heroTint` is on.
+enum DabblerNavigationHeroTone {
+  /// The brand tint of the Settings and Profile heroes — the default.
+  brand,
+
+  /// The pastel-blue Messaging header, `--surface-header-messages`.
+  messages,
+}
+
 /// One trailing action in a [DabblerNavigationTopBar].
 ///
 /// The source's export carries these as free-form `text1` / `text2` node slots
@@ -228,6 +238,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
        scrollController = null,
        titleRevealOffset = defaultTitleRevealOffset,
        heroTint = false,
+       heroTone = DabblerNavigationHeroTone.brand,
        centerTitle = false;
 
   /// The titled variant: a back button, a title and trailing actions — the
@@ -264,6 +275,7 @@ class DabblerNavigationTopBar extends StatelessWidget {
     this.scrollController,
     this.titleRevealOffset = defaultTitleRevealOffset,
     this.heroTint = false,
+    this.heroTone = DabblerNavigationHeroTone.brand,
     this.centerTitle = false,
   }) : _titled = true,
        metrics = DabblerFeedMetrics.touch,
@@ -349,6 +361,11 @@ class DabblerNavigationTopBar extends StatelessWidget {
   /// [scrollController]; titled variant only. Overrides [transparent] and
   /// [border].
   final bool heroTint;
+
+  /// The tint [heroTint] paints at the top of the page: the brand tint by
+  /// default, or the Messaging pastel blue. Titled variant only; ignored
+  /// without [heroTint].
+  final DabblerNavigationHeroTone heroTone;
 
   /// [titleRevealOffset]'s default — the `18` floor of
   /// `Math.max(el.offsetHeight - 52, 18)` (`Profiles.dc.html:818`),
@@ -625,7 +642,12 @@ class DabblerNavigationTopBar extends StatelessWidget {
           decoration: BoxDecoration(
             color: scrolled
                 ? colors.bgPrimary
-                : DabblerSettingsHeader.tintFor(colors),
+                : switch (heroTone) {
+                    DabblerNavigationHeroTone.brand =>
+                      DabblerSettingsHeader.tintFor(colors),
+                    DabblerNavigationHeroTone.messages =>
+                      colors.surfaceHeaderMessages,
+                  },
             border: Border(
               bottom: BorderSide(
                 color: scrolled

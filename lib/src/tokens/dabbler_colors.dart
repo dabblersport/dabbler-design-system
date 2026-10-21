@@ -195,6 +195,7 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
     required this.info,
     required this.spotlight,
     required this.scrim,
+    required this.surfaceHeaderMessages,
   });
 
   /// The section theme this instance resolves.
@@ -299,6 +300,11 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
   /// Menu). Ink at 45% in light, `--ink-950` at 65% in dark. Overlays consume
   /// this and never invent their own opacity.
   final Color scrim;
+
+  /// `--surface-header-messages` — the pastel-blue ground of the Messaging
+  /// header. The same in every section theme; it varies only by brightness
+  /// (light #DCEAFB, dark #16243F).
+  final Color surfaceHeaderMessages;
 
   /// The status tone for [tone].
   DabblerStatusColor status(DabblerStatusTone tone) => switch (tone) {
@@ -487,6 +493,9 @@ class DabblerColors extends ThemeExtension<DabblerColors> {
       scrim: dark
           ? DabblerPalette.ink950.withValues(alpha: 0.65)
           : DabblerPalette.ink.withValues(alpha: 0.45),
+      surfaceHeaderMessages: dark
+          ? DabblerProvisionalDark.messagesHeaderDark
+          : DabblerProvisionalDark.messagesHeaderLight,
     );
   }
 

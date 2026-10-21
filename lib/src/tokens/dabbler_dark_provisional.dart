@@ -144,6 +144,16 @@ abstract final class DabblerProvisionalDark {
 
   /// `[data-theme="bright"][data-mode="dark"] --t-on-warning` — `#F6D9C2`.
   static const Color brightWarningInk = Color(0xFFF6D9C2);
+
+  // --- Messaging header (`Messaging.dc.html` frames 40-43) ---
+
+  /// `--surface-header-messages`, light — the pastel-blue Messaging header.
+  /// `#DCEAFB` is [DabblerPalette.tileInfoSurface], re-exported by reference
+  /// beside its dark pair rather than re-declared.
+  static const Color messagesHeaderLight = DabblerPalette.tileInfoSurface;
+
+  /// `--surface-header-messages`, dark.
+  static const Color messagesHeaderDark = Color(0xFF16243F);
 }
 
 /// The six per-theme status tints of the **light** theme layer.
