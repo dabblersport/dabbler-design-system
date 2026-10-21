@@ -57,7 +57,7 @@ void main() {
       expect(p.didExceedMaxLines, isTrue);
       expect(
         p.size.height,
-        lessThanOrEqualTo(DabblerType.caption1.fontSize! * 1.6),
+        lessThanOrEqualTo(DabblerType.caption1.fontSize * 1.6),
       );
     });
   }
