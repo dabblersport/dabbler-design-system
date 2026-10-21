@@ -24,6 +24,13 @@ enum DabblerTabsVariant {
   /// fill. For two or three peer views; always full width.
   segmented,
 
+  /// [segmented]'s track with a **card-coloured thumb** under the selected
+  /// segment, for the Auto / Manual mode switch (`LocationModeSwitch`,
+  /// `Location.dc.html:1270` "Sunken track, card thumb, 39px segments inside
+  /// a 45px target"). Same geometry as [segmented]; only the colours differ
+  /// — see [DabblerTabs] *Card thumb*.
+  segmentedCard,
+
   /// The Home Feed's tab rail, as the frame measures it
   /// (`home-design-measure.md` section 5): label-width tabs 21 apart, every
   /// label at the regular weight (active differs by ink and underline only),
@@ -142,6 +149,18 @@ class DabblerTabItem {
 /// | indicator | 2px [DabblerColors.brandPrimary] | — (solid fill) |
 /// | rail | 1px [DabblerColors.bgTertiary] (`--faint`) | — |
 /// | track | — | [DabblerColors.surfaceSunken], [DabblerRadius.pill] |
+///
+/// ## Card thumb ([DabblerTabsVariant.segmentedCard])
+///
+/// Read from `Location.dc.html` (Claude Design project 60c6ce9d, synced
+/// 2026-10-21): the track is `background: var(--surface-sunken)` (`:539`),
+/// and each segment is painted by `:1169` as
+/// `bg: on ? var(--surface-card) : transparent`,
+/// `fg: on ? var(--ink) : var(--muted)`. `--ink` is `--color-text-primary`
+/// and `--muted` is `--color-text-tertiary` (`:29`). The source gives the
+/// thumb no border and no shadow (`:541`), so none is drawn. Selected:
+/// [DabblerColors.surfaceCard] with [DabblerColors.textPrimary]; unselected:
+/// transparent with [DabblerColors.textTertiary].
 ///
 /// Labels are [DabblerType.subheadline] at [DabblerType.medium] when active and
 /// [DabblerType.regular] otherwise. Flat throughout: no shadow, no gradient.
@@ -281,7 +300,11 @@ class _DabblerTabsState extends State<DabblerTabs> {
     return found < 0 ? 0 : found;
   }
 
-  bool get _segmented => widget.variant == DabblerTabsVariant.segmented;
+  /// Both segmented treatments share the track, the 39/45 geometry and the
+  /// roving focus; [_cardThumb] only switches the thumb and label colours.
+  bool get _segmented =>
+      widget.variant == DabblerTabsVariant.segmented || _cardThumb;
+  bool get _cardThumb => widget.variant == DabblerTabsVariant.segmentedCard;
   bool get _feed => widget.variant == DabblerTabsVariant.feed;
   bool get _listing => widget.variant == DabblerTabsVariant.listing;
 
@@ -722,7 +745,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
   }) {
     final DabblerTabItem item = widget.items[index];
 
-    final Color foreground = _segmented
+    final Color foreground = _cardThumb
+        ? (active ? colors.textPrimary : colors.textTertiary)
+        : _segmented
         ? (active ? colors.onBrand : colors.textSecondary)
         : (active ? colors.textPrimary : colors.textSecondary);
 
@@ -776,7 +801,9 @@ class _DabblerTabsState extends State<DabblerTabs> {
             ),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: active ? colors.brandPrimary : null,
+              color: active
+                  ? (_cardThumb ? colors.surfaceCard : colors.brandPrimary)
+                  : null,
               borderRadius: DabblerRadius.pillAll,
             ),
             child: content,
