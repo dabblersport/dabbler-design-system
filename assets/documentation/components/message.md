@@ -43,7 +43,7 @@ The six delivery states with the word spelled, the group receipt count in each t
 
 **Words come from `lang` or a prop.** `lang` (`en` or `ar`) selects the delivery and receipt words; `editedLabel`, `retryLabel` and `deliveryLabel` override them for any other language.
 
-**Message info is its own body.** `DabblerReceiptsSheet` is the body of the Message info drawer: the message, three summary tiles (seen, delivered, not yet) and a list per state with the people and the time each was reached. `DabblerReceiptsSheet.show` presents it as a content-height sheet; build the widget directly to embed it. It takes data in and reports nothing out except the sheet's own close.
+**Message info is its own body.** `DabblerReceiptsSheet` is the body of the Message info drawer: the message, three summary tiles (seen, delivered, not yet) and a list per state with the people and the time each was reached. `DabblerReceiptsSheet.show` presents it as a content-height sheet; build the widget directly to embed it. It takes data in and reports nothing out except the sheet's own close. A summary tile reads "All" instead of its count when every recipient is in the seen or delivered state, and the not-yet tile reads "Nobody" instead of 0; both words are props (`allLabel`, `nobodyLabel`) with English and Arabic defaults, and each tile announces caption and value together.
 
 ## Axes
 
@@ -66,6 +66,7 @@ The selected outline is 2px at a 2px offset; press scale 0.98; sending opacity 0
 
 ## Change log
 
+- Receipts stat tiles read "All" and "Nobody" in place of a full-group count and a zero (KAN-614): new optional `allLabel` and `nobodyLabel` on `DabblerReceiptsSheet`; each tile has one merged Semantics label.
 - Delivery states follow messaging section 11 (KAN-580): `read` is now `seen` and draws the brand eye; delivered is the linear tick; `retrying` is new; a group message shows one receipt count in place of the glyph; a failed message spells "Not sent"; `fresh` fades a new row in. `DabblerDeliveryState.read` stays as a deprecated alias.
 - Corrected against the hand-transcribed mirror of the live source (no byte or pixel check): the bubble width cap is 76% of the whole row (it was computed after removing the avatar gutter); the sender name and the reaction row now sit 3px from the bubble; the selected outline no longer adds 4px of layout around the bubble; Retry sits 3px after the glyph instead of 9px; the reply reference spans the bubble's width; the sending fade animates. Retry keeps its 45px height by growing the metadata line, because Flutter has no negative margin.
 
