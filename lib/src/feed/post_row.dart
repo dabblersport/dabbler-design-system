@@ -105,6 +105,8 @@ class DabblerPostRow extends StatelessWidget {
     this.segments,
     this.sportLabel,
     this.sportLeading,
+    this.placeTagLabel,
+    this.placeTagLeading,
     this.showActions = true,
     this.likes = 0,
     this.replies = 0,
@@ -228,6 +230,15 @@ class DabblerPostRow extends StatelessWidget {
 
   /// An optional leading glyph for the sport pill (a widget slot, never emoji).
   final Widget? sportLeading;
+
+  /// KAN-592: the place the post is ABOUT (a venue, street, area or address),
+  /// drawn as a pill beside the sport pill in the same style. It is not the
+  /// header's [place], which is where the author posted from. Omitted when
+  /// null or blank.
+  final String? placeTagLabel;
+
+  /// An optional leading glyph for the place pill (a widget slot, never emoji).
+  final Widget? placeTagLeading;
 
   /// The like count.
   final int likes;
@@ -438,52 +449,72 @@ class DabblerPostRow extends StatelessWidget {
       style: bodyStyle,
     );
 
+    Widget pill(String label, Widget? leading) => DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: DabblerRadius.pillAll,
+        border: Border.all(
+          color: colors.borderDefault,
+          width: DabblerSizing.borderDefault,
+        ),
+      ),
+      child: _sportBox(
+        Padding(
+          padding: _drawn
+              ? const EdgeInsetsDirectional.fromSTEB(
+                  DabblerSpacing.space3 + DabblerSizing.borderDefault,
+                  DabblerHomeFrame.sportPillPaddingBlock +
+                      DabblerSizing.borderDefault,
+                  DabblerHomeFrame.sportPillPaddingEnd +
+                      DabblerSizing.borderDefault,
+                  DabblerHomeFrame.sportPillPaddingBlock +
+                      DabblerSizing.borderDefault,
+                )
+              : const EdgeInsetsDirectional.fromSTEB(
+                  DabblerSpacing.space3,
+                  DabblerSpacing.space2,
+                  DabblerSpacing.space4,
+                  DabblerSpacing.space2,
+                ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              if (leading != null) ...<Widget>[
+                leading,
+                SizedBox(
+                  width: _drawn
+                      ? DabblerHomeFrame.sportPillGap
+                      : DabblerSpacing.space2,
+                ),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: caption,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
     final Widget? sport = sportLabel == null
+        ? null
+        : pill(sportLabel!, sportLeading);
+    final String? placeTagText = placeTagLabel?.trim();
+    final Widget? placeTag = placeTagText == null || placeTagText.isEmpty
+        ? null
+        : pill(placeTagText, placeTagLeading);
+    final Widget? pills = sport == null && placeTag == null
         ? null
         : Align(
             alignment: AlignmentDirectional.centerStart,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: DabblerRadius.pillAll,
-                border: Border.all(
-                  color: colors.borderDefault,
-                  width: DabblerSizing.borderDefault,
-                ),
-              ),
-              child: _sportBox(
-                Padding(
-                  padding: _drawn
-                      ? const EdgeInsetsDirectional.fromSTEB(
-                          DabblerSpacing.space3 + DabblerSizing.borderDefault,
-                          DabblerHomeFrame.sportPillPaddingBlock +
-                              DabblerSizing.borderDefault,
-                          DabblerHomeFrame.sportPillPaddingEnd +
-                              DabblerSizing.borderDefault,
-                          DabblerHomeFrame.sportPillPaddingBlock +
-                              DabblerSizing.borderDefault,
-                        )
-                      : const EdgeInsetsDirectional.fromSTEB(
-                          DabblerSpacing.space3,
-                          DabblerSpacing.space2,
-                          DabblerSpacing.space4,
-                          DabblerSpacing.space2,
-                        ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      if (sportLeading != null) ...<Widget>[
-                        sportLeading!,
-                        SizedBox(
-                          width: _drawn
-                              ? DabblerHomeFrame.sportPillGap
-                              : DabblerSpacing.space2,
-                        ),
-                      ],
-                      Text(sportLabel!, maxLines: 1, style: caption),
-                    ],
-                  ),
-                ),
-              ),
+            child: Wrap(
+              spacing: DabblerSpacing.space2,
+              runSpacing: DabblerSpacing.space2,
+              children: <Widget>[?sport, ?placeTag],
             ),
           );
 
@@ -606,9 +637,9 @@ class DabblerPostRow extends StatelessWidget {
                     const SizedBox(height: DabblerSpacing.space3),
                     ClipRRect(borderRadius: DabblerRadius.lgAll, child: media),
                   ],
-                  if (sport != null) ...<Widget>[
+                  if (pills != null) ...<Widget>[
                     const SizedBox(height: DabblerSpacing.space3),
-                    sport,
+                    pills,
                   ],
                   if (detail != null) DabblerPostDetailLine(detail: detail!),
                   // 6 of gap plus the action row's own 6 margin.
