@@ -105,6 +105,7 @@ class DabblerPostRow extends StatelessWidget {
     this.segments,
     this.sportLabel,
     this.sportLeading,
+    this.onSportTap,
     this.placeTagLabel,
     this.placeTagLeading,
     this.showActions = true,
@@ -230,6 +231,10 @@ class DabblerPostRow extends StatelessWidget {
 
   /// An optional leading glyph for the sport pill (a widget slot, never emoji).
   final Widget? sportLeading;
+
+  /// KAN-622: taps on the sport pill. When set the pill is a button; when null
+  /// it is drawn exactly as before and takes no taps.
+  final VoidCallback? onSportTap;
 
   /// KAN-592: the place the post is ABOUT (a venue, street, area or address),
   /// drawn as a pill beside the sport pill in the same style. It is not the
@@ -502,7 +507,16 @@ class DabblerPostRow extends StatelessWidget {
 
     final Widget? sport = sportLabel == null
         ? null
-        : pill(sportLabel!, sportLeading);
+        : onSportTap == null
+        ? pill(sportLabel!, sportLeading)
+        : Semantics(
+            button: true,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onSportTap,
+              child: pill(sportLabel!, sportLeading),
+            ),
+          );
     final String? placeTagText = placeTagLabel?.trim();
     final Widget? placeTag = placeTagText == null || placeTagText.isEmpty
         ? null

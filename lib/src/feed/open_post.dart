@@ -54,6 +54,7 @@ class DabblerOpenPost extends StatelessWidget {
     this.segments = const <DabblerPostSegment>[],
     this.media,
     this.sportLabel,
+    this.onSportTap,
     this.sportIcon = 'game',
     this.placeLabel,
     this.chips,
@@ -115,6 +116,10 @@ class DabblerOpenPost extends StatelessWidget {
 
   /// The sport pill's text; null hides it.
   final String? sportLabel;
+
+  /// KAN-622: taps on the sport pill. When set the pill is a button; when null
+  /// it is drawn exactly as before and takes no taps.
+  final VoidCallback? onSportTap;
 
   /// The sport pill's glyph.
   final String sportIcon;
@@ -196,6 +201,17 @@ class DabblerOpenPost extends StatelessWidget {
       ),
     ),
   );
+
+  Widget _tappable(VoidCallback? onTap, Widget pill) => onTap == null
+      ? pill
+      : Semantics(
+          button: true,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+            child: pill,
+          ),
+        );
 
   Widget _pill({
     required Widget child,
@@ -372,25 +388,28 @@ class DabblerOpenPost extends StatelessWidget {
 
     final List<Widget> pills = <Widget>[
       if (sportLabel != null)
-        _pill(
-          fill: colors.brandPrimary,
-          line: null,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              DabblerIcon(
-                sportIcon,
-                size: 14,
-                weight: DabblerIconWeight.bold,
-                color: colors.onBrand,
-              ),
-              const SizedBox(width: DabblerSpacing.space2),
-              Text(
-                sportLabel!,
-                maxLines: 1,
-                style: chipText.copyWith(color: colors.onBrand),
-              ),
-            ],
+        _tappable(
+          onSportTap,
+          _pill(
+            fill: colors.brandPrimary,
+            line: null,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                DabblerIcon(
+                  sportIcon,
+                  size: 14,
+                  weight: DabblerIconWeight.bold,
+                  color: colors.onBrand,
+                ),
+                const SizedBox(width: DabblerSpacing.space2),
+                Text(
+                  sportLabel!,
+                  maxLines: 1,
+                  style: chipText.copyWith(color: colors.onBrand),
+                ),
+              ],
+            ),
           ),
         ),
       if (placeLabel != null)
