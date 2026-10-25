@@ -108,6 +108,8 @@ class DabblerPostRow extends StatelessWidget {
     this.onSportTap,
     this.placeTagLabel,
     this.placeTagLeading,
+    this.vibeTagLabel,
+    this.vibeTagLeading,
     this.showActions = true,
     this.likes = 0,
     this.replies = 0,
@@ -244,6 +246,13 @@ class DabblerPostRow extends StatelessWidget {
 
   /// An optional leading glyph for the place pill (a widget slot, never emoji).
   final Widget? placeTagLeading;
+
+  /// The post's vibe, already localised, drawn as the FIRST pill, before the sport and
+  /// place pills in the same style. Omitted when null or blank.
+  final String? vibeTagLabel;
+
+  /// An optional leading glyph for the vibe pill (a widget slot, never emoji).
+  final Widget? vibeTagLeading;
 
   /// The like count.
   final int likes;
@@ -521,14 +530,18 @@ class DabblerPostRow extends StatelessWidget {
     final Widget? placeTag = placeTagText == null || placeTagText.isEmpty
         ? null
         : pill(placeTagText, placeTagLeading);
-    final Widget? pills = sport == null && placeTag == null
+    final String? vibeTagText = vibeTagLabel?.trim();
+    final Widget? vibeTag = vibeTagText == null || vibeTagText.isEmpty
+        ? null
+        : pill(vibeTagText, vibeTagLeading);
+    final Widget? pills = sport == null && placeTag == null && vibeTag == null
         ? null
         : Align(
             alignment: AlignmentDirectional.centerStart,
             child: Wrap(
               spacing: DabblerSpacing.space2,
               runSpacing: DabblerSpacing.space2,
-              children: <Widget>[?sport, ?placeTag],
+              children: <Widget>[?vibeTag, ?sport, ?placeTag],
             ),
           );
 
