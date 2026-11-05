@@ -33,7 +33,8 @@ class DabblerNavigationTab {
 ///
 /// | Source | Here | Why |
 /// |---|---|---|
-/// | `384 x 47` frame | flexible width, content height | a Figma frame measurement |
+/// | `width: 384`, `maxWidth: 384` | [barWidth], as a **max** | the tabs are `flexGrow: 1`, so the strip is happy narrower |
+/// | `height: 47`, content-box | [barHeight] 49 (47 + two 1px shell borders) | the specimen rendered from `navigation.card.html` measures 49 rows of ink (KAN-292) |
 /// | slots are `text1..text4` React nodes | [tabs] (icon name plus label) | injected view-model; the default four are [defaultTabs] |
 /// | no selection state (the first slot is simply drawn active) | [activeIndex] and [onSelect] | a tab bar that cannot select is not usable; the source's drawing is the default `activeIndex` of 0 |
 /// | `Inter` on the slot spans | not applied | the span only wraps an icon; the face is not shipped |
@@ -73,6 +74,32 @@ class DabblerNavigationTabBar extends StatelessWidget {
   /// The icon size — `size={24}`.
   static const double iconSize = DabblerSizing.iconMd;
 
+  /// `width: 384` / `maxWidth: 384` — applied as a maximum, so the bar does not
+  /// stretch across a tablet and leave the glyphs marooned.
+  static const double barWidth = 384;
+
+  /// `height: 47` — the shell's **content** height, not the height it draws at.
+  /// See [barHeight].
+  static const double barContentHeight = 47;
+
+  /// The height the bar occupies: **49**. The export's `height: 47` is
+  /// content-box, so the shell's two 1px borders sit outside it; the specimen
+  /// rendered headless from `navigation.card.html` measures 49 rows of ink.
+  static const double barHeight =
+      barContentHeight + 2 * DabblerSizing.borderDefault;
+
+  /// The inner row's natural height: 50 (1 border + 12 padding + the 24 glyph +
+  /// 12 padding + 1 border). It overflows [barContentHeight] and the shell
+  /// clips the overflow from the block end, so the row's bottom border is never
+  /// drawn.
+  static const double rowHeight =
+      2 * DabblerSizing.borderDefault + 2 * slotPadding + iconSize;
+
+  /// `lineHeight: "20px"` on the span that holds each glyph. It does not set
+  /// the row's height ([rowHeight] does, from the 24 glyph); kept as the
+  /// transcribed value of the declaration.
+  static const double glyphLineHeight = 20;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -80,31 +107,53 @@ class DabblerNavigationTabBar extends StatelessWidget {
       color: colors.borderDefault,
       width: DabblerSizing.borderDefault,
     );
+    final Widget row = DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surfaceCard,
+        border: Border.fromBorderSide(line),
+      ),
+      child: Row(
+        children: <Widget>[
+          for (int i = 0; i < tabs.length; i++)
+            Expanded(
+              child: _Slot(
+                tab: tabs[i],
+                active: i == activeIndex,
+                onTap: onSelect == null ? null : () => onSelect!(i),
+              ),
+            ),
+        ],
+      ),
+    );
     return Semantics(
       container: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(radius)),
-          border: Border.fromBorderSide(line),
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(radius)),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: colors.surfaceCard,
-              border: Border.fromBorderSide(line),
-            ),
-            child: Row(
-              children: <Widget>[
-                for (int i = 0; i < tabs.length; i++)
-                  Expanded(
-                    child: _Slot(
-                      tab: tabs[i],
-                      active: i == activeIndex,
-                      onTap: onSelect == null ? null : () => onSelect!(i),
-                    ),
+      // Align loosens a tight host width so the cap holds there too: a
+      // ConstrainedBox alone cannot narrow a parent that forces a width.
+      child: Align(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: barWidth),
+          child: SizedBox(
+            height: barHeight,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(radius)),
+                border: Border.fromBorderSide(line),
+              ),
+              // The row keeps its natural [rowHeight] in the 47 content box and
+              // is clipped from the block end, not squeezed.
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(radius)),
+                child: Align(
+                  alignment: AlignmentDirectional.topStart,
+                  child: OverflowBox(
+                    alignment: AlignmentDirectional.topStart,
+                    minHeight: 0,
+                    maxHeight: double.infinity,
+                    child: row,
                   ),
-              ],
+                ),
+              ),
             ),
           ),
         ),

@@ -41,21 +41,50 @@ void main() {
       expect(DabblerNavigationTabBar.iconSize, 24);
     });
 
-    testWidgets('four equal slots; height is 12 + 24 + 12', (
+    testWidgets('four equal slots; drawn height is 49 (KAN-292)', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(_host(const DabblerNavigationTabBar()));
       final Size bar = tester.getSize(find.byType(DabblerNavigationTabBar));
       expect(bar.width, 384);
-      // 12 + 24 + 12 of content; the two 1px outlines paint inside it (the
-      // source frame is a fixed 47 that clips its content-box overflow).
-      expect(bar.height, 12 + 24 + 12);
+      // 47 content-box + the shell's two 1px borders, as the specimen renders.
+      expect(bar.height, 49);
+      expect(DabblerNavigationTabBar.barHeight, 49);
       final List<Size> slots = tester
           .widgetList<DabblerIcon>(find.byType(DabblerIcon))
           .map((DabblerIcon i) => tester.getSize(find.byWidget(i)))
           .toList();
       expect(slots.length, 4);
       expect(slots.every((Size s) => s == const Size(24, 24)), isTrue);
+    });
+
+    testWidgets('is at most 384 wide on a wider host', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: <ThemeExtension<dynamic>>[_c()]),
+          home: const Scaffold(
+            body: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(width: 800, child: DabblerNavigationTabBar()),
+            ),
+          ),
+        ),
+      );
+      // The root fills the 800 host; the drawn shell is what is capped.
+      final Size bar = tester.getSize(
+        find
+            .descendant(
+              of: find.byType(DabblerNavigationTabBar),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect(bar.width, lessThanOrEqualTo(384));
+      expect(bar.height, 49);
+      expect(DabblerNavigationTabBar.rowHeight, 50);
+      expect(DabblerNavigationTabBar.glyphLineHeight, 20);
     });
 
     testWidgets('only the active slot is bold and brand-coloured', (
