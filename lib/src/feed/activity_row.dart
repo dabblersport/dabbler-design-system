@@ -113,49 +113,75 @@ class DabblerActivityGroupHeader extends StatelessWidget {
         top: dense ? DabblerSpacing.space3 : DabblerSpacing.space6,
         bottom: dense ? DabblerSpacing.space1 : DabblerSpacing.space3,
       ),
-      child: Row(
-        children: <Widget>[
-          Semantics(
-            header: true,
-            child: Text(
-              label,
-              maxLines: 1,
-              softWrap: false,
-              style: DabblerType.caption1
-                  .resolveForDirection(dir)
-                  .copyWith(
-                    color: live ? colors.success.strong : colors.textSecondary,
+      // KAN-946: the label ellipsizes rather than overflowing a narrow row. It
+      // is capped at the row's width less the gap before the hairline, so a
+      // short label keeps its natural width and the hairline still runs to
+      // the end (a Flexible beside the Expanded hairline would split the free
+      // space between them and open a gap).
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) => Row(
+          children: <Widget>[
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: constraints.maxWidth - DabblerSpacing.space3,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Flexible(
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: DabblerType.caption1
+                            .resolveForDirection(dir)
+                            .copyWith(
+                              color: live
+                                  ? colors.success.strong
+                                  : colors.textSecondary,
+                            ),
+                      ),
+                    ),
                   ),
-            ),
-          ),
-          if (count != null) ...<Widget>[
-            const SizedBox(width: DabblerSpacing.space3),
-            Text(
-              count!,
-              maxLines: 1,
-              softWrap: false,
-              style: DabblerType.caption1
-                  .resolveForDirection(dir)
-                  .copyWith(
-                    color: colors.textTertiary,
-                    fontSize: 11,
-                    height: 14 / 11,
-                  ),
-            ),
-          ],
-          const SizedBox(width: DabblerSpacing.space3),
-          Expanded(
-            child: ExcludeSemantics(
-              child: SizedBox(
-                height: DabblerSizing.borderDefault,
-                child: ColoredBox(color: colors.bgTertiary),
+                  ..._count(colors, dir),
+                ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: DabblerSpacing.space3),
+            Expanded(
+              child: ExcludeSemantics(
+                child: SizedBox(
+                  height: DabblerSizing.borderDefault,
+                  child: ColoredBox(color: colors.bgTertiary),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  List<Widget> _count(DabblerColors colors, TextDirection dir) => <Widget>[
+    if (count != null) ...<Widget>[
+      const SizedBox(width: DabblerSpacing.space3),
+      Text(
+        count!,
+        maxLines: 1,
+        softWrap: false,
+        style: DabblerType.caption1
+            .resolveForDirection(dir)
+            .copyWith(
+              color: colors.textTertiary,
+              fontSize: 11,
+              height: 14 / 11,
+            ),
+      ),
+    ],
+  ];
 }
 
 /// ActivityRow — one entry in the Home Feed's Active tab: who, what, where and
