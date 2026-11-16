@@ -170,10 +170,12 @@ class DabblerHueTone {
   }
 
   /// KAN-972: the dark-mode tone of [hue]: [surface] the rest fill at
-  /// [darkSurfaceLightness] / [darkSurfaceChroma] (the depth of the
-  /// provisional dark tile surfaces, `#16243F` is L 0.27) and [edge] the
-  /// border at [darkEdgeLightness] / [darkEdgeChroma]. [solid] and [deep] are
-  /// the same border; a dark pill inks its label in the light text colour.
+  /// [darkSurfaceLightness] / [darkSurfaceChroma] (one step above the dark
+  /// card `#1C1C1C`, L ~0.23) and [edge] the border at [darkEdgeLightness] /
+  /// [darkEdgeChroma]. The same rule fills `vibes.dark_bg_hex` /
+  /// `dark_border_hex` (migration `20261116170000_kan972_vibes_dark_colors`),
+  /// so a derived pill matches a stored one. [solid] and [deep] are the same
+  /// border; a dark pill inks its label in the light text colour.
   factory DabblerHueTone.darkHue(double hue) {
     final Color surface = _oklch(darkSurfaceLightness, darkSurfaceChroma, hue);
     final Color edge = _oklch(darkEdgeLightness, darkEdgeChroma, hue);
@@ -186,16 +188,16 @@ class DabblerHueTone {
   }
 
   /// The dark rest fill's OKLCH lightness.
-  static const double darkSurfaceLightness = 0.27;
+  static const double darkSurfaceLightness = 0.32;
 
   /// The dark rest fill's OKLCH chroma: low, so it sits on the dark surfaces.
   static const double darkSurfaceChroma = 0.045;
 
   /// The dark border's OKLCH lightness.
-  static const double darkEdgeLightness = 0.4;
+  static const double darkEdgeLightness = 0.42;
 
   /// The dark border's OKLCH chroma.
-  static const double darkEdgeChroma = 0.07;
+  static const double darkEdgeChroma = 0.06;
 
   /// [darkHue] in the hue of [color]; null when [color] is achromatic.
   static DabblerHueTone? darkFromColor(Color color) {
