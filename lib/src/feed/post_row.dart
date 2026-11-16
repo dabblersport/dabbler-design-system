@@ -9,6 +9,7 @@ import '../tokens/dabbler_geometry.dart';
 import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_type.dart';
 import 'feed_atoms.dart';
+import 'feed_pill.dart';
 import 'post_detail.dart';
 
 /// One run of a [DabblerPostRow]'s body text. A [link] run (a `#hashtag` or an
@@ -51,9 +52,10 @@ class DabblerPostSegment {
 ///
 /// ## Deviations (recorded, not silent)
 ///
-/// * **Emoji.** The design's `sportEmoji` (`:311`) is not reproduced — the
-///   system is Iconsax and tokens only. [sportLeading] is a `Widget` slot for
-///   a sport glyph; omitted by default.
+/// * **Emoji.** The design's `sportEmoji` (`:311`) is [sportEmoji], drawn by
+///   [DabblerFeedPill] under its KAN-963 ruling (CEO 2026-11-16); before it
+///   the system was Iconsax only. [sportLeading] stays a `Widget` slot for a
+///   sport glyph; both are omitted by default.
 /// * **Body colour.** `--ink-soft` resolves to `textSecondary`
 ///   (`D-003(a)`); `--muted` text resolves to `textSecondary` as well, as in
 ///   the conversation row. `--subtle` is only used for icons and the dot
@@ -105,6 +107,7 @@ class DabblerPostRow extends StatelessWidget {
     this.segments,
     this.sportLabel,
     this.sportLeading,
+    this.sportEmoji,
     this.onSportTap,
     this.placeTagLabel,
     this.placeTagLeading,
@@ -231,8 +234,14 @@ class DabblerPostRow extends StatelessWidget {
   /// the result lists of `Results.dc.html`, which end on the sport pill.
   final bool showActions;
 
-  /// An optional leading glyph for the sport pill (a widget slot, never emoji).
+  /// An optional leading glyph for the sport pill, drawn when [sportEmoji] is
+  /// null.
   final Widget? sportLeading;
+
+  /// KAN-963: the sport's emoji before its label (the design's
+  /// `p.sportEmoji`, 15/20), under the [DabblerFeedPill] emoji ruling. Data,
+  /// never named here; null draws [sportLeading] instead.
+  final String? sportEmoji;
 
   /// KAN-622: taps on the sport pill. When set the pill is a button; when null
   /// it is drawn exactly as before and takes no taps.
@@ -334,18 +343,6 @@ class DabblerPostRow extends StatelessWidget {
   Widget _metaGlyph(String name, DabblerColors colors) => ExcludeSemantics(
     child: DabblerIcon(name, size: metaGlyphSize, color: colors.textTertiary),
   );
-
-  /// The sport pill's body: at the drawing's 32 it centres its content in a
-  /// minimum-height box, so a 12px glyph in place of the frame's emoji keeps
-  /// the pill's height.
-  Widget _sportBox(Widget content) => _drawn
-      ? ConstrainedBox(
-          constraints: const BoxConstraints(
-            minHeight: DabblerHomeFrame.sportPillHeight,
-          ),
-          child: Center(widthFactor: 1, child: content),
-        )
-      : content;
 
   @override
   Widget build(BuildContext context) {
@@ -463,68 +460,18 @@ class DabblerPostRow extends StatelessWidget {
       style: bodyStyle,
     );
 
-    Widget pill(String label, Widget? leading) => DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: DabblerRadius.pillAll,
-        border: Border.all(
-          color: colors.borderDefault,
-          width: DabblerSizing.borderDefault,
-        ),
-      ),
-      child: _sportBox(
-        Padding(
-          padding: _drawn
-              ? const EdgeInsetsDirectional.fromSTEB(
-                  DabblerSpacing.space3 + DabblerSizing.borderDefault,
-                  DabblerHomeFrame.sportPillPaddingBlock +
-                      DabblerSizing.borderDefault,
-                  DabblerHomeFrame.sportPillPaddingEnd +
-                      DabblerSizing.borderDefault,
-                  DabblerHomeFrame.sportPillPaddingBlock +
-                      DabblerSizing.borderDefault,
-                )
-              : const EdgeInsetsDirectional.fromSTEB(
-                  DabblerSpacing.space3,
-                  DabblerSpacing.space2,
-                  DabblerSpacing.space4,
-                  DabblerSpacing.space2,
-                ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (leading != null) ...<Widget>[
-                leading,
-                SizedBox(
-                  width: _drawn
-                      ? DabblerHomeFrame.sportPillGap
-                      : DabblerSpacing.space2,
-                ),
-              ],
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: caption,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    // KAN-963: every pill on the row is the public [DabblerFeedPill].
+    Widget pill(String label, Widget? leading) =>
+        DabblerFeedPill(label: label, leading: leading, metrics: metrics);
 
     final Widget? sport = sportLabel == null
         ? null
-        : onSportTap == null
-        ? pill(sportLabel!, sportLeading)
-        : Semantics(
-            button: true,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: onSportTap,
-              child: pill(sportLabel!, sportLeading),
-            ),
+        : DabblerFeedPill(
+            label: sportLabel!,
+            emoji: sportEmoji,
+            leading: sportLeading,
+            onTap: onSportTap,
+            metrics: metrics,
           );
     final String? placeTagText = placeTagLabel?.trim();
     final Widget? placeTag = placeTagText == null || placeTagText.isEmpty

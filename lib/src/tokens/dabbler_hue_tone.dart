@@ -158,4 +158,61 @@ class DabblerHueTone {
 
   @override
   int get hashCode => Object.hash(surface, edge, solid, deep);
+
+  /// KAN-963: a tone in the hue of [color], a colour that comes from data
+  /// (a vibe's `color_hex`), so the screen carries no colour literal. Null
+  /// when [color] is achromatic (OKLCH chroma under [minChroma]): a grey has
+  /// no hue to tint with, and the caller falls back to its neutral form.
+  static DabblerHueTone? fromColor(Color color) {
+    final ({double chroma, double hue}) lch = _oklchOf(color);
+    if (lch.chroma < minChroma) return null;
+    return DabblerHueTone.hue(lch.hue);
+  }
+
+  /// [fromColor] for a `#RRGGBB` / `RRGGBB` / `#AARRGGBB` string; null when
+  /// [hex] is null, malformed or achromatic.
+  static DabblerHueTone? fromHex(String? hex) {
+    final Color? color = parseHex(hex);
+    return color == null ? null : fromColor(color);
+  }
+
+  /// The colour a `#RRGGBB`, `RRGGBB` or `#AARRGGBB` string names (alpha is
+  /// dropped: a tint is opaque). Null when [hex] is null or not one of those.
+  static Color? parseHex(String? hex) {
+    if (hex == null) return null;
+    String h = hex.trim();
+    if (h.startsWith('#')) h = h.substring(1);
+    if (h.length == 8) h = h.substring(2);
+    if (!_hex6.hasMatch(h)) return null;
+    return Color(0xFF000000 | int.parse(h, radix: 16));
+  }
+
+  static final RegExp _hex6 = RegExp(r'^[0-9a-fA-F]{6}$');
+
+  /// Below this OKLCH chroma a colour reads as grey ([fromColor]).
+  static const double minChroma = 0.02;
+
+  /// sRGB to OKLCH chroma and hue (degrees), the inverse of [_oklch].
+  static ({double chroma, double hue}) _oklchOf(Color color) {
+    double lin(double v) => v <= 0.04045
+        ? v / 12.92
+        : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+    double cbrt(double v) => math.pow(v, 1 / 3).toDouble();
+    final double r = lin(color.r);
+    final double g = lin(color.g);
+    final double b = lin(color.b);
+    final double l = cbrt(
+      0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b,
+    );
+    final double m = cbrt(
+      0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b,
+    );
+    final double s = cbrt(
+      0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b,
+    );
+    final double oa = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+    final double ob = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+    final double hue = (math.atan2(ob, oa) * 180 / math.pi + 360) % 360;
+    return (chroma: math.sqrt(oa * oa + ob * ob), hue: hue);
+  }
 }
