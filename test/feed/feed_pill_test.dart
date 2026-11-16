@@ -178,7 +178,14 @@ void main() {
         );
         expect(mine.color, tone.edge, reason: 'a deeper pastel, never solid');
         expect(mine.color!.computeLuminance() > 0.5, isTrue);
-        expect((mine.border! as Border).top.color, tone.deep);
+        expect(
+          (mine.border! as Border).top.color,
+          (idle.border! as Border).top.color,
+          reason: 'mine keeps the resting soft edge; the fill tells it apart',
+        );
+        expect((mine.border! as Border).top.color, tone.edge);
+        expect((mine.border! as Border).top.color, isNot(tone.deep));
+        expect(mine.color, isNot(idle.color));
         expect(
           (mine.border! as Border).top.width,
           (idle.border! as Border).top.width,
@@ -209,7 +216,11 @@ void main() {
         expect(deco.color, brand.surface);
         expect(deco.color, isNot(threadColors.brandPrimary));
         expect(deco.color!.computeLuminance() > 0.5, isTrue);
-        expect((deco.border! as Border).top.color, threadColors.brandPrimary);
+        expect((deco.border! as Border).top.color, brand.edge, reason: 'soft');
+        expect(
+          (deco.border! as Border).top.color,
+          isNot(threadColors.brandPrimary),
+        );
         expect(_labelInk(tester, 'Calm 1'), threadColors.textPrimary);
       });
 

@@ -41,18 +41,20 @@ import '../tokens/dabbler_type.dart';
 /// | | fill | border | label |
 /// | --- | --- | --- | --- |
 /// | tinted | `surface` | `edge` | `deep` |
-/// | tinted, [selected] | `edge` | `deep` | `deep` |
+/// | tinted, [selected] | `edge` | `edge` | `deep` |
 /// | neutral (no or achromatic tint) | none | `borderDefault` | `textSecondary` |
-/// | neutral, [selected] | brand at 12% over `surfaceCard` | `brandPrimary` | `textPrimary` |
+/// | neutral, [selected] | brand at 12% over `surfaceCard` | brand at 30% (`ramp.edge`) | `textPrimary` |
 ///
 /// **Pastels only** (CEO 2026-11-16, KAN-963: "not good for solid colour,
 /// should be pastels only"): no state is a solid fill. The tone is built from
 /// the input's hue alone at fixed OKLCH lightness and chroma, so an input that
-/// is already pastel draws the same pastel. Selected ("mine") is the slightly
-/// deeper pastel `edge` (L 0.882) with the hue's `deep` (L 0.42) border and
-/// label, readable on both pastels; the neutral pill selects to the same rule
-/// in the brand hue ([DabblerHueTone.ramp]). The border is always drawn and
-/// keeps its width, so selecting never changes the pill's size.
+/// is already pastel draws the same pastel. Selected ("mine") is told apart by
+/// its fill alone, the slightly deeper pastel `edge` (L 0.882); its border is
+/// the same soft `edge` as the resting pills (CEO, same day: the deep border
+/// contrasted too much), and the hue's `deep` (L 0.42) label stays readable on
+/// both pastels. The neutral pill selects to the same rule in the brand hue
+/// ([DabblerHueTone.ramp]). The border is always drawn and keeps its width,
+/// so selecting never changes the pill's size.
 ///
 /// ## Tap
 ///
@@ -117,8 +119,8 @@ class DabblerFeedPill extends StatelessWidget {
         ? (selected ? tone.edge : tone.surface)
         : (selected ? _brandTone(colors).surface : null);
     final Color border = tone != null
-        ? (selected ? tone.deep : tone.edge)
-        : (selected ? colors.brandPrimary : colors.borderDefault);
+        ? tone.edge
+        : (selected ? _brandTone(colors).edge : colors.borderDefault);
     final Color ink = tone != null
         ? tone.deep
         : (selected ? colors.textPrimary : colors.textSecondary);
