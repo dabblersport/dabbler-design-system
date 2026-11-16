@@ -272,6 +272,7 @@ class DabblerAvatar extends StatelessWidget {
     this.badge,
     this.badgeTone = DabblerAvatarBadgeTone.primary,
     this.ringColor,
+    this.ringWidth = defaultRingWidth,
     this.badgeSize = badgeDiameter,
     this.imageUrl,
     this.onTap,
@@ -312,6 +313,15 @@ class DabblerAvatar extends StatelessWidget {
   /// system is flat, so it is a border — the same two pixels of paper, painted
   /// by something that is not a shadow.
   final Color? ringColor;
+
+  /// The ring's width outside the portrait. Defaults to
+  /// [defaultRingWidth] (2, the group ring); the Home Feed activity card rings
+  /// its 64 player avatar at 3 (`ActivityCard.dc.html`,
+  /// `outline:3px solid var(--surface-card)`, KAN-965).
+  final double ringWidth;
+
+  /// The 2px of `Avatar.jsx`'s group ring and badge border.
+  static const double defaultRingWidth = _ringWidth;
 
   /// The corner badge's diameter. Defaults to [badgeDiameter] (24, `Avatar.jsx`);
   /// `NavigationTopBar` draws a 16px one (`NavigationTopBar.jsx:189-190`).
@@ -408,10 +418,10 @@ class DabblerAvatar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: <Widget>[
           Positioned(
-            left: -_ringWidth,
-            top: -_ringWidth,
-            right: -_ringWidth,
-            bottom: -_ringWidth,
+            left: -ringWidth,
+            top: -ringWidth,
+            right: -ringWidth,
+            bottom: -ringWidth,
             child: DecoratedBox(
               decoration: BoxDecoration(shape: BoxShape.circle, color: ring),
             ),

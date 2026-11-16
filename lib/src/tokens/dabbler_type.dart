@@ -374,6 +374,19 @@ abstract final class DabblerType {
     fontWeight: regular,
   );
 
+  /// Activity date day — 28/32, weight 400, display role. `ActivityCard.dc.html`
+  /// date tile (`font-family:var(--font-display);font-size:28px;line-height:32px`).
+  /// The Arabic frame draws the same inline leading.
+  static const DabblerTypeStyle displayDay = DabblerTypeStyle(
+    name: 'displayDay',
+    role: DabblerTypeRole.display,
+    fontSize: 28,
+    arabicFontSize: 27.1,
+    latinLeading: 32,
+    arabicLeading: 32,
+    fontWeight: regular,
+  );
+
   /// Rail label — 18/23, weight 400, display role. `Listings.dc.html:116,424` ("Upcoming" over a listing's countdown rail).
   static const DabblerTypeStyle displayLabel = DabblerTypeStyle(
     name: 'displayLabel',
@@ -448,6 +461,19 @@ abstract final class DabblerType {
     arabicFontSize: 13.1,
     latinLeading: 19,
     arabicLeading: 22,
+    fontWeight: regular,
+  );
+
+  /// Small, compact — 14/18, weight 400, sans role. `ActivityCard.dc.html`
+  /// action pill (`font-size:14px;line-height:18px`); the Arabic frame draws the
+  /// same inline 18 leading.
+  static const DabblerTypeStyle smallCompact = DabblerTypeStyle(
+    name: 'smallCompact',
+    role: DabblerTypeRole.sans,
+    fontSize: 14,
+    arabicFontSize: 13.1,
+    latinLeading: 18,
+    arabicLeading: 18,
     fontWeight: regular,
   );
 
@@ -615,6 +641,7 @@ abstract final class DabblerType {
     displayStatHero,
     displayStatMid,
     displayStatSmall,
+    displayDay,
     displayLabel,
     leadLarge,
     lead,
@@ -622,6 +649,7 @@ abstract final class DabblerType {
     copy,
     small,
     smallTight,
+    smallCompact,
     smallRelaxed,
     footnoteTight,
     footnoteRelaxed,

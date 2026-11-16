@@ -337,4 +337,26 @@ abstract final class DabblerPalette {
 
   /// `--tile-accent-surface` — `#FBE0EC`.
   static const Color tileAccentSurface = Color(0xFFFBE0EC);
+
+  // --- Activity tile tones (KAN-965) ---
+  //
+  // Not declared in `tokens/colors.css`: `Home Feed.dc.html` (`ACT_TONE`,
+  // `actTone()`) paints `var(--tile-<n>-surface, <hex>)` and the variable is
+  // undeclared, so the fallback hex is what the design draws. Named one by one
+  // in `dabbler_palette_test.dart` beside `--accent-indigo`.
+
+  /// `--tile-main-surface` (Home Feed fallback) — `#EADDF8`.
+  static const Color tileMainSurface = Color(0xFFEADDF8);
+
+  /// `--tile-sport-surface` (Home Feed fallback) — `#DDEEDE`.
+  static const Color tileSportSurface = Color(0xFFDDEEDE);
+
+  /// `--tile-social-surface` (Home Feed fallback) — `#DCE7F9`.
+  static const Color tileSocialSurface = Color(0xFFDCE7F9);
+
+  /// `--tile-active-surface` (Home Feed fallback) — `#F9DDEB`.
+  static const Color tileActiveSurface = Color(0xFFF9DDEB);
+
+  /// `--tile-bright-surface` (Home Feed fallback) — `#FDEBD6`.
+  static const Color tileBrightSurface = Color(0xFFFDEBD6);
 }

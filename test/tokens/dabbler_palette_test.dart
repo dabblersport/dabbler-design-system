@@ -112,7 +112,28 @@ void main() {
         // so the count stays an exact statement rather than a tolerance.
         expect(tokens.containsKey('accent-indigo'), isFalse);
         expect(DabblerPalette.accentIndigo, const Color(0xFF5C50E6));
-        expect(_hexLiteral.allMatches(source).length, tokens.length + 1);
+        // KAN-965: five more, the activity tile surfaces `Home Feed.dc.html`
+        // paints as `var(--tile-<n>-surface, <hex>)` fallbacks of variables
+        // `colors.css` does not declare.
+        const Map<String, Color> activityTiles = <String, Color>{
+          'tile-main-surface': DabblerPalette.tileMainSurface,
+          'tile-sport-surface': DabblerPalette.tileSportSurface,
+          'tile-social-surface': DabblerPalette.tileSocialSurface,
+          'tile-active-surface': DabblerPalette.tileActiveSurface,
+          'tile-bright-surface': DabblerPalette.tileBrightSurface,
+        };
+        for (final String name in activityTiles.keys) {
+          expect(tokens.containsKey(name), isFalse, reason: name);
+        }
+        expect(DabblerPalette.tileMainSurface, const Color(0xFFEADDF8));
+        expect(DabblerPalette.tileSportSurface, const Color(0xFFDDEEDE));
+        expect(DabblerPalette.tileSocialSurface, const Color(0xFFDCE7F9));
+        expect(DabblerPalette.tileActiveSurface, const Color(0xFFF9DDEB));
+        expect(DabblerPalette.tileBrightSurface, const Color(0xFFFDEBD6));
+        expect(
+          _hexLiteral.allMatches(source).length,
+          tokens.length + 1 + activityTiles.length,
+        );
       });
 
       test('covers all seven theme palettes and their p/s ramps', () {
