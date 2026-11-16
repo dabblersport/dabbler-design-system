@@ -387,6 +387,33 @@ abstract final class DabblerType {
     fontWeight: regular,
   );
 
+  /// Activity feature title — 24/30, weight 400, display role.
+  /// `ActivityCard.dc.html` venue of the week / month / day headline
+  /// (`font-size:24px;line-height:30px`, KAN-967). The Arabic frame draws the
+  /// same inline leading.
+  static const DabblerTypeStyle displayFeature = DabblerTypeStyle(
+    name: 'displayFeature',
+    role: DabblerTypeRole.display,
+    fontSize: 24,
+    arabicFontSize: 23.1,
+    latinLeading: 30,
+    arabicLeading: 30,
+    fontWeight: regular,
+  );
+
+  /// Activity review quote — 18/24, weight 400, display role.
+  /// `ActivityCard.dc.html` new venue rating quote
+  /// (`font-size:18px;line-height:24px`, KAN-967).
+  static const DabblerTypeStyle displayQuote = DabblerTypeStyle(
+    name: 'displayQuote',
+    role: DabblerTypeRole.display,
+    fontSize: 18,
+    arabicFontSize: 17.1,
+    latinLeading: 24,
+    arabicLeading: 24,
+    fontWeight: regular,
+  );
+
   /// Rail label — 18/23, weight 400, display role. `Listings.dc.html:116,424` ("Upcoming" over a listing's countdown rail).
   static const DabblerTypeStyle displayLabel = DabblerTypeStyle(
     name: 'displayLabel',
@@ -642,6 +669,8 @@ abstract final class DabblerType {
     displayStatMid,
     displayStatSmall,
     displayDay,
+    displayFeature,
+    displayQuote,
     displayLabel,
     leadLarge,
     lead,

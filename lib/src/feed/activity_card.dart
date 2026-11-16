@@ -151,6 +151,7 @@ class DabblerActivityKicker extends StatelessWidget {
     required this.ink,
     this.icon,
     this.live = false,
+    this.compact = false,
   });
 
   final String label;
@@ -162,6 +163,10 @@ class DabblerActivityKicker extends StatelessWidget {
   final String? icon;
   final bool live;
 
+  /// The trending pair box's tighter pill, `padding:4px 9px 4px 7px`
+  /// ([compactPadding], KAN-967).
+  final bool compact;
+
   /// `padding:4px 10px 4px 8px`.
   static const EdgeInsetsDirectional padding = EdgeInsetsDirectional.fromSTEB(
     8,
@@ -169,6 +174,10 @@ class DabblerActivityKicker extends StatelessWidget {
     10,
     4,
   );
+
+  /// `padding:4px 9px 4px 7px` (the pair box).
+  static const EdgeInsetsDirectional compactPadding =
+      EdgeInsetsDirectional.fromSTEB(7, 4, 9, 4);
 
   /// `gap:6px` beside the live dot.
   static const double liveGap = DabblerSpacing.space2;
@@ -189,7 +198,7 @@ class DabblerActivityKicker extends StatelessWidget {
         borderRadius: DabblerRadius.pillAll,
       ),
       child: Padding(
-        padding: padding,
+        padding: compact ? compactPadding : padding,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[

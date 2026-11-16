@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import 'dabbler_colors.dart';
 import 'dabbler_palette.dart';
 
@@ -70,6 +72,25 @@ abstract final class DabblerActivityTones {
     surface: DabblerPalette.surfaceSunken,
     ink: DabblerPalette.inkSoft,
   );
+
+  /// `--tile-info-*` (`#DCEAFB` / `--social-p-700`): a trending sport
+  /// (KAN-967). The same pair as [DabblerColors.tileInfo], held light.
+  static const DabblerToneColor info = DabblerColors.tileInfo;
+
+  /// The monthly honour's soft gold (KAN-967, `player_month`, `venue_month`):
+  /// `color-mix(in srgb, var(--tile-amber-surface) 30%, #FFFFFF)` with
+  /// `--bright-s-600`. sRGB mixing is [Color.lerp] from white.
+  static final DabblerToneColor gold = DabblerToneColor(
+    surface: Color.lerp(
+      DabblerPalette.paper,
+      DabblerPalette.tileAmberSurface,
+      goldAmberShare,
+    )!,
+    ink: DabblerPalette.brightS600,
+  );
+
+  /// The amber share of [gold]: `30%`.
+  static const double goldAmberShare = 0.3;
 
   /// Every tone, for galleries and tests.
   static const List<DabblerToneColor> all = <DabblerToneColor>[

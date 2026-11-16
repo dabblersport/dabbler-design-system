@@ -142,6 +142,7 @@ export 'src/feedback/navigation_feedback.dart';
 export 'src/feedback/navigation_status.dart';
 export 'src/feedback/status_tones.dart';
 export 'src/feed/activity_card.dart';
+export 'src/feed/activity_card_types.dart';
 export 'src/feed/activity_row.dart';
 export 'src/feed/feed_atoms.dart';
 export 'src/feed/feed_gallery.dart';

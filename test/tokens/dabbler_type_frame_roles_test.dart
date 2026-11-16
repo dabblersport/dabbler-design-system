@@ -19,6 +19,8 @@ _pinned = <String, (double, double, double, FontWeight, DabblerTypeRole)>{
   'displayStatMid': (34, 36, 36, FontWeight.w400, DabblerTypeRole.display),
   'displayStatSmall': (30, 32, 32, FontWeight.w400, DabblerTypeRole.display),
   'displayDay': (28, 32, 32, FontWeight.w400, DabblerTypeRole.display),
+  'displayFeature': (24, 30, 30, FontWeight.w400, DabblerTypeRole.display),
+  'displayQuote': (18, 24, 24, FontWeight.w400, DabblerTypeRole.display),
   'displayLabel': (18, 23, 23, FontWeight.w400, DabblerTypeRole.display),
   'leadLarge': (19, 27, 27, FontWeight.w400, DabblerTypeRole.sans),
   'lead': (17, 24, 25, FontWeight.w400, DabblerTypeRole.sans),
