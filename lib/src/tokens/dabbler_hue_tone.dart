@@ -169,6 +169,41 @@ class DabblerHueTone {
     return DabblerHueTone.hue(lch.hue);
   }
 
+  /// KAN-972: the dark-mode tone of [hue]: [surface] the rest fill at
+  /// [darkSurfaceLightness] / [darkSurfaceChroma] (the depth of the
+  /// provisional dark tile surfaces, `#16243F` is L 0.27) and [edge] the
+  /// border at [darkEdgeLightness] / [darkEdgeChroma]. [solid] and [deep] are
+  /// the same border; a dark pill inks its label in the light text colour.
+  factory DabblerHueTone.darkHue(double hue) {
+    final Color surface = _oklch(darkSurfaceLightness, darkSurfaceChroma, hue);
+    final Color edge = _oklch(darkEdgeLightness, darkEdgeChroma, hue);
+    return DabblerHueTone(
+      surface: surface,
+      edge: edge,
+      solid: edge,
+      deep: edge,
+    );
+  }
+
+  /// The dark rest fill's OKLCH lightness.
+  static const double darkSurfaceLightness = 0.27;
+
+  /// The dark rest fill's OKLCH chroma: low, so it sits on the dark surfaces.
+  static const double darkSurfaceChroma = 0.045;
+
+  /// The dark border's OKLCH lightness.
+  static const double darkEdgeLightness = 0.4;
+
+  /// The dark border's OKLCH chroma.
+  static const double darkEdgeChroma = 0.07;
+
+  /// [darkHue] in the hue of [color]; null when [color] is achromatic.
+  static DabblerHueTone? darkFromColor(Color color) {
+    final ({double chroma, double hue}) lch = _oklchOf(color);
+    if (lch.chroma < minChroma) return null;
+    return DabblerHueTone.darkHue(lch.hue);
+  }
+
   /// [fromColor] for a `#RRGGBB` / `RRGGBB` / `#AARRGGBB` string; null when
   /// [hex] is null, malformed or achromatic.
   static DabblerHueTone? fromHex(String? hex) {

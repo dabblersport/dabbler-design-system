@@ -30,13 +30,12 @@ import '../tokens/dabbler_type.dart';
 /// absolute span) and takes no hit or semantics (`aria-hidden`,
 /// `pointer-events:none`).
 ///
-/// ## Light island
+/// ## Brightness
 ///
-/// The source paints the card with tokens no dark rule touches: the
-/// [DabblerActivityTones] fallbacks, `--surface-card` (#FFFFFF), `--ink` and
-/// `--ink-soft`. The card therefore resolves its content in the light
-/// [DabblerColors] of the ambient theme, so `DabblerText` and the parts below
-/// draw the design's inks on the pastel in either brightness.
+/// The card follows the theme (KAN-972): pass the [DabblerActivityTone]'s pair
+/// for the ambient brightness, and the parts read the ambient
+/// [DabblerColors] (`--surface-card`, `--ink`, `--ink-soft` resolve dark in
+/// dark mode).
 class DabblerActivityCard extends StatelessWidget {
   /// A card in [tone] with the [mark] glyph behind [children].
   const DabblerActivityCard({
@@ -76,60 +75,44 @@ class DabblerActivityCard extends StatelessWidget {
   /// `opacity:0.14`.
   static const double markOpacity = 0.14;
 
-  /// The light colours of [colors]' theme: the card's content colours.
-  static DabblerColors islandOf(DabblerColors colors) =>
-      colors.brightness == Brightness.light
-      ? colors
-      : DabblerColors.resolve(
-          theme: colors.theme,
-          brightness: Brightness.light,
-        );
-
   @override
   Widget build(BuildContext context) {
-    final DabblerColors light = islandOf(DabblerColors.of(context));
     final List<Widget> rows = <Widget>[
       for (int i = 0; i < children.length; i++) ...<Widget>[
         if (i > 0) const SizedBox(height: gap),
         children[i],
       ],
     ];
-    return Theme(
-      data: ThemeData(
-        brightness: Brightness.light,
-        extensions: <DabblerColors>[light],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: ColoredBox(
-          color: tone.surface,
-          child: Stack(
-            children: <Widget>[
-              PositionedDirectional(
-                end: markInsetEnd,
-                top: markInsetTop,
-                child: IgnorePointer(
-                  child: ExcludeSemantics(
-                    child: DabblerIcon(
-                      mark,
-                      key: const ValueKey<String>('activity-card-mark'),
-                      size: markSize,
-                      weight: DabblerIconWeight.bold,
-                      color: tone.ink.withValues(alpha: markOpacity),
-                    ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: ColoredBox(
+        color: tone.surface,
+        child: Stack(
+          children: <Widget>[
+            PositionedDirectional(
+              end: markInsetEnd,
+              top: markInsetTop,
+              child: IgnorePointer(
+                child: ExcludeSemantics(
+                  child: DabblerIcon(
+                    mark,
+                    key: const ValueKey<String>('activity-card-mark'),
+                    size: markSize,
+                    weight: DabblerIconWeight.bold,
+                    color: tone.ink.withValues(alpha: markOpacity),
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(padding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: rows,
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(padding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: rows,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -393,38 +393,6 @@ void main() {
     );
   });
 
-  testWidgets('dark: the card content resolves in light inks', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      host(
-        _card(
-          children: <Widget>[
-            Builder(
-              builder: (BuildContext context) => Text(
-                'x',
-                style: TextStyle(color: DabblerColors.of(context).textPrimary),
-              ),
-            ),
-            const DabblerActivityChip(label: 'Padel'),
-          ],
-        ),
-        brightness: Brightness.dark,
-      ),
-    );
-    expect(_text(tester, 'x').color, DabblerPalette.ink);
-    expect(_text(tester, 'Padel').color, DabblerPalette.inkSoft);
-    final ColoredBox ground = tester.widget<ColoredBox>(
-      find
-          .descendant(
-            of: find.byType(DabblerActivityCard),
-            matching: find.byType(ColoredBox),
-          )
-          .first,
-    );
-    expect(ground.color, const Color(0xFFEADDF8));
-  });
-
   testWidgets('live dot pulses 1.6s ease-out; still under reduced motion', (
     WidgetTester tester,
   ) async {

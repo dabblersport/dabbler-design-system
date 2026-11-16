@@ -18,22 +18,11 @@ import 'activity_card.dart';
 /// [DabblerActivityPhoto], [DabblerActivityReason], [DabblerActivityReview],
 /// [DabblerActivityVenueRow]).
 ///
-/// Every part reads [DabblerColors] at light brightness: the slim strip and
-/// the pair boxes set their own light island, as [DabblerActivityCard] does,
-/// and the full-card parts sit inside one.
+/// Every part reads the ambient [DabblerColors] and follows the theme
+/// (KAN-972); callers pass the tone pair for the ambient brightness.
 
 TextStyle _style(BuildContext context, DabblerTypeStyle s, Color color) =>
     s.resolveForDirection(Directionality.of(context)).copyWith(color: color);
-
-Widget _island(BuildContext context, Widget child) => Theme(
-  data: ThemeData(
-    brightness: Brightness.light,
-    extensions: <DabblerColors>[
-      DabblerActivityCard.islandOf(DabblerColors.of(context)),
-    ],
-  ),
-  child: child,
-);
 
 Text _line(
   BuildContext context,
@@ -110,110 +99,107 @@ class DabblerActivitySlim extends StatelessWidget {
   static const double metricMaxShare = 0.5;
 
   @override
-  Widget build(BuildContext context) => _island(
-    context,
-    Builder(
-      builder: (BuildContext context) {
-        final DabblerColors colors = DabblerColors.of(context);
-        return ClipRRect(
-          borderRadius: DabblerRadius.xlAll,
-          child: ColoredBox(
-            color: tone.surface,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: minHeight),
-              child: Padding(
-                padding: padding,
-                child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints c) => Row(
-                    children: <Widget>[
-                      DecoratedBox(
+  Widget build(BuildContext context) => Builder(
+    builder: (BuildContext context) {
+      final DabblerColors colors = DabblerColors.of(context);
+      return ClipRRect(
+        borderRadius: DabblerRadius.xlAll,
+        child: ColoredBox(
+          color: tone.surface,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: minHeight),
+            child: Padding(
+              padding: padding,
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints c) => Row(
+                  children: <Widget>[
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colors.surfaceCard,
+                        borderRadius: DabblerRadius.lgAll,
+                      ),
+                      child: SizedBox.square(
+                        dimension: tileSize,
+                        child: Center(
+                          child: DabblerIcon(
+                            icon,
+                            size: iconSize,
+                            weight: DabblerIconWeight.bold,
+                            color: tone.ink,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: DabblerSpacing.space4),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          _line(
+                            context,
+                            kicker,
+                            DabblerType.caption2,
+                            tone.ink,
+                          ),
+                          _line(
+                            context,
+                            value,
+                            DabblerType.title3,
+                            colors.textPrimary,
+                            oneLine: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: DabblerSpacing.space4),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: c.maxWidth * metricMaxShare,
+                      ),
+                      child: DecoratedBox(
+                        key: const ValueKey<String>('activity-slim-metric'),
                         decoration: BoxDecoration(
                           color: colors.surfaceCard,
-                          borderRadius: DabblerRadius.lgAll,
+                          borderRadius: DabblerRadius.pillAll,
                         ),
-                        child: SizedBox.square(
-                          dimension: tileSize,
-                          child: Center(
-                            child: DabblerIcon(
-                              icon,
-                              size: iconSize,
-                              weight: DabblerIconWeight.bold,
-                              color: tone.ink,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: DabblerSpacing.space4),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            _line(
-                              context,
-                              kicker,
-                              DabblerType.caption2,
-                              tone.ink,
-                            ),
-                            _line(
-                              context,
-                              value,
-                              DabblerType.title3,
-                              colors.textPrimary,
-                              oneLine: true,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: DabblerSpacing.space4),
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: c.maxWidth * metricMaxShare,
-                        ),
-                        child: DecoratedBox(
-                          key: const ValueKey<String>('activity-slim-metric'),
-                          decoration: BoxDecoration(
-                            color: colors.surfaceCard,
-                            borderRadius: DabblerRadius.pillAll,
-                          ),
-                          child: Padding(
-                            padding: metricPadding,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                DabblerIcon(
-                                  'trend-up',
-                                  size: metricIconSize,
-                                  color: tone.ink,
-                                ),
-                                const SizedBox(width: metricGap),
-                                Flexible(
-                                  child: Text(
-                                    DabblerType.toWesternDigits(metric),
-                                    maxLines: 1,
-                                    softWrap: false,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: _style(
-                                      context,
-                                      DabblerType.caption1,
-                                      tone.ink,
-                                    ),
+                        child: Padding(
+                          padding: metricPadding,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              DabblerIcon(
+                                'trend-up',
+                                size: metricIconSize,
+                                color: tone.ink,
+                              ),
+                              const SizedBox(width: metricGap),
+                              Flexible(
+                                child: Text(
+                                  DabblerType.toWesternDigits(metric),
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: _style(
+                                    context,
+                                    DabblerType.caption1,
+                                    tone.ink,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        );
-      },
-    ),
+        ),
+      );
+    },
   );
 }
 
@@ -258,75 +244,67 @@ class DabblerActivityTrendBox extends StatelessWidget {
   static const double markInsetBottom = -14;
 
   @override
-  Widget build(BuildContext context) => _island(
-    context,
-    Builder(
-      builder: (BuildContext context) {
-        final DabblerColors colors = DabblerColors.of(context);
-        return ClipRRect(
-          borderRadius: DabblerRadius.xlAll,
-          child: ColoredBox(
-            color: tone.surface,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: minHeight),
-              child: IntrinsicHeight(
-                child: Stack(
-                  children: <Widget>[
-                    PositionedDirectional(
-                      end: markInsetEnd,
-                      bottom: markInsetBottom,
-                      child: IgnorePointer(
-                        child: ExcludeSemantics(
-                          child: DabblerIcon(
-                            icon,
-                            key: const ValueKey<String>('activity-trend-mark'),
-                            size: markSize,
-                            weight: DabblerIconWeight.bold,
-                            color: tone.ink.withValues(
-                              alpha: DabblerActivityCard.markOpacity,
-                            ),
+  Widget build(BuildContext context) => Builder(
+    builder: (BuildContext context) {
+      final DabblerColors colors = DabblerColors.of(context);
+      return ClipRRect(
+        borderRadius: DabblerRadius.xlAll,
+        child: ColoredBox(
+          color: tone.surface,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: minHeight),
+            child: IntrinsicHeight(
+              child: Stack(
+                children: <Widget>[
+                  PositionedDirectional(
+                    end: markInsetEnd,
+                    bottom: markInsetBottom,
+                    child: IgnorePointer(
+                      child: ExcludeSemantics(
+                        child: DabblerIcon(
+                          icon,
+                          key: const ValueKey<String>('activity-trend-mark'),
+                          size: markSize,
+                          weight: DabblerIconWeight.bold,
+                          color: tone.ink.withValues(
+                            alpha: DabblerActivityCard.markOpacity,
                           ),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(padding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          DabblerActivityKicker(
-                            label: kicker,
-                            ink: tone.ink,
-                            icon: icon,
-                            compact: true,
-                          ),
-                          const SizedBox(height: gap),
-                          _line(
-                            context,
-                            value,
-                            DabblerType.title2,
-                            colors.textPrimary,
-                            oneLine: true,
-                          ),
-                          const SizedBox(height: gap),
-                          const Spacer(),
-                          _line(
-                            context,
-                            metric,
-                            DabblerType.caption1,
-                            tone.ink,
-                          ),
-                        ],
-                      ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(padding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        DabblerActivityKicker(
+                          label: kicker,
+                          ink: tone.ink,
+                          icon: icon,
+                          compact: true,
+                        ),
+                        const SizedBox(height: gap),
+                        _line(
+                          context,
+                          value,
+                          DabblerType.title2,
+                          colors.textPrimary,
+                          oneLine: true,
+                        ),
+                        const SizedBox(height: gap),
+                        const Spacer(),
+                        _line(context, metric, DabblerType.caption1, tone.ink),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        );
-      },
-    ),
+        ),
+      );
+    },
   );
 }
 
