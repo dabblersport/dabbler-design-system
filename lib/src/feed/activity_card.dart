@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../foundations/icon.dart';
+import 'feed_pill.dart';
 import '../tokens/dabbler_activity_tones.dart';
 import '../tokens/dabbler_colors.dart';
 import '../tokens/dabbler_geometry.dart';
+import '../tokens/dabbler_home_frame.dart';
 import '../tokens/dabbler_motion.dart';
 import '../tokens/dabbler_type.dart';
 
@@ -485,11 +487,25 @@ class DabblerActivityBar extends StatelessWidget {
 
 /// A sport chip: `padding:4px 10px`, `--radius-pill`, the card surface at
 /// 70% over the tone, 11/13 `--ink-soft`.
+///
+/// ## Emoji
+///
+/// [emoji] is drawn before the label with [DabblerFeedPill]'s emoji metrics:
+/// `subheadline` (15/20), [DabblerHomeFrame.sportPillGap] (5) to the label.
+/// The package prescribes no smaller emoji for an 11/13 label, so the pill's
+/// own metrics are used and the chip grows to the emoji line: 28 tall, 31 in
+/// Arabic (subheadline's Arabic leading is 23, as on the pill).
+/// Added by the CEO's order of 2026-11-16 (KAN-965: the card's sport chips
+/// show the same emoji as the home post's sport tag). The emoji is data;
+/// none is named here. Decorative: the label carries the accessible name.
 class DabblerActivityChip extends StatelessWidget {
   /// A chip.
-  const DabblerActivityChip({super.key, required this.label});
+  const DabblerActivityChip({super.key, required this.label, this.emoji});
 
   final String label;
+
+  /// An emoji before the label, drawn at 15/20; null draws the label alone.
+  final String? emoji;
 
   /// `padding:4px 10px`.
   static const EdgeInsets padding = EdgeInsets.symmetric(
@@ -500,9 +516,21 @@ class DabblerActivityChip extends StatelessWidget {
   /// `color-mix(in srgb, var(--surface-card) 70%, transparent)`.
   static const double fillAlpha = 0.7;
 
+  /// The emoji's style: [DabblerFeedPill]'s, `subheadline` (15/20).
+  static const DabblerTypeStyle emojiStyle = DabblerType.subheadline;
+
+  /// The emoji-to-label gap: [DabblerFeedPill]'s drawn
+  /// [DabblerHomeFrame.sportPillGap] (5).
+  static const double emojiGap = DabblerHomeFrame.sportPillGap;
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
+    final Widget text = Text(
+      DabblerType.toWesternDigits(label),
+      maxLines: 1,
+      style: _style(context, DabblerType.caption2, colors.textSecondary),
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.surfaceCard.withValues(alpha: fillAlpha),
@@ -510,11 +538,24 @@ class DabblerActivityChip extends StatelessWidget {
       ),
       child: Padding(
         padding: padding,
-        child: Text(
-          DabblerType.toWesternDigits(label),
-          maxLines: 1,
-          style: _style(context, DabblerType.caption2, colors.textSecondary),
-        ),
+        child: emoji == null
+            ? text
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ExcludeSemantics(
+                    child: Text(
+                      emoji!,
+                      key: const ValueKey<String>('activity-chip-emoji'),
+                      style: emojiStyle.resolveForDirection(
+                        Directionality.of(context),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: emojiGap),
+                  Flexible(child: text),
+                ],
+              ),
       ),
     );
   }

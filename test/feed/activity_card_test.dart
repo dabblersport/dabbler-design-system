@@ -333,6 +333,66 @@ void main() {
     });
   }
 
+  for (final TextDirection dir in TextDirection.values) {
+    final bool rtl = dir == TextDirection.rtl;
+    testWidgets(
+      'chip emoji: 15/20, gap 5, leads the label - ${rtl ? 'rtl' : 'ltr'}',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          host(
+            const Align(
+              alignment: AlignmentDirectional.topStart,
+              child: DabblerActivityChip(label: 'Padel', emoji: '🎾'),
+            ),
+            direction: dir,
+          ),
+        );
+        final Finder e = find.byKey(
+          const ValueKey<String>('activity-chip-emoji'),
+        );
+        final Rect chip = tester.getRect(find.byType(DabblerActivityChip));
+        final Rect em = tester.getRect(e);
+        final Rect t = tester.getRect(find.text('Padel'));
+        final TextStyle es = tester.widget<Text>(e).style!;
+        final double ar = rtl ? 0.9 : 0;
+        expect(es.fontSize, 15 - ar);
+        // DabblerFeedPill's subheadline: 15/20, Arabic leading 23.
+        final double lead = rtl ? 23 : 20;
+        expect(es.height! * (15 - ar), closeTo(lead, 0.01));
+        expect(chip.height, 4 + lead + 4);
+        if (rtl) {
+          expect(chip.right - em.right, 10);
+          expect(em.left - t.right, 5);
+        } else {
+          expect(em.left - chip.left, 10);
+          expect(t.left - em.right, 5);
+        }
+        expect(
+          find.ancestor(of: e, matching: find.byType(ExcludeSemantics)),
+          findsWidgets,
+        );
+      },
+    );
+  }
+
+  testWidgets('chip without emoji keeps the 4/13/4 height', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        const Align(
+          alignment: Alignment.topLeft,
+          child: DabblerActivityChip(label: 'Padel'),
+        ),
+      ),
+    );
+    expect(tester.getSize(find.byType(DabblerActivityChip)).height, 21);
+    expect(
+      find.byKey(const ValueKey<String>('activity-chip-emoji')),
+      findsNothing,
+    );
+  });
+
   testWidgets('dark: the card content resolves in light inks', (
     WidgetTester tester,
   ) async {
