@@ -41,13 +41,18 @@ import '../tokens/dabbler_type.dart';
 /// | | fill | border | label |
 /// | --- | --- | --- | --- |
 /// | tinted | `surface` | `edge` | `deep` |
-/// | tinted, [selected] | `solid` | `solid` | `surface` |
+/// | tinted, [selected] | `edge` | `deep` | `deep` |
 /// | neutral (no or achromatic tint) | none | `borderDefault` | `textSecondary` |
-/// | neutral, [selected] | `brandPrimary` | `brandPrimary` | `onBrand` |
+/// | neutral, [selected] | brand at 12% over `surfaceCard` | `brandPrimary` | `textPrimary` |
 ///
-/// The selected label sits on the tone's dark `solid` (OKLCH L 0.455) in its
-/// pale `surface` (L 0.945), so it stays readable for any hue. The border is
-/// always drawn, so selecting never changes the pill's size.
+/// **Pastels only** (CEO 2026-11-16, KAN-963: "not good for solid colour,
+/// should be pastels only"): no state is a solid fill. The tone is built from
+/// the input's hue alone at fixed OKLCH lightness and chroma, so an input that
+/// is already pastel draws the same pastel. Selected ("mine") is the slightly
+/// deeper pastel `edge` (L 0.882) with the hue's `deep` (L 0.42) border and
+/// label, readable on both pastels; the neutral pill selects to the same rule
+/// in the brand hue ([DabblerHueTone.ramp]). The border is always drawn and
+/// keeps its width, so selecting never changes the pill's size.
 ///
 /// ## Tap
 ///
@@ -92,6 +97,13 @@ class DabblerFeedPill extends StatelessWidget {
   /// [DabblerFeedMetrics.drawn] lays the pill out as the Home Feed frame.
   final DabblerFeedMetrics metrics;
 
+  /// The brand as a pastel tone, for a neutral pill's selected state.
+  static DabblerHueTone _brandTone(DabblerColors colors) => DabblerHueTone.ramp(
+    base: colors.brandPrimary,
+    deep: colors.brandPrimary,
+    card: colors.surfaceCard,
+  );
+
   @override
   Widget build(BuildContext context) {
     final DabblerColors colors = DabblerColors.of(context);
@@ -102,14 +114,14 @@ class DabblerFeedPill extends StatelessWidget {
         : DabblerHueTone.fromColor(tint!);
 
     final Color? fill = tone != null
-        ? (selected ? tone.solid : tone.surface)
-        : (selected ? colors.brandPrimary : null);
+        ? (selected ? tone.edge : tone.surface)
+        : (selected ? _brandTone(colors).surface : null);
     final Color border = tone != null
-        ? (selected ? tone.solid : tone.edge)
+        ? (selected ? tone.deep : tone.edge)
         : (selected ? colors.brandPrimary : colors.borderDefault);
     final Color ink = tone != null
-        ? (selected ? tone.surface : tone.deep)
-        : (selected ? colors.onBrand : colors.textSecondary);
+        ? tone.deep
+        : (selected ? colors.textPrimary : colors.textSecondary);
 
     final Widget? lead = emoji != null
         ? ExcludeSemantics(

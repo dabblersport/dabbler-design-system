@@ -46,6 +46,21 @@ void main() {
       expect(a, isNot(c));
       expect((a.solid.b - b.solid.b).abs() < 0.1, isTrue);
     });
+
+    test('a pastel input gives the same pastel as its saturated hue', () {
+      final DabblerHueTone strong = DabblerHueTone.fromHex('#EF4444')!;
+      final DabblerHueTone pastel = DabblerHueTone.fromHex('#FECACA')!;
+      for (final (Color x, Color y) in <(Color, Color)>[
+        (strong.surface, pastel.surface),
+        (strong.edge, pastel.edge),
+      ]) {
+        expect((x.r - y.r).abs() < 0.03, isTrue);
+        expect((x.g - y.g).abs() < 0.03, isTrue);
+        expect((x.b - y.b).abs() < 0.03, isTrue);
+      }
+      expect(pastel.surface.computeLuminance() > 0.7, isTrue);
+      expect(pastel.edge.computeLuminance() > 0.6, isTrue);
+    });
   });
 
   for (final TextDirection dir in TextDirection.values) {
@@ -161,8 +176,14 @@ void main() {
           tester,
           find.byKey(const ValueKey<String>('mine')),
         );
-        expect(mine.color, tone.solid);
-        expect(_labelInk(tester, 'Calm 3'), tone.surface, reason: 'readable');
+        expect(mine.color, tone.edge, reason: 'a deeper pastel, never solid');
+        expect(mine.color!.computeLuminance() > 0.5, isTrue);
+        expect((mine.border! as Border).top.color, tone.deep);
+        expect(
+          (mine.border! as Border).top.width,
+          (idle.border! as Border).top.width,
+        );
+        expect(_labelInk(tester, 'Calm 3'), tone.deep, reason: 'readable');
         expect(
           tester.getSize(find.byKey(const ValueKey<String>('idle'))).height,
           tester.getSize(find.byKey(const ValueKey<String>('mine'))).height,
@@ -170,7 +191,7 @@ void main() {
         );
       });
 
-      testWidgets('no tint: neutral; selected neutral is the brand fill', (
+      testWidgets('no tint: selected neutral is a pastel brand, not solid', (
         WidgetTester tester,
       ) async {
         await tester.pumpWidget(
@@ -180,8 +201,16 @@ void main() {
           ),
         );
         final BoxDecoration deco = _deco(tester, find.byType(DabblerFeedPill));
-        expect(deco.color, threadColors.brandPrimary);
-        expect(_labelInk(tester, 'Calm 1'), threadColors.onBrand);
+        final DabblerHueTone brand = DabblerHueTone.ramp(
+          base: threadColors.brandPrimary,
+          deep: threadColors.brandPrimary,
+          card: threadColors.surfaceCard,
+        );
+        expect(deco.color, brand.surface);
+        expect(deco.color, isNot(threadColors.brandPrimary));
+        expect(deco.color!.computeLuminance() > 0.5, isTrue);
+        expect((deco.border! as Border).top.color, threadColors.brandPrimary);
+        expect(_labelInk(tester, 'Calm 1'), threadColors.textPrimary);
       });
 
       testWidgets('onTap: a button hit from the 45 box around it', (
