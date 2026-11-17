@@ -614,6 +614,19 @@ abstract final class DabblerType {
     fontWeight: regular,
   );
 
+  /// Caption, notification — 12/17, weight 400, sans role.
+  /// `NotificationRow.dc.html` meta line, people toggle, pending and result
+  /// text (`font-size:12px;line-height:17px`, KAN-988).
+  static const DabblerTypeStyle captionNotif = DabblerTypeStyle(
+    name: 'captionNotif',
+    role: DabblerTypeRole.sans,
+    fontSize: 12,
+    arabicFontSize: 11.1,
+    latinLeading: 17,
+    arabicLeading: 17,
+    fontWeight: regular,
+  );
+
   /// Caption, relaxed — 12/18, weight 400, sans role. `Auth and Onboarding.dc.html:134,175,852` (legal line under the CTA). Arabic leading 20 (`:1096`, `12/20`).
   static const DabblerTypeStyle captionRelaxed = DabblerTypeStyle(
     name: 'captionRelaxed',
@@ -689,6 +702,7 @@ abstract final class DabblerType {
     figureXl,
     displayNameMid,
     displayNameSmall,
+    captionNotif,
     captionRelaxed,
     copyRelaxed,
     bodyRelaxed,

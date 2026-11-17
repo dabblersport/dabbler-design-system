@@ -148,6 +148,7 @@ export 'src/feed/feed_atoms.dart';
 export 'src/feed/feed_gallery.dart';
 export 'src/feed/feed_pill.dart';
 export 'src/feed/news_card.dart';
+export 'src/feed/notification_card.dart';
 export 'src/feed/notification_row.dart';
 export 'src/feed/post_row.dart';
 export 'src/feed/attachment_add_tile.dart';
